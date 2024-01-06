@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { SortableItem, SortableList } from '$lib/index.js';
+	import { SortableList } from '$lib/index.js';
 
-	let items = [
+	let items: { id: number; text: string }[] = [
 		{
 			id: 1,
 			text: 'Item 1',
@@ -19,12 +19,42 @@
 			text: 'Item 4',
 		},
 	];
+
+	function handleSort(event: CustomEvent) {
+		items = event.detail;
+	}
 </script>
 
-<SortableList>
-	{#each items as item (item.id)}
-		<SortableItem>
-			{item.text}
-		</SortableItem>
-	{/each}
-</SortableList>
+<div class="container">
+	<SortableList {items} key="id" let:item on:sort={handleSort}>
+		{item.text}
+	</SortableList>
+</div>
+
+<style lang="scss">
+	.container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		min-height: 100vh;
+	}
+
+	:global(.sortable-list) {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	:global(.sortable-item) {
+		padding: 0.5rem 1rem;
+		background-color: #eee;
+		text-transform: uppercase;
+		transition: background-color 0.24s;
+	}
+
+	:global(.sortable-item.is-target) {
+		background-color: #bbb;
+	}
+</style>
