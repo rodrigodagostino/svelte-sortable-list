@@ -12,8 +12,8 @@
 
 	const dispatch = createEventDispatcher();
 
-	function handleDragStart(event: DragEvent) {
-		const target = event.target as HTMLLIElement;
+	function handleMouseDown(event: MouseEvent) {
+		const target = event.currentTarget as HTMLLIElement;
 		if (target.dataset.index) {
 			draggedItemIndex = +target.dataset.index;
 		} else {
@@ -22,9 +22,10 @@
 		isDragging = true;
 	}
 
-	function handleDragOver(event: DragEvent) {
-		event.preventDefault();
-		const target = event.target as HTMLLIElement;
+	function handleMouseEnter(event: MouseEvent) {
+		if (!isDragging) return;
+
+		const target = event.currentTarget as HTMLLIElement;
 		if (target.dataset.index) {
 			targetItemIndex = +target.dataset.index;
 		} else {
@@ -32,7 +33,15 @@
 		}
 	}
 
-	function handleDrop() {
+	function handleMouseLeave() {
+		if (!isDragging) return;
+
+		targetItemIndex = null;
+	}
+
+	function handleMouseUp() {
+		if (!isDragging) return;
+
 		if (
 			draggedItemIndex !== null &&
 			targetItemIndex !== null &&
@@ -47,7 +56,7 @@
 	}
 </script>
 
-<svelte:document on:dragover={handleDragOver} />
+<svelte:document on:mouseup={handleMouseUp} />
 
 <ul class="sortable-list">
 	{#each items as item, index (item[key])}
@@ -58,9 +67,9 @@
 				targetItemIndex !== draggedItemIndex &&
 				isDragging}
 			data-index={index}
-			draggable="true"
-			on:dragstart={handleDragStart}
-			on:drop={handleDrop}
+			on:mousedown={handleMouseDown}
+			on:mouseenter={handleMouseEnter}
+			on:mouseleave={handleMouseLeave}
 			animate:flip={{ duration: 320 }}
 		>
 			<slot {item} {index} />
@@ -76,5 +85,6 @@
 	.sortable-item {
 		list-style: none;
 		cursor: grab;
+		user-select: none;
 	}
 </style>
