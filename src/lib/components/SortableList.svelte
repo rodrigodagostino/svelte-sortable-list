@@ -6,42 +6,95 @@
 	export let items: Record<string, unknown>[];
 	export let key: string = 'id';
 
-	let draggedItemIndex: number | null;
-	let targetItemIndex: number | null;
+	let draggedItem: HTMLLIElement | null;
+	let draggedItemId: number | null;
+	let targetItem: HTMLLIElement | null;
+	let targetItemId: number | null;
+	let ghostRef: HTMLLIElement;
+	let draggingOrigin: { x: number; y: number };
 	let isDragging = false;
+	let isDropping = false;
 
 	const dispatch = createEventDispatcher();
 
-	function handleMouseDown(event: MouseEvent) {
-		const target = event.currentTarget as HTMLLIElement;
-		if (target.dataset.index) {
-			draggedItemIndex = +target.dataset.index;
+	const TRANSITION_DURATION = 320;
+
+	function setGhostStyles(action: 'init' | 'set' | 'unset', source: HTMLLIElement | null = null) {
+		if (action === 'init' || action === 'set') {
+			if (!source) return;
+
+			const sourceRect = source?.getBoundingClientRect();
+			ghostRef.style.width = `${sourceRect?.width}px`;
+			ghostRef.style.height = `${sourceRect?.height}px`;
+			ghostRef.style.left = `${sourceRect?.left}px`;
+			ghostRef.style.top = `${sourceRect?.top}px`;
+
+			if (action === 'set') {
+				ghostRef.style.transition = `left ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1), top ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1), translate ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`;
+				ghostRef.style.translate = '0 0 0';
+			}
 		} else {
-			draggedItemIndex = null;
+			ghostRef.style.transition = '';
 		}
-		isDragging = true;
+	}
+
+	function handleGhostTransitionEnd() {
+		draggedItem = null;
+		draggedItemId = null;
+		targetItem = null;
+		targetItemId = null;
+		setGhostStyles('unset');
+		isDropping = false;
+
+		ghostRef.removeEventListener('transitionend', handleGhostTransitionEnd);
+	}
+
+	function handleMouseDown(event: MouseEvent) {
+		if (isDropping || isDragging) return;
+
+		const target = event.currentTarget as HTMLLIElement;
+		if (target.dataset.id) {
+			draggedItem = target;
+			draggedItemId = +target.dataset.id;
+			setGhostStyles('init', draggedItem);
+			draggingOrigin = { x: event.clientX, y: event.clientY };
+			isDragging = true;
+			isDropping = false;
+		}
+	}
+
+	function handleMouseMove(event: MouseEvent) {
+		if (!isDragging || !ghostRef) return;
+
+		/* prettier-ignore */
+		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px 0`;
 	}
 
 	function handleMouseEnter(event: MouseEvent) {
 		if (!isDragging) return;
 
 		const target = event.currentTarget as HTMLLIElement;
-		if (target.dataset.index) {
-			targetItemIndex = +target.dataset.index;
-		} else {
-			targetItemIndex = null;
+		if (target.dataset.id) {
+			targetItem = target;
+			targetItemId = +target.dataset.id;
 		}
 	}
 
-	function handleMouseLeave() {
+	function handleMouseLeave(event: MouseEvent) {
 		if (!isDragging) return;
 
-		targetItemIndex = null;
+		const target = event.currentTarget as HTMLLIElement;
+		if (target.dataset.id && +target.dataset.id !== draggedItemId) {
+			targetItem = null;
+			targetItemId = null;
+		}
 	}
 
 	function handleMouseUp() {
-		if (!isDragging) return;
+		if (!isDragging || isDropping) return;
 
+		const draggedItemIndex = draggedItem?.dataset.index ? +draggedItem.dataset.index : null;
+		const targetItemIndex = targetItem?.dataset.index ? +targetItem.dataset.index : null;
 		if (
 			draggedItemIndex !== null &&
 			targetItemIndex !== null &&
@@ -50,41 +103,73 @@
 			const newItems = reorder(items, draggedItemIndex, targetItemIndex);
 			dispatch('sort', newItems);
 		}
-		draggedItemIndex = null;
-		targetItemIndex = null;
+
+		targetItem ? setGhostStyles('set', targetItem) : setGhostStyles('set', draggedItem);
+		ghostRef.addEventListener('transitionend', handleGhostTransitionEnd);
 		isDragging = false;
+		isDropping = true;
 	}
 </script>
 
-<svelte:document on:mouseup={handleMouseUp} />
+<svelte:document on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
 
 <ul class="sortable-list">
 	{#each items as item, index (item[key])}
+		{@const id = item[key]}
 		<li
 			class="sortable-item"
-			class:is-dragged={draggedItemIndex === index && isDragging}
-			class:is-target={targetItemIndex === index &&
-				targetItemIndex !== draggedItemIndex &&
-				isDragging}
+			class:is-dragged={draggedItemId === id && isDragging}
+			class:is-target={targetItemId === id && targetItemId !== draggedItemId && isDragging}
+			class:is-dropped={draggedItemId === id && isDropping}
+			data-id={item[key]}
 			data-index={index}
 			on:mousedown={handleMouseDown}
 			on:mouseenter={handleMouseEnter}
 			on:mouseleave={handleMouseLeave}
-			animate:flip={{ duration: 320 }}
+			animate:flip={{ duration: TRANSITION_DURATION }}
 		>
 			<slot {item} {index} />
 		</li>
 	{/each}
+	<li
+		bind:this={ghostRef}
+		class="sortable-item sortable-item--ghost"
+		class:is-visible={isDragging || isDropping}
+	>
+		{@html draggedItem?.innerHTML}
+	</li>
 </ul>
 
-<style>
+<style lang="scss">
+	.sortable-list,
+	.sortable-list * {
+		box-sizing: border-box;
+	}
+
 	.sortable-list {
 		padding: 0;
 	}
 
 	.sortable-item {
+		position: relative;
 		list-style: none;
-		cursor: grab;
 		user-select: none;
+		cursor: grab;
+
+		&.is-dragged,
+		&.is-dropped {
+			visibility: hidden;
+		}
+
+		&--ghost {
+			position: fixed;
+			visibility: hidden;
+			pointer-events: none;
+			cursor: grabbing;
+
+			&.is-visible {
+				visibility: visible;
+			}
+		}
 	}
 </style>
