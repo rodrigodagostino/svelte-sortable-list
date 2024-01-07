@@ -4,7 +4,7 @@
 	import { reorder } from '$lib/utils/index.js';
 
 	export let items: Record<string, unknown>[];
-	export let key: string = 'id';
+	export let key: string;
 
 	let draggedItem: HTMLLIElement | null;
 	let draggedItemId: number | null;
