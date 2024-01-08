@@ -6,11 +6,12 @@
 	export let items: Record<string, unknown>[];
 	export let key: string;
 
+	let listRef: HTMLUListElement;
+	let ghostRef: HTMLLIElement;
 	let draggedItem: HTMLLIElement | null;
 	let draggedItemId: number | null;
 	let targetItem: HTMLLIElement | null;
 	let targetItemId: number | null;
-	let ghostRef: HTMLLIElement;
 	let draggingOrigin: { x: number; y: number };
 	let isDragging = false;
 	let isDropping = false;
@@ -68,23 +69,27 @@
 
 		/* prettier-ignore */
 		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px 0`;
-	}
 
-	function handleMouseEnter(event: MouseEvent) {
-		if (!isDragging) return;
+		const itemsElements = listRef.querySelectorAll<HTMLLIElement>(
+			'.sortable-item:not(.sortable-item--ghost)'
+		);
+		const collidingItem = Array.from(itemsElements).find((item) => {
+			const itemId = item.dataset.id ? +item.dataset.id : null;
+			const ghostRect = ghostRef.getBoundingClientRect();
+			const itemRect = item.getBoundingClientRect();
+			return (
+				draggedItemId !== itemId &&
+				ghostRect.x + ghostRect.width / 2 > itemRect.x &&
+				ghostRect.x < itemRect.x + itemRect.width / 2 &&
+				ghostRect.y + ghostRect.height / 2 > itemRect.y &&
+				ghostRect.y < itemRect.y + itemRect.height / 2
+			);
+		});
 
-		const target = event.currentTarget as HTMLLIElement;
-		if (target.dataset.id) {
-			targetItem = target;
-			targetItemId = +target.dataset.id;
-		}
-	}
-
-	function handleMouseLeave(event: MouseEvent) {
-		if (!isDragging) return;
-
-		const target = event.currentTarget as HTMLLIElement;
-		if (target.dataset.id && +target.dataset.id !== draggedItemId) {
+		if (collidingItem) {
+			targetItem = collidingItem;
+			targetItemId = collidingItem.dataset.id ? +collidingItem.dataset.id : null;
+		} else {
 			targetItem = null;
 			targetItemId = null;
 		}
@@ -113,7 +118,7 @@
 
 <svelte:document on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
 
-<ul class="sortable-list">
+<ul bind:this={listRef} class="sortable-list">
 	{#each items as item, index (item[key])}
 		{@const id = item[key]}
 		<li
@@ -124,8 +129,6 @@
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={handleMouseDown}
-			on:mouseenter={handleMouseEnter}
-			on:mouseleave={handleMouseLeave}
 			animate:flip={{ duration: TRANSITION_DURATION }}
 		>
 			<slot {item} {index} />
@@ -164,7 +167,6 @@
 		&--ghost {
 			position: fixed;
 			visibility: hidden;
-			pointer-events: none;
 			cursor: grabbing;
 
 			&.is-visible {
