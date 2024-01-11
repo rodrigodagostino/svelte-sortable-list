@@ -137,7 +137,7 @@
 		class="sortable-item sortable-item--ghost"
 		class:is-visible={isDragging || isDropping}
 	>
-		{@html draggedItem?.innerHTML}
+		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
 	</li>
 </ul>
 
