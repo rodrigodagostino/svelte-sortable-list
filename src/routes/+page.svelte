@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SortableList } from '$lib/index.js';
+	import { SortableList, reorder } from '$lib/index.js';
 
 	let items: { id: number; text: string }[] = [
 		{
@@ -21,7 +21,8 @@
 	];
 
 	function handleSort(event: CustomEvent) {
-		items = event.detail;
+		const { oldIndex, newIndex } = event.detail;
+		items = reorder(items, oldIndex, newIndex);
 	}
 </script>
 

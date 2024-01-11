@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { reorder } from '$lib/utils/index.js';
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
@@ -105,8 +104,7 @@
 			targetItemIndex !== null &&
 			draggedItemIndex !== targetItemIndex
 		) {
-			const newItems = reorder(items, draggedItemIndex, targetItemIndex);
-			dispatch('sort', newItems);
+			dispatch('sort', { oldIndex: draggedItemIndex, newIndex: targetItemIndex });
 		}
 
 		targetItem ? setGhostStyles('set', targetItem) : setGhostStyles('set', draggedItem);
