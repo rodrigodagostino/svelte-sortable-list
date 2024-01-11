@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] (2024-08-01)
+## [0.1.1] (2024-01-11)
+
+### Changed
+
+- Move items sorting outside of the **SortableList** component.
+
+## [0.1.0] (2024-01-08)
 
 ### Added
 
@@ -18,5 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ghost element to represent the item being dragged and dropped.
 - Base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/rodrigodagostino/svelte-sortable-list/releases/tag/0.1.0
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/rodrigodagostino/svelte-sortable-list/releases/tag/v0.1.0
