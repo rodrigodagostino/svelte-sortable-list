@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { flip } from 'svelte/animate';
 
 	export let items: Record<string, unknown>[];
@@ -52,8 +52,11 @@
 	function handleMouseDown(event: MouseEvent) {
 		if (isDropping || isDragging) return;
 
-		const target = event.currentTarget as HTMLLIElement;
-		if (target.dataset.id) {
+		const currTarget: HTMLLIElement | SVGElement = event.currentTarget as HTMLLIElement;
+		const target: HTMLLIElement | null = !$$slots.handle
+			? currTarget
+			: currTarget.closest('.sortable-item');
+		if (target && target.dataset.id) {
 			draggedItem = target;
 			draggedItemId = +target.dataset.id;
 			setGhostStyles('init', draggedItem);
@@ -112,6 +115,15 @@
 		isDragging = false;
 		isDropping = true;
 	}
+
+	onMount(() => {
+		const handles = listRef.querySelectorAll<HTMLLIElement>('.sortable-item__handle');
+		handles.forEach((handle) => handle.addEventListener('mousedown', handleMouseDown));
+
+		return () => {
+			handles.forEach((handle) => handle.removeEventListener('mousedown', handleMouseDown));
+		};
+	});
 </script>
 
 <svelte:document on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
@@ -124,11 +136,17 @@
 			class:is-dragged={draggedItemId === id && isDragging}
 			class:is-target={targetItemId === id && targetItemId !== draggedItemId && isDragging}
 			class:is-dropped={draggedItemId === id && isDropping}
+			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
 			data-id={item[key]}
 			data-index={index}
-			on:mousedown={handleMouseDown}
+			on:mousedown={!$$slots.handle ? handleMouseDown : null}
 			animate:flip={{ duration: TRANSITION_DURATION }}
 		>
+			{#if $$slots.handle}
+				<span class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
+					<slot name="handle" />
+				</span>
+			{/if}
 			<slot {item} {index} />
 		</li>
 	{/each}
@@ -136,6 +154,7 @@
 		bind:this={ghostRef}
 		class="sortable-item sortable-item--ghost"
 		class:is-visible={isDragging || isDropping}
+		style:cursor={isDragging ? 'grabbing' : 'grab'}
 	>
 		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
 	</li>
@@ -155,7 +174,6 @@
 		position: relative;
 		list-style: none;
 		user-select: none;
-		cursor: grab;
 
 		&.is-dragged,
 		&.is-dropped {
@@ -165,11 +183,14 @@
 		&--ghost {
 			position: fixed;
 			visibility: hidden;
-			cursor: grabbing;
 
 			&.is-visible {
 				visibility: visible;
 			}
+		}
+
+		&__handle {
+			display: flex;
 		}
 	}
 </style>
