@@ -30,23 +30,31 @@
 			ghostRef.style.top = `${sourceRect?.top}px`;
 
 			if (action === 'set') {
-				ghostRef.style.transition = `left ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1), top ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1), translate ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`;
-				ghostRef.style.translate = '0 0 0';
+				const ghostStyles = [
+					`left ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
+					`top ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
+					`translate ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
+					`visibility 0s ${TRANSITION_DURATION}ms`,
+				];
+				ghostRef.style.transition = ghostStyles.join(', ');
+				ghostRef.style.removeProperty('translate');
 			}
 		} else {
-			ghostRef.style.transition = '';
+			ghostRef.style.removeProperty('transition');
 		}
 	}
 
-	function handleGhostTransitionEnd() {
-		draggedItem = null;
-		draggedItemId = null;
+	function handleGhostTransitionEnd(event: TransitionEvent) {
+		setGhostStyles('unset');
 		targetItem = null;
 		targetItemId = null;
-		setGhostStyles('unset');
 		isDropping = false;
 
-		ghostRef.removeEventListener('transitionend', handleGhostTransitionEnd);
+		if (event.propertyName === 'visibility') {
+			ghostRef.removeEventListener('transitionend', handleGhostTransitionEnd);
+			draggedItem = null;
+			draggedItemId = null;
+		}
 	}
 
 	function handleMouseDown(event: MouseEvent) {
@@ -70,7 +78,7 @@
 		if (!isDragging || !ghostRef) return;
 
 		/* prettier-ignore */
-		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px 0`;
+		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px`;
 
 		const itemsElements = listRef.querySelectorAll<HTMLLIElement>(
 			'.sortable-item:not(.sortable-item--ghost)'
@@ -110,8 +118,8 @@
 			dispatch('sort', { oldIndex: draggedItemIndex, newIndex: targetItemIndex });
 		}
 
-		targetItem ? setGhostStyles('set', targetItem) : setGhostStyles('set', draggedItem);
 		ghostRef.addEventListener('transitionend', handleGhostTransitionEnd);
+		setGhostStyles('set', targetItem ? targetItem : draggedItem);
 		isDragging = false;
 		isDropping = true;
 	}
@@ -133,9 +141,9 @@
 		{@const id = item[key]}
 		<li
 			class="sortable-item"
-			class:is-dragged={draggedItemId === id && isDragging}
+			class:is-dragging={draggedItemId === id && isDragging}
+			class:is-dropping={draggedItemId === id && isDropping}
 			class:is-target={targetItemId === id && targetItemId !== draggedItemId && isDragging}
-			class:is-dropped={draggedItemId === id && isDropping}
 			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
 			data-id={item[key]}
 			data-index={index}
@@ -153,7 +161,8 @@
 	<li
 		bind:this={ghostRef}
 		class="sortable-item sortable-item--ghost"
-		class:is-visible={isDragging || isDropping}
+		class:is-dragging={isDragging}
+		class:is-dropping={isDropping}
 		style:cursor={isDragging ? 'grabbing' : 'grab'}
 	>
 		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
@@ -175,16 +184,20 @@
 		list-style: none;
 		user-select: none;
 
-		&.is-dragged,
-		&.is-dropped {
-			visibility: hidden;
+		&:not(.sortable-item--ghost) {
+			&.is-dragging,
+			&.is-dropping {
+				visibility: hidden;
+			}
 		}
 
 		&--ghost {
 			position: fixed;
 			visibility: hidden;
+			translate: 0;
 
-			&.is-visible {
+			&.is-dragging,
+			&.is-dropping {
 				visibility: visible;
 			}
 		}
