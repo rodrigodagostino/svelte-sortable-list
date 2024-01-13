@@ -1,0 +1,217 @@
+/**
+ * Variables
+ */
+:root {
+	--font-main: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+		"Segoe UI Symbol", "Noto Color Emoji";
+
+	--white-rich: #fff;
+	--white: #f3f3f5;
+	--gray-050: #ededf0;
+	--gray-100: #e1e1e6;
+	--gray-150: #d2d2da;
+	--gray-200: #c3c3ce;
+	--gray-300: #a4a6b5;
+	--gray-400: #86889d;
+	--gray-500: #686a84;
+	--gray-600: #585a70;
+	--gray-650: #515266;
+	--gray-700: #494a5c;
+	--gray-750: #414253;
+	--gray-800: #393a49;
+	--gray-850: #31323f;
+	--gray-900: #2a2a35;
+	--gray-950: #22222b;
+	--black: #15151a;
+	--black-rich: #000;
+
+	--box-shadow-1: 0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
+		0 4px 4px rgba(54, 57, 90, 0.1), 0 6px 8px rgba(54, 57, 90, 0.1),
+		0 8px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-2: 0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
+		0 4px 4px rgba(54, 57, 90, 0.1), 0 8px 8px rgba(54, 57, 90, 0.1),
+		0 16px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-3: 0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
+		0 8px 4px rgba(54, 57, 90, 0.1), 0 12px 8px rgba(54, 57, 90, 0.1),
+		0 24px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-4: 0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
+		0 8px 4px rgba(54, 57, 90, 0.1), 0 16px 8px rgba(54, 57, 90, 0.1),
+		0 32px 16px rgba(54, 57, 90, 0.1);
+}
+
+/**
+ * Reset styles.
+ */
+html {
+	box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+}
+
+/* Reset margins and paddings on most elements */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+ol,
+li,
+p,
+pre,
+blockquote,
+figure,
+hr {
+	margin: 0;
+	padding: 0;
+}
+
+::selection {
+	color: var(--white);
+	background: var(--indigo-600);
+}
+
+a {
+	color: var(--white);
+	transition: outline 240ms;
+	outline: 1px dotted transparent;
+}
+
+a:focus {
+	outline: 1px dotted currentColor;
+}
+
+/* Reset forms and buttons */
+input,
+textarea,
+select,
+button {
+	color: inherit;
+	font: inherit;
+	letter-spacing: inherit;
+}
+
+input,
+textarea,
+button {
+	border: 1px solid var(--gray-400);
+	min-width: 0;
+}
+
+button {
+	border-radius: 0;
+	padding: 0.75em 1em;
+	background-color: transparent;
+}
+
+/* Easy responsive for media elements */
+embed,
+iframe,
+img,
+object,
+video {
+	display: block;
+	max-width: 100%;
+}
+
+/* Useful table styles */
+table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+/**
+ * Base styles.
+ */
+body {
+	font-family: var(--font-main);
+	color: var(--gray-800);
+	background-color: var(--gray-100);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: flex;
+	justify-content: center;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.app {
+	display: grid;
+	grid-template-columns: 1fr;
+	width: 100%;
+	min-height: 100vh;
+	min-height: 100svh;
+}
+
+.sortable-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.sortable-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	height: 3rem;
+	padding-inline: 1.5rem;
+	background-color: var(--white);
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.sortable-item:not(.sortable-item--ghost) {
+	transition: background-color 240ms;
+}
+
+.sortable-item--ghost.is-dragging {
+	animation: box-shadow-in 240ms forwards;
+}
+
+.sortable-item--ghost.is-dropping {
+	animation: box-shadow-out 240ms forwards;
+}
+
+.sortable-item.is-target {
+	background-color: var(--gray-150);
+}
+
+@keyframes box-shadow-in {
+	0% {
+		box-shadow: none;
+	}
+	100% {
+		box-shadow: var(--box-shadow-1);
+	}
+}
+
+@keyframes box-shadow-out {
+	0% {
+		box-shadow: var(--box-shadow-1);
+	}
+	100% {
+		box-shadow: none;
+	}
+}
+
+@media (min-width: 40em) {
+	.app {
+		grid-template-columns: 3fr 1fr;
+	}
+}

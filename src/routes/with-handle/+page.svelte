@@ -31,5 +31,13 @@
 </script>
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
-	{item.text}
+	<svg slot="handle" height="0.875rem" viewBox="0 0 320 512">
+		<circle fill="currentColor" cx="80" cy="96" r="48" />
+		<circle fill="currentColor" cx="240" cy="96" r="48" />
+		<circle fill="currentColor" cx="80" cy="256" r="48" />
+		<circle fill="currentColor" cx="240" cy="256" r="48" />
+		<circle fill="currentColor" cx="80" cy="416" r="48" />
+		<circle fill="currentColor" cx="240" cy="416" r="48" />
+	</svg>
+	<span>{item.text}</span>
 </SortableList>
