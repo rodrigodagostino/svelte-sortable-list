@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] (2024-01-14)
+
+### Added
+
+- Add `transitionDuration` prop to the **SortableList** component.
+
+### Fixed
+
+- Prevent crash when an item is dropped in the exact same position it was dragged from.
+
 ## [0.2.1] (2024-01-13)
 
 ### Changed
@@ -17,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Handle feature: drag items using a handle element.
+- Add handle feature: drag and drop items using a handle element.
 
 ### Changed
 
@@ -27,20 +37,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Move items sorting outside of the **SortableList** component.
+- Move sort handling outside of the **SortableList** component.
 
 ## [0.1.0] (2024-01-08)
 
 ### Added
 
-- Base structure.
-- Custom collision detection logic to be used instead of **Drag and Drop API** and `mouseenter` and `mouseleave` **Mouse Events**. Enabled the following:
+- Create base structure.
+- Add custom collision detection logic to be used instead of **Drag and Drop API** and `mouseenter` and `mouseleave` **Mouse Events**. This enabled the following:
   - Setting an overlap threshold.
   - Customizing the mouse cursor at each stage of the drag-and-drop process.
-- Ghost element to represent the item being dragged and dropped.
-- Base animations.
+- Add a ghost element to represent the item being dragged and dropped.
+- Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.1.0...v0.1.1
