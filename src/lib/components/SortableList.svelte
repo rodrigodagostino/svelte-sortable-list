@@ -4,6 +4,7 @@
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
+	export let sortThreshold: number = 0.5;
 	export let transitionDuration: number = 320;
 
 	let listRef: HTMLUListElement;
@@ -74,10 +75,10 @@
 			const itemRect = item.getBoundingClientRect();
 			return (
 				draggedItemId !== itemId &&
-				ghostRect.x + ghostRect.width / 2 > itemRect.x &&
-				ghostRect.x < itemRect.x + itemRect.width / 2 &&
-				ghostRect.y + ghostRect.height / 2 > itemRect.y &&
-				ghostRect.y < itemRect.y + itemRect.height / 2
+				ghostRect.x + ghostRect.width * sortThreshold > itemRect.x &&
+				ghostRect.x < itemRect.x + itemRect.width * sortThreshold &&
+				ghostRect.y + ghostRect.height * sortThreshold > itemRect.y &&
+				ghostRect.y < itemRect.y + itemRect.height * sortThreshold
 			);
 		});
 
