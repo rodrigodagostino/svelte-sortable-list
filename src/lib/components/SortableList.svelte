@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { flip } from 'svelte/animate';
 
 	export let items: Record<string, unknown>[];
@@ -34,7 +34,6 @@
 					`left ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
 					`top ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
 					`translate ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
-					`visibility 0s ${TRANSITION_DURATION}ms`,
 				];
 				ghostRef.style.transition = ghostStyles.join(', ');
 				ghostRef.style.removeProperty('translate');
@@ -44,20 +43,7 @@
 		}
 	}
 
-	function handleGhostTransitionEnd(event: TransitionEvent) {
-		setGhostStyles('unset');
-		targetItem = null;
-		targetItemId = null;
-		isDropping = false;
-
-		if (event.propertyName === 'visibility') {
-			ghostRef.removeEventListener('transitionend', handleGhostTransitionEnd);
-			draggedItem = null;
-			draggedItemId = null;
-		}
-	}
-
-	function handleMouseDown(event: MouseEvent) {
+	async function handleMouseDown(event: MouseEvent) {
 		if (isDropping || isDragging) return;
 
 		const currTarget: HTMLLIElement | SVGElement = event.currentTarget as HTMLLIElement;
@@ -65,12 +51,12 @@
 			? currTarget
 			: currTarget.closest('.sortable-item');
 		if (target && target.dataset.id) {
+			isDragging = true;
 			draggedItem = target;
 			draggedItemId = +target.dataset.id;
-			setGhostStyles('init', draggedItem);
 			draggingOrigin = { x: event.clientX, y: event.clientY };
-			isDragging = true;
-			isDropping = false;
+			await tick();
+			setGhostStyles('init', draggedItem);
 		}
 	}
 
@@ -118,10 +104,18 @@
 			dispatch('sort', { oldIndex: draggedItemIndex, newIndex: targetItemIndex });
 		}
 
-		ghostRef.addEventListener('transitionend', handleGhostTransitionEnd);
-		setGhostStyles('set', targetItem ? targetItem : draggedItem);
 		isDragging = false;
+		setGhostStyles('set', targetItem ? targetItem : draggedItem);
 		isDropping = true;
+
+		const timeoutId = setTimeout(() => {
+			setGhostStyles('unset');
+			targetItem = null;
+			targetItemId = null;
+			isDropping = false;
+
+			clearTimeout(timeoutId);
+		}, TRANSITION_DURATION);
 	}
 
 	onMount(() => {
@@ -141,10 +135,10 @@
 		{@const id = item[key]}
 		<li
 			class="sortable-item"
-			class:is-dragging={draggedItemId === id && isDragging}
-			class:is-dropping={draggedItemId === id && isDropping}
+			class:is-dragged={draggedItemId === id && (isDragging || isDropping)}
 			class:is-target={targetItemId === id && targetItemId !== draggedItemId && isDragging}
 			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
+			style:visibility={draggedItemId === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={!$$slots.handle ? handleMouseDown : null}
@@ -164,6 +158,7 @@
 		class:is-dragging={isDragging}
 		class:is-dropping={isDropping}
 		style:cursor={isDragging ? 'grabbing' : 'grab'}
+		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 	>
 		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
 	</li>
@@ -184,22 +179,8 @@
 		list-style: none;
 		user-select: none;
 
-		&:not(.sortable-item--ghost) {
-			&.is-dragging,
-			&.is-dropping {
-				visibility: hidden;
-			}
-		}
-
 		&--ghost {
 			position: fixed;
-			visibility: hidden;
-			translate: 0;
-
-			&.is-dragging,
-			&.is-dropping {
-				visibility: visible;
-			}
 		}
 
 		&__handle {
