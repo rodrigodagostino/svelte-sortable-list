@@ -4,6 +4,7 @@
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
+	export let transitionDuration: number = 320;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
@@ -17,8 +18,6 @@
 
 	const dispatch = createEventDispatcher();
 
-	const TRANSITION_DURATION = 320;
-
 	function setGhostStyles(action: 'init' | 'set' | 'unset', source: HTMLLIElement | null = null) {
 		if (action === 'init' || action === 'set') {
 			if (!source) return;
@@ -31,9 +30,9 @@
 
 			if (action === 'set') {
 				const ghostStyles = [
-					`left ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
-					`top ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
-					`translate ${TRANSITION_DURATION}ms cubic-bezier(.2,1,.1,1)`,
+					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
+					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
+					`translate ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
 				];
 				ghostRef.style.transition = ghostStyles.join(', ');
 				ghostRef.style.removeProperty('translate');
@@ -115,7 +114,7 @@
 			isDropping = false;
 
 			clearTimeout(timeoutId);
-		}, TRANSITION_DURATION);
+		}, transitionDuration);
 	}
 
 	onMount(() => {
@@ -142,7 +141,7 @@
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={!$$slots.handle ? handleMouseDown : null}
-			animate:flip={{ duration: TRANSITION_DURATION }}
+			animate:flip={{ duration: transitionDuration }}
 		>
 			{#if $$slots.handle}
 				<span class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
