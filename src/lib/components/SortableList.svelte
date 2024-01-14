@@ -4,7 +4,7 @@
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
-	export let sortThreshold: number = 0.5;
+	export let sortThreshold: number = 1;
 	export let transitionDuration: number = 320;
 
 	let listRef: HTMLUListElement;
