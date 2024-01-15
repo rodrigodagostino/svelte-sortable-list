@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { getIntersectionRect } from '$lib/utils/index.js';
+	import { getCollidingItem } from '$lib/utils/index.js';
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
@@ -62,38 +62,15 @@
 	}
 
 	function handleMouseMove(event: MouseEvent) {
-		if (!isDragging || !ghostRef) return;
+		if (!isDragging || !ghostRef || !draggedItemId) return;
 
 		/* prettier-ignore */
 		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px`;
 
-		const itemsElements = listRef.querySelectorAll<HTMLLIElement>(
+		const items = listRef.querySelectorAll<HTMLLIElement>(
 			'.sortable-item:not(.sortable-item--ghost)'
 		);
-		const collidingItems = Array.from(itemsElements).filter((item) => {
-			const itemId = item.dataset.id ? +item.dataset.id : null;
-			const ghostRect = ghostRef.getBoundingClientRect();
-			const itemRect = item.getBoundingClientRect();
-			return (
-				draggedItemId !== itemId &&
-				ghostRect.x + ghostRect.width * sortThreshold > itemRect.x &&
-				ghostRect.x < itemRect.x + itemRect.width * sortThreshold &&
-				ghostRect.y + ghostRect.height * sortThreshold > itemRect.y &&
-				ghostRect.y < itemRect.y + itemRect.height * sortThreshold
-			);
-		});
-		if (collidingItems.length > 1) {
-			collidingItems.sort((a, b) => {
-				const ghostRect = ghostRef.getBoundingClientRect();
-				const aIntersectionRect = getIntersectionRect(ghostRect, a.getBoundingClientRect());
-				const bIntersectionRect = getIntersectionRect(ghostRect, b.getBoundingClientRect());
-
-				return bIntersectionRect.area - aIntersectionRect.area;
-			});
-		}
-
-		const collidingItem = collidingItems[0];
-
+		const collidingItem = getCollidingItem(ghostRef, items, draggedItemId, sortThreshold);
 		if (collidingItem) {
 			targetItem = collidingItem;
 			targetItemId = collidingItem.dataset.id ? +collidingItem.dataset.id : null;
