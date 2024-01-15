@@ -34,10 +34,10 @@
 				const ghostStyles = [
 					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
 					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
-					`translate ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
+					`transform ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
 				];
 				ghostRef.style.transition = ghostStyles.join(', ');
-				ghostRef.style.removeProperty('translate');
+				ghostRef.style.removeProperty('transform');
 			}
 		} else {
 			ghostRef.style.removeProperty('transition');
@@ -65,7 +65,7 @@
 		if (!isDragging || !ghostRef || !draggedItemId) return;
 
 		/* prettier-ignore */
-		ghostRef.style.translate = `${event.clientX - draggingOrigin.x}px ${event.clientY - draggingOrigin.y}px`;
+		ghostRef.style.transform = `translate3d(${event.clientX - draggingOrigin.x}px, ${event.clientY - draggingOrigin.y}px, 0)`;
 
 		const items = listRef.querySelectorAll<HTMLLIElement>(
 			'.sortable-item:not(.sortable-item--ghost)'
