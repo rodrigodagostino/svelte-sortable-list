@@ -1,3 +1,31 @@
+// Thank you, Vojtech Miksu :)
+// https://github.com/tajo/react-movable/blob/master/src/utils.ts
+export function checkIfInteractive(target: Element, rootElement: Element) {
+	const DISABLED_ELEMENTS = [
+		'a',
+		'audio',
+		'button',
+		'input',
+		'optgroup',
+		'option',
+		'select',
+		'textarea',
+		'video',
+	];
+	const DISABLED_ROLES = ['button', 'checkbox', 'link', 'tab'];
+
+	while (target !== rootElement) {
+		if (DISABLED_ELEMENTS.includes(target.tagName.toLowerCase())) return true;
+		const role = target.getAttribute('role');
+		if (role && DISABLED_ROLES.includes(role.toLowerCase())) return true;
+		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) return true;
+
+		if (target.tagName) target = target.parentElement!;
+	}
+
+	return false;
+}
+
 function getIntersectionRect(r1: DOMRect, r2: DOMRect) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);

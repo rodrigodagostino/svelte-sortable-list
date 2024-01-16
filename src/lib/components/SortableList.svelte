@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { getCollidingItem } from '$lib/utils/index.js';
+	import { checkIfInteractive, getCollidingItem } from '$lib/utils/index.js';
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
@@ -47,14 +47,16 @@
 	async function handleMouseDown(event: MouseEvent) {
 		if (isDropping || isDragging) return;
 
-		const currTarget: HTMLLIElement | SVGElement = event.currentTarget as HTMLLIElement;
-		const target: HTMLLIElement | null = !$$slots.handle
-			? currTarget
-			: currTarget.closest('.sortable-item');
-		if (target && target.dataset.id) {
+		const target = event.target;
+		const currTarget = event.currentTarget as HTMLElement;
+		const currItem: HTMLLIElement | null = currTarget.closest('.sortable-item');
+
+		if (target && checkIfInteractive(target as Element, currItem!)) return;
+
+		if (currItem && currItem.dataset.id) {
 			isDragging = true;
-			draggedItem = target;
-			draggedItemId = +target.dataset.id;
+			draggedItem = currItem;
+			draggedItemId = +currItem.dataset.id;
 			draggingOrigin = { x: event.clientX, y: event.clientY };
 			await tick();
 			setGhostStyles('init', draggedItem);
