@@ -35,12 +35,12 @@ function getIntersectionRect(r1: DOMRect, r2: DOMRect) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export const getCollidingItem = (
+export function getCollidingItem(
 	ghost: HTMLLIElement,
 	items: NodeListOf<HTMLLIElement>,
 	draggedItemId: number,
 	threshold: number
-): HTMLLIElement => {
+): HTMLLIElement {
 	const ghostRect = ghost.getBoundingClientRect();
 	const collidingItems = Array.from(items).filter((item) => {
 		const itemId = item.dataset.id ? +item.dataset.id : null;
@@ -63,7 +63,7 @@ export const getCollidingItem = (
 	}
 
 	return collidingItems[0];
-};
+}
 
 export function reorder<T>(array: T[], from: number, to: number) {
 	array = array.slice();
