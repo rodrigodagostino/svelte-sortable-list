@@ -110,7 +110,7 @@
 	}
 
 	onMount(() => {
-		const handles = listRef.querySelectorAll<HTMLLIElement>('.sortable-item__handle');
+		const handles = listRef.querySelectorAll<HTMLElement>('.sortable-item__handle');
 		handles.forEach((handle) => handle.addEventListener('mousedown', handleMouseDown));
 
 		return () => {
