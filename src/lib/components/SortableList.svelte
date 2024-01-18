@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
-	import { flip } from 'svelte/animate';
 	import {
 		checkIfInteractive,
 		getCollidingItem,
@@ -84,21 +83,21 @@
 	function handleMouseUp() {
 		if (!isDragging || isDropping) return;
 
-		if (
-			draggedItem &&
-			draggedItem.index !== null &&
-			targetItem &&
-			targetItem.index !== null &&
-			draggedItem.index !== targetItem.index
-		) {
-			dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
-		}
-
 		isDragging = false;
 		setGhostStyles('set', targetItem ? targetItem : draggedItem);
 		isDropping = true;
 
 		const timeoutId = setTimeout(() => {
+			if (
+				draggedItem &&
+				draggedItem.index !== null &&
+				targetItem &&
+				targetItem.index !== null &&
+				draggedItem.index !== targetItem.index
+			) {
+				dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
+			}
+
 			setGhostStyles('unset');
 			targetItem = null;
 			itemsOrigin = null;
@@ -126,13 +125,22 @@
 		<li
 			class="sortable-item"
 			class:is-dragged={draggedItem?.id === id && (isDragging || isDropping)}
-			class:is-target={targetItem?.id === id && targetItem?.id !== draggedItem?.id && isDragging}
 			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
 			style:visibility={draggedItem?.id === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
+			style:transform={(isDragging || isDropping) &&
+			draggedItem?.id !== id &&
+			draggedItem &&
+			targetItem
+				? index <= targetItem?.index && index > draggedItem?.index
+					? `translate3d(0, -${ghostRef.getBoundingClientRect().height + 12}px, 0)`
+					: index >= targetItem?.index && index < draggedItem?.index
+						? `translate3d(0, ${ghostRef.getBoundingClientRect().height + 12}px, 0)`
+						: ''
+				: ''}
+			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={!$$slots.handle ? handleMouseDown : null}
-			animate:flip={{ duration: transitionDuration }}
 		>
 			{#if $$slots.handle}
 				<span class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
