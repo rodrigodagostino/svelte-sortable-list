@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { flip } from 'svelte/animate';
-	import { checkIfInteractive, getCollidingItem } from '$lib/utils/index.js';
+	import {
+		checkIfInteractive,
+		getCollidingItem,
+		getItemData,
+		getItemsData,
+		type IItemData,
+	} from '$lib/utils/index.js';
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
@@ -10,25 +16,23 @@
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
-	let draggedItem: HTMLLIElement | null;
-	let draggedItemId: number | null;
-	let targetItem: HTMLLIElement | null;
-	let targetItemId: number | null;
-	let draggingOrigin: { x: number; y: number };
+	let draggedItem: IItemData | null;
+	let targetItem: IItemData | null;
+	let ghostOrigin: { x: number; y: number };
+	let itemsOrigin: IItemData[] | null;
 	let isDragging = false;
 	let isDropping = false;
 
 	const dispatch = createEventDispatcher();
 
-	function setGhostStyles(action: 'init' | 'set' | 'unset', source: HTMLLIElement | null = null) {
+	function setGhostStyles(action: 'init' | 'set' | 'unset', source: IItemData | null = null) {
 		if (action === 'init' || action === 'set') {
 			if (!source) return;
 
-			const sourceRect = source?.getBoundingClientRect();
-			ghostRef.style.width = `${sourceRect?.width}px`;
-			ghostRef.style.height = `${sourceRect?.height}px`;
-			ghostRef.style.left = `${sourceRect?.left}px`;
-			ghostRef.style.top = `${sourceRect?.top}px`;
+			ghostRef.style.width = `${source.width}px`;
+			ghostRef.style.height = `${source.height}px`;
+			ghostRef.style.left = `${source.x}px`;
+			ghostRef.style.top = `${source.y}px`;
 
 			if (action === 'set') {
 				const ghostStyles = [
@@ -55,44 +59,39 @@
 
 		if (currItem && currItem.dataset.id) {
 			isDragging = true;
-			draggedItem = currItem;
-			draggedItemId = +currItem.dataset.id;
-			draggingOrigin = { x: event.clientX, y: event.clientY };
+			draggedItem = getItemData(currItem);
+			ghostOrigin = { x: event.clientX, y: event.clientY };
+			itemsOrigin = getItemsData(listRef);
 			await tick();
 			setGhostStyles('init', draggedItem);
 		}
 	}
 
 	function handleMouseMove(event: MouseEvent) {
-		if (!isDragging || !ghostRef || !draggedItemId) return;
+		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
 		/* prettier-ignore */
-		ghostRef.style.transform = `translate3d(${event.clientX - draggingOrigin.x}px, ${event.clientY - draggingOrigin.y}px, 0)`;
+		ghostRef.style.transform = `translate3d(${event.clientX - ghostOrigin.x}px, ${event.clientY - ghostOrigin.y}px, 0)`;
 
-		const items = listRef.querySelectorAll<HTMLLIElement>(
-			'.sortable-item:not(.sortable-item--ghost)'
-		);
-		const collidingItem = getCollidingItem(ghostRef, items, draggedItemId, sortThreshold);
+		const collidingItem = getCollidingItem(ghostRef, itemsOrigin, draggedItem.id, sortThreshold);
 		if (collidingItem) {
 			targetItem = collidingItem;
-			targetItemId = collidingItem.dataset.id ? +collidingItem.dataset.id : null;
 		} else {
 			targetItem = null;
-			targetItemId = null;
 		}
 	}
 
 	function handleMouseUp() {
 		if (!isDragging || isDropping) return;
 
-		const draggedItemIndex = draggedItem?.dataset.index ? +draggedItem.dataset.index : null;
-		const targetItemIndex = targetItem?.dataset.index ? +targetItem.dataset.index : null;
 		if (
-			draggedItemIndex !== null &&
-			targetItemIndex !== null &&
-			draggedItemIndex !== targetItemIndex
+			draggedItem &&
+			draggedItem.index !== null &&
+			targetItem &&
+			targetItem.index !== null &&
+			draggedItem.index !== targetItem.index
 		) {
-			dispatch('sort', { oldIndex: draggedItemIndex, newIndex: targetItemIndex });
+			dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
 		}
 
 		isDragging = false;
@@ -102,7 +101,7 @@
 		const timeoutId = setTimeout(() => {
 			setGhostStyles('unset');
 			targetItem = null;
-			targetItemId = null;
+			itemsOrigin = null;
 			isDropping = false;
 
 			clearTimeout(timeoutId);
@@ -126,10 +125,10 @@
 		{@const id = item[key]}
 		<li
 			class="sortable-item"
-			class:is-dragged={draggedItemId === id && (isDragging || isDropping)}
-			class:is-target={targetItemId === id && targetItemId !== draggedItemId && isDragging}
+			class:is-dragged={draggedItem?.id === id && (isDragging || isDropping)}
+			class:is-target={targetItem?.id === id && targetItem?.id !== draggedItem?.id && isDragging}
 			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
-			style:visibility={draggedItemId === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
+			style:visibility={draggedItem?.id === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={!$$slots.handle ? handleMouseDown : null}

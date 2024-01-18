@@ -1,3 +1,32 @@
+export interface IItemData {
+	id: number;
+	index: number;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	innerHTML: string;
+}
+
+export function getItemData(item: HTMLElement): IItemData {
+	const itemRect = item.getBoundingClientRect();
+	return {
+		id: +item.dataset.id!,
+		index: +item.dataset.index!,
+		x: itemRect.x,
+		y: itemRect.y,
+		width: itemRect.width,
+		height: itemRect.height,
+		innerHTML: item.innerHTML,
+	};
+}
+
+export function getItemsData(list: HTMLUListElement): IItemData[] {
+	return Array.from(
+		list.querySelectorAll<HTMLLIElement>('.sortable-item:not(.sortable-item--ghost)')
+	).map((item) => getItemData(item));
+}
+
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
 export function checkIfInteractive(target: Element, rootElement: Element) {
@@ -26,7 +55,7 @@ export function checkIfInteractive(target: Element, rootElement: Element) {
 	return false;
 }
 
-function getIntersectionRect(r1: DOMRect, r2: DOMRect) {
+function getIntersectionRect(r1: DOMRect, r2: IItemData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
 	const x2 = Math.min(r1.x + r1.width, r2.x + r2.width);
@@ -37,26 +66,24 @@ function getIntersectionRect(r1: DOMRect, r2: DOMRect) {
 
 export function getCollidingItem(
 	ghost: HTMLLIElement,
-	items: NodeListOf<HTMLLIElement>,
+	itemsRects: IItemData[],
 	draggedItemId: number,
 	threshold: number
-): HTMLLIElement {
+) {
 	const ghostRect = ghost.getBoundingClientRect();
-	const collidingItems = Array.from(items).filter((item) => {
-		const itemId = item.dataset.id ? +item.dataset.id : null;
-		const itemRect = item.getBoundingClientRect();
+	const collidingItems = itemsRects.filter((item) => {
 		return (
-			draggedItemId !== itemId &&
-			ghostRect.x + ghostRect.width * threshold > itemRect.x &&
-			ghostRect.x < itemRect.x + itemRect.width * threshold &&
-			ghostRect.y + ghostRect.height * threshold > itemRect.y &&
-			ghostRect.y < itemRect.y + itemRect.height * threshold
+			draggedItemId !== item.id &&
+			ghostRect.x + ghostRect.width * threshold > item.x &&
+			ghostRect.x < item.x + item.width * threshold &&
+			ghostRect.y + ghostRect.height * threshold > item.y &&
+			ghostRect.y < item.y + item.height * threshold
 		);
 	});
 	if (collidingItems.length > 1) {
 		collidingItems.sort((a, b) => {
-			const aIntersectionRect = getIntersectionRect(ghostRect, a.getBoundingClientRect());
-			const bIntersectionRect = getIntersectionRect(ghostRect, b.getBoundingClientRect());
+			const aIntersectionRect = getIntersectionRect(ghostRect, a);
+			const bIntersectionRect = getIntersectionRect(ghostRect, b);
 
 			return bIntersectionRect.area - aIntersectionRect.area;
 		});
