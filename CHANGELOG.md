@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] (2024-01-20)
+
+### Added
+
+- Translate the items based on the ghost position as it is being dragged (instead of waiting for it to be dropped to trigger the items translation).
+
+### Changed
+
+- Simplify and increase the flexibility of the data structure.
+
 ## [0.2.4] (2024-01-15)
 
 ### Changed
@@ -67,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.3.0...HEAD
+[0.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.1...v0.2.2
