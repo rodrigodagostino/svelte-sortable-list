@@ -31,5 +31,5 @@
 </script>
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
-	{item.text}
+	<span class="sortable-item__text">{item.text}</span>
 </SortableList>

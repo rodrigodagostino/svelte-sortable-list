@@ -27,12 +27,16 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 2rem;
+	}
+
+	.app-main {
+		padding: 3rem;
 	}
 
 	.app-nav {
 		align-items: center;
 		gap: 0.5rem;
+		padding: 3rem 2rem;
 		background-color: var(--gray-500);
 
 		&__link {
@@ -47,11 +51,10 @@
 	.container {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		align-items: center;
 	}
 
-	@media (min-width: 40em) {
+	@media (min-width: 48em) {
 		.app-nav {
 			align-items: start;
 		}

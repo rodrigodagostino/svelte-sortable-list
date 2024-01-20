@@ -39,5 +39,5 @@
 		<circle fill="currentColor" cx="80" cy="416" r="48" />
 		<circle fill="currentColor" cx="240" cy="416" r="48" />
 	</svg>
-	<span>{item.text}</span>
+	<span class="sortable-item__text">{item.text}</span>
 </SortableList>
