@@ -19,6 +19,13 @@
 	>
 		With handle
 	</a>
+	<a
+		class="app-nav__link"
+		href="/with-dynamic-items"
+		aria-current={$page.url.pathname === '/with-dynamic-items' ? 'page' : undefined}
+	>
+		With dynamic items
+	</a>
 </nav>
 
 <style lang="scss">
