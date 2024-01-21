@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] (2024-01-21)
+
+### Added
+
+- Add gap feature: control the spacing between items through the new `gap` prop.
+- Create `scaleFly` custom transition.
+- Animate dynamically added/removed items.
+- Add **“With dynamic items”** demo page.
+
+### Changed
+
+- Improve overall demos layout.
+
 ## [0.3.0] (2024-01-20)
 
 ### Added
@@ -27,7 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `sortThreshold` prop to the **SortableList** component.
+- Add sort threshold feature: control the interaction threshold between ghost and items on dragging through the new `sortThreshold` prop.
 
 ### Changed
 
@@ -77,8 +90,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.3.0...HEAD
-[0.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.4...v0.3.0
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.2.1...v0.2.2
