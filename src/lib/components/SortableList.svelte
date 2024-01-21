@@ -10,6 +10,7 @@
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
+	export let gap: number = 12;
 	export let sortThreshold: number = 1;
 	export let transitionDuration: number = 320;
 
@@ -119,7 +120,7 @@
 
 <svelte:document on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
 
-<ul bind:this={listRef} class="sortable-list">
+<ul bind:this={listRef} class="sortable-list" style:--gap="{gap}px">
 	{#each items as item, index (item[key])}
 		{@const id = item[key]}
 		<li
@@ -132,9 +133,9 @@
 			draggedItem &&
 			targetItem
 				? index <= targetItem?.index && index > draggedItem?.index
-					? `translate3d(0, -${ghostRef.getBoundingClientRect().height + 12}px, 0)`
+					? `translate3d(0, -${ghostRef.getBoundingClientRect().height + gap}px, 0)`
 					: index >= targetItem?.index && index < draggedItem?.index
-						? `translate3d(0, ${ghostRef.getBoundingClientRect().height + 12}px, 0)`
+						? `translate3d(0, ${ghostRef.getBoundingClientRect().height + gap}px, 0)`
 						: ''
 				: ''}
 			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
@@ -176,6 +177,10 @@
 		position: relative;
 		list-style: none;
 		user-select: none;
+
+		& + &:not(.sortable-item--ghost) {
+			margin-top: var(--gap);
+		}
 
 		&--ghost {
 			position: fixed;

@@ -159,12 +159,6 @@ body {
 	min-height: 100svh;
 }
 
-.sortable-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
-
 .sortable-item {
 	display: flex;
 	align-items: center;
