@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { scaleFly } from '$lib/transitions/index.js';
 	import {
 		checkIfInteractive,
 		getCollidingItem,
@@ -142,6 +143,8 @@
 			data-id={item[key]}
 			data-index={index}
 			on:mousedown={!$$slots.handle ? handleMouseDown : null}
+			in:scaleFly={{ x: -120 }}
+			out:scaleFly={{ x: 120 }}
 		>
 			{#if $$slots.handle}
 				<span class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
