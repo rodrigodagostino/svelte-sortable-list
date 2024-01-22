@@ -26,22 +26,20 @@
 
 	const dispatch = createEventDispatcher();
 
-	function setGhostStyles(action: 'init' | 'set' | 'unset', source: IItemData | null = null) {
+	function setGhostStyles(action: 'init' | 'set' | 'unset') {
 		if (action === 'init' || action === 'set') {
+			const source = targetItem ? targetItem : draggedItem;
 			if (!source) return;
 
 			ghostRef.style.width = `${source.width}px`;
-			ghostRef.style.height = `${source.height}px`;
 			ghostRef.style.left = `${source.x}px`;
 			ghostRef.style.top = `${source.y}px`;
 
 			if (action === 'set') {
-				const ghostStyles = [
-					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
-					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
-					`transform ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`,
-				];
-				ghostRef.style.transition = ghostStyles.join(', ');
+				ghostRef.style.transition =
+					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
+					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
+					`transform ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`;
 				ghostRef.style.removeProperty('transform');
 			}
 		} else {
@@ -64,7 +62,7 @@
 			ghostOrigin = { x: event.clientX, y: event.clientY };
 			itemsOrigin = getItemsData(listRef);
 			await tick();
-			setGhostStyles('init', draggedItem);
+			setGhostStyles('init');
 		}
 	}
 
@@ -86,7 +84,7 @@
 		if (!isDragging || isDropping) return;
 
 		isDragging = false;
-		setGhostStyles('set', targetItem ? targetItem : draggedItem);
+		setGhostStyles('set');
 		isDropping = true;
 
 		const timeoutId = setTimeout(() => {
