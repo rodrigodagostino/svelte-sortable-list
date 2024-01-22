@@ -9,30 +9,36 @@
 	</div>
 </main>
 <nav class="app-nav">
-	<a class="app-nav__link" href="/" aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
-		Basic
-	</a>
-	<a
-		class="app-nav__link"
-		href="/with-handle"
-		aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
-	>
-		With handle
-	</a>
-	<a
-		class="app-nav__link"
-		href="/with-varying-heights"
-		aria-current={$page.url.pathname === '/with-varying-heights' ? 'page' : undefined}
-	>
-		With varying heights
-	</a>
-	<a
-		class="app-nav__link"
-		href="/with-dynamic-items"
-		aria-current={$page.url.pathname === '/with-dynamic-items' ? 'page' : undefined}
-	>
-		With dynamic items
-	</a>
+	<div class="container">
+		<a
+			class="app-nav__link"
+			href="/"
+			aria-current={$page.url.pathname === '/' ? 'page' : undefined}
+		>
+			Basic
+		</a>
+		<a
+			class="app-nav__link"
+			href="/with-handle"
+			aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
+		>
+			With handle
+		</a>
+		<a
+			class="app-nav__link"
+			href="/with-varying-heights"
+			aria-current={$page.url.pathname === '/with-varying-heights' ? 'page' : undefined}
+		>
+			With varying heights
+		</a>
+		<a
+			class="app-nav__link"
+			href="/with-dynamic-items"
+			aria-current={$page.url.pathname === '/with-dynamic-items' ? 'page' : undefined}
+		>
+			With dynamic items
+		</a>
+	</div>
 </nav>
 
 <style lang="scss">
@@ -40,18 +46,26 @@
 	.app-nav {
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 	}
 
 	.app-main {
+		justify-content: center;
 		padding: 3rem;
+
+		.container {
+			align-items: center;
+		}
 	}
 
 	.app-nav {
-		align-items: center;
-		gap: 0.5rem;
 		padding: 3rem 2rem;
 		background-color: var(--gray-500);
+
+		.container {
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+		}
 
 		&__link {
 			text-decoration: none;
@@ -70,7 +84,14 @@
 
 	@media (min-width: 48em) {
 		.app-nav {
-			align-items: start;
+			position: fixed;
+			inset: 0;
+			left: calc(100% - 20rem);
+
+			.container {
+				align-items: start;
+				height: 100%;
+			}
 		}
 	}
 </style>
