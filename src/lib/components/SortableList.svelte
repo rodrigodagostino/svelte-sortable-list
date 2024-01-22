@@ -65,10 +65,10 @@
 
 		if (currItem && currItem.dataset.id) {
 			isDragging = true;
+			await tick();
 			draggedItem = getItemData(currItem);
 			ghostOrigin = { x: event.clientX, y: event.clientY };
 			itemsOrigin = getItemsData(listRef);
-			await tick();
 			setGhostStyles('init');
 		}
 	}
