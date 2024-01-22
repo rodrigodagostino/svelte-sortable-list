@@ -147,9 +147,9 @@
 			out:scaleFly={{ x: 120 }}
 		>
 			{#if $$slots.handle}
-				<span class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
+				<button class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
 					<slot name="handle" />
-				</span>
+				</button>
 			{/if}
 			<slot {item} {index} />
 		</li>

@@ -37,20 +37,19 @@
 		class="sortable-item__button"
 		on:click={() => (items = items.filter((i) => i.id !== item.id))}
 	>
-		<!-- https://tablericons.com/ -->
 		<svg
-			width="18"
-			height="18"
+			width="0.875rem"
+			height="0.875rem"
 			viewBox="0 0 24 24"
-			stroke-width="2"
+			fill="currentColor"
 			stroke="currentColor"
-			fill="none"
 			stroke-linecap="round"
 			stroke-linejoin="round"
+			stroke-width="3"
+			pointer-events="none"
 		>
-			<path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-			<path d="M18 6l-12 12"></path>
-			<path d="M6 6l12 12"></path>
+			<path d="m20.5 3.5-17 17" />
+			<path d="m3.5 3.5 17 17" />
 		</svg>
 	</button>
 </SortableList>

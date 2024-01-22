@@ -162,8 +162,8 @@ body {
 .sortable-item {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 0.75rem;
-	height: 3.5rem;
 	padding: 0.5rem 1.75rem;
 	background-color: var(--white);
 	border: 0.0625rem solid var(--gray-200);
@@ -179,30 +179,47 @@ body {
 	animation: box-shadow-out 240ms forwards;
 }
 
-.sortable-item__handle {
-	padding: 0.75rem 0.5rem;
-	margin-inline-start: -1rem;
-	border-radius: 0.25rem;
-	transition: background-color 240ms;
-}
-
-.sortable-item__handle:focus,
-.sortable-item__handle:hover {
-	background-color: var(--gray-100);
-}
-
+.sortable-item__handle,
 .sortable-item__button {
 	display: flex;
+	flex-shrink: 0;
 	padding: 0.75rem 0.5rem;
-	margin-inline-end: -1rem;
 	border: none;
 	border-radius: 0.25rem;
 	transition: background-color 240ms;
 }
 
+.sortable-item__handle svg,
+.sortable-item__button svg {
+	fill: var(--gray-400);
+	stroke: var(--gray-400);
+}
+
+.sortable-item__handle:focus,
+.sortable-item__handle:hover,
 .sortable-item__button:focus,
 .sortable-item__button:hover {
 	background-color: var(--gray-100);
+}
+
+.sortable-item__handle:focus svg,
+.sortable-item__handle:hover svg,
+.sortable-item__button:focus svg,
+.sortable-item__button:hover svg {
+	fill: var(--gray-600);
+	stroke: var(--gray-600);
+}
+
+.sortable-item__handle {
+	margin-inline-start: -1rem;
+}
+
+.sortable-item__text {
+	margin-block: 0.75rem;
+}
+
+.sortable-item__button {
+	margin-inline-end: -1rem;
 }
 
 @keyframes box-shadow-in {
