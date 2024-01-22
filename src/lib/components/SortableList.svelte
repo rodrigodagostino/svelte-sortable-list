@@ -33,9 +33,16 @@
 
 			ghostRef.style.width = `${source.width}px`;
 			ghostRef.style.left = `${source.x}px`;
-			ghostRef.style.top = `${source.y}px`;
+
+			if (action === 'init') ghostRef.style.top = `${source.y}px`;
 
 			if (action === 'set') {
+				if (draggedItem?.y && targetItem?.y) {
+					const styleTop =
+						// Check if the dragged item is above the target item.
+						draggedItem.y < source.y ? source.y + (source.height - draggedItem.height) : source.y;
+					ghostRef.style.top = `${styleTop}px`;
+				}
 				ghostRef.style.transition =
 					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
 					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
