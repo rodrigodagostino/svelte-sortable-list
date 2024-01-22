@@ -44,7 +44,11 @@ export function checkIfInteractive(target: Element, rootElement: Element) {
 	const DISABLED_ROLES = ['button', 'checkbox', 'link', 'tab'];
 
 	while (target !== rootElement) {
-		if (DISABLED_ELEMENTS.includes(target.tagName.toLowerCase())) return true;
+		if (
+			DISABLED_ELEMENTS.includes(target.tagName.toLowerCase()) &&
+			!target.classList.contains('sortable-item__handle')
+		)
+			return true;
 		const role = target.getAttribute('role');
 		if (role && DISABLED_ROLES.includes(role.toLowerCase())) return true;
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) return true;
