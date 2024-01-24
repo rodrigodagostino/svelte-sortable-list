@@ -38,16 +38,16 @@
 
 			if (action === 'set') {
 				if (draggedItem?.y && targetItem?.y) {
-					const styleTop =
+					const ghostTop =
 						// Check if the dragged item is above the target item.
 						draggedItem.y < source.y ? source.y + (source.height - draggedItem.height) : source.y;
-					ghostRef.style.top = `${styleTop}px`;
+					ghostRef.style.top = `${ghostTop}px`;
 				}
 				ghostRef.style.transition =
-					`left ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
-					`top ${transitionDuration}ms cubic-bezier(.2,1,.1,1),` +
-					`transform ${transitionDuration}ms cubic-bezier(.2,1,.1,1)`;
-				ghostRef.style.removeProperty('transform');
+					`left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+					`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+					`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1)`;
+				ghostRef.style.transform = 'translate3d(0, 0, 0)';
 			}
 		} else {
 			ghostRef.style.removeProperty('transition');
@@ -142,8 +142,8 @@
 					? `translate3d(0, -${ghostRef.getBoundingClientRect().height + gap}px, 0)`
 					: index >= targetItem?.index && index < draggedItem?.index
 						? `translate3d(0, ${ghostRef.getBoundingClientRect().height + gap}px, 0)`
-						: ''
-				: ''}
+						: 'translate3d(0, 0, 0)'
+				: 'translate3d(0, 0, 0)'}
 			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
 			data-id={item[key]}
 			data-index={index}
@@ -166,6 +166,7 @@
 		class:is-dropping={isDropping}
 		style:cursor={isDragging ? 'grabbing' : 'grab'}
 		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
+		style:transform="translate3d(0, 0, 0)"
 	>
 		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
 	</li>
@@ -185,6 +186,7 @@
 		position: relative;
 		list-style: none;
 		user-select: none;
+		backface-visibility: hidden;
 
 		& + &:not(.sortable-item--ghost) {
 			margin-top: var(--gap);
