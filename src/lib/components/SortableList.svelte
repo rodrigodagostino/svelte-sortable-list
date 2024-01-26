@@ -71,6 +71,16 @@
 			itemsOrigin = getItemsData(listRef);
 			setGhostStyles('init');
 		}
+
+		listRef.addEventListener('pointermove', handlePointerMove);
+		listRef.addEventListener(
+			'pointerup',
+			() => {
+				listRef.removeEventListener('pointermove', handlePointerMove);
+				handlePointerUp();
+			},
+			{ once: true }
+		);
 	}
 
 	function handlePointerMove(event: PointerEvent) {
@@ -123,8 +133,6 @@
 		};
 	});
 </script>
-
-<svelte:document on:pointermove={handlePointerMove} on:pointerup={handlePointerUp} />
 
 <ul bind:this={listRef} class="sortable-list" style:--gap="{gap}px">
 	{#each items as item, index (item[key])}
