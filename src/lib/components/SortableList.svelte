@@ -57,6 +57,8 @@
 	async function handlePointerDown(event: PointerEvent) {
 		if (isDropping || isDragging) return;
 
+		listRef.setPointerCapture(event.pointerId);
+
 		const target = event.target;
 		const currTarget = event.currentTarget as HTMLElement;
 		const currItem: HTMLLIElement | null = currTarget.closest('.sortable-item');
