@@ -54,7 +54,7 @@
 		}
 	}
 
-	async function handleMouseDown(event: MouseEvent) {
+	async function handlePointerDown(event: PointerEvent) {
 		if (isDropping || isDragging) return;
 
 		const target = event.target;
@@ -73,7 +73,7 @@
 		}
 	}
 
-	function handleMouseMove(event: MouseEvent) {
+	function handlePointerMove(event: PointerEvent) {
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
 		/* prettier-ignore */
@@ -87,7 +87,7 @@
 		}
 	}
 
-	function handleMouseUp() {
+	function handlePointerUp() {
 		if (!isDragging || isDropping) return;
 
 		isDragging = false;
@@ -116,15 +116,15 @@
 
 	onMount(() => {
 		const handles = listRef.querySelectorAll<HTMLElement>('.sortable-item__handle');
-		handles.forEach((handle) => handle.addEventListener('mousedown', handleMouseDown));
+		handles.forEach((handle) => handle.addEventListener('pointerdown', handlePointerDown));
 
 		return () => {
-			handles.forEach((handle) => handle.removeEventListener('mousedown', handleMouseDown));
+			handles.forEach((handle) => handle.removeEventListener('pointerdown', handlePointerDown));
 		};
 	});
 </script>
 
-<svelte:document on:mousemove={handleMouseMove} on:mouseup={handleMouseUp} />
+<svelte:document on:pointermove={handlePointerMove} on:pointerup={handlePointerUp} />
 
 <ul bind:this={listRef} class="sortable-list" style:--gap="{gap}px">
 	{#each items as item, index (item[key])}
@@ -147,7 +147,7 @@
 			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
 			data-id={item[key]}
 			data-index={index}
-			on:mousedown={!$$slots.handle ? handleMouseDown : null}
+			on:pointerdown={!$$slots.handle ? handlePointerDown : null}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
