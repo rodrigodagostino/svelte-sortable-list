@@ -180,6 +180,7 @@
 
 	.sortable-list {
 		padding: 0;
+		touch-action: none;
 	}
 
 	.sortable-item {
