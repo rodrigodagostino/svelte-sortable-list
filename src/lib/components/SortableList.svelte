@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { createEventDispatcher, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import {
 		checkIfInteractive,
@@ -59,13 +59,13 @@
 
 		listRef.setPointerCapture(event.pointerId);
 
-		const target = event.target;
-		const currTarget = event.currentTarget as HTMLElement;
-		const currItem: HTMLLIElement | null = currTarget.closest('.sortable-item');
+		const target = event.target as HTMLElement;
+		if ($$slots.handle && !target?.closest('.sortable-item__handle')) return;
 
-		if (target && checkIfInteractive(target as Element, currItem!)) return;
+		const currItem: HTMLLIElement | null = target?.closest('.sortable-item');
+		if (!target || !currItem || checkIfInteractive(target as Element, currItem)) return;
 
-		if (currItem && currItem.dataset.id) {
+		if (currItem.dataset.id) {
 			isDragging = true;
 			await tick();
 			draggedItem = getItemData(currItem);
@@ -125,18 +125,14 @@
 			clearTimeout(timeoutId);
 		}, transitionDuration);
 	}
-
-	onMount(() => {
-		const handles = listRef.querySelectorAll<HTMLElement>('.sortable-item__handle');
-		handles.forEach((handle) => handle.addEventListener('pointerdown', handlePointerDown));
-
-		return () => {
-			handles.forEach((handle) => handle.removeEventListener('pointerdown', handlePointerDown));
-		};
-	});
 </script>
 
-<ul bind:this={listRef} class="sortable-list" style:--gap="{gap}px">
+<ul
+	bind:this={listRef}
+	class="sortable-list"
+	style:--gap="{gap}px"
+	on:pointerdown={handlePointerDown}
+>
 	{#each items as item, index (item[key])}
 		{@const id = item[key]}
 		<li
@@ -157,7 +153,6 @@
 			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
 			data-id={item[key]}
 			data-index={index}
-			on:pointerdown={!$$slots.handle ? handlePointerDown : null}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
