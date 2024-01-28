@@ -57,13 +57,13 @@
 	async function handlePointerDown(event: PointerEvent) {
 		if (isDropping || isDragging) return;
 
-		listRef.setPointerCapture(event.pointerId);
-
 		const target = event.target as HTMLElement;
 		if ($$slots.handle && !target?.closest('.sortable-item__handle')) return;
 
 		const currItem: HTMLLIElement | null = target?.closest('.sortable-item');
 		if (!target || !currItem || checkIfInteractive(target as Element, currItem)) return;
+
+		currItem.setPointerCapture(event.pointerId);
 
 		if (currItem.dataset.id) {
 			isDragging = true;
@@ -74,11 +74,11 @@
 			setGhostStyles('init');
 		}
 
-		listRef.addEventListener('pointermove', handlePointerMove);
-		listRef.addEventListener(
+		currItem.addEventListener('pointermove', handlePointerMove);
+		currItem.addEventListener(
 			'pointerup',
 			() => {
-				listRef.removeEventListener('pointermove', handlePointerMove);
+				currItem.removeEventListener('pointermove', handlePointerMove);
 				handlePointerUp();
 			},
 			{ once: true }
@@ -138,7 +138,11 @@
 		<li
 			class="sortable-item"
 			class:is-dragged={draggedItem?.id === id && (isDragging || isDropping)}
-			style:cursor={!$$slots.handle ? 'grab' : 'initial'}
+			style:cursor={draggedItem?.id === id && isDragging
+				? 'grabbing'
+				: !$$slots.handle
+					? 'grab'
+					: 'initial'}
 			style:visibility={draggedItem?.id === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
 			style:transform={(isDragging || isDropping) &&
 			draggedItem?.id !== id &&
@@ -157,7 +161,7 @@
 			out:scaleFly={{ x: 120 }}
 		>
 			{#if $$slots.handle}
-				<button class="sortable-item__handle" style:cursor={isDragging ? 'grabbing' : 'grab'}>
+				<button class="sortable-item__handle" style:cursor="grab">
 					<slot name="handle" />
 				</button>
 			{/if}
