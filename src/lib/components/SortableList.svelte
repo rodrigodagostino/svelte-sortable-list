@@ -160,12 +160,14 @@
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
-			{#if $$slots.handle}
-				<button class="sortable-item__handle" style:cursor="grab">
-					<slot name="handle" />
-				</button>
-			{/if}
-			<slot {item} {index} />
+			<div class="sortable-item__inner">
+				{#if $$slots.handle}
+					<button class="sortable-item__handle" style:cursor="grab">
+						<slot name="handle" />
+					</button>
+				{/if}
+				<slot {item} {index} />
+			</div>
 		</li>
 	{/each}
 	<li
@@ -177,7 +179,9 @@
 		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 		style:transform="translate3d(0, 0, 0)"
 	>
-		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
+		<div class="sortable-item__inner">
+			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
+		</div>
 	</li>
 </ul>
 

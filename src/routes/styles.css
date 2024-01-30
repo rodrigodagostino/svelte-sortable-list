@@ -159,7 +159,7 @@ body {
 	min-height: 100svh;
 }
 
-.sortable-item {
+.sortable-item__inner {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -170,14 +170,12 @@ body {
 	border: 0.0625rem solid var(--gray-200);
 	line-height: 1.25;
 	text-transform: uppercase;
+	box-shadow: none;
+	transition: box-shadow 240ms;
 }
 
-.sortable-item--ghost.is-dragging {
-	animation: box-shadow-in 240ms forwards;
-}
-
-.sortable-item--ghost.is-dropping {
-	animation: box-shadow-out 240ms forwards;
+.sortable-item--ghost.is-dragging .sortable-item__inner {
+	box-shadow: var(--box-shadow-1);
 }
 
 .sortable-item__handle,

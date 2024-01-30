@@ -17,7 +17,7 @@ export function getItemData(item: HTMLElement): IItemData {
 		y: itemRect.y,
 		width: itemRect.width,
 		height: itemRect.height,
-		innerHTML: item.innerHTML,
+		innerHTML: item.querySelector('.sortable-item__inner')!.innerHTML,
 	};
 }
 
