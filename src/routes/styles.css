@@ -159,6 +159,10 @@ body {
 	min-height: 100svh;
 }
 
+.sortable-item:focus-visible {
+	outline: 0.125rem solid var(--gray-800);
+}
+
 .sortable-item__inner {
 	display: flex;
 	align-items: center;
@@ -175,6 +179,10 @@ body {
 }
 
 .sortable-item--ghost.is-dragging .sortable-item__inner {
+	box-shadow: var(--box-shadow-1);
+}
+
+.sortable-item.is-selected .sortable-item__inner {
 	box-shadow: var(--box-shadow-1);
 }
 

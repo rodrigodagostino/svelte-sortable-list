@@ -17,12 +17,14 @@
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
-	let draggedItem: IItemData | null;
-	let targetItem: IItemData | null;
 	let ghostOrigin: { x: number; y: number };
 	let itemsOrigin: IItemData[] | null;
+	let draggedItem: IItemData | null;
+	let targetItem: IItemData | null;
+
 	let isDragging = false;
 	let isDropping = false;
+	let isSelected = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -58,21 +60,19 @@
 		if (isDropping || isDragging) return;
 
 		const target = event.target as HTMLElement;
-		if ($$slots.handle && !target?.closest('.sortable-item__handle')) return;
+		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
 
-		const currItem: HTMLLIElement | null = target?.closest('.sortable-item');
-		if (!target || !currItem || checkIfInteractive(target as Element, currItem)) return;
+		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
+		if (!currItem || checkIfInteractive(target as Element, currItem)) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
-		if (currItem.dataset.id) {
-			isDragging = true;
-			await tick();
-			draggedItem = getItemData(currItem);
-			ghostOrigin = { x: event.clientX, y: event.clientY };
-			itemsOrigin = getItemsData(listRef);
-			setGhostStyles('init');
-		}
+		isDragging = true;
+		await tick();
+		draggedItem = getItemData(currItem);
+		ghostOrigin = { x: event.clientX, y: event.clientY };
+		itemsOrigin = getItemsData(listRef);
+		setGhostStyles('init');
 
 		currItem.addEventListener('pointermove', handlePointerMove);
 		currItem.addEventListener(
@@ -122,38 +122,116 @@
 			clearTimeout(timeoutId);
 		}, transitionDuration);
 	}
+
+	async function handleKeyDown(event: KeyboardEvent) {
+		const { code } = event;
+
+		const target = event.target as HTMLElement;
+		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
+
+		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
+		if (!currItem) return;
+
+		if (code === 'Space') {
+			if (!isSelected) {
+				isSelected = true;
+				await tick();
+				draggedItem = getItemData(currItem);
+				itemsOrigin = getItemsData(listRef);
+			} else {
+				if (
+					draggedItem &&
+					draggedItem.index !== null &&
+					targetItem &&
+					targetItem.index !== null &&
+					draggedItem.index !== targetItem.index
+				) {
+					dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
+				}
+
+				draggedItem = null;
+				targetItem = null;
+				itemsOrigin = null;
+				isSelected = false;
+			}
+		}
+
+		if (code === 'ArrowUp' || code === 'ArrowDown') {
+			if (!isSelected || draggedItem === null || !itemsOrigin) return;
+
+			event.preventDefault();
+
+			const step = code === 'ArrowUp' ? -1 : 1;
+			targetItem = !targetItem
+				? itemsOrigin.find((item) => draggedItem && item.index === draggedItem.index + step) || null
+				: itemsOrigin.find((item) => targetItem && item.index === targetItem.index + step) || null;
+
+			await tick();
+			if (!targetItem) return;
+
+			const itemsInBetween =
+				draggedItem.index < targetItem.index
+					? itemsOrigin.filter(
+							(item) =>
+								draggedItem &&
+								targetItem &&
+								item.index > draggedItem.index &&
+								item.index <= targetItem.index
+						)
+					: itemsOrigin.filter(
+							(item) =>
+								draggedItem &&
+								targetItem &&
+								item.index < draggedItem.index &&
+								item.index >= targetItem.index
+						);
+			const currItemTranslateY =
+				draggedItem.index < targetItem.index
+					? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
+					: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0);
+			currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
+		}
+	}
 </script>
 
 <ul
 	bind:this={listRef}
 	class="sortable-list"
 	style:--gap="{gap}px"
+	role="presentation"
 	on:pointerdown={handlePointerDown}
+	on:keydown={handleKeyDown}
 >
 	{#each items as item, index (item[key])}
 		{@const id = item[key]}
+		{@const activeElement = isSelected ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
+		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<li
 			class="sortable-item"
-			class:is-dragged={draggedItem?.id === id && (isDragging || isDropping)}
-			style:cursor={draggedItem?.id === id && isDragging
+			class:is-dragged={(isDragging || isDropping) && draggedItem?.id === id}
+			class:is-selected={isSelected && draggedItem?.id === id}
+			style:cursor={isDragging && draggedItem?.id === id
 				? 'grabbing'
 				: !$$slots.handle
 					? 'grab'
 					: 'initial'}
-			style:visibility={draggedItem?.id === id && (isDragging || isDropping) ? 'hidden' : 'visible'}
-			style:transform={(isDragging || isDropping) &&
-			draggedItem?.id !== id &&
+			style:visibility={(isDragging || isDropping) && draggedItem?.id === id ? 'hidden' : 'visible'}
+			style:transform={(isDragging || isDropping || isSelected) &&
 			draggedItem &&
+			draggedItem.id !== id &&
 			targetItem
-				? index <= targetItem?.index && index > draggedItem?.index
-					? `translate3d(0, -${ghostRef.getBoundingClientRect().height + gap}px, 0)`
-					: index >= targetItem?.index && index < draggedItem?.index
-						? `translate3d(0, ${ghostRef.getBoundingClientRect().height + gap}px, 0)`
+				? index > draggedItem.index && index <= targetItem.index
+					? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
+					: index < draggedItem.index && index >= targetItem.index
+						? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
-			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
+			style:transition={isDragging || isDropping || isSelected
+				? `transform ${transitionDuration}ms`
+				: ''}
 			data-id={id}
 			data-index={index}
+			tabindex={!$$slots.handle ? 0 : null}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
@@ -202,6 +280,10 @@
 
 		& + &:not(.sortable-item--ghost) {
 			margin-top: var(--gap);
+		}
+
+		&.is-selected {
+			z-index: 1;
 		}
 
 		&--ghost {
