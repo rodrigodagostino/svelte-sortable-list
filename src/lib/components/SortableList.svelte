@@ -63,7 +63,7 @@
 		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
 
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
-		if (!currItem || checkIfInteractive(target as Element, currItem)) return;
+		if (!currItem || checkIfInteractive(target, currItem)) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
@@ -131,7 +131,7 @@
 		if ($$slots.handle && (!target || !handle)) return;
 
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
-		if (!currItem) return;
+		if (!currItem || checkIfInteractive(target, currItem)) return;
 
 		if (key === ' ') {
 			if (!isSelected) {
