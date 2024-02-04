@@ -124,7 +124,7 @@
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
-		const { code } = event;
+		const { key } = event;
 
 		const target = event.target as HTMLElement;
 		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
@@ -132,7 +132,7 @@
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
 		if (!currItem) return;
 
-		if (code === 'Space') {
+		if (key === ' ') {
 			if (!isSelected) {
 				isSelected = true;
 				await tick();
@@ -156,12 +156,12 @@
 			}
 		}
 
-		if (code === 'ArrowUp' || code === 'ArrowDown') {
+		if (key === 'ArrowUp' || key === 'ArrowDown') {
 			if (!isSelected || draggedItem === null || !itemsOrigin) return;
 
 			event.preventDefault();
 
-			const step = code === 'ArrowUp' ? -1 : 1;
+			const step = key === 'ArrowUp' ? -1 : 1;
 			targetItem = !targetItem
 				? itemsOrigin.find((item) => draggedItem && item.index === draggedItem.index + step) || null
 				: itemsOrigin.find((item) => targetItem && item.index === targetItem.index + step) || null;
