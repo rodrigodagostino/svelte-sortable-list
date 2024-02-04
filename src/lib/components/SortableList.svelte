@@ -244,7 +244,6 @@
 		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<li
 			class="sortable-item"
-			class:is-dragged={(isDragging || isDropping) && draggedItem?.id === id}
 			class:is-selecting={isSelecting && draggedItem?.id === id}
 			class:is-deselecting={isDeselecting && draggedItem?.id === id}
 			style:cursor={isDragging && draggedItem?.id === id
