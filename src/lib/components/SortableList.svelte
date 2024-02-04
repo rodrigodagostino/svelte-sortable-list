@@ -153,6 +153,9 @@
 				targetItem = null;
 				itemsOrigin = null;
 				isSelected = false;
+
+				await tick();
+				currItem.focus();
 			}
 		}
 
