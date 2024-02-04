@@ -134,6 +134,8 @@
 		if (!currItem || checkIfInteractive(target, currItem)) return;
 
 		if (key === ' ') {
+			event.preventDefault();
+
 			if (!isSelected) {
 				isSelected = true;
 				await tick();
