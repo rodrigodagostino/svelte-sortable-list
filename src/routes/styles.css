@@ -188,7 +188,7 @@ body {
 	box-shadow: var(--box-shadow-1);
 }
 
-.sortable-item.is-selected .sortable-item__inner {
+.sortable-item.is-selecting .sortable-item__inner {
 	box-shadow: var(--box-shadow-1);
 }
 

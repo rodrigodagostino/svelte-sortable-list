@@ -24,7 +24,8 @@
 
 	let isDragging = false;
 	let isDropping = false;
-	let isSelected = false;
+	let isSelecting = false;
+	let isDeselecting = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -54,6 +55,32 @@
 		} else {
 			ghostRef.style.removeProperty('transition');
 		}
+	}
+
+	function setCurrItemStyles(currItem: HTMLLIElement) {
+		if (!draggedItem || !targetItem || !itemsOrigin) return;
+
+		const itemsInBetween =
+			draggedItem.index < targetItem.index
+				? itemsOrigin.filter(
+						(item) =>
+							draggedItem &&
+							targetItem &&
+							item.index > draggedItem.index &&
+							item.index <= targetItem.index
+					)
+				: itemsOrigin.filter(
+						(item) =>
+							draggedItem &&
+							targetItem &&
+							item.index < draggedItem.index &&
+							item.index >= targetItem.index
+					);
+		const currItemTranslateY =
+			draggedItem.index < targetItem.index
+				? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
+				: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0);
+		currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
@@ -115,6 +142,7 @@
 			}
 
 			setGhostStyles('unset');
+			draggedItem = null;
 			targetItem = null;
 			itemsOrigin = null;
 			isDropping = false;
@@ -136,38 +164,48 @@
 		if (key === ' ') {
 			event.preventDefault();
 
-			if (!isSelected) {
-				isSelected = true;
+			if (!isSelecting) {
+				isSelecting = true;
 				await tick();
 				draggedItem = getItemData(currItem);
 				itemsOrigin = getItemsData(listRef);
 			} else {
-				if (
-					draggedItem &&
-					draggedItem.index !== null &&
-					targetItem &&
-					targetItem.index !== null &&
-					draggedItem.index !== targetItem.index
-				) {
-					dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
-				}
-
-				draggedItem = null;
-				targetItem = null;
-				itemsOrigin = null;
-				isSelected = false;
+				isSelecting = false;
+				isDeselecting = true;
 
 				await tick();
-				$$slots.handle ? handle?.focus() : currItem.focus();
+				setCurrItemStyles(currItem);
+
+				const timeoutId = setTimeout(async () => {
+					if (
+						draggedItem &&
+						draggedItem.index !== null &&
+						targetItem &&
+						targetItem.index !== null &&
+						draggedItem.index !== targetItem.index
+					) {
+						dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
+					}
+
+					draggedItem = null;
+					targetItem = null;
+					itemsOrigin = null;
+					isDeselecting = false;
+
+					await tick();
+					$$slots.handle ? handle?.focus() : currItem.focus();
+
+					clearTimeout(timeoutId);
+				}, transitionDuration);
 			}
 		}
 
-		if (key === 'Tab' && isSelected) {
+		if (key === 'Tab' && isSelecting) {
 			event.preventDefault();
 		}
 
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
-			if (!isSelected || draggedItem === null || !itemsOrigin) return;
+			if (!isSelecting || draggedItem === null || !itemsOrigin) return;
 
 			event.preventDefault();
 
@@ -186,29 +224,7 @@
 				: itemsOrigin.find((item) => targetItem && item.index === targetItem.index + step) || null;
 
 			await tick();
-			if (!targetItem) return;
-
-			const itemsInBetween =
-				draggedItem.index < targetItem.index
-					? itemsOrigin.filter(
-							(item) =>
-								draggedItem &&
-								targetItem &&
-								item.index > draggedItem.index &&
-								item.index <= targetItem.index
-						)
-					: itemsOrigin.filter(
-							(item) =>
-								draggedItem &&
-								targetItem &&
-								item.index < draggedItem.index &&
-								item.index >= targetItem.index
-						);
-			const currItemTranslateY =
-				draggedItem.index < targetItem.index
-					? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
-					: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0);
-			currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
+			setCurrItemStyles(currItem);
 		}
 	}
 </script>
@@ -223,19 +239,21 @@
 >
 	{#each items as item, index (item[key])}
 		{@const id = item[key]}
-		{@const activeElement = isSelected ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
+		{@const activeElement =
+			isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
 		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<li
 			class="sortable-item"
 			class:is-dragged={(isDragging || isDropping) && draggedItem?.id === id}
-			class:is-selected={isSelected && draggedItem?.id === id}
+			class:is-selecting={isSelecting && draggedItem?.id === id}
+			class:is-deselecting={isDeselecting && draggedItem?.id === id}
 			style:cursor={isDragging && draggedItem?.id === id
 				? 'grabbing'
 				: !$$slots.handle
 					? 'grab'
 					: 'initial'}
 			style:visibility={(isDragging || isDropping) && draggedItem?.id === id ? 'hidden' : 'visible'}
-			style:transform={(isDragging || isDropping || isSelected) &&
+			style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
 			draggedItem &&
 			draggedItem.id !== id &&
 			targetItem
@@ -245,9 +263,7 @@
 						? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
-			style:transition={isDragging || isDropping || isSelected
-				? `transform ${transitionDuration}ms`
-				: ''}
+			style:transition={isDragging || isSelecting ? `transform ${transitionDuration}ms` : ''}
 			data-id={id}
 			data-index={index}
 			tabindex={!$$slots.handle ? 0 : null}
@@ -301,7 +317,7 @@
 			margin-top: var(--gap);
 		}
 
-		&.is-selected {
+		&.is-selecting {
 			z-index: 1;
 		}
 
