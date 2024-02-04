@@ -152,6 +152,11 @@
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
+		if (isDeselecting) {
+			event.preventDefault();
+			return;
+		}
+
 		const { key } = event;
 
 		const target = event.target as HTMLElement;
