@@ -159,10 +159,23 @@
 			}
 		}
 
+		if (key === 'Tab' && isSelected) {
+			event.preventDefault();
+		}
+
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
 			if (!isSelected || draggedItem === null || !itemsOrigin) return;
 
 			event.preventDefault();
+
+			// Prevent item movement if they are already at the top or bottom.
+			if (
+				(key === 'ArrowUp' && draggedItem.index === 0 && !targetItem) ||
+				(key === 'ArrowUp' && targetItem && targetItem.index === 0) ||
+				(key === 'ArrowDown' && draggedItem.index === itemsOrigin.length - 1 && !targetItem) ||
+				(key === 'ArrowDown' && targetItem && targetItem.index === itemsOrigin.length - 1)
+			)
+				return;
 
 			const step = key === 'ArrowUp' ? -1 : 1;
 			targetItem = !targetItem
