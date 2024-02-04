@@ -91,12 +91,9 @@
 		/* prettier-ignore */
 		ghostRef.style.transform = `translate3d(${event.clientX - ghostOrigin.x}px, ${event.clientY - ghostOrigin.y}px, 0)`;
 
-		const collidingItem = getCollidingItem(ghostRef, itemsOrigin, draggedItem.id, sortThreshold);
-		if (collidingItem) {
-			targetItem = collidingItem;
-		} else {
-			targetItem = null;
-		}
+		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, sortThreshold);
+		if (collidingItem) targetItem = collidingItem;
+		else targetItem = null;
 	}
 
 	function handlePointerUp() {
@@ -155,7 +152,7 @@
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
 			style:transition={isDragging || isDropping ? `transform ${transitionDuration}ms` : ''}
-			data-id={item[key]}
+			data-id={id}
 			data-index={index}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
@@ -178,6 +175,7 @@
 		style:cursor={isDragging ? 'grabbing' : 'grab'}
 		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 		style:transform="translate3d(0, 0, 0)"
+		data-id={draggedItem?.id}
 	>
 		<div class="sortable-item__inner">
 			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}

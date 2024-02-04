@@ -59,7 +59,7 @@ export function checkIfInteractive(target: Element, rootElement: Element) {
 	return false;
 }
 
-function getIntersectionRect(r1: DOMRect, r2: IItemData) {
+function getIntersectionRect(r1: IItemData, r2: IItemData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
 	const x2 = Math.min(r1.x + r1.width, r2.x + r2.width);
@@ -68,26 +68,20 @@ function getIntersectionRect(r1: DOMRect, r2: IItemData) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(
-	ghost: HTMLLIElement,
-	itemsRects: IItemData[],
-	draggedItemId: number,
-	threshold: number
-) {
-	const ghostRect = ghost.getBoundingClientRect();
-	const collidingItems = itemsRects.filter((item) => {
+export function getCollidingItem(ghost: IItemData, items: IItemData[], threshold: number) {
+	const collidingItems = items.filter((targetItem) => {
 		return (
-			draggedItemId !== item.id &&
-			ghostRect.x + ghostRect.width * threshold > item.x &&
-			ghostRect.x < item.x + item.width * threshold &&
-			ghostRect.y + ghostRect.height * threshold > item.y &&
-			ghostRect.y < item.y + item.height * threshold
+			ghost.id !== targetItem.id &&
+			ghost.x + ghost.width * threshold > targetItem.x &&
+			ghost.x < targetItem.x + targetItem.width * threshold &&
+			ghost.y + ghost.height * threshold > targetItem.y &&
+			ghost.y < targetItem.y + targetItem.height * threshold
 		);
 	});
 	if (collidingItems.length > 1) {
 		collidingItems.sort((a, b) => {
-			const aIntersectionRect = getIntersectionRect(ghostRect, a);
-			const bIntersectionRect = getIntersectionRect(ghostRect, b);
+			const aIntersectionRect = getIntersectionRect(ghost, a);
+			const bIntersectionRect = getIntersectionRect(ghost, b);
 
 			return bIntersectionRect.area - aIntersectionRect.area;
 		});
