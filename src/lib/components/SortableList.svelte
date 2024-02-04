@@ -127,7 +127,8 @@
 		const { key } = event;
 
 		const target = event.target as HTMLElement;
-		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
+		const handle = target.closest<HTMLButtonElement>('.sortable-item__handle');
+		if ($$slots.handle && (!target || !handle)) return;
 
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
 		if (!currItem) return;
@@ -155,7 +156,7 @@
 				isSelected = false;
 
 				await tick();
-				currItem.focus();
+				$$slots.handle ? handle?.focus() : currItem.focus();
 			}
 		}
 
