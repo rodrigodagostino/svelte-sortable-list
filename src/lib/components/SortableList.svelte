@@ -321,6 +321,7 @@
 			margin-top: var(--gap);
 		}
 
+		&:focus-visible,
 		&.is-selecting {
 			z-index: 1;
 		}
