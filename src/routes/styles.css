@@ -204,16 +204,12 @@ body {
 	stroke: var(--gray-400);
 }
 
-.sortable-item__handle:focus,
 .sortable-item__handle:hover,
-.sortable-item__button:focus,
 .sortable-item__button:hover {
 	background-color: var(--gray-100);
 }
 
-.sortable-item__handle:focus svg,
 .sortable-item__handle:hover svg,
-.sortable-item__button:focus svg,
 .sortable-item__button:hover svg {
 	fill: var(--gray-600);
 	stroke: var(--gray-600);

@@ -18,9 +18,10 @@
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
 	let ghostOrigin: { x: number; y: number };
-	let itemsOrigin: IItemData[] | null;
-	let draggedItem: IItemData | null;
-	let targetItem: IItemData | null;
+	let itemsOrigin: IItemData[] | null = null;
+	let draggedItem: IItemData | null = null;
+	let targetItem: IItemData | null = null;
+	let focusedItem: IItemData | null = null;
 
 	let isDragging = false;
 	let isDropping = false;
@@ -57,7 +58,7 @@
 		}
 	}
 
-	function setCurrItemStyles(currItem: HTMLLIElement) {
+	function setItemStyles(currItem: HTMLLIElement) {
 		if (!draggedItem || !targetItem || !itemsOrigin) return;
 
 		const itemsInBetween =
@@ -158,28 +159,32 @@
 		}
 
 		const { key } = event;
-
-		const target = event.target as HTMLElement;
-		const handle = target.closest<HTMLButtonElement>('.sortable-item__handle');
-		if ($$slots.handle && (!target || !handle)) return;
-
-		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
-		if (!currItem || checkIfInteractive(target, currItem)) return;
+		const items = listRef.querySelectorAll<HTMLLIElement>(
+			'.sortable-item:not(.sortable-item--ghost)'
+		);
 
 		if (key === ' ') {
 			event.preventDefault();
+			if (!focusedItem) return;
 
 			if (!isSelecting) {
 				isSelecting = true;
+
 				await tick();
-				draggedItem = getItemData(currItem);
+				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
+					`.sortable-item[data-id="${focusedItem?.id}"]`
+				);
+				draggedItem = focusedItemElement && getItemData(focusedItemElement);
 				itemsOrigin = getItemsData(listRef);
 			} else {
 				isSelecting = false;
 				isDeselecting = true;
 
 				await tick();
-				setCurrItemStyles(currItem);
+				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
+					`.sortable-item[data-id="${focusedItem?.id}"]`
+				);
+				focusedItemElement && setItemStyles(focusedItemElement);
 
 				const timeoutId = setTimeout(async () => {
 					if (
@@ -198,38 +203,81 @@
 					isDeselecting = false;
 
 					await tick();
-					$$slots.handle ? handle?.focus() : currItem.focus();
+					const focusedItemElement = listRef.querySelector<HTMLLIElement>(
+						`.sortable-item[data-id="${focusedItem?.id}"]`
+					);
+					if (focusedItemElement) {
+						focusedItem = getItemData(focusedItemElement);
+						await tick();
+						focusedItemElement?.focus();
+					}
 
 					clearTimeout(timeoutId);
 				}, transitionDuration);
 			}
 		}
 
-		if (key === 'Tab' && isSelecting) {
-			event.preventDefault();
+		if (key === 'Tab') {
+			isSelecting = false;
+			focusedItem = null;
+			draggedItem = null;
+			targetItem = null;
 		}
 
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
-			if (!isSelecting || draggedItem === null || !itemsOrigin) return;
-
 			event.preventDefault();
 
-			// Prevent item movement if they are already at the top or bottom.
-			if (
-				(key === 'ArrowUp' && draggedItem.index === 0 && !targetItem) ||
-				(key === 'ArrowUp' && targetItem && targetItem.index === 0) ||
-				(key === 'ArrowDown' && draggedItem.index === itemsOrigin.length - 1 && !targetItem) ||
-				(key === 'ArrowDown' && targetItem && targetItem.index === itemsOrigin.length - 1)
-			)
-				return;
-
 			const step = key === 'ArrowUp' ? -1 : 1;
-			targetItem = !targetItem
-				? itemsOrigin.find((item) => draggedItem && item.index === draggedItem.index + step) || null
-				: itemsOrigin.find((item) => targetItem && item.index === targetItem.index + step) || null;
 
-			await tick();
-			setCurrItemStyles(currItem);
+			if (!isSelecting) {
+				if (!focusedItem) {
+					const firstItemElement = listRef.querySelector<HTMLLIElement>(
+						'.sortable-item:not(.sortable-item--ghost)'
+					);
+					if (firstItemElement) {
+						focusedItem = getItemData(firstItemElement);
+						await tick();
+						firstItemElement.focus();
+					}
+
+					return;
+				}
+
+				// Prevent focusing the previous item if the current one is the first,
+				// and focusing the next item if the current one is the last.
+				if (
+					(key === 'ArrowUp' && focusedItem?.index === 0) ||
+					(key === 'ArrowDown' && focusedItem?.index === items.length - 1)
+				)
+					return;
+
+				focusedItem = getItemData(items[focusedItem.index + step]);
+				await tick();
+				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
+					`.sortable-item[data-id="${focusedItem?.id}"]`
+				);
+				focusedItemElement?.focus();
+			} else {
+				if (!draggedItem || !itemsOrigin) return;
+				// Prevent moving the selected item if it’s the first or last item,
+				// or is at the top or bottom of the list.
+				if (
+					(key === 'ArrowUp' && draggedItem.index === 0 && !targetItem) ||
+					(key === 'ArrowUp' && targetItem && targetItem.index === 0) ||
+					(key === 'ArrowDown' && draggedItem.index === itemsOrigin.length - 1 && !targetItem) ||
+					(key === 'ArrowDown' && targetItem && targetItem.index === itemsOrigin.length - 1)
+				)
+					return;
+
+				targetItem = !targetItem
+					? itemsOrigin?.find((item) => draggedItem && item.index === draggedItem.index + step) ||
+						null
+					: itemsOrigin?.find((item) => targetItem && item.index === targetItem.index + step) ||
+						null;
+
+				await tick();
+				draggedItem && setItemStyles(items[draggedItem.index]);
+			}
 		}
 	}
 </script>
@@ -238,7 +286,9 @@
 	bind:this={listRef}
 	class="sortable-list"
 	style:--gap="{gap}px"
-	role="presentation"
+	role="listbox"
+	aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
+	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
 >
@@ -246,7 +296,6 @@
 		{@const id = item[key]}
 		{@const activeElement =
 			isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
-		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<li
 			class="sortable-item"
 			class:is-selecting={isSelecting && draggedItem?.id === id}
@@ -268,15 +317,18 @@
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
 			style:transition={isDragging || isSelecting ? `transform ${transitionDuration}ms` : ''}
+			id={`sortable-item-${id}`}
 			data-id={id}
 			data-index={index}
-			tabindex={!$$slots.handle ? 0 : null}
+			role="option"
+			tabindex={focusedItem?.id === id ? 0 : -1}
+			aria-selected={focusedItem?.id === id}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
 			<div class="sortable-item__inner">
 				{#if $$slots.handle}
-					<button class="sortable-item__handle" style:cursor="grab">
+					<button class="sortable-item__handle" style:cursor="grab" tabindex="-1">
 						<slot name="handle" />
 					</button>
 				{/if}
@@ -293,6 +345,7 @@
 		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 		style:transform="translate3d(0, 0, 0)"
 		data-id={draggedItem?.id}
+		aria-hidden="true"
 	>
 		<div class="sortable-item__inner">
 			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
