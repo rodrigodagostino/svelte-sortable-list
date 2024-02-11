@@ -322,9 +322,9 @@
 		>
 			<div class="sortable-item__inner">
 				{#if $$slots.handle}
-					<button class="sortable-item__handle" style:cursor="grab" tabindex="-1">
+					<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
 						<slot name="handle" />
-					</button>
+					</span>
 				{/if}
 				<slot {item} {index} />
 			</div>
