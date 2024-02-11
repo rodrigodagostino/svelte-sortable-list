@@ -206,11 +206,7 @@
 					const focusedItemElement = listRef.querySelector<HTMLLIElement>(
 						`.sortable-item[data-id="${focusedItem?.id}"]`
 					);
-					if (focusedItemElement) {
-						focusedItem = getItemData(focusedItemElement);
-						await tick();
-						focusedItemElement?.focus();
-					}
+					focusedItemElement?.focus();
 
 					clearTimeout(timeoutId);
 				}, transitionDuration);
@@ -235,7 +231,6 @@
 						'.sortable-item:not(.sortable-item--ghost)'
 					);
 					if (firstItemElement) {
-						focusedItem = getItemData(firstItemElement);
 						await tick();
 						firstItemElement.focus();
 					}
@@ -251,10 +246,8 @@
 				)
 					return;
 
-				focusedItem = getItemData(items[focusedItem.index + step]);
-				await tick();
 				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
-					`.sortable-item[data-id="${focusedItem?.id}"]`
+					`.sortable-item[data-index="${focusedItem?.index + step}"]`
 				);
 				focusedItemElement?.focus();
 			} else {
@@ -323,6 +316,7 @@
 			role="option"
 			tabindex={focusedItem?.id === id ? 0 : -1}
 			aria-selected={focusedItem?.id === id}
+			on:focus={(event) => (focusedItem = getItemData(event.currentTarget))}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
