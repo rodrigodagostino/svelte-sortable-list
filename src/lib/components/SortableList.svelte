@@ -22,6 +22,7 @@
 	let draggedItem: IItemData | null = null;
 	let targetItem: IItemData | null = null;
 	let focusedItem: IItemData | null = null;
+	let liveText: string = '';
 
 	let isDragging = false;
 	let isDropping = false;
@@ -176,6 +177,17 @@
 				);
 				draggedItem = focusedItemElement && getItemData(focusedItemElement);
 				itemsOrigin = getItemsData(listRef);
+				if (draggedItem !== null) {
+					const element =
+						draggedItem.index >= 0
+							? listRef.querySelector<HTMLLIElement>(
+									`.sortable-item[data-index="${draggedItem.index}"]`
+								)?.textContent
+							: 'the item';
+					liveText = `Dragging ${element} at position ${
+						draggedItem.index + 1
+					}. Press Arrow Down to move it down, Arrow Up to move it up, Space Bar to drop it.`;
+				}
 			} else {
 				isSelecting = false;
 				isDeselecting = true;
@@ -185,6 +197,19 @@
 					`.sortable-item[data-id="${focusedItem?.id}"]`
 				);
 				focusedItemElement && setItemStyles(focusedItemElement);
+				if (draggedItem !== null) {
+					const element =
+						draggedItem.index >= 0
+							? listRef.querySelector<HTMLLIElement>(
+									`.sortable-item[data-index="${draggedItem.index}"]`
+								)?.textContent
+							: 'the item';
+					const result =
+						targetItem && draggedItem.index !== targetItem.index
+							? `Moved from position ${draggedItem?.index + 1} to ${targetItem.index + 1}`
+							: `Hasn’t changed position`;
+					liveText = `Dropped ${element}. ${result}.`;
+				}
 
 				const timeoutId = setTimeout(async () => {
 					if (
@@ -218,6 +243,7 @@
 			focusedItem = null;
 			draggedItem = null;
 			targetItem = null;
+			itemsOrigin = null;
 		}
 
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
@@ -270,6 +296,17 @@
 
 				await tick();
 				draggedItem && setItemStyles(items[draggedItem.index]);
+				if (targetItem !== null) {
+					const element =
+						draggedItem.index >= 0
+							? listRef.querySelector<HTMLLIElement>(
+									`.sortable-item[data-index="${draggedItem.index}"]`
+								)?.textContent
+							: 'the item';
+					const direction = key === 'ArrowUp' ? 'up' : 'down';
+					const position = targetItem.index + 1;
+					liveText = `Moved ${element} ${direction} to position ${position}.`;
+				}
 			}
 		}
 	}
@@ -280,6 +317,7 @@
 	class="sortable-list"
 	style:--gap="{gap}px"
 	role="listbox"
+	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
@@ -310,12 +348,15 @@
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
 			style:transition={isDragging || isSelecting ? `transform ${transitionDuration}ms` : ''}
-			id={`sortable-item-${id}`}
+			id="sortable-item-{id}"
 			data-id={id}
 			data-index={index}
 			role="option"
 			tabindex={focusedItem?.id === id ? 0 : -1}
 			aria-selected={focusedItem?.id === id}
+			aria-label="{focusedItem?.id === id
+				? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
+				: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
 			on:focus={(event) => (focusedItem = getItemData(event.currentTarget))}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
@@ -346,6 +387,9 @@
 		</div>
 	</li>
 </ul>
+<div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
+	{liveText}
+</div>
 
 <style lang="scss">
 	.sortable-list,
@@ -384,5 +428,17 @@
 		&__handle {
 			display: flex;
 		}
+	}
+
+	.live-text {
+		position: absolute;
+		left: 0px;
+		top: 0px;
+		clip: rect(0px, 0px, 0px, 0px);
+		clip-path: inset(50%);
+		overflow: hidden;
+		white-space: nowrap;
+		width: 1px;
+		height: 1px;
 	}
 </style>
