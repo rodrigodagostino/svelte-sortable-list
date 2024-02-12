@@ -28,6 +28,7 @@
 	let isDropping = false;
 	let isSelecting = false;
 	let isDeselecting = false;
+	let isCancelling = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -239,11 +240,27 @@
 		}
 
 		if (key === 'Tab') {
+			if (!focusedItem) return;
+
+			if (!isSelecting) {
+				focusedItem = null;
+				return;
+			}
+
 			isSelecting = false;
-			focusedItem = null;
-			draggedItem = null;
-			targetItem = null;
-			itemsOrigin = null;
+			isDeselecting = true;
+			isCancelling = true;
+
+			const timeoutId = setTimeout(() => {
+				focusedItem = null;
+				draggedItem = null;
+				targetItem = null;
+				itemsOrigin = null;
+				isDeselecting = false;
+				isCancelling = false;
+
+				clearTimeout(timeoutId);
+			}, transitionDuration);
 		}
 
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
@@ -341,13 +358,15 @@
 			draggedItem &&
 			draggedItem.id !== id &&
 			targetItem
-				? index > draggedItem.index && index <= targetItem.index
+				? !isCancelling && index > draggedItem.index && index <= targetItem.index
 					? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
-					: index < draggedItem.index && index >= targetItem.index
+					: !isCancelling && index < draggedItem.index && index >= targetItem.index
 						? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 						: 'translate3d(0, 0, 0)'
 				: 'translate3d(0, 0, 0)'}
-			style:transition={isDragging || isSelecting ? `transform ${transitionDuration}ms` : ''}
+			style:transition={isDragging || isSelecting || isDeselecting
+				? `transform ${transitionDuration}ms`
+				: ''}
 			id="sortable-item-{id}"
 			data-id={id}
 			data-index={index}
@@ -417,7 +436,8 @@
 		}
 
 		&:focus-visible,
-		&.is-selecting {
+		&.is-selecting,
+		&.is-deselecting {
 			z-index: 1;
 		}
 
