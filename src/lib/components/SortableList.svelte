@@ -239,30 +239,6 @@
 			}
 		}
 
-		if (key === 'Tab') {
-			if (!focusedItem) return;
-
-			if (!isSelecting) {
-				focusedItem = null;
-				return;
-			}
-
-			isSelecting = false;
-			isDeselecting = true;
-			isCancelling = true;
-
-			const timeoutId = setTimeout(() => {
-				focusedItem = null;
-				draggedItem = null;
-				targetItem = null;
-				itemsOrigin = null;
-				isDeselecting = false;
-				isCancelling = false;
-
-				clearTimeout(timeoutId);
-			}, transitionDuration);
-		}
-
 		if (key === 'ArrowUp' || key === 'ArrowDown') {
 			event.preventDefault();
 
@@ -326,8 +302,36 @@
 				}
 			}
 		}
+
+		if (key === 'Tab') handleFocusOut();
+	}
+
+	function handleFocusOut() {
+		if (!focusedItem) return;
+
+		if (!isSelecting) {
+			focusedItem = null;
+			return;
+		}
+
+		isSelecting = false;
+		isDeselecting = true;
+		isCancelling = true;
+
+		const timeoutId = setTimeout(() => {
+			focusedItem = null;
+			draggedItem = null;
+			targetItem = null;
+			itemsOrigin = null;
+			isDeselecting = false;
+			isCancelling = false;
+
+			clearTimeout(timeoutId);
+		}, transitionDuration);
 	}
 </script>
+
+<svelte:document on:click={handleFocusOut} />
 
 <ul
 	bind:this={listRef}
