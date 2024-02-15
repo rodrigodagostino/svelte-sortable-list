@@ -232,7 +232,11 @@
 					const focusedItemElement = listRef.querySelector<HTMLLIElement>(
 						`.sortable-item[data-id="${focusedItem?.id}"]`
 					);
-					focusedItemElement?.focus();
+					if (focusedItemElement) {
+						focusedItem = getItemData(focusedItemElement);
+						await tick();
+						focusedItemElement?.focus();
+					}
 
 					clearTimeout(timeoutId);
 				}, transitionDuration);
@@ -250,10 +254,10 @@
 						'.sortable-item:not(.sortable-item--ghost)'
 					);
 					if (firstItemElement) {
+						focusedItem = getItemData(firstItemElement);
 						await tick();
-						firstItemElement.focus();
+						firstItemElement?.focus();
 					}
-
 					return;
 				}
 
@@ -268,7 +272,11 @@
 				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
 					`.sortable-item[data-index="${focusedItem?.index + step}"]`
 				);
-				focusedItemElement?.focus();
+				if (focusedItemElement) {
+					focusedItem = getItemData(focusedItemElement);
+					await tick();
+					focusedItemElement?.focus();
+				}
 			} else {
 				if (!draggedItem || !itemsOrigin) return;
 				// Prevent moving the selected item if it’s the first or last item,
@@ -380,7 +388,6 @@
 			aria-label="{focusedItem?.id === id
 				? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
 				: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
-			on:focus={(event) => (focusedItem = getItemData(event.currentTarget))}
 			in:scaleFly={{ x: -120 }}
 			out:scaleFly={{ x: 120 }}
 		>
