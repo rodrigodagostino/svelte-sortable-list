@@ -312,6 +312,24 @@
 		}
 
 		if (key === 'Tab') handleFocusOut();
+
+		if (key === 'Escape') {
+			if (!focusedItem || !isSelecting) return;
+
+			isSelecting = false;
+			isDeselecting = true;
+			isCancelling = true;
+
+			const timeoutId = setTimeout(() => {
+				draggedItem = null;
+				targetItem = null;
+				itemsOrigin = null;
+				isDeselecting = false;
+				isCancelling = false;
+
+				clearTimeout(timeoutId);
+			}, transitionDuration);
+		}
 	}
 
 	function handleFocusOut() {
