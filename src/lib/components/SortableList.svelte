@@ -161,9 +161,7 @@
 		}
 
 		const { key } = event;
-		const items = listRef.querySelectorAll<HTMLLIElement>(
-			'.sortable-item:not(.sortable-item--ghost)'
-		);
+		const items = listRef.querySelectorAll<HTMLLIElement>('.sortable-item');
 
 		if (key === ' ') {
 			event.preventDefault();
@@ -250,9 +248,7 @@
 
 			if (!isSelecting) {
 				if (!focusedItem) {
-					const firstItemElement = listRef.querySelector<HTMLLIElement>(
-						'.sortable-item:not(.sortable-item--ghost)'
-					);
+					const firstItemElement = listRef.querySelector<HTMLLIElement>('.sortable-item');
 					if (firstItemElement) {
 						focusedItem = getItemData(firstItemElement);
 						await tick();
@@ -419,22 +415,24 @@
 			</div>
 		</li>
 	{/each}
-	<li
-		bind:this={ghostRef}
-		class="sortable-item sortable-item--ghost"
-		class:is-dragging={isDragging}
-		class:is-dropping={isDropping}
-		style:cursor={isDragging ? 'grabbing' : 'grab'}
-		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
-		style:transform="translate3d(0, 0, 0)"
-		data-id={draggedItem?.id}
-		aria-hidden="true"
-	>
-		<div class="sortable-item__inner">
-			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
-		</div>
-	</li>
 </ul>
+
+<li
+	bind:this={ghostRef}
+	class="sortable-item sortable-item--ghost"
+	class:is-dragging={isDragging}
+	class:is-dropping={isDropping}
+	style:cursor={isDragging ? 'grabbing' : 'grab'}
+	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
+	style:transform="translate3d(0, 0, 0)"
+	data-id={draggedItem?.id}
+	aria-hidden="true"
+>
+	<div class="sortable-item__inner">
+		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
+	</div>
+</li>
+
 <div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
 	{liveText}
 </div>
@@ -460,7 +458,7 @@
 		user-select: none;
 		backface-visibility: hidden;
 
-		& + &:not(.sortable-item--ghost) {
+		& + & {
 			margin-top: var(--gap);
 		}
 
@@ -470,13 +468,14 @@
 			z-index: 1;
 		}
 
-		&--ghost {
-			position: fixed;
-		}
-
 		&__handle {
 			display: flex;
 		}
+	}
+
+	.sortable-item--ghost {
+		position: fixed;
+		z-index: 9999;
 	}
 
 	.live-text {

@@ -22,9 +22,9 @@ export function getItemData(item: HTMLElement): IItemData {
 }
 
 export function getItemsData(list: HTMLUListElement): IItemData[] {
-	return Array.from(
-		list.querySelectorAll<HTMLLIElement>('.sortable-item:not(.sortable-item--ghost)')
-	).map((item) => getItemData(item));
+	return Array.from(list.querySelectorAll<HTMLLIElement>('.sortable-item')).map((item) =>
+		getItemData(item)
+	);
 }
 
 // Thank you, Vojtech Miksu :)
