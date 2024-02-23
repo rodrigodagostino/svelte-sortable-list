@@ -355,87 +355,96 @@
 
 <svelte:document on:click={handleFocusOut} />
 
-<ul
-	bind:this={listRef}
-	class="sortable-list"
-	style:--gap="{gap}px"
-	role="listbox"
-	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
-	aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
-	tabindex="0"
-	on:pointerdown={handlePointerDown}
-	on:keydown={handleKeyDown}
->
-	{#each items as item, index (item[key])}
-		{@const id = item[key]}
-		{@const activeElement =
-			isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
-		<li
-			class="sortable-item"
-			class:is-selecting={isSelecting && draggedItem?.id === id}
-			class:is-deselecting={isDeselecting && draggedItem?.id === id}
-			style:cursor={isDragging && draggedItem?.id === id
-				? 'grabbing'
-				: !$$slots.handle
-					? 'grab'
-					: 'initial'}
-			style:visibility={(isDragging || isDropping) && draggedItem?.id === id ? 'hidden' : 'visible'}
-			style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
-			draggedItem &&
-			draggedItem.id !== id &&
-			targetItem
-				? !isCancelling && index > draggedItem.index && index <= targetItem.index
-					? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
-					: !isCancelling && index < draggedItem.index && index >= targetItem.index
-						? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
-						: 'translate3d(0, 0, 0)'
-				: 'translate3d(0, 0, 0)'}
-			style:transition={isDragging || isSelecting || isDeselecting
-				? `transform ${transitionDuration}ms`
-				: ''}
-			id="sortable-item-{id}"
-			data-id={id}
-			data-index={index}
-			role="option"
-			tabindex={focusedItem?.id === id ? 0 : -1}
-			aria-selected={focusedItem?.id === id}
-			aria-label="{focusedItem?.id === id
-				? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
-				: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
-			in:scaleFly={{ x: -120 }}
-			out:scaleFly={{ x: 120 }}
-		>
-			<div class="sortable-item__inner">
-				{#if $$slots.handle}
-					<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
-						<slot name="handle" />
-					</span>
-				{/if}
-				<slot {item} {index} />
-			</div>
-		</li>
-	{/each}
-</ul>
+{#if items}
+	<ul
+		bind:this={listRef}
+		class="sortable-list"
+		style:--gap="{gap}px"
+		role="listbox"
+		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
+		aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
+		tabindex="0"
+		on:pointerdown={handlePointerDown}
+		on:keydown={handleKeyDown}
+	>
+		{#each items as item, index (item[key])}
+			{@const id = item[key]}
+			{@const activeElement =
+				isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
+			<li
+				class="sortable-item"
+				class:is-selecting={isSelecting && draggedItem?.id === id}
+				class:is-deselecting={isDeselecting && draggedItem?.id === id}
+				style:cursor={isDragging && draggedItem?.id === id
+					? 'grabbing'
+					: !$$slots.handle
+						? 'grab'
+						: 'initial'}
+				style:visibility={(isDragging || isDropping) && draggedItem?.id === id
+					? 'hidden'
+					: 'visible'}
+				style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
+				draggedItem &&
+				draggedItem.id !== id &&
+				targetItem
+					? !isCancelling && index > draggedItem.index && index <= targetItem.index
+						? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
+						: !isCancelling && index < draggedItem.index && index >= targetItem.index
+							? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
+							: 'translate3d(0, 0, 0)'
+					: 'translate3d(0, 0, 0)'}
+				style:transition={isDragging || isSelecting || isDeselecting
+					? `transform ${transitionDuration}ms`
+					: ''}
+				id="sortable-item-{id}"
+				data-id={id}
+				data-index={index}
+				role="option"
+				tabindex={focusedItem?.id === id ? 0 : -1}
+				aria-selected={focusedItem?.id === id}
+				aria-label="{focusedItem?.id === id
+					? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
+					: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
+				in:scaleFly={{ x: -120 }}
+				out:scaleFly={{ x: 120 }}
+			>
+				<div class="sortable-item__inner">
+					{#if $$slots.handle}
+						<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+							<slot name="handle" />
+						</span>
+					{/if}
+					<slot {item} {index} />
+				</div>
+			</li>
+		{/each}
+	</ul>
 
-<li
-	bind:this={ghostRef}
-	class="sortable-item sortable-item--ghost"
-	class:is-dragging={isDragging}
-	class:is-dropping={isDropping}
-	style:cursor={isDragging ? 'grabbing' : 'grab'}
-	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
-	style:transform="translate3d(0, 0, 0)"
-	data-id={draggedItem?.id}
-	aria-hidden="true"
->
-	<div class="sortable-item__inner">
-		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
+	<li
+		bind:this={ghostRef}
+		class="sortable-item sortable-item--ghost"
+		class:is-dragging={isDragging}
+		class:is-dropping={isDropping}
+		style:cursor={isDragging ? 'grabbing' : 'grab'}
+		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
+		style:transform="translate3d(0, 0, 0)"
+		data-id={draggedItem?.id}
+		aria-hidden="true"
+	>
+		<div class="sortable-item__inner">
+			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
+		</div>
+	</li>
+
+	<div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
+		{liveText}
 	</div>
-</li>
-
-<div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
-	{liveText}
-</div>
+{:else}
+	<p>
+		To display your list, provide an array of <code>items</code> to
+		<code>{'<SortableList />'}</code>.
+	</p>
+{/if}
 
 <style lang="scss">
 	.sortable-list,

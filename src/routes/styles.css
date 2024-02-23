@@ -137,12 +137,18 @@ table {
  */
 body {
 	font-family: var(--font-main);
+	font-size: 1rem;
 	color: var(--gray-800);
 	background-color: var(--gray-100);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	display: flex;
 	justify-content: center;
+}
+
+code {
+	background-color: var(--gray-200);
+	border-radius: 0.25rem;
 }
 
 .sr-only {
