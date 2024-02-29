@@ -186,10 +186,6 @@ code {
 	transition: box-shadow 240ms;
 }
 
-.sortable-item--ghost.is-dragging .sortable-item__inner {
-	box-shadow: var(--box-shadow-1);
-}
-
 .sortable-item.is-selecting .sortable-item__inner {
 	box-shadow: var(--box-shadow-1);
 }
@@ -202,6 +198,10 @@ code {
 	border: none;
 	border-radius: 0.25rem;
 	transition: background-color 240ms;
+}
+
+.sortable-item__handle {
+	margin-inline-start: -1rem;
 }
 
 .sortable-item__handle:hover,
@@ -221,16 +221,16 @@ code {
 	stroke: var(--gray-600);
 }
 
-.sortable-item__handle {
-	margin-inline-start: -1rem;
-}
-
 .sortable-item__text {
 	margin-block: 0.625rem;
 }
 
 .sortable-item__button {
 	margin-inline-end: -1rem;
+}
+
+.ghost.is-dragging .sortable-item__inner {
+	box-shadow: var(--box-shadow-1);
 }
 
 @keyframes box-shadow-in {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
+	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
 	import {
 		checkIfInteractive,
@@ -392,23 +393,7 @@
 			</SortableItem>
 		{/each}
 	</ul>
-
-	<li
-		bind:this={ghostRef}
-		class="sortable-item sortable-item--ghost"
-		class:is-dragging={isDragging}
-		class:is-dropping={isDropping}
-		style:cursor={isDragging ? 'grabbing' : 'grab'}
-		style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
-		style:transform="translate3d(0, 0, 0)"
-		data-id={draggedItem?.id}
-		aria-hidden="true"
-	>
-		<div class="sortable-item__inner">
-			{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
-		</div>
-	</li>
-
+	<Ghost bind:node={ghostRef} {draggedItem} {isDragging} {isDropping} />
 	<div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
@@ -436,14 +421,6 @@
 		:global(.sortable-item + .sortable-item) {
 			margin-top: var(--gap);
 		}
-	}
-
-	.sortable-item--ghost {
-		position: fixed;
-		list-style: none;
-		user-select: none;
-		backface-visibility: hidden;
-		z-index: 9999;
 	}
 
 	.live-text {
