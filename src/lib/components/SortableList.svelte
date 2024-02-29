@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
-	import { scaleFly } from '$lib/transitions/index.js';
+	import SortableItem from '$lib/components/SortableItem.svelte';
 	import {
 		checkIfInteractive,
 		getCollidingItem,
@@ -368,55 +368,28 @@
 		on:keydown={handleKeyDown}
 	>
 		{#each items as item, index (item[key])}
-			{@const id = item[key]}
-			{@const activeElement =
-				isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null}
-			<li
-				class="sortable-item"
-				class:is-selecting={isSelecting && draggedItem?.id === id}
-				class:is-deselecting={isDeselecting && draggedItem?.id === id}
-				style:cursor={isDragging && draggedItem?.id === id
-					? 'grabbing'
-					: !$$slots.handle
-						? 'grab'
-						: 'initial'}
-				style:visibility={(isDragging || isDropping) && draggedItem?.id === id
-					? 'hidden'
-					: 'visible'}
-				style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
-				draggedItem &&
-				draggedItem.id !== id &&
-				targetItem
-					? !isCancelling && index > draggedItem.index && index <= targetItem.index
-						? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
-						: !isCancelling && index < draggedItem.index && index >= targetItem.index
-							? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
-							: 'translate3d(0, 0, 0)'
-					: 'translate3d(0, 0, 0)'}
-				style:transition={isDragging || isSelecting || isDeselecting
-					? `transform ${transitionDuration}ms`
-					: ''}
-				id="sortable-item-{id}"
-				data-id={id}
-				data-index={index}
-				role="option"
-				tabindex={focusedItem?.id === id ? 0 : -1}
-				aria-selected={focusedItem?.id === id}
-				aria-label="{focusedItem?.id === id
-					? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
-					: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
-				in:scaleFly={{ x: -120 }}
-				out:scaleFly={{ x: 120 }}
+			<SortableItem
+				{item}
+				{index}
+				{key}
+				{listRef}
+				{ghostRef}
+				{focusedItem}
+				{draggedItem}
+				{targetItem}
+				{isDragging}
+				{isDropping}
+				{isSelecting}
+				{isDeselecting}
+				{isCancelling}
 			>
-				<div class="sortable-item__inner">
-					{#if $$slots.handle}
-						<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
-							<slot name="handle" />
-						</span>
-					{/if}
-					<slot {item} {index} />
-				</div>
-			</li>
+				{#if $$slots.handle}
+					<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+						<slot name="handle" />
+					</span>
+				{/if}
+				<slot {item} {index} />
+			</SortableItem>
 		{/each}
 	</ul>
 
@@ -448,7 +421,7 @@
 
 <style lang="scss">
 	.sortable-list,
-	.sortable-list * {
+	.sortable-list :global(*) {
 		box-sizing: border-box;
 
 		&:focus-visible {
@@ -459,31 +432,17 @@
 	.sortable-list {
 		padding: 0;
 		touch-action: none;
-	}
 
-	.sortable-item {
-		position: relative;
-		list-style: none;
-		user-select: none;
-		backface-visibility: hidden;
-
-		& + & {
+		:global(.sortable-item + .sortable-item) {
 			margin-top: var(--gap);
-		}
-
-		&:focus-visible,
-		&.is-selecting,
-		&.is-deselecting {
-			z-index: 1;
-		}
-
-		&__handle {
-			display: flex;
 		}
 	}
 
 	.sortable-item--ghost {
 		position: fixed;
+		list-style: none;
+		user-select: none;
+		backface-visibility: hidden;
 		z-index: 9999;
 	}
 
