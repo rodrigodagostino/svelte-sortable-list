@@ -62,9 +62,7 @@
 	out:scaleFly={{ x: 120 }}
 >
 	<div class="sortable-item__inner">
-		{#if $$slots.handle}
-			<slot name="handle" />
-		{/if}
+		<slot name="handle" />
 		<slot {item} {index} />
 	</div>
 </li>

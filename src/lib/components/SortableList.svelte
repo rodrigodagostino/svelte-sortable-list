@@ -385,11 +385,13 @@
 				{isCancelling}
 			>
 				{#if $$slots.handle}
-					<span class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+					<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
 						<slot name="handle" />
-					</span>
+					</div>
 				{/if}
-				<slot {item} {index} />
+				<div class="sortable-item__content">
+					<slot {item} {index} />
+				</div>
 			</SortableItem>
 		{/each}
 	</ul>
@@ -423,8 +425,13 @@
 		}
 	}
 
-	.sortable-item__handle {
+	.sortable-item__handle,
+	.sortable-item__content {
 		display: flex;
+		align-items: center;
+	}
+
+	.sortable-item__handle {
 		flex-shrink: 0;
 	}
 

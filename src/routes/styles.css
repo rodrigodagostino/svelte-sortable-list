@@ -221,6 +221,10 @@ code {
 	stroke: var(--gray-600);
 }
 
+.sortable-item__content {
+	gap: 0.75rem;
+}
+
 .sortable-item__text {
 	margin-block: 0.625rem;
 }
