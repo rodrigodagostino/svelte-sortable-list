@@ -423,6 +423,11 @@
 		}
 	}
 
+	.sortable-item__handle {
+		display: flex;
+		flex-shrink: 0;
+	}
+
 	.live-text {
 		position: absolute;
 		left: 0px;

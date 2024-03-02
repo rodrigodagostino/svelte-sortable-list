@@ -81,9 +81,5 @@
 		&.is-deselecting {
 			z-index: 1;
 		}
-
-		&__handle {
-			display: flex;
-		}
 	}
 </style>
