@@ -1,4 +1,5 @@
 <script lang="ts">
+	import HandleIcon from '$lib/components/HandleIcon.svelte';
 	import { SortableList, reorder } from '$lib/index.js';
 
 	let items: { id: number; text: string }[] = [
@@ -31,19 +32,6 @@
 </script>
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
-	<svg
-		slot="handle"
-		fill="currentColor"
-		height="0.875rem"
-		viewBox="0 0 320 512"
-		pointer-events="none"
-	>
-		<circle cx="80" cy="96" r="48" />
-		<circle cx="240" cy="96" r="48" />
-		<circle cx="80" cy="256" r="48" />
-		<circle cx="240" cy="256" r="48" />
-		<circle cx="80" cy="416" r="48" />
-		<circle cx="240" cy="416" r="48" />
-	</svg>
+	<HandleIcon slot="handle" />
 	<span class="sortable-item__text">{item.text}</span>
 </SortableList>
