@@ -316,6 +316,11 @@
 			isSelecting = false;
 			isDeselecting = true;
 			isCancelling = true;
+			if (draggedItem) {
+				liveText = `Movement has been cancelled. The item has returned to its starting position of ${
+					draggedItem?.index + 1
+				}.`;
+			}
 
 			const timeoutId = setTimeout(() => {
 				draggedItem = null;
