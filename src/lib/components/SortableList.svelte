@@ -7,6 +7,7 @@
 		getCollidingItem,
 		getItemData,
 		getItemsData,
+		screenReaderText,
 		type IItemData,
 	} from '$lib/utils/index.js';
 
@@ -177,17 +178,7 @@
 				);
 				draggedItem = focusedItemElement && getItemData(focusedItemElement);
 				itemsOrigin = getItemsData(listRef);
-				if (draggedItem !== null) {
-					const element =
-						draggedItem.index >= 0
-							? listRef.querySelector<HTMLLIElement>(
-									`.sortable-item[data-index="${draggedItem.index}"]`
-								)?.textContent
-							: 'the item';
-					liveText = `Dragging ${element} at position ${
-						draggedItem.index + 1
-					}. Press Arrow Down to move it down, Arrow Up to move it up, Space Bar to drop it.`;
-				}
+				if (draggedItem !== null) liveText = screenReaderText.lifted(draggedItem, listRef);
 			} else {
 				isSelecting = false;
 				isDeselecting = true;
@@ -197,19 +188,8 @@
 					`.sortable-item[data-id="${focusedItem?.id}"]`
 				);
 				focusedItemElement && setItemStyles(focusedItemElement);
-				if (draggedItem !== null) {
-					const element =
-						draggedItem.index >= 0
-							? listRef.querySelector<HTMLLIElement>(
-									`.sortable-item[data-index="${draggedItem.index}"]`
-								)?.textContent
-							: 'the item';
-					const result =
-						targetItem && draggedItem.index !== targetItem.index
-							? `Moved from position ${draggedItem?.index + 1} to ${targetItem.index + 1}`
-							: `Hasn’t changed position`;
-					liveText = `Dropped ${element}. ${result}.`;
-				}
+				if (draggedItem)
+					liveText = screenReaderText.dropped(draggedItem, targetItem || null, listRef);
 
 				const timeoutId = setTimeout(async () => {
 					if (
@@ -294,17 +274,8 @@
 
 				await tick();
 				draggedItem && setItemStyles(items[draggedItem.index]);
-				if (targetItem !== null) {
-					const element =
-						draggedItem.index >= 0
-							? listRef.querySelector<HTMLLIElement>(
-									`.sortable-item[data-index="${draggedItem.index}"]`
-								)?.textContent
-							: 'the item';
-					const direction = key === 'ArrowUp' ? 'up' : 'down';
-					const position = targetItem.index + 1;
-					liveText = `Moved ${element} ${direction} to position ${position}.`;
-				}
+				if (targetItem !== null)
+					liveText = screenReaderText.dragged(draggedItem, targetItem, listRef, key);
 			}
 		}
 
@@ -316,11 +287,7 @@
 			isSelecting = false;
 			isDeselecting = true;
 			isCancelling = true;
-			if (draggedItem) {
-				liveText = `Movement has been cancelled. The item has returned to its starting position of ${
-					draggedItem?.index + 1
-				}.`;
-			}
+			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
 			const timeoutId = setTimeout(() => {
 				draggedItem = null;
@@ -378,7 +345,6 @@
 				{item}
 				{index}
 				{key}
-				{listRef}
 				{ghostRef}
 				{focusedItem}
 				{draggedItem}

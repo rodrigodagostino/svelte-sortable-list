@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { scaleFly } from '$lib/transitions/index.js';
-	import { getItemData, type IItemData } from '$lib/utils/index.js';
+	import { getItemData, screenReaderText, type IItemData } from '$lib/utils/index.js';
 
 	export let item: Record<string, unknown>;
 	export let index: number;
@@ -9,7 +9,6 @@
 	export let transitionDuration: number = 320;
 
 	let itemRef: HTMLLIElement;
-	export let listRef: HTMLUListElement;
 	export let ghostRef: HTMLLIElement;
 	export let focusedItem: IItemData | null;
 	export let draggedItem: IItemData | null;
@@ -55,9 +54,7 @@
 	role="option"
 	tabindex={focusedItem?.id === id ? 0 : -1}
 	aria-selected={focusedItem?.id === id}
-	aria-label="{focusedItem?.id === id
-		? `${listRef.querySelector(`.sortable-item[data-id="${id}"]`)?.textContent}`
-		: 'Draggable item'} at position {index + 1}. Press Space Bar to drag it."
+	aria-label={screenReaderText.item(index)}
 	in:scaleFly={{ x: -120 }}
 	out:scaleFly={{ x: 120 }}
 >

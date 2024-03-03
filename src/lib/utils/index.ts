@@ -95,3 +95,55 @@ export function reorder<T>(array: T[], from: number, to: number) {
 	array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
 	return array;
 }
+
+export const screenReaderText = {
+	item: (index: number) => {
+		return `Draggable item at position ${index + 1}. Press Space Bar to lift it.`;
+	},
+
+	lifted: (draggedItem: IItemData, listRef: HTMLUListElement) => {
+		const element =
+			draggedItem.index >= 0
+				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
+						?.textContent
+				: 'the item';
+		return `Lifted ${element} at position ${
+			draggedItem.index + 1
+		}. Press Arrow Down to move it down, Arrow Up to move it up, Space Bar to drop it.`;
+	},
+
+	dragged: (
+		draggedItem: IItemData,
+		targetItem: IItemData,
+		listRef: HTMLUListElement,
+		key: 'ArrowUp' | 'ArrowDown'
+	) => {
+		const element =
+			draggedItem.index >= 0
+				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
+						?.textContent
+				: 'the item';
+		const direction = key === 'ArrowUp' ? 'up' : 'down';
+		const position = targetItem.index + 1;
+		return `Moved ${element} ${direction} to position ${position}.`;
+	},
+
+	dropped: (draggedItem: IItemData, targetItem: IItemData | null, listRef: HTMLUListElement) => {
+		const element =
+			draggedItem.index >= 0
+				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
+						?.textContent
+				: 'the item';
+		const result =
+			targetItem && draggedItem.index !== targetItem.index
+				? `moved from position ${draggedItem.index + 1} to ${targetItem.index + 1}`
+				: `hasn’t changed position`;
+		return `Dropped ${element}, ${result}.`;
+	},
+
+	canceled: (draggedItem: IItemData) => {
+		return `Movement has been cancelled. The item has returned to its starting position of ${
+			draggedItem.index + 1
+		}.`;
+	},
+};
