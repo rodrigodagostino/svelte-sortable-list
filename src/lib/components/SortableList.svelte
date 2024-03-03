@@ -302,19 +302,13 @@
 	}
 
 	function handleFocusOut() {
-		if (!focusedItem) return;
-
-		if (!isSelecting) {
-			focusedItem = null;
-			return;
-		}
+		if (!focusedItem || !isSelecting) return;
 
 		isSelecting = false;
 		isDeselecting = true;
 		isCanceling = true;
 
 		const timeoutId = setTimeout(() => {
-			focusedItem = null;
 			draggedItem = null;
 			targetItem = null;
 			itemsOrigin = null;
@@ -346,7 +340,7 @@
 				{index}
 				{key}
 				{ghostRef}
-				{focusedItem}
+				bind:focusedItem
 				{draggedItem}
 				{targetItem}
 				{isDragging}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import { getItemData, screenReaderText, type IItemData } from '$lib/utils/index.js';
 
@@ -35,6 +35,15 @@
 	}
 
 	onMount(() => setInteractiveElementsTabIndex());
+
+	async function handleFocusOut(event: FocusEvent) {
+		const relatedTarget = (event.relatedTarget as HTMLElement) || null;
+		if (!relatedTarget.closest('.sortable-item')) {
+			focusedItem = null;
+			await tick();
+			setInteractiveElementsTabIndex();
+		}
+	}
 </script>
 
 <li
@@ -69,6 +78,7 @@
 	aria-roledescription={screenReaderText.item(index)}
 	aria-selected={focusedItem?.id === id}
 	on:focus={setInteractiveElementsTabIndex}
+	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
 	in:scaleFly={{ x: -120 }}
 	out:scaleFly={{ x: 120 }}
