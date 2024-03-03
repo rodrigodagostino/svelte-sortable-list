@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import { getItemData, screenReaderText, type IItemData } from '$lib/utils/index.js';
 
@@ -22,6 +23,18 @@
 	let id = item[key];
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
+
+	function setInteractiveElementsTabIndex() {
+		itemRef
+			.querySelectorAll<HTMLElement>(
+				'a, audio, button, input, optgroup, option, select, textarea, video, [role="button"], [role="checkbox"], [role="link"], [role="tab"]'
+			)
+			.forEach((el) =>
+				focusedItem?.id === id ? el.removeAttribute('tabindex') : (el.tabIndex = -1)
+			);
+	}
+
+	onMount(() => setInteractiveElementsTabIndex());
 </script>
 
 <li
@@ -53,8 +66,10 @@
 	data-index={index}
 	role="option"
 	tabindex={focusedItem?.id === id ? 0 : -1}
-	aria-selected={focusedItem?.id === id}
 	aria-roledescription={screenReaderText.item(index)}
+	aria-selected={focusedItem?.id === id}
+	on:focus={setInteractiveElementsTabIndex}
+	on:blur={setInteractiveElementsTabIndex}
 	in:scaleFly={{ x: -120 }}
 	out:scaleFly={{ x: 120 }}
 >
