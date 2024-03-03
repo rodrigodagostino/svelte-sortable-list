@@ -90,8 +90,7 @@ export function getCollidingItem(ghost: IItemData, items: IItemData[], threshold
 	return collidingItems[0];
 }
 
-export function reorder<T>(array: T[], from: number, to: number) {
-	array = array.slice();
+export function reorderItems<T>(array: T[], from: number, to: number) {
 	array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
 	return array;
 }
