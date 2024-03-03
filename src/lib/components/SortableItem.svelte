@@ -86,6 +86,7 @@
 	<div class="sortable-item__inner">
 		<slot name="handle" />
 		<slot {item} {index} />
+		<slot name="remove" />
 	</div>
 </li>
 

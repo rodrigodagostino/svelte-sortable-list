@@ -362,6 +362,14 @@
 				<div class="sortable-item__content">
 					<slot {item} {index} />
 				</div>
+				{#if $$slots.remove}
+					<button
+						class="sortable-item__remove"
+						on:click={() => (items = items.filter((i) => i[key] !== item[key]))}
+					>
+						<slot name="remove" />
+					</button>
+				{/if}
 			</SortableItem>
 		{/each}
 	</ul>
