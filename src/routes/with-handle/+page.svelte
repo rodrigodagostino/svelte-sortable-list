@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { HandleIcon, SortableList, reorder } from '$lib/index.js';
+	import { SortableList, IconHandle, reorder } from '$lib/index.js';
 
 	let items: { id: number; text: string }[] = [
 		{
@@ -35,6 +35,6 @@
 </svelte:head>
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
-	<HandleIcon slot="handle" />
+	<IconHandle slot="handle" />
 	{item.text}
 </SortableList>

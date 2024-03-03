@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RemoveIcon, SortableList, reorder } from '$lib/index.js';
+	import { SortableList, IconRemove, reorder } from '$lib/index.js';
 
 	let items: { id: number; text: string }[] = [
 		{
@@ -37,7 +37,7 @@
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
 	{item.text}
-	<RemoveIcon slot="remove" />
+	<IconRemove slot="remove" />
 </SortableList>
 
 <form
