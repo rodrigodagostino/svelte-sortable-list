@@ -89,7 +89,7 @@
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
-		if (isDropping || isDragging) return;
+		if (isDragging || isDropping || isSelecting || isDeselecting || isCancelling) return;
 
 		const target = event.target as HTMLElement;
 		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
