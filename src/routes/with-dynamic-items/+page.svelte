@@ -36,7 +36,7 @@
 </svelte:head>
 
 <SortableList {items} key="id" let:item on:sort={handleSort}>
-	<span class="sortable-item__text">{item.text}</span>
+	{item.text}
 	<RemoveIcon slot="remove" />
 </SortableList>
 
