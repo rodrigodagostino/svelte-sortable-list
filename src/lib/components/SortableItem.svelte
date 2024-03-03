@@ -17,7 +17,7 @@
 	export let isDropping: boolean;
 	export let isSelecting: boolean;
 	export let isDeselecting: boolean;
-	export let isCancelling: boolean;
+	export let isCanceling: boolean;
 
 	let id = item[key];
 	$: activeElement =
@@ -39,9 +39,9 @@
 	draggedItem &&
 	draggedItem.id !== id &&
 	targetItem
-		? !isCancelling && index > draggedItem.index && index <= targetItem.index
+		? !isCanceling && index > draggedItem.index && index <= targetItem.index
 			? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
-			: !isCancelling && index < draggedItem.index && index >= targetItem.index
+			: !isCanceling && index < draggedItem.index && index >= targetItem.index
 				? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 				: 'translate3d(0, 0, 0)'
 		: 'translate3d(0, 0, 0)'}

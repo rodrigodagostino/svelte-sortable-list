@@ -30,7 +30,7 @@
 	let isDropping = false;
 	let isSelecting = false;
 	let isDeselecting = false;
-	let isCancelling = false;
+	let isCanceling = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -89,7 +89,7 @@
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
-		if (isDragging || isDropping || isSelecting || isDeselecting || isCancelling) return;
+		if (isDragging || isDropping || isSelecting || isDeselecting || isCanceling) return;
 
 		const target = event.target as HTMLElement;
 		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
@@ -286,7 +286,7 @@
 
 			isSelecting = false;
 			isDeselecting = true;
-			isCancelling = true;
+			isCanceling = true;
 			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
 			const timeoutId = setTimeout(() => {
@@ -294,7 +294,7 @@
 				targetItem = null;
 				itemsOrigin = null;
 				isDeselecting = false;
-				isCancelling = false;
+				isCanceling = false;
 
 				clearTimeout(timeoutId);
 			}, transitionDuration);
@@ -311,7 +311,7 @@
 
 		isSelecting = false;
 		isDeselecting = true;
-		isCancelling = true;
+		isCanceling = true;
 
 		const timeoutId = setTimeout(() => {
 			focusedItem = null;
@@ -319,7 +319,7 @@
 			targetItem = null;
 			itemsOrigin = null;
 			isDeselecting = false;
-			isCancelling = false;
+			isCanceling = false;
 
 			clearTimeout(timeoutId);
 		}, transitionDuration);
@@ -353,7 +353,7 @@
 				{isDropping}
 				{isSelecting}
 				{isDeselecting}
-				{isCancelling}
+				{isCanceling}
 			>
 				{#if $$slots.handle}
 					<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
