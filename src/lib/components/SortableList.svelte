@@ -162,11 +162,16 @@
 			return;
 		}
 
-		const { key } = event;
+		const { key, target } = event;
 		const items = listRef.querySelectorAll<HTMLLIElement>('.sortable-item');
 
 		if (key === ' ') {
-			event.preventDefault();
+			// Prevent default only if the target is a sortable item.
+			// This allows interactive elements (like buttons) to operate normally.
+			if ((target as HTMLElement | null)?.classList.contains('sortable-item'))
+				event.preventDefault();
+			else return;
+
 			if (!focusedItem) return;
 
 			if (!isSelecting) {
