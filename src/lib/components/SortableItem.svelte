@@ -54,7 +54,7 @@
 	role="option"
 	tabindex={focusedItem?.id === id ? 0 : -1}
 	aria-selected={focusedItem?.id === id}
-	aria-label={screenReaderText.item(index)}
+	aria-roledescription={screenReaderText.item(index)}
 	in:scaleFly={{ x: -120 }}
 	out:scaleFly={{ x: 120 }}
 >
