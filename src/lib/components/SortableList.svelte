@@ -323,6 +323,40 @@
 			clearTimeout(timeoutId);
 		}, transitionDuration);
 	}
+
+	async function handleRemove(itemId: unknown) {
+		if (items.length > 1 && focusedItem && focusedItem.index !== items.length - 1) {
+			// Focus the next item before removing the item
+			// (if it exists and the focused item is not the last).
+			const newFocusedItemElement = listRef.querySelector<HTMLLIElement>(
+				`.sortable-item[data-id="${items[focusedItem.index + 1].id}"]`
+			);
+			if (newFocusedItemElement) {
+				focusedItem = getItemData(newFocusedItemElement);
+				await tick();
+				newFocusedItemElement.focus();
+			}
+		} else if (items.length > 1 && focusedItem && focusedItem.index === items.length - 1) {
+			// Focus the next item before removing the item
+			// (if it exists and the focused item is the last).
+			const newFocusedItemElement = listRef.querySelector<HTMLLIElement>(
+				`.sortable-item[data-id="${items[focusedItem.index - 1].id}"]`
+			);
+			if (newFocusedItemElement) {
+				focusedItem = getItemData(newFocusedItemElement);
+				await tick();
+				newFocusedItemElement.focus();
+			}
+		} else {
+			// Focus the list before removing the item
+			// (if there are no items left in the list).
+			focusedItem = null;
+			await tick();
+			listRef.focus();
+		}
+
+		dispatch('remove', { id: itemId });
+	}
 </script>
 
 <svelte:document on:click={handleFocusOut} />
@@ -363,10 +397,7 @@
 					<slot {item} {index} />
 				</div>
 				{#if $$slots.remove}
-					<button
-						class="sortable-item__remove"
-						on:click={() => dispatch('remove', { id: item[key] })}
-					>
+					<button class="sortable-item__remove" on:click={() => handleRemove(item[key])}>
 						<slot name="remove" />
 					</button>
 				{/if}
