@@ -29,13 +29,18 @@
 		const { oldIndex, newIndex } = event.detail;
 		items = reorderItems(items, oldIndex, newIndex);
 	}
+
+	function handleRemove(event: CustomEvent) {
+		const { id } = event.detail;
+		items = items.filter((i) => i.id !== id);
+	}
 </script>
 
 <svelte:head>
 	<title>With dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {items} key="id" let:item on:sort={handleSort}>
+<SortableList {items} key="id" let:item on:sort={handleSort} on:remove={handleRemove}>
 	{item.text}
 	<IconRemove slot="remove" />
 </SortableList>

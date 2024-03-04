@@ -365,7 +365,7 @@
 				{#if $$slots.remove}
 					<button
 						class="sortable-item__remove"
-						on:click={() => (items = items.filter((i) => i[key] !== item[key]))}
+						on:click={() => dispatch('remove', { id: item[key] })}
 					>
 						<slot name="remove" />
 					</button>
