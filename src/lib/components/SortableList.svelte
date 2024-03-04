@@ -12,7 +12,7 @@
 	import type { IItemData } from '$lib/types.js';
 
 	export let items: Record<string, unknown>[];
-	export let key: string;
+	export let key: string = 'id';
 	export let gap: number = 12;
 	export let sortThreshold: number = 1;
 	export let transitionDuration: number = 320;
