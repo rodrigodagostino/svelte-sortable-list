@@ -31,7 +31,7 @@
 				'a, audio, button, input, optgroup, option, select, textarea, video, [role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach((el) =>
-				focusedItem?.id === id ? el.removeAttribute('tabindex') : (el.tabIndex = -1)
+				focusedItem?.id === String(id) ? el.removeAttribute('tabindex') : (el.tabIndex = -1)
 			);
 	}
 
@@ -77,17 +77,19 @@
 <li
 	bind:this={itemRef}
 	class="sortable-item"
-	class:is-selecting={isSelecting && draggedItem?.id === id}
-	class:is-deselecting={isDeselecting && draggedItem?.id === id}
-	style:cursor={isDragging && draggedItem?.id === id
+	class:is-selecting={isSelecting && draggedItem?.id === String(id)}
+	class:is-deselecting={isDeselecting && draggedItem?.id === String(id)}
+	style:cursor={isDragging && draggedItem?.id === String(id)
 		? 'grabbing'
 		: !$$slots.handle
 			? 'grab'
 			: 'initial'}
-	style:visibility={(isDragging || isDropping) && draggedItem?.id === id ? 'hidden' : 'visible'}
+	style:visibility={(isDragging || isDropping) && draggedItem?.id === String(id)
+		? 'hidden'
+		: 'visible'}
 	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
 	draggedItem &&
-	draggedItem.id !== id &&
+	draggedItem.id !== String(id) &&
 	targetItem
 		? !isCanceling && index > draggedItem.index && index <= targetItem.index
 			? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
@@ -102,9 +104,9 @@
 	data-id={id}
 	data-index={index}
 	role="option"
-	tabindex={focusedItem?.id === id ? 0 : -1}
+	tabindex={focusedItem?.id === String(id) ? 0 : -1}
 	aria-roledescription={screenReaderText.item(index)}
-	aria-selected={focusedItem?.id === id}
+	aria-selected={focusedItem?.id === String(id)}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}

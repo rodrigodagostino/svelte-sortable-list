@@ -1,5 +1,5 @@
 export interface IItemData {
-	id: number;
+	id: string;
 	index: number;
 	x: number;
 	y: number;
@@ -11,7 +11,7 @@ export interface IItemData {
 export function getItemData(item: HTMLElement): IItemData {
 	const itemRect = item.getBoundingClientRect();
 	return {
-		id: +item.dataset.id!,
+		id: item.dataset.id!,
 		index: +item.dataset.index!,
 		x: itemRect.x,
 		y: itemRect.y,
