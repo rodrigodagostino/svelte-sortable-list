@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] (2024-03-04)
+
+### Added
+
+- Add item removal feature.
+- Add **Handle** icon component.
+- Add **Remove** icon component.
+- Add `canceled` live text.
+
+### Changed
+
+- Extract **SortableItem** component.
+- Extract **Ghost** component.
+- Render **SortableList** only if `items` prop is provided.
+- Add default value to `key` prop.
+- Ensure `id` prop consistency.
+
+### Fixed
+
+- Prevent focus loss after removing a **SortableItem**.
+- Allow interactive elements (like buttons) in an item to be tabbable and operate normally only when that item is focused.
+- Prevent dragging with pointer while dragging with keyboard is occurring.
+- Prevent screen reading of an item’s content after dropping it.
+
+### Docs
+
+- Add page titles
+
 ## [0.5.2] (2024-02-15)
 
 ### Added
@@ -155,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.4.1...v0.5.0
