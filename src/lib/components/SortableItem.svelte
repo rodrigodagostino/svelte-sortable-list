@@ -11,6 +11,7 @@
 
 	let itemRef: HTMLLIElement;
 	export let ghostRef: HTMLLIElement;
+	export let itemsOrigin: IItemData[] | null;
 	export let focusedItem: IItemData | null;
 	export let draggedItem: IItemData | null;
 	export let targetItem: IItemData | null;
@@ -36,13 +37,40 @@
 
 	onMount(() => setInteractiveElementsTabIndex());
 
+	async function handleFocus() {
+		await tick();
+		focusedItem = getItemData(itemRef);
+		setInteractiveElementsTabIndex();
+	}
+
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = (event.relatedTarget as HTMLElement) || null;
-		if (!relatedTarget.closest('.sortable-item')) {
+		if (!relatedTarget || !relatedTarget.closest('.sortable-item')) {
 			focusedItem = null;
-			await tick();
-			setInteractiveElementsTabIndex();
+			isSelecting = false;
+			isDeselecting = true;
+			isCanceling = true;
+
+			const timeoutId = setTimeout(async () => {
+				draggedItem = null;
+				targetItem = null;
+				itemsOrigin = null;
+				isDeselecting = false;
+				isCanceling = false;
+
+				clearTimeout(timeoutId);
+			}, transitionDuration);
 		}
+
+		if (
+			relatedTarget &&
+			relatedTarget.classList.contains('sortable-item') &&
+			relatedTarget.getAttribute('data-id') !== String(focusedItem?.id)
+		)
+			focusedItem = null;
+
+		await tick();
+		setInteractiveElementsTabIndex();
 	}
 </script>
 
@@ -77,7 +105,7 @@
 	tabindex={focusedItem?.id === id ? 0 : -1}
 	aria-roledescription={screenReaderText.item(index)}
 	aria-selected={focusedItem?.id === id}
-	on:focus={setInteractiveElementsTabIndex}
+	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
 	in:scaleFly={{ x: -120 }}

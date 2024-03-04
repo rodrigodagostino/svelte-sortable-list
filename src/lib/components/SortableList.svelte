@@ -216,11 +216,7 @@
 					const focusedItemElement = listRef.querySelector<HTMLLIElement>(
 						`.sortable-item[data-id="${focusedItem?.id}"]`
 					);
-					if (focusedItemElement) {
-						focusedItem = getItemData(focusedItemElement);
-						await tick();
-						focusedItemElement?.focus();
-					}
+					focusedItemElement?.focus();
 
 					clearTimeout(timeoutId);
 				}, transitionDuration);
@@ -235,11 +231,7 @@
 			if (!isSelecting) {
 				if (!focusedItem) {
 					const firstItemElement = listRef.querySelector<HTMLLIElement>('.sortable-item');
-					if (firstItemElement) {
-						focusedItem = getItemData(firstItemElement);
-						await tick();
-						firstItemElement?.focus();
-					}
+					firstItemElement?.focus();
 					return;
 				}
 
@@ -254,11 +246,7 @@
 				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
 					`.sortable-item[data-index="${focusedItem?.index + step}"]`
 				);
-				if (focusedItemElement) {
-					focusedItem = getItemData(focusedItemElement);
-					await tick();
-					focusedItemElement?.focus();
-				}
+				focusedItemElement?.focus();
 			} else {
 				if (!draggedItem || !itemsOrigin) return;
 				// Prevent moving the selected item if it’s the first or last item,
@@ -284,8 +272,6 @@
 			}
 		}
 
-		if (key === 'Tab') handleFocusOut();
-
 		if (key === 'Escape') {
 			if (!focusedItem || !isSelecting) return;
 
@@ -306,60 +292,23 @@
 		}
 	}
 
-	function handleFocusOut() {
-		if (!focusedItem || !isSelecting) return;
-
-		isSelecting = false;
-		isDeselecting = true;
-		isCanceling = true;
-
-		const timeoutId = setTimeout(() => {
-			draggedItem = null;
-			targetItem = null;
-			itemsOrigin = null;
-			isDeselecting = false;
-			isCanceling = false;
-
-			clearTimeout(timeoutId);
-		}, transitionDuration);
-	}
-
 	async function handleRemove(itemId: unknown) {
-		if (items.length > 1 && focusedItem && focusedItem.index !== items.length - 1) {
-			// Focus the next item before removing the item
-			// (if it exists and the focused item is not the last).
-			const newFocusedItemElement = listRef.querySelector<HTMLLIElement>(
-				`.sortable-item[data-id="${items[focusedItem.index + 1].id}"]`
-			);
-			if (newFocusedItemElement) {
-				focusedItem = getItemData(newFocusedItemElement);
-				await tick();
-				newFocusedItemElement.focus();
-			}
-		} else if (items.length > 1 && focusedItem && focusedItem.index === items.length - 1) {
-			// Focus the next item before removing the item
-			// (if it exists and the focused item is the last).
-			const newFocusedItemElement = listRef.querySelector<HTMLLIElement>(
-				`.sortable-item[data-id="${items[focusedItem.index - 1].id}"]`
-			);
-			if (newFocusedItemElement) {
-				focusedItem = getItemData(newFocusedItemElement);
-				await tick();
-				newFocusedItemElement.focus();
-			}
+		if (items.length > 1 && focusedItem) {
+			// Focus the next/previous item (if it exists) before removing.
+			const step = focusedItem.index !== items.length - 1 ? 1 : -1;
+			const adjacentFocusedItemId = items[focusedItem.index + step].id;
+			listRef
+				.querySelector<HTMLLIElement>(`.sortable-item[data-id="${adjacentFocusedItemId}"]`)
+				?.focus();
 		} else {
-			// Focus the list before removing the item
-			// (if there are no items left in the list).
+			// Focus the list (if there are no items left) before removing.
 			focusedItem = null;
-			await tick();
 			listRef.focus();
 		}
 
 		dispatch('remove', { id: itemId });
 	}
 </script>
-
-<svelte:document on:click={handleFocusOut} />
 
 {#if items}
 	<ul
@@ -379,14 +328,15 @@
 				{index}
 				{key}
 				{ghostRef}
+				{itemsOrigin}
 				bind:focusedItem
-				{draggedItem}
-				{targetItem}
-				{isDragging}
-				{isDropping}
-				{isSelecting}
-				{isDeselecting}
-				{isCanceling}
+				bind:draggedItem
+				bind:targetItem
+				bind:isDragging
+				bind:isDropping
+				bind:isSelecting
+				bind:isDeselecting
+				bind:isCanceling
 			>
 				{#if $$slots.handle}
 					<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
