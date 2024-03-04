@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
-	import { getItemData, screenReaderText, type IItemData } from '$lib/utils/index.js';
+	import { getItemData, screenReaderText } from '$lib/utils/index.js';
+	import type { IItemData } from '$lib/types.js';
 
 	export let item: Record<string, unknown>;
 	export let index: number;

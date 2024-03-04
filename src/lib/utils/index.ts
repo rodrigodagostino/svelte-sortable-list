@@ -1,12 +1,4 @@
-export interface IItemData {
-	id: string;
-	index: number;
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	innerHTML: string;
-}
+import type { IItemData } from '$lib/types.js';
 
 export function getItemData(item: HTMLElement): IItemData {
 	const itemRect = item.getBoundingClientRect();

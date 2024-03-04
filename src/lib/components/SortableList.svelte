@@ -8,8 +8,8 @@
 		getItemData,
 		getItemsData,
 		screenReaderText,
-		type IItemData,
 	} from '$lib/utils/index.js';
+	import type { IItemData } from '$lib/types.js';
 
 	export let items: Record<string, unknown>[];
 	export let key: string;
