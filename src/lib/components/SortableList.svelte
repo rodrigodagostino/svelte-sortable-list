@@ -89,7 +89,8 @@
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
-		if (isDragging || isDropping || isSelecting || isDeselecting || isCanceling) return;
+		if (isDragging || isDropping || isSelecting || isDeselecting || isCanceling || focusedItem)
+			return;
 
 		const target = event.target as HTMLElement;
 		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
@@ -315,6 +316,7 @@
 		bind:this={listRef}
 		class="sortable-list"
 		style:--gap="{gap}px"
+		style:pointer-events={focusedItem ? 'none' : 'auto'}
 		role="listbox"
 		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 		aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
