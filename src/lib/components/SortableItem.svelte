@@ -31,9 +31,7 @@
 			.querySelectorAll<HTMLElement>(
 				'a, audio, button, input, optgroup, option, select, textarea, video, [role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
-			.forEach((el) =>
-				focusedItem?.id === String(id) ? el.removeAttribute('tabindex') : (el.tabIndex = -1)
-			);
+			.forEach((el) => (el.tabIndex = focusedItem?.id === String(id) ? 0 : -1));
 	}
 
 	onMount(() => setInteractiveElementsTabIndex());
