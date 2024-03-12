@@ -1,6 +1,6 @@
 {
 	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "always"
+		"source.fixAll.eslint": "explicit"
 	},
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.detectIndentation": false,
