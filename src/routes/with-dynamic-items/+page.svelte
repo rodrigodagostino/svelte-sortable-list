@@ -40,7 +40,7 @@
 	<title>With dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {items} key="id" let:item on:sort={handleSort} on:remove={handleRemove}>
+<SortableList {items} let:item on:sort={handleSort} on:remove={handleRemove}>
 	{item.text}
 	<IconRemove slot="remove" />
 </SortableList>

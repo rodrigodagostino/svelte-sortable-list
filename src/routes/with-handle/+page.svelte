@@ -34,7 +34,7 @@
 	<title>With handle | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {items} key="id" let:item on:sort={handleSort}>
+<SortableList {items} let:item on:sort={handleSort}>
 	<IconHandle slot="handle" />
 	{item.text}
 </SortableList>
