@@ -89,6 +89,16 @@
 		currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
 	}
 
+	function dispatchSort(draggedItem: IItemData | null, targetItem: IItemData | null) {
+		if (
+			draggedItem?.index !== null &&
+			targetItem?.index !== null &&
+			draggedItem?.index !== targetItem?.index
+		) {
+			dispatch('sort', { oldIndex: draggedItem?.index, newIndex: targetItem?.index });
+		}
+	}
+
 	async function handlePointerDown(event: PointerEvent) {
 		if (isDragging || isDropping || isSelecting || isDeselecting || isCanceling || focusedItem)
 			return;
@@ -138,15 +148,7 @@
 		isDropping = true;
 
 		const timeoutId = setTimeout(() => {
-			if (
-				draggedItem &&
-				draggedItem.index !== null &&
-				targetItem &&
-				targetItem.index !== null &&
-				draggedItem.index !== targetItem.index
-			) {
-				dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
-			}
+			dispatchSort(draggedItem, targetItem);
 
 			setGhostStyles('unset');
 			draggedItem = null;
@@ -195,15 +197,7 @@
 					liveText = screenReaderText.dropped(draggedItem, targetItem || null, listRef);
 
 				const timeoutId = setTimeout(async () => {
-					if (
-						draggedItem &&
-						draggedItem.index !== null &&
-						targetItem &&
-						targetItem.index !== null &&
-						draggedItem.index !== targetItem.index
-					) {
-						dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
-					}
+					dispatchSort(draggedItem, targetItem);
 
 					draggedItem = null;
 					targetItem = null;
