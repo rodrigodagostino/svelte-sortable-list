@@ -19,6 +19,10 @@ export function getItemsData(list: HTMLUListElement): IItemData[] {
 	);
 }
 
+export function getFocusedItemElement(list: HTMLUListElement, key: 'id' | 'index', value: string) {
+	return list.querySelector<HTMLLIElement>(`.sortable-item[data-${key}="${value}"]`);
+}
+
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
 export function checkIfInteractive(target: Element, rootElement: Element) {

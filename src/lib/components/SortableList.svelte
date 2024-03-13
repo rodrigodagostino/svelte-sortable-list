@@ -5,6 +5,7 @@
 	import {
 		checkIfInteractive,
 		getCollidingItem,
+		getFocusedItemElement,
 		getItemData,
 		getItemsData,
 		screenReaderText,
@@ -179,9 +180,7 @@
 				isSelecting = true;
 
 				await tick();
-				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
-					`.sortable-item[data-id="${focusedItem?.id}"]`
-				);
+				const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
 				draggedItem = focusedItemElement && getItemData(focusedItemElement);
 				itemsOrigin = getItemsData(listRef);
 				if (draggedItem !== null) liveText = screenReaderText.lifted(draggedItem, listRef);
@@ -190,9 +189,7 @@
 				isDeselecting = true;
 
 				await tick();
-				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
-					`.sortable-item[data-id="${focusedItem?.id}"]`
-				);
+				const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
 				focusedItemElement && setItemStyles(focusedItemElement);
 				if (draggedItem)
 					liveText = screenReaderText.dropped(draggedItem, targetItem || null, listRef);
@@ -214,9 +211,8 @@
 					isDeselecting = false;
 
 					await tick();
-					const focusedItemElement = listRef.querySelector<HTMLLIElement>(
-						`.sortable-item[data-id="${focusedItem?.id}"]`
-					);
+					const focusedItemElement =
+						focusedItem && getFocusedItemElement(listRef, 'id', focusedItem.id);
 					focusedItemElement?.focus();
 
 					clearTimeout(timeoutId);
@@ -244,8 +240,10 @@
 				)
 					return;
 
-				const focusedItemElement = listRef.querySelector<HTMLLIElement>(
-					`.sortable-item[data-index="${focusedItem?.index + step}"]`
+				const focusedItemElement = getFocusedItemElement(
+					listRef,
+					'index',
+					String(focusedItem?.index + step)
 				);
 				focusedItemElement?.focus();
 			} else {
@@ -297,10 +295,8 @@
 		if (items.length > 1 && focusedItem) {
 			// Focus the next/previous item (if it exists) before removing.
 			const step = focusedItem.index !== items.length - 1 ? 1 : -1;
-			const adjacentFocusedItemId = items[focusedItem.index + step].id;
-			listRef
-				.querySelector<HTMLLIElement>(`.sortable-item[data-id="${adjacentFocusedItemId}"]`)
-				?.focus();
+			const adjacentFocusedItemId = items[focusedItem.index + step].id as string;
+			getFocusedItemElement(listRef, 'id', adjacentFocusedItemId)?.focus();
 		} else {
 			// Focus the list (if there are no items left) before removing.
 			focusedItem = null;
