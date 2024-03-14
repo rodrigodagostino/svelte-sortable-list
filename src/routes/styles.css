@@ -236,24 +236,6 @@ code {
 	box-shadow: var(--box-shadow-1);
 }
 
-@keyframes box-shadow-in {
-	0% {
-		box-shadow: none;
-	}
-	100% {
-		box-shadow: var(--box-shadow-1);
-	}
-}
-
-@keyframes box-shadow-out {
-	0% {
-		box-shadow: var(--box-shadow-1);
-	}
-	100% {
-		box-shadow: none;
-	}
-}
-
 @media (min-width: 48em) {
 	.app {
 		grid-template-columns: 1fr 20rem;
