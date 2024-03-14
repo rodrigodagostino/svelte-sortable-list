@@ -6,7 +6,6 @@
 
 	export let item: Record<string, unknown>;
 	export let index: number;
-	export let key: string;
 	export let gap: number;
 	export let transitionDuration: number;
 
@@ -22,7 +21,6 @@
 	export let isDeselecting: boolean;
 	export let isCanceling: boolean;
 
-	let id = item[key];
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
 
@@ -31,7 +29,7 @@
 			.querySelectorAll<HTMLElement>(
 				'a, audio, button, input, optgroup, option, select, textarea, video, [role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
-			.forEach((el) => (el.tabIndex = focusedItem?.id === String(id) ? 0 : -1));
+			.forEach((el) => (el.tabIndex = focusedItem?.id === String(item.id) ? 0 : -1));
 	}
 
 	onMount(() => setInteractiveElementsTabIndex());
@@ -76,19 +74,19 @@
 <li
 	bind:this={itemRef}
 	class="sortable-item"
-	class:is-selecting={isSelecting && draggedItem?.id === String(id)}
-	class:is-deselecting={isDeselecting && draggedItem?.id === String(id)}
-	style:cursor={isDragging && draggedItem?.id === String(id)
+	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
+	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
+	style:cursor={isDragging && draggedItem?.id === String(item.id)
 		? 'grabbing'
 		: !$$slots.handle
 			? 'grab'
 			: 'initial'}
-	style:visibility={(isDragging || isDropping) && draggedItem?.id === String(id)
+	style:visibility={(isDragging || isDropping) && draggedItem?.id === String(item.id)
 		? 'hidden'
 		: 'visible'}
 	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
 	draggedItem &&
-	draggedItem.id !== String(id) &&
+	draggedItem.id !== String(item.id) &&
 	targetItem
 		? !isCanceling && index > draggedItem.index && index <= targetItem.index
 			? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
@@ -99,13 +97,13 @@
 	style:transition={isDragging || isSelecting || isDeselecting
 		? `transform ${transitionDuration}ms`
 		: ''}
-	id="sortable-item-{id}"
-	data-id={id}
+	id="sortable-item-{item.id}"
+	data-id={item.id}
 	data-index={index}
 	role="option"
-	tabindex={focusedItem?.id === String(id) ? 0 : -1}
+	tabindex={focusedItem?.id === String(item.id) ? 0 : -1}
 	aria-roledescription={screenReaderText.item(index)}
-	aria-selected={focusedItem?.id === String(id)}
+	aria-selected={focusedItem?.id === String(item.id)}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}

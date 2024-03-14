@@ -13,7 +13,6 @@
 	import type { IItemData } from '$lib/types.js';
 
 	export let items: Record<string, unknown>[];
-	export let key: string = 'id';
 	export let gap: number = 12;
 	export let swapThreshold: number = 1;
 	export let transitionDuration: number = 320;
@@ -314,11 +313,10 @@
 		on:pointerdown={handlePointerDown}
 		on:keydown={handleKeyDown}
 	>
-		{#each items as item, index (item[key])}
+		{#each items as item, index (item.id)}
 			<SortableItem
 				{item}
 				{index}
-				{key}
 				{gap}
 				{transitionDuration}
 				{ghostRef}
@@ -341,7 +339,7 @@
 					<slot {item} {index} />
 				</div>
 				{#if $$slots.remove}
-					<button class="sortable-item__remove" on:click={() => handleRemove(item[key])}>
+					<button class="sortable-item__remove" on:click={() => handleRemove(item.id)}>
 						<slot name="remove" />
 					</button>
 				{/if}
