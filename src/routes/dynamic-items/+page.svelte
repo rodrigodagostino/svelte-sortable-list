@@ -37,7 +37,7 @@
 </script>
 
 <svelte:head>
-	<title>With dynamic items | Svelte Sortable List</title>
+	<title>Dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {items} let:item on:sort={handleSort} on:remove={handleRemove}>

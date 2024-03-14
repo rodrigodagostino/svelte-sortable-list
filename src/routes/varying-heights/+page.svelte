@@ -31,7 +31,7 @@
 </script>
 
 <svelte:head>
-	<title>With varying heights | Svelte Sortable List</title>
+	<title>Varying heights | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {items} let:item on:sort={handleSort}>
