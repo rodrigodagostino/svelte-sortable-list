@@ -8,7 +8,7 @@
 	export let index: number;
 	export let key: string;
 	export let gap: number;
-	export let transitionDuration: number = 320;
+	export let transitionDuration: number;
 
 	let itemRef: HTMLLIElement;
 	export let ghostRef: HTMLLIElement;

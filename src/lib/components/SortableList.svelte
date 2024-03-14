@@ -320,6 +320,7 @@
 				{index}
 				{key}
 				{gap}
+				{transitionDuration}
 				{ghostRef}
 				{itemsOrigin}
 				bind:focusedItem
