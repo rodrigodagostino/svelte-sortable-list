@@ -15,7 +15,7 @@
 	export let items: Record<string, unknown>[];
 	export let key: string = 'id';
 	export let gap: number = 12;
-	export let sortThreshold: number = 1;
+	export let swapThreshold: number = 1;
 	export let transitionDuration: number = 320;
 
 	let listRef: HTMLUListElement;
@@ -135,7 +135,7 @@
 		/* prettier-ignore */
 		ghostRef.style.transform = `translate3d(${event.clientX - ghostOrigin.x}px, ${event.clientY - ghostOrigin.y}px, 0)`;
 
-		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, sortThreshold);
+		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, swapThreshold);
 		if (collidingItem) targetItem = collidingItem;
 		else targetItem = null;
 	}
