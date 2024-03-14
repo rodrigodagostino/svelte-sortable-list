@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { SortableList, reorderItems } from '$lib/index.js';
+	import { SortableList, reorderItems, type SortableListProps } from '$lib/index.js';
 
-	let items: { id: number; text: string }[] = [
+	let items: SortableListProps['items'] = [
 		{
 			id: 1,
 			text: 'List item 1',

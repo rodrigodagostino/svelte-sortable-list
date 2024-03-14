@@ -2,12 +2,12 @@
 	import { onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import { getItemData, screenReaderText } from '$lib/utils/index.js';
-	import type { IItemData } from '$lib/types.js';
+	import type { IItemData, SortableItemProps } from '$lib/types.js';
 
-	export let item: Record<string, unknown>;
-	export let index: number;
-	export let gap: number;
-	export let transitionDuration: number;
+	export let item: SortableItemProps['item'];
+	export let index: SortableItemProps['index'];
+	export let gap: SortableItemProps['gap'];
+	export let transitionDuration: SortableItemProps['transitionDuration'];
 
 	let itemRef: HTMLLIElement;
 	export let ghostRef: HTMLLIElement;

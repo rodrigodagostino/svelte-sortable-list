@@ -10,12 +10,12 @@
 		getItemsData,
 		screenReaderText,
 	} from '$lib/utils/index.js';
-	import type { IItemData } from '$lib/types.js';
+	import type { IItemData, SortableListProps } from '$lib/types.js';
 
-	export let items: Record<string, unknown>[];
-	export let gap: number = 12;
-	export let swapThreshold: number = 1;
-	export let transitionDuration: number = 320;
+	export let items: SortableListProps['items'];
+	export let gap: SortableListProps['gap'] = 12;
+	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
+	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
