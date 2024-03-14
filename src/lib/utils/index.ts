@@ -67,7 +67,6 @@ function getIntersectionRect(r1: IItemData, r2: IItemData) {
 export function getCollidingItem(ghost: IItemData, items: IItemData[], threshold: number) {
 	const collidingItems = items.filter((targetItem) => {
 		return (
-			ghost.id !== targetItem.id &&
 			ghost.x + ghost.width * threshold > targetItem.x &&
 			ghost.x < targetItem.x + targetItem.width * threshold &&
 			ghost.y + ghost.height * threshold > targetItem.y &&
