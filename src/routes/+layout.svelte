@@ -26,17 +26,17 @@
 		</a>
 		<a
 			class="app-nav__link"
-			href="/with-varying-heights"
-			aria-current={$page.url.pathname === '/with-varying-heights' ? 'page' : undefined}
+			href="/varying-heights"
+			aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
 		>
-			With varying heights
+			Varying heights
 		</a>
 		<a
 			class="app-nav__link"
-			href="/with-dynamic-items"
-			aria-current={$page.url.pathname === '/with-dynamic-items' ? 'page' : undefined}
+			href="/dynamic-items"
+			aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
 		>
-			With dynamic items
+			Dynamic items
 		</a>
 	</div>
 </nav>
