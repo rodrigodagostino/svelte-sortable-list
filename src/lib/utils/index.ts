@@ -1,6 +1,6 @@
-import type { IItemData } from '$lib/types.js';
+import type { ItemData } from '$lib/types.js';
 
-export function getItemData(item: HTMLElement): IItemData {
+export function getItemData(item: HTMLElement): ItemData {
 	const itemRect = item.getBoundingClientRect();
 	return {
 		id: item.dataset.id!,
@@ -13,7 +13,7 @@ export function getItemData(item: HTMLElement): IItemData {
 	};
 }
 
-export function getItemsData(list: HTMLUListElement): IItemData[] {
+export function getItemsData(list: HTMLUListElement): ItemData[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.sortable-item')).map((item) =>
 		getItemData(item)
 	);
@@ -55,7 +55,7 @@ export function checkIfInteractive(target: Element, rootElement: Element) {
 	return false;
 }
 
-function getIntersectionRect(r1: IItemData, r2: IItemData) {
+function getIntersectionRect(r1: ItemData, r2: ItemData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
 	const x2 = Math.min(r1.x + r1.width, r2.x + r2.width);
@@ -64,7 +64,7 @@ function getIntersectionRect(r1: IItemData, r2: IItemData) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(ghost: IItemData, items: IItemData[], threshold: number) {
+export function getCollidingItem(ghost: ItemData, items: ItemData[], threshold: number) {
 	const collidingItems = items.filter((targetItem) => {
 		return (
 			ghost.x + ghost.width * threshold > targetItem.x &&
@@ -95,7 +95,7 @@ export const screenReaderText = {
 		return `Draggable item at position ${index + 1}. Press Space Bar to lift it.`;
 	},
 
-	lifted: (draggedItem: IItemData, listRef: HTMLUListElement) => {
+	lifted: (draggedItem: ItemData, listRef: HTMLUListElement) => {
 		const element =
 			draggedItem.index >= 0
 				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
@@ -107,8 +107,8 @@ export const screenReaderText = {
 	},
 
 	dragged: (
-		draggedItem: IItemData,
-		targetItem: IItemData,
+		draggedItem: ItemData,
+		targetItem: ItemData,
 		listRef: HTMLUListElement,
 		key: 'ArrowUp' | 'ArrowDown'
 	) => {
@@ -122,7 +122,7 @@ export const screenReaderText = {
 		return `Moved ${element} ${direction} to position ${position}.`;
 	},
 
-	dropped: (draggedItem: IItemData, targetItem: IItemData | null, listRef: HTMLUListElement) => {
+	dropped: (draggedItem: ItemData, targetItem: ItemData | null, listRef: HTMLUListElement) => {
 		const element =
 			draggedItem.index >= 0
 				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
@@ -135,7 +135,7 @@ export const screenReaderText = {
 		return `Dropped ${element}, ${result}.`;
 	},
 
-	canceled: (draggedItem: IItemData) => {
+	canceled: (draggedItem: ItemData) => {
 		return `Movement has been cancelled. The item has returned to its starting position of ${
 			draggedItem.index + 1
 		}.`;

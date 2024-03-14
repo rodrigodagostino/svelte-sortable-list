@@ -10,7 +10,7 @@
 		getItemsData,
 		screenReaderText,
 	} from '$lib/utils/index.js';
-	import type { IItemData, SortableListProps } from '$lib/types.js';
+	import type { ItemData, SortableListProps } from '$lib/types.js';
 
 	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
@@ -20,10 +20,10 @@
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
 	let ghostOrigin: { x: number; y: number };
-	let itemsOrigin: IItemData[] | null = null;
-	let draggedItem: IItemData | null = null;
-	let targetItem: IItemData | null = null;
-	let focusedItem: IItemData | null = null;
+	let itemsOrigin: ItemData[] | null = null;
+	let draggedItem: ItemData | null = null;
+	let targetItem: ItemData | null = null;
+	let focusedItem: ItemData | null = null;
 	let liveText: string = '';
 
 	let isDragging = false;
@@ -88,7 +88,7 @@
 		currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
 	}
 
-	function dispatchSort(draggedItem: IItemData | null, targetItem: IItemData | null) {
+	function dispatchSort(draggedItem: ItemData | null, targetItem: ItemData | null) {
 		if (
 			draggedItem?.index !== null &&
 			targetItem?.index !== null &&

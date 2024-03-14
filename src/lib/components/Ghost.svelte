@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { IItemData } from '$lib/types.js';
+	import type { ItemData } from '$lib/types.js';
 
 	export let node: HTMLLIElement;
-	export let draggedItem: IItemData | null;
+	export let draggedItem: ItemData | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
 </script>

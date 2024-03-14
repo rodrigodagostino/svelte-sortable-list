@@ -17,7 +17,7 @@ interface Item {
 	[key: string]: unknown;
 }
 
-export interface IItemData {
+export interface ItemData {
 	id: string;
 	index: number;
 	x: number;

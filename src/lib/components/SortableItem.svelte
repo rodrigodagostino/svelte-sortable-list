@@ -2,7 +2,7 @@
 	import { onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import { getItemData, screenReaderText } from '$lib/utils/index.js';
-	import type { IItemData, SortableItemProps } from '$lib/types.js';
+	import type { ItemData, SortableItemProps } from '$lib/types.js';
 
 	export let item: SortableItemProps['item'];
 	export let index: SortableItemProps['index'];
@@ -11,10 +11,10 @@
 
 	let itemRef: HTMLLIElement;
 	export let ghostRef: HTMLLIElement;
-	export let itemsOrigin: IItemData[] | null;
-	export let focusedItem: IItemData | null;
-	export let draggedItem: IItemData | null;
-	export let targetItem: IItemData | null;
+	export let itemsOrigin: ItemData[] | null;
+	export let focusedItem: ItemData | null;
+	export let draggedItem: ItemData | null;
+	export let targetItem: ItemData | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
 	export let isSelecting: boolean;
