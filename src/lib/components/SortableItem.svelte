@@ -7,7 +7,7 @@
 	export let item: Record<string, unknown>;
 	export let index: number;
 	export let key: string;
-	export let gap: number = 12;
+	export let gap: number;
 	export let transitionDuration: number = 320;
 
 	let itemRef: HTMLLIElement;

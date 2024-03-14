@@ -319,6 +319,7 @@
 				{item}
 				{index}
 				{key}
+				{gap}
 				{ghostRef}
 				{itemsOrigin}
 				bind:focusedItem
