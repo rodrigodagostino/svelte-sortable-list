@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] (2024-03-14)
+
+### Changed
+
+- Avoid unnecessary code repetition through `getFocusedItemElement()` and `dispatchSort()`.
+- Rename `sortThreshold` prop to `swapThreshold`.
+
+### Fixed
+
+- Handle interruption of keyboard navigation caused by pointer interaction.
+- Trigger swap consistently when ghost hovers over the adjacent items of the dragged item (by including the dragged item in the list of colliding items).
+- Pass down `gap` and `transitionDuration` props to the **SortableItem** component to actually make use of the values assigned to the **SortableList** component.
+
 ## [0.6.0] (2024-03-04)
 
 ### Added
@@ -183,7 +196,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.0...v0.5.1
