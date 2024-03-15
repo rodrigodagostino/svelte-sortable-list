@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { SortableList, IconRemove, reorderItems, type SortableListProps } from '$lib/index.js';
+	import '$lib/styles.css';
 
 	let items: SortableListProps['items'] = [
 		{

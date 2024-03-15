@@ -1,0 +1,107 @@
+:root {
+	--font-main: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+		"Segoe UI Symbol", "Noto Color Emoji";
+
+	--white-rich: #fff;
+	--white: #f3f3f5;
+	--gray-050: #ededf0;
+	--gray-100: #e1e1e6;
+	--gray-150: #d2d2da;
+	--gray-200: #c3c3ce;
+	--gray-300: #a4a6b5;
+	--gray-400: #86889d;
+	--gray-500: #686a84;
+	--gray-600: #585a70;
+	--gray-650: #515266;
+	--gray-700: #494a5c;
+	--gray-750: #414253;
+	--gray-800: #393a49;
+	--gray-850: #31323f;
+	--gray-900: #2a2a35;
+	--gray-950: #22222b;
+	--black: #15151a;
+	--black-rich: #000;
+
+	--box-shadow-1: 0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
+		0 4px 4px rgba(54, 57, 90, 0.1), 0 6px 8px rgba(54, 57, 90, 0.1),
+		0 8px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-2: 0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
+		0 4px 4px rgba(54, 57, 90, 0.1), 0 8px 8px rgba(54, 57, 90, 0.1),
+		0 16px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-3: 0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
+		0 8px 4px rgba(54, 57, 90, 0.1), 0 12px 8px rgba(54, 57, 90, 0.1),
+		0 24px 16px rgba(54, 57, 90, 0.1);
+	--box-shadow-4: 0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
+		0 8px 4px rgba(54, 57, 90, 0.1), 0 16px 8px rgba(54, 57, 90, 0.1),
+		0 32px 16px rgba(54, 57, 90, 0.1);
+}
+
+.sortable-list:focus-visible,
+.sortable-list *:focus-visible {
+	outline: 0.125rem solid var(--gray-800);
+}
+
+.sortable-item__inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	max-width: 18rem;
+	padding: 0.5rem 1.75rem;
+	background-color: var(--white);
+	border: 0.0625rem solid var(--gray-200);
+	line-height: 1.25;
+	text-transform: uppercase;
+	box-shadow: none;
+	transition: box-shadow 240ms;
+}
+
+.sortable-item.is-selecting .sortable-item__inner {
+	box-shadow: var(--box-shadow-1);
+}
+
+.sortable-item__handle,
+.sortable-item__remove {
+	display: flex;
+	flex-shrink: 0;
+	padding: 0.75rem 0.5rem;
+	border: none;
+	border-radius: 0.25rem;
+	transition: background-color 240ms;
+}
+
+.sortable-item__handle {
+	margin-inline-start: -1rem;
+}
+
+.sortable-item__handle:hover,
+.sortable-item__remove:focus,
+.sortable-item__remove:hover {
+	background-color: var(--gray-100);
+}
+
+.sortable-item__handle svg,
+.sortable-item__remove svg {
+	fill: var(--gray-400);
+	stroke: var(--gray-400);
+}
+
+.sortable-item__handle:hover svg,
+.sortable-item__remove:focus svg,
+.sortable-item__remove:hover svg {
+	fill: var(--gray-600);
+	stroke: var(--gray-600);
+}
+
+.sortable-item__content {
+	gap: 0.75rem;
+	margin-block: 0.625rem;
+}
+
+.sortable-item__remove {
+	margin-inline-end: -1rem;
+}
+
+.ghost.is-dragging .sortable-item__inner {
+	box-shadow: var(--box-shadow-1);
+}

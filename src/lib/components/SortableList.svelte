@@ -361,10 +361,6 @@
 	.sortable-list,
 	.sortable-list :global(*) {
 		box-sizing: border-box;
-
-		&:focus-visible {
-			outline: 0.125rem solid var(--gray-800);
-		}
 	}
 
 	.sortable-list {

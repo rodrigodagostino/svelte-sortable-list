@@ -1,5 +1,5 @@
 /**
- * Variables
+ * Custom properties.
  */
 :root {
 	--font-main: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
@@ -169,71 +169,6 @@ code {
 	width: 100%;
 	min-height: 100vh;
 	min-height: 100svh;
-}
-
-.sortable-item__inner {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.75rem;
-	max-width: 18rem;
-	padding: 0.5rem 1.75rem;
-	background-color: var(--white);
-	border: 0.0625rem solid var(--gray-200);
-	line-height: 1.25;
-	text-transform: uppercase;
-	box-shadow: none;
-	transition: box-shadow 240ms;
-}
-
-.sortable-item.is-selecting .sortable-item__inner {
-	box-shadow: var(--box-shadow-1);
-}
-
-.sortable-item__handle,
-.sortable-item__remove {
-	display: flex;
-	flex-shrink: 0;
-	padding: 0.75rem 0.5rem;
-	border: none;
-	border-radius: 0.25rem;
-	transition: background-color 240ms;
-}
-
-.sortable-item__handle {
-	margin-inline-start: -1rem;
-}
-
-.sortable-item__handle:hover,
-.sortable-item__remove:focus,
-.sortable-item__remove:hover {
-	background-color: var(--gray-100);
-}
-
-.sortable-item__handle svg,
-.sortable-item__remove svg {
-	fill: var(--gray-400);
-	stroke: var(--gray-400);
-}
-
-.sortable-item__handle:hover svg,
-.sortable-item__remove:focus svg,
-.sortable-item__remove:hover svg {
-	fill: var(--gray-600);
-	stroke: var(--gray-600);
-}
-
-.sortable-item__content {
-	gap: 0.75rem;
-	margin-block: 0.625rem;
-}
-
-.sortable-item__remove {
-	margin-inline-end: -1rem;
-}
-
-.ghost.is-dragging .sortable-item__inner {
-	box-shadow: var(--box-shadow-1);
 }
 
 @media (min-width: 48em) {
