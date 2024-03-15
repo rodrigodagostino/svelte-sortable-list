@@ -102,8 +102,9 @@
 	data-index={index}
 	role="option"
 	tabindex={focusedItem?.id === String(item.id) ? 0 : -1}
-	aria-roledescription={screenReaderText.item(index)}
+	aria-roledescription={screenReaderText.item(index, item.isDisabled || false)}
 	aria-selected={focusedItem?.id === String(item.id)}
+	aria-disabled={item.isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
@@ -128,6 +129,14 @@
 		&.is-selecting,
 		&.is-deselecting {
 			z-index: 1;
+		}
+
+		&[aria-disabled='true'] {
+			pointer-events: none;
+
+			.sortable-item__inner {
+				opacity: 0.5;
+			}
 		}
 	}
 </style>

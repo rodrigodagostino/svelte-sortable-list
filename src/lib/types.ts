@@ -15,6 +15,7 @@ export interface SortableItemProps {
 interface Item {
 	id: string | number;
 	[key: string]: unknown;
+	isDisabled?: boolean;
 }
 
 export interface ItemData {

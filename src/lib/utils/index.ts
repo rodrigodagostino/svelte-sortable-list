@@ -91,8 +91,8 @@ export function reorderItems<T>(array: T[], from: number, to: number) {
 }
 
 export const screenReaderText = {
-	item: (index: number) => {
-		return `Draggable item at position ${index + 1}. Press Space Bar to lift it.`;
+	item: (index: number, isDisabled: boolean) => {
+		return `Draggable item at position ${index + 1}. ${!isDisabled ? 'Press Space Bar to lift it.' : ''}`;
 	},
 
 	lifted: (draggedItem: ItemData, listRef: HTMLUListElement) => {
