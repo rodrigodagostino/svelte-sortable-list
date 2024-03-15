@@ -19,6 +19,14 @@
 		</a>
 		<a
 			class="app-nav__link"
+			href="/unstyled"
+			aria-current={$page.url.pathname === '/unstyled' ? 'page' : undefined}
+			data-sveltekit-reload
+		>
+			Unstyled
+		</a>
+		<a
+			class="app-nav__link"
 			href="/with-handle"
 			aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
 		>
