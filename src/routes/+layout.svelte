@@ -38,6 +38,13 @@
 		>
 			Dynamic items
 		</a>
+		<a
+			class="app-nav__link"
+			href="/disabled-items"
+			aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
+		>
+			Disabled items
+		</a>
 	</div>
 </nav>
 
