@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] (2024-03-16)
+
+### Added
+
+- Add support for disabled items.
+- Extract components styles to importable CSS stylesheet (allows reuse of demo styles in a project using this package).
+
+### Changed
+
+- Avoid data preload on link hover.
+- Add `label` to list of elements to be checked in `checkIfInteractive()`.
+
+## Fixed
+
+- Correct slots forwarding structure.
+- Prevent item focus when a pointer down event is triggered.
+- Correct validations in `dispatchSort()`.
+
+### Docs
+
+- Add **“Disabled items”** demo page.
+- Add **“Unstyled items”** demo page.
+
 ## [0.6.2] (2024-03-14)
 
 ### Added
@@ -211,7 +234,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.5.2...v0.6.0
