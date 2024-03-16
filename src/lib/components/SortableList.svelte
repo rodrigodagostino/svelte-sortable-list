@@ -372,6 +372,12 @@
 		}
 	}
 
+	:global(.sortable-item__inner) {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
 	.sortable-item__handle,
 	.sortable-item__content {
 		display: flex;

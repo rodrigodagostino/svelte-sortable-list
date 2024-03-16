@@ -69,7 +69,7 @@
 			display: flex;
 			align-items: center;
 			height: 3rem;
-			padding-block: 0;
+			padding: 0.75em 1em;
 			background-color: var(--gray-800);
 			border: none;
 			color: var(--white);
