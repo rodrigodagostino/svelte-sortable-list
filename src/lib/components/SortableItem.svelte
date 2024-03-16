@@ -29,7 +29,8 @@
 	function setInteractiveElementsTabIndex() {
 		itemRef
 			.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, optgroup, option, select, textarea, video, [role="button"], [role="checkbox"], [role="link"], [role="tab"]'
+				'a, audio, button, input, optgroup, option, select, textarea, video,' +
+					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach((el) => (el.tabIndex = focusedItem?.id === String(item.id) ? 0 : -1));
 	}
@@ -50,7 +51,7 @@
 			isDeselecting = true;
 			isCanceling = true;
 
-			const timeoutId = setTimeout(async () => {
+			const timeoutId = setTimeout(() => {
 				draggedItem = null;
 				targetItem = null;
 				itemsOrigin = null;
@@ -70,6 +71,11 @@
 
 		await tick();
 		setInteractiveElementsTabIndex();
+	}
+
+	function handlePointerDown(event: PointerEvent) {
+		// Prevent item focus on pointer down.
+		event.preventDefault();
 	}
 </script>
 
@@ -110,6 +116,7 @@
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
+	on:pointerdown={handlePointerDown}
 	in:scaleFly={{ x: -120 }}
 	out:scaleFly={{ x: 120 }}
 >
