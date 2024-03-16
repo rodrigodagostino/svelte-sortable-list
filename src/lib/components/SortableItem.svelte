@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import { getItemData, screenReaderText } from '$lib/utils/index.js';
 	import type { ItemData, SortableItemProps } from '$lib/types.js';
@@ -23,6 +23,8 @@
 
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
+
+	const dispatch = createEventDispatcher();
 
 	function setInteractiveElementsTabIndex() {
 		itemRef
@@ -112,9 +114,15 @@
 	out:scaleFly={{ x: 120 }}
 >
 	<div class="sortable-item__inner">
-		<slot name="handle" />
-		<slot {item} {index} />
-		<slot name="remove" />
+		<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+			<slot name="handle" />
+		</div>
+		<div class="sortable-item__content">
+			<slot {item} {index} />
+		</div>
+		<button class="sortable-item__remove" on:click={() => dispatch('remove')}>
+			<slot name="remove" />
+		</button>
 	</div>
 </li>
 
@@ -137,6 +145,21 @@
 			.sortable-item__inner {
 				opacity: 0.5;
 			}
+		}
+
+		&__handle,
+		&__content {
+			display: flex;
+			align-items: center;
+		}
+
+		&__handle:empty,
+		&__remove:empty {
+			display: none;
+		}
+
+		&__handle {
+			flex-shrink: 0;
 		}
 	}
 </style>

@@ -329,20 +329,11 @@
 				bind:isSelecting
 				bind:isDeselecting
 				bind:isCanceling
+				on:remove={() => handleRemove(item.id)}
 			>
-				{#if $$slots.handle}
-					<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
-						<slot name="handle" />
-					</div>
-				{/if}
-				<div class="sortable-item__content">
-					<slot {item} {index} />
-				</div>
-				{#if $$slots.remove}
-					<button class="sortable-item__remove" on:click={() => handleRemove(item.id)}>
-						<slot name="remove" />
-					</button>
-				{/if}
+				<slot name="handle" slot="handle" />
+				<slot {item} {index} />
+				<slot name="remove" slot="remove" />
 			</SortableItem>
 		{/each}
 	</ul>
@@ -376,16 +367,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-	}
-
-	.sortable-item__handle,
-	.sortable-item__content {
-		display: flex;
-		align-items: center;
-	}
-
-	.sortable-item__handle {
-		flex-shrink: 0;
 	}
 
 	.live-text {
