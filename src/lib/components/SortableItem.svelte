@@ -21,6 +21,9 @@
 	export let isDeselecting: boolean;
 	export let isCanceling: boolean;
 
+	export let hasHandle: boolean;
+	export let hasRemove: boolean;
+
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
 
@@ -86,7 +89,7 @@
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
 	style:cursor={isDragging && draggedItem?.id === String(item.id)
 		? 'grabbing'
-		: !$$slots.handle
+		: !hasHandle
 			? 'grab'
 			: 'initial'}
 	style:visibility={(isDragging || isDropping) && draggedItem?.id === String(item.id)
@@ -121,15 +124,19 @@
 	out:scaleFly={{ x: 120 }}
 >
 	<div class="sortable-item__inner">
-		<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
-			<slot name="handle" />
-		</div>
+		{#if hasHandle}
+			<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+				<slot name="handle" />
+			</div>
+		{/if}
 		<div class="sortable-item__content">
 			<slot {item} {index} />
 		</div>
-		<button class="sortable-item__remove" on:click={() => dispatch('remove')}>
-			<slot name="remove" />
-		</button>
+		{#if hasRemove}
+			<button class="sortable-item__remove" on:click={() => dispatch('remove')}>
+				<slot name="remove" />
+			</button>
+		{/if}
 	</div>
 </li>
 
@@ -158,11 +165,6 @@
 		&__content {
 			display: flex;
 			align-items: center;
-		}
-
-		&__handle:empty,
-		&__remove:empty {
-			display: none;
 		}
 
 		&__handle {

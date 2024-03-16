@@ -32,6 +32,9 @@
 	let isDeselecting = false;
 	let isCanceling = false;
 
+	let hasHandle = $$slots.handle;
+	let hasRemove = $$slots.remove;
+
 	const dispatch = createEventDispatcher();
 
 	function setGhostStyles(action: 'init' | 'set' | 'unset') {
@@ -329,6 +332,8 @@
 				bind:isSelecting
 				bind:isDeselecting
 				bind:isCanceling
+				{hasHandle}
+				{hasRemove}
 				on:remove={() => handleRemove(item.id)}
 			>
 				<slot name="handle" slot="handle" />
