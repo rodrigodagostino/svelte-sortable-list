@@ -93,11 +93,13 @@
 
 	function dispatchSort(draggedItem: ItemData | null, targetItem: ItemData | null) {
 		if (
-			draggedItem?.index !== null &&
-			targetItem?.index !== null &&
-			draggedItem?.index !== targetItem?.index
+			draggedItem !== null &&
+			targetItem !== null &&
+			typeof draggedItem.index === 'number' &&
+			typeof targetItem.index === 'number' &&
+			draggedItem.index !== targetItem.index
 		) {
-			dispatch('sort', { oldIndex: draggedItem?.index, newIndex: targetItem?.index });
+			dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
 		}
 	}
 
