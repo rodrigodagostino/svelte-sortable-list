@@ -24,15 +24,25 @@
 	export let hasHandle: boolean;
 	export let hasRemove: boolean;
 
+	const dispatch = createEventDispatcher();
+
+	$: styleCursor =
+		isDragging && draggedItem?.id === String(item.id)
+			? 'grabbing'
+			: !hasHandle
+				? 'grab'
+				: 'initial';
+	$: styleTransition =
+		isDragging || isSelecting || isDeselecting ? `transform ${transitionDuration}ms` : '';
+	$: styleVisibility =
+		(isDragging || isDropping) && draggedItem?.id === String(item.id) ? 'hidden' : 'visible';
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
-
-	const dispatch = createEventDispatcher();
 
 	function setInteractiveElementsTabIndex() {
 		itemRef
 			.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, optgroup, option, select, textarea, video,' +
+				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach((el) => (el.tabIndex = focusedItem?.id === String(item.id) ? 0 : -1));
@@ -87,27 +97,19 @@
 	class="sortable-item"
 	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
-	style:cursor={isDragging && draggedItem?.id === String(item.id)
-		? 'grabbing'
-		: !hasHandle
-			? 'grab'
-			: 'initial'}
-	style:visibility={(isDragging || isDropping) && draggedItem?.id === String(item.id)
-		? 'hidden'
-		: 'visible'}
+	style:cursor={styleCursor}
 	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
-	draggedItem &&
+	draggedItem !== null &&
 	draggedItem.id !== String(item.id) &&
-	targetItem
+	targetItem !== null
 		? !isCanceling && index > draggedItem.index && index <= targetItem.index
 			? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
 			: !isCanceling && index < draggedItem.index && index >= targetItem.index
 				? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 				: 'translate3d(0, 0, 0)'
 		: 'translate3d(0, 0, 0)'}
-	style:transition={isDragging || isSelecting || isDeselecting
-		? `transform ${transitionDuration}ms`
-		: ''}
+	style:transition={styleTransition}
+	style:visibility={styleVisibility}
 	id="sortable-item-{item.id}"
 	data-id={item.id}
 	data-index={index}
