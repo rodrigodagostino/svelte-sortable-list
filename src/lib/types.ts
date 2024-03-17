@@ -1,6 +1,7 @@
 export interface SortableListProps {
 	items: Item[];
 	gap: number;
+	direction: 'vertical' | 'horizontal';
 	swapThreshold: number;
 	transitionDuration: number;
 	hasDropMarker: boolean;

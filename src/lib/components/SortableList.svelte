@@ -14,6 +14,7 @@
 
 	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
+	export let direction: SortableListProps['direction'] = 'vertical';
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
 	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
@@ -90,11 +91,19 @@
 							item.index < draggedItem.index &&
 							item.index >= targetItem.index
 					);
+		const currItemTranslateX =
+			direction === 'horizontal'
+				? draggedItem.index < targetItem.index
+					? itemsInBetween.reduce((sum, item) => sum + item.width + gap, 0)
+					: itemsInBetween.reduce((sum, item) => sum - item.width - gap, 0)
+				: 0;
 		const currItemTranslateY =
-			draggedItem.index < targetItem.index
-				? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
-				: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0);
-		currItem.style.transform = `translate3d(0, ${currItemTranslateY}px, 0)`;
+			direction === 'vertical'
+				? draggedItem.index < targetItem.index
+					? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
+					: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0)
+				: 0;
+		currItem.style.transform = `translate3d(${currItemTranslateX}px, ${currItemTranslateY}px, 0)`;
 	}
 
 	function dispatchSort(draggedItem: ItemData | null, targetItem: ItemData | null) {
@@ -143,8 +152,8 @@
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
 		ghostRef.style.transform =
-			`translate3d(${!hasLockedAxis ? event.clientX - ghostOrigin.x : 0}px, ` +
-			`${event.clientY - ghostOrigin.y}px, 0)`;
+			`translate3d(${direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis) ? event.clientX - ghostOrigin.x : 0}px, ` +
+			`${direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis) ? event.clientY - ghostOrigin.y : 0}px, 0)`;
 
 		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, swapThreshold);
 		if (collidingItem) targetItem = collidingItem;
@@ -225,10 +234,10 @@
 			}
 		}
 
-		if (key === 'ArrowUp' || key === 'ArrowDown') {
+		if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
 			event.preventDefault();
 
-			const step = key === 'ArrowUp' ? -1 : 1;
+			const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
 
 			if (!isSelecting) {
 				if (!focusedItem) {
@@ -256,10 +265,14 @@
 				// Prevent moving the selected item if it’s the first or last item,
 				// or is at the top or bottom of the list.
 				if (
-					(key === 'ArrowUp' && draggedItem.index === 0 && !targetItem) ||
-					(key === 'ArrowUp' && targetItem && targetItem.index === 0) ||
-					(key === 'ArrowDown' && draggedItem.index === itemsOrigin.length - 1 && !targetItem) ||
-					(key === 'ArrowDown' && targetItem && targetItem.index === itemsOrigin.length - 1)
+					((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItem.index === 0 && !targetItem) ||
+					((key === 'ArrowUp' || key === 'ArrowLeft') && targetItem && targetItem.index === 0) ||
+					((key === 'ArrowDown' || key === 'ArrowRight') &&
+						draggedItem.index === itemsOrigin.length - 1 &&
+						!targetItem) ||
+					((key === 'ArrowDown' || key === 'ArrowRight') &&
+						targetItem &&
+						targetItem.index === itemsOrigin.length - 1)
 				)
 					return;
 
@@ -315,7 +328,7 @@
 {#if items}
 	<ul
 		bind:this={listRef}
-		class="sortable-list"
+		class="sortable-list has-direction-{direction}"
 		style:--gap="{gap}px"
 		style:pointer-events={focusedItem ? 'none' : 'auto'}
 		role="listbox"
@@ -330,6 +343,7 @@
 				{item}
 				{index}
 				{gap}
+				{direction}
 				{transitionDuration}
 				{hasDropMarker}
 				{ghostRef}
@@ -370,11 +384,24 @@
 	}
 
 	.sortable-list {
+		display: flex;
 		padding: 0;
 		touch-action: none;
 
-		:global(.sortable-item + .sortable-item) {
-			margin-top: var(--gap);
+		&.has-direction-vertical {
+			flex-direction: column;
+
+			:global(.sortable-item + .sortable-item) {
+				margin-top: var(--gap);
+			}
+		}
+
+		&.has-direction-horizontal {
+			flex-direction: row;
+
+			:global(.sortable-item + .sortable-item) {
+				margin-left: var(--gap);
+			}
 		}
 	}
 

@@ -104,21 +104,21 @@ export const screenReaderText = {
 				: 'the item';
 		return `Lifted ${element} at position ${
 			draggedItem.index + 1
-		}. Press Arrow Down to move it down, Arrow Up to move it up, Space Bar to drop it.`;
+		}. Press Arrow Down or Arrow Right to move it down, Arrow Up or Arrow Left to move it up, and Space Bar to drop it.`;
 	},
 
 	dragged: (
 		draggedItem: ItemData,
 		targetItem: ItemData,
 		listRef: HTMLUListElement,
-		key: 'ArrowUp' | 'ArrowDown'
+		key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
 	) => {
 		const element =
 			draggedItem.index >= 0
 				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
 						?.textContent
 				: 'the item';
-		const direction = key === 'ArrowUp' ? 'up' : 'down';
+		const direction = key === 'ArrowUp' || key === 'ArrowLeft' ? 'up' : 'down';
 		const position = targetItem.index + 1;
 		return `Moved ${element} ${direction} to position ${position}.`;
 	},
@@ -129,15 +129,16 @@ export const screenReaderText = {
 				? listRef.querySelector<HTMLLIElement>(`.sortable-item[data-index="${draggedItem.index}"]`)
 						?.textContent
 				: 'the item';
+		const direction = targetItem && draggedItem.index > targetItem.index ? 'up' : 'down';
 		const result =
 			targetItem && draggedItem.index !== targetItem.index
-				? `moved from position ${draggedItem.index + 1} to ${targetItem.index + 1}`
+				? `moved ${direction} from position ${draggedItem.index + 1} to ${targetItem.index + 1}`
 				: `hasn’t changed position`;
 		return `Dropped ${element}, ${result}.`;
 	},
 
 	canceled: (draggedItem: ItemData) => {
-		return `Movement has been cancelled. The item has returned to its starting position of ${
+		return `Movement has been canceled. The item has returned to its starting position of ${
 			draggedItem.index + 1
 		}.`;
 	},

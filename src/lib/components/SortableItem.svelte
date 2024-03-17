@@ -7,6 +7,7 @@
 	export let item: SortableItemProps['item'];
 	export let index: SortableItemProps['index'];
 	export let gap: SortableItemProps['gap'];
+	export let direction: SortableItemProps['direction'];
 	export let transitionDuration: SortableItemProps['transitionDuration'];
 	export let hasDropMarker: SortableItemProps['hasDropMarker'];
 
@@ -109,12 +110,14 @@
 	targetItem !== null
 		? draggedItem.id !== String(item.id)
 			? !isCanceling && index > draggedItem.index && index <= targetItem.index
-				? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
+				? activeElement &&
+					`translate3d(${direction === 'vertical' ? `0, -${activeElement.height + gap}px` : `-${activeElement.width + gap}px, 0`}, 0)`
 				: !isCanceling && index < draggedItem.index && index >= targetItem.index
-					? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
+					? activeElement &&
+						`translate3d(${direction === 'vertical' ? `0, ${activeElement.height + gap}px` : `${activeElement.width + gap}px, 0`}, 0)`
 					: 'translate3d(0, 0, 0)'
 			: !isCanceling
-				? `translate3d(0, ${targetItem.y - draggedItem.y}px, 0)`
+				? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px`}, 0)`
 				: 'translate3d(0, 0, 0)'
 		: 'translate3d(0, 0, 0)'}
 	style:transition={styleTransition}
