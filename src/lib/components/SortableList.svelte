@@ -17,6 +17,7 @@
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
 	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
+	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
@@ -141,7 +142,9 @@
 	function handlePointerMove(event: PointerEvent) {
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
-		ghostRef.style.transform = `translate3d(${event.clientX - ghostOrigin.x}px, ${event.clientY - ghostOrigin.y}px, 0)`;
+		ghostRef.style.transform =
+			`translate3d(${!hasLockedAxis ? event.clientX - ghostOrigin.x : 0}px, ` +
+			`${event.clientY - ghostOrigin.y}px, 0)`;
 
 		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, swapThreshold);
 		if (collidingItem) targetItem = collidingItem;

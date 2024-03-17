@@ -4,9 +4,10 @@ export interface SortableListProps {
 	swapThreshold: number;
 	transitionDuration: number;
 	hasDropMarker: boolean;
+	hasLockedAxis: boolean;
 }
 
-export interface SortableItemProps extends Omit<SortableListProps, 'items'> {
+export interface SortableItemProps extends Omit<SortableListProps, 'items' | 'hasLockedAxis'> {
 	item: Item;
 	index: number;
 }
