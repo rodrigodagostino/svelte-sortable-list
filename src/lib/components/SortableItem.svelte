@@ -100,13 +100,14 @@
 	style:cursor={styleCursor}
 	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
 	draggedItem !== null &&
-	draggedItem.id !== String(item.id) &&
 	targetItem !== null
-		? !isCanceling && index > draggedItem.index && index <= targetItem.index
-			? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
-			: !isCanceling && index < draggedItem.index && index >= targetItem.index
-				? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
-				: 'translate3d(0, 0, 0)'
+		? draggedItem.id !== String(item.id)
+			? !isCanceling && index > draggedItem.index && index <= targetItem.index
+				? activeElement && `translate3d(0, -${activeElement.height + gap}px, 0)`
+				: !isCanceling && index < draggedItem.index && index >= targetItem.index
+					? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
+					: 'translate3d(0, 0, 0)'
+			: `translate3d(0, ${targetItem.y - draggedItem.y}px, 0)`
 		: 'translate3d(0, 0, 0)'}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
