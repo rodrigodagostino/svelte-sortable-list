@@ -16,6 +16,7 @@
 	export let gap: SortableListProps['gap'] = 12;
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
 	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
+	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
@@ -324,6 +325,7 @@
 				{index}
 				{gap}
 				{transitionDuration}
+				{hasDropMarker}
 				{ghostRef}
 				{itemsOrigin}
 				bind:focusedItem

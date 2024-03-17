@@ -3,13 +3,12 @@ export interface SortableListProps {
 	gap: number;
 	swapThreshold: number;
 	transitionDuration: number;
+	hasDropMarker: boolean;
 }
 
-export interface SortableItemProps {
+export interface SortableItemProps extends Omit<SortableListProps, 'items'> {
 	item: Item;
-	gap: number;
 	index: number;
-	transitionDuration: number;
 }
 
 interface Item {

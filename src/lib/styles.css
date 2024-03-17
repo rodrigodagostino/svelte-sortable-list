@@ -49,7 +49,27 @@
 	line-height: 1.25;
 	text-transform: uppercase;
 	box-shadow: none;
-	transition: box-shadow 240ms;
+	opacity: 1;
+	transition:
+		box-shadow 240ms,
+		opacity 0s 320ms;
+}
+
+.sortable-item:not(.ghost) .sortable-item__inner > * {
+	opacity: 1;
+	transition: opacity 0s var(--transition-duration);
+}
+
+.sortable-item:not(.ghost).is-dragging .sortable-item__inner {
+	opacity: 0.5;
+	transition:
+		box-shadow 240ms,
+		opacity 0s;
+}
+
+.sortable-item:not(.ghost).is-dragging .sortable-item__inner > * {
+	opacity: 0;
+	transition: opacity 0s;
 }
 
 .sortable-item.is-selecting .sortable-item__inner {

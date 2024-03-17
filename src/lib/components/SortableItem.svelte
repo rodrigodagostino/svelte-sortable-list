@@ -8,6 +8,7 @@
 	export let index: SortableItemProps['index'];
 	export let gap: SortableItemProps['gap'];
 	export let transitionDuration: SortableItemProps['transitionDuration'];
+	export let hasDropMarker: SortableItemProps['hasDropMarker'];
 
 	let itemRef: HTMLLIElement;
 	export let ghostRef: HTMLLIElement;
@@ -35,7 +36,9 @@
 	$: styleTransition =
 		isDragging || isSelecting || isDeselecting ? `transform ${transitionDuration}ms` : '';
 	$: styleVisibility =
-		(isDragging || isDropping) && draggedItem?.id === String(item.id) ? 'hidden' : 'visible';
+		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
+			? 'hidden'
+			: 'visible';
 	$: activeElement =
 		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
 
@@ -95,8 +98,11 @@
 <li
 	bind:this={itemRef}
 	class="sortable-item"
+	class:is-dragging={isDragging && draggedItem?.id === String(item.id)}
+	class:is-dropping={isDropping && draggedItem?.id === String(item.id)}
 	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
+	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
 	draggedItem !== null &&
@@ -107,7 +113,9 @@
 				: !isCanceling && index < draggedItem.index && index >= targetItem.index
 					? activeElement && `translate3d(0, ${activeElement.height + gap}px, 0)`
 					: 'translate3d(0, 0, 0)'
-			: `translate3d(0, ${targetItem.y - draggedItem.y}px, 0)`
+			: !isCanceling
+				? `translate3d(0, ${targetItem.y - draggedItem.y}px, 0)`
+				: 'translate3d(0, 0, 0)'
 		: 'translate3d(0, 0, 0)'}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
@@ -149,20 +157,7 @@
 		list-style: none;
 		user-select: none;
 		backface-visibility: hidden;
-
-		&:focus-visible,
-		&.is-selecting,
-		&.is-deselecting {
-			z-index: 1;
-		}
-
-		&[aria-disabled='true'] {
-			pointer-events: none;
-
-			.sortable-item__inner {
-				opacity: 0.5;
-			}
-		}
+		z-index: 1;
 
 		&__handle,
 		&__content {
@@ -172,6 +167,25 @@
 
 		&__handle {
 			flex-shrink: 0;
+		}
+
+		&:focus-visible,
+		&.is-selecting,
+		&.is-deselecting {
+			z-index: 2;
+		}
+
+		&.is-dragging,
+		&.is-dropping {
+			z-index: 0;
+		}
+
+		&[aria-disabled='true'] {
+			pointer-events: none;
+
+			.sortable-item__inner {
+				opacity: 0.5;
+			}
 		}
 	}
 </style>
