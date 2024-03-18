@@ -36,6 +36,10 @@
 		0 32px 16px rgba(54, 57, 90, 0.1);
 }
 
+.sortable-list {
+	align-items: center;
+}
+
 .sortable-list:focus-visible,
 .sortable-list *:focus-visible {
 	outline: 0.125rem solid var(--gray-800);

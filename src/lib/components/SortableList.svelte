@@ -42,15 +42,14 @@
 
 	function setGhostStyles(action: 'init' | 'set' | 'unset') {
 		if (action === 'init' || action === 'set') {
-			const source = targetItem ? targetItem : draggedItem;
-			if (!source || !draggedItem) return;
+			if (!draggedItem) return;
 
-			ghostRef.style.width = `${source.width}px`;
-			ghostRef.style.height = `${source.height}px`;
+			ghostRef.style.width = `${draggedItem.width}px`;
+			ghostRef.style.height = `${draggedItem.height}px`;
 
 			if (action === 'init') {
-				ghostRef.style.left = `${source.x}px`;
-				ghostRef.style.top = `${source.y}px`;
+				ghostRef.style.left = `${draggedItem.x}px`;
+				ghostRef.style.top = `${draggedItem.y}px`;
 			}
 
 			if (action === 'set') {
@@ -59,12 +58,29 @@
 				ghostRef.style.transform = 'translate3d(0, 0, 0)';
 				// setTimeout will allow the values above to be properly set before setting the ones below.
 				setTimeout(() => {
+					if (!draggedItem) return;
+
 					ghostRef.style.transition =
 						`left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
 						`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
 						`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1)`;
-					ghostRef.style.left = `${source.x}px`;
-					ghostRef.style.top = `${source.y}px`;
+					if (!targetItem) {
+						ghostRef.style.left = `${draggedItem.x}px`;
+						ghostRef.style.top = `${draggedItem.y}px`;
+					} else {
+						ghostRef.style.left =
+							direction === 'vertical'
+								? `${draggedItem.x}px`
+								: draggedItem.index < targetItem.index
+									? `${targetItem.x + targetItem.width - draggedItem.width}px`
+									: `${targetItem.x}px`;
+						ghostRef.style.top =
+							direction === 'vertical'
+								? draggedItem.index < targetItem.index
+									? `${targetItem.y + targetItem.height - draggedItem.height}px`
+									: `${targetItem.y}px`
+								: `${draggedItem.y}px`;
+					}
 				}, 0);
 			}
 		} else {
@@ -346,7 +362,6 @@
 				{direction}
 				{transitionDuration}
 				{hasDropMarker}
-				{ghostRef}
 				{itemsOrigin}
 				bind:focusedItem
 				bind:draggedItem

@@ -12,7 +12,6 @@
 	export let hasDropMarker: SortableItemProps['hasDropMarker'];
 
 	let itemRef: HTMLLIElement;
-	export let ghostRef: HTMLLIElement;
 	export let itemsOrigin: ItemData[] | null;
 	export let focusedItem: ItemData | null;
 	export let draggedItem: ItemData | null;
@@ -35,13 +34,13 @@
 				? 'grab'
 				: 'initial';
 	$: styleTransition =
-		isDragging || isSelecting || isDeselecting ? `transform ${transitionDuration}ms` : '';
+		isDragging || isDropping || isSelecting || isDeselecting
+			? `transform ${transitionDuration}ms`
+			: '';
 	$: styleVisibility =
 		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
 			? 'hidden'
 			: 'visible';
-	$: activeElement =
-		isSelecting || isDeselecting ? draggedItem : ghostRef ? getItemData(ghostRef) : null;
 
 	function setInteractiveElementsTabIndex() {
 		itemRef
@@ -110,15 +109,15 @@
 	targetItem !== null
 		? draggedItem.id !== String(item.id)
 			? !isCanceling && index > draggedItem.index && index <= targetItem.index
-				? activeElement &&
-					`translate3d(${direction === 'vertical' ? `0, -${activeElement.height + gap}px` : `-${activeElement.width + gap}px, 0`}, 0)`
+				? `translate3d(${direction === 'vertical' ? `0, -${draggedItem.height + gap}px` : `-${draggedItem.width + gap}px, 0`}, 0)`
 				: !isCanceling && index < draggedItem.index && index >= targetItem.index
-					? activeElement &&
-						`translate3d(${direction === 'vertical' ? `0, ${activeElement.height + gap}px` : `${activeElement.width + gap}px, 0`}, 0)`
+					? `translate3d(${direction === 'vertical' ? `0, ${draggedItem.height + gap}px` : `${draggedItem.width + gap}px, 0`}, 0)`
 					: 'translate3d(0, 0, 0)'
-			: !isCanceling
-				? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px`}, 0)`
-				: 'translate3d(0, 0, 0)'
+			: !isCanceling && draggedItem.index < targetItem.index
+				? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y + targetItem.height - draggedItem.y - draggedItem.height}px` : `${targetItem.x + targetItem.width - draggedItem.x - draggedItem.width}px, 0`}, 0)`
+				: !isCanceling && draggedItem.index > targetItem.index
+					? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px, 0`}, 0)`
+					: 'translate3d(0, 0, 0)'
 		: 'translate3d(0, 0, 0)'}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
