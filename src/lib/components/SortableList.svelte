@@ -183,17 +183,21 @@
 		setGhostStyles('set');
 		isDropping = true;
 
-		const timeoutId = setTimeout(() => {
-			dispatchSort(draggedItem, targetItem);
+		function handleGhostDrop(event: TransitionEvent) {
+			if (event.propertyName === 'top') {
+				dispatchSort(draggedItem, targetItem);
 
-			setGhostStyles('unset');
-			draggedItem = null;
-			targetItem = null;
-			itemsOrigin = null;
-			isDropping = false;
+				setGhostStyles('unset');
+				draggedItem = null;
+				targetItem = null;
+				itemsOrigin = null;
+				isDropping = false;
 
-			clearTimeout(timeoutId);
-		}, transitionDuration);
+				ghostRef.removeEventListener('transitionend', handleGhostDrop);
+			}
+		}
+
+		ghostRef.addEventListener('transitionend', handleGhostDrop);
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
