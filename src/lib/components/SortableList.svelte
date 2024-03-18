@@ -382,7 +382,7 @@
 		{/each}
 	</ul>
 	<Ghost bind:node={ghostRef} {draggedItem} {isDragging} {isDropping} />
-	<div class="live-text" role="log" aria-live="assertive" aria-atomic="true">
+	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
 {:else}
@@ -426,7 +426,7 @@
 		gap: 0.75rem;
 	}
 
-	.live-text {
+	.live-region {
 		position: absolute;
 		left: 0px;
 		top: 0px;
