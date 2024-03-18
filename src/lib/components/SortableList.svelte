@@ -46,6 +46,7 @@
 
 			ghostRef.style.width = `${draggedItem.width}px`;
 			ghostRef.style.height = `${draggedItem.height}px`;
+			ghostRef.style.zIndex = '10000';
 
 			if (action === 'init') {
 				ghostRef.style.left = `${draggedItem.x}px`;
@@ -63,7 +64,12 @@
 					ghostRef.style.transition =
 						`left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
 						`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-						`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1)`;
+						`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+						`z-index 0s ${transitionDuration}ms`;
+					// zIndex is only set and then re-set to force the transitionend event
+					// (along with the handleGhostDrop() function) to be fired when the ghost
+					// is dragged and dropped without being moved.
+					ghostRef.style.zIndex = '9999';
 					if (!targetItem) {
 						ghostRef.style.left = `${draggedItem.x}px`;
 						ghostRef.style.top = `${draggedItem.y}px`;
@@ -183,8 +189,8 @@
 		setGhostStyles('set');
 		isDropping = true;
 
-		function handleGhostDrop(event: TransitionEvent) {
-			if (event.propertyName === 'top') {
+		function handleGhostDrop({ propertyName }: TransitionEvent) {
+			if (propertyName === 'top' || propertyName === 'z-index') {
 				dispatchSort(draggedItem, targetItem);
 
 				setGhostStyles('unset');
