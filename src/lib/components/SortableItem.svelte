@@ -33,6 +33,22 @@
 			: !hasHandle
 				? 'grab'
 				: 'initial';
+	$: styleTransform =
+		(isDragging || isDropping || isSelecting || isDeselecting) &&
+		draggedItem !== null &&
+		targetItem !== null
+			? draggedItem.id !== String(item.id)
+				? !isCanceling && index > draggedItem.index && index <= targetItem.index
+					? `translate3d(${direction === 'vertical' ? `0, -${draggedItem.height + gap}px` : `-${draggedItem.width + gap}px, 0`}, 0)`
+					: !isCanceling && index < draggedItem.index && index >= targetItem.index
+						? `translate3d(${direction === 'vertical' ? `0, ${draggedItem.height + gap}px` : `${draggedItem.width + gap}px, 0`}, 0)`
+						: 'translate3d(0, 0, 0)'
+				: !isCanceling && draggedItem.index < targetItem.index
+					? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y + targetItem.height - draggedItem.y - draggedItem.height}px` : `${targetItem.x + targetItem.width - draggedItem.x - draggedItem.width}px, 0`}, 0)`
+					: !isCanceling && draggedItem.index > targetItem.index
+						? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px, 0`}, 0)`
+						: 'translate3d(0, 0, 0)'
+			: 'translate3d(0, 0, 0)';
 	$: styleTransition =
 		isDragging || isDropping || isSelecting || isDeselecting
 			? `transform ${transitionDuration}ms`
@@ -104,21 +120,7 @@
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
 	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
-	style:transform={(isDragging || isDropping || isSelecting || isDeselecting) &&
-	draggedItem !== null &&
-	targetItem !== null
-		? draggedItem.id !== String(item.id)
-			? !isCanceling && index > draggedItem.index && index <= targetItem.index
-				? `translate3d(${direction === 'vertical' ? `0, -${draggedItem.height + gap}px` : `-${draggedItem.width + gap}px, 0`}, 0)`
-				: !isCanceling && index < draggedItem.index && index >= targetItem.index
-					? `translate3d(${direction === 'vertical' ? `0, ${draggedItem.height + gap}px` : `${draggedItem.width + gap}px, 0`}, 0)`
-					: 'translate3d(0, 0, 0)'
-			: !isCanceling && draggedItem.index < targetItem.index
-				? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y + targetItem.height - draggedItem.y - draggedItem.height}px` : `${targetItem.x + targetItem.width - draggedItem.x - draggedItem.width}px, 0`}, 0)`
-				: !isCanceling && draggedItem.index > targetItem.index
-					? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px, 0`}, 0)`
-					: 'translate3d(0, 0, 0)'
-		: 'translate3d(0, 0, 0)'}
+	style:transform={styleTransform}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
 	id="sortable-item-{item.id}"
