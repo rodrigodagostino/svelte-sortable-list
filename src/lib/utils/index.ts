@@ -87,8 +87,13 @@ export function getCollidingItem(ghost: ItemData, items: ItemData[], threshold: 
 }
 
 export function reorderItems<T>(array: T[], from: number, to: number) {
-	array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-	return array;
+	const reorderedItems = structuredClone(array);
+	reorderedItems.splice(
+		to < 0 ? reorderedItems.length + to : to,
+		0,
+		reorderedItems.splice(from, 1)[0]
+	);
+	return reorderedItems;
 }
 
 export const screenReaderText = {
