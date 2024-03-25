@@ -80,6 +80,10 @@
 	box-shadow: var(--box-shadow-1);
 }
 
+.sortable-item[aria-disabled="true"] .sortable-item__inner {
+	opacity: 0.5;
+}
+
 .sortable-item__handle,
 .sortable-item__remove {
 	display: flex;

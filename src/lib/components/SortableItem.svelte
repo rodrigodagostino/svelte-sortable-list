@@ -196,10 +196,6 @@
 
 		&[aria-disabled='true'] {
 			pointer-events: none;
-
-			.sortable-item__inner {
-				opacity: 0.5;
-			}
 		}
 	}
 </style>
