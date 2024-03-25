@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] (2024-03-25)
+
+### Added
+
+- Add locked axis feature.
+- Add direction feature.
+
+### Fixed
+
+- Repair ghost, items and marker translations when dropping.
+- Prevent mutation of the source array in `reorderItems()`.
+- Add consistency to the handling of items focus loss.
+
+### Docs
+
+- Add **“Locked axis”** demo page.
+- Add **“Direction horizontal”** demo page.
+- Add **“Direction horizontal (locked axis)”** demo page.
+
 ## [0.7.1] (2024-03-17)
 
 ### Added
@@ -248,7 +267,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.1...v0.6.2
