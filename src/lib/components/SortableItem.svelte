@@ -58,7 +58,8 @@
 			? 'hidden'
 			: 'visible';
 
-	function setInteractiveElementsTabIndex() {
+	async function setInteractiveElementsTabIndex() {
+		await tick();
 		itemRef
 			.querySelectorAll<HTMLElement>(
 				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
@@ -69,16 +70,10 @@
 
 	onMount(() => setInteractiveElementsTabIndex());
 
-	async function handleFocus() {
-		await tick();
-		focusedItem = getItemData(itemRef);
-		setInteractiveElementsTabIndex();
-	}
+	function cleanUp() {
+		focusedItem = null;
 
-	async function handleFocusOut(event: FocusEvent) {
-		const relatedTarget = (event.relatedTarget as HTMLElement) || null;
-		if (!relatedTarget || !relatedTarget.closest('.sortable-item')) {
-			focusedItem = null;
+		if (isSelecting) {
 			isSelecting = false;
 			isDeselecting = true;
 			isCanceling = true;
@@ -93,14 +88,18 @@
 				clearTimeout(timeoutId);
 			}, transitionDuration);
 		}
+	}
 
-		if (
-			relatedTarget &&
-			relatedTarget.classList.contains('sortable-item') &&
-			relatedTarget.getAttribute('data-id') !== String(focusedItem?.id)
-		)
-			focusedItem = null;
+	async function handleFocus() {
+		await tick();
+		focusedItem = getItemData(itemRef);
+		await tick();
+		setInteractiveElementsTabIndex();
+	}
 
+	async function handleFocusOut(event: FocusEvent) {
+		const relatedTarget = event.relatedTarget as HTMLElement | null;
+		if (relatedTarget && !relatedTarget.closest('.sortable-item')) cleanUp();
 		await tick();
 		setInteractiveElementsTabIndex();
 	}
@@ -109,7 +108,18 @@
 		// Prevent item focus on pointer down.
 		event.preventDefault();
 	}
+
+	async function handleDocumentPointerDown(event: PointerEvent) {
+		const target = event.target as HTMLElement;
+		if (focusedItem?.id === String(item.id) && !target.closest('.sortable-item')) {
+			cleanUp();
+			await tick();
+			setInteractiveElementsTabIndex();
+		}
+	}
 </script>
+
+<svelte:document on:pointerdown={handleDocumentPointerDown} />
 
 <li
 	bind:this={itemRef}
