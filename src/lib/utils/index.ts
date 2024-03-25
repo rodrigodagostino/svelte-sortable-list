@@ -19,7 +19,7 @@ export function getItemsData(list: HTMLUListElement): ItemData[] {
 	);
 }
 
-export function getFocusedItemElement(list: HTMLUListElement, key: 'id' | 'index', value: string) {
+export function getFocusedItemElement(list: HTMLUListElement, key: 'id' | 'index', value: unknown) {
 	return list.querySelector<HTMLLIElement>(`.sortable-item[data-${key}="${value}"]`);
 }
 
