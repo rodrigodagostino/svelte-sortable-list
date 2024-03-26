@@ -48,6 +48,13 @@
 		</a>
 		<a
 			class="app-nav__link"
+			href="/has-boundaries"
+			aria-current={$page.url.pathname === '/has-boundaries' ? 'page' : undefined}
+		>
+			Has boundaries
+		</a>
+		<a
+			class="app-nav__link"
 			href="/direction-horizontal"
 			aria-current={$page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
 		>
