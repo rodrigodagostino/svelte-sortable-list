@@ -41,10 +41,10 @@
 		</a>
 		<a
 			class="app-nav__link"
-			href="/locked-axis"
-			aria-current={$page.url.pathname === '/locked-axis' ? 'page' : undefined}
+			href="/has-locked-axis"
+			aria-current={$page.url.pathname === '/has-locked-axis' ? 'page' : undefined}
 		>
-			Locked axis
+			Has locked axis
 		</a>
 		<a
 			class="app-nav__link"
@@ -62,10 +62,12 @@
 		</a>
 		<a
 			class="app-nav__link"
-			href="/direction-horizontal-locked-axis"
-			aria-current={$page.url.pathname === '/direction-horizontal-locked-axis' ? 'page' : undefined}
+			href="/direction-horizontal-has-locked-axis"
+			aria-current={$page.url.pathname === '/direction-horizontal-has-locked-axis'
+				? 'page'
+				: undefined}
 		>
-			Direction horizontal (locked axis)
+			Direction horizontal (has locked axis)
 		</a>
 		<a
 			class="app-nav__link"
@@ -136,7 +138,7 @@
 		.app-nav {
 			position: fixed;
 			inset: 0;
-			left: calc(100% - 20rem);
+			left: calc(100% - 22rem);
 
 			.container {
 				align-items: start;

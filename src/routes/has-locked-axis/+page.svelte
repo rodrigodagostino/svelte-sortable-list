@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Locked axis | Svelte Sortable List</title>
+	<title>Has locked axis | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {items} hasLockedAxis={true} let:item on:sort={handleSort}>

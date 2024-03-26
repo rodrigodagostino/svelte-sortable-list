@@ -172,6 +172,6 @@ code {
 
 @media (min-width: 48em) {
 	.app {
-		grid-template-columns: 1fr 20rem;
+		grid-template-columns: 1fr 22rem;
 	}
 }

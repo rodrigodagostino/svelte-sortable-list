@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Direction horizontal (locked axis) | Svelte Sortable List</title>
+	<title>Direction horizontal (has locked axis) | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {items} direction="horizontal" hasLockedAxis={true} let:item on:sort={handleSort}>
