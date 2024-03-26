@@ -33,7 +33,7 @@
 
 	function handleRemove(event: CustomEvent) {
 		const { id } = event.detail;
-		items = items.filter((i) => i.id !== id);
+		items = items.filter((i) => String(i.id) !== id);
 	}
 </script>
 

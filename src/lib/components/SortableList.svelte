@@ -364,7 +364,7 @@
 		}
 	}
 
-	function handleRemove(itemId: unknown) {
+	function handleRemove(itemId: string) {
 		if (focusedItem) {
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
@@ -414,7 +414,7 @@
 				bind:isCanceling
 				{hasHandle}
 				{hasRemove}
-				on:remove={() => handleRemove(item.id)}
+				on:remove={() => handleRemove(String(item.id))}
 			>
 				<slot name="handle" slot="handle" />
 				<slot {item} {index} />
