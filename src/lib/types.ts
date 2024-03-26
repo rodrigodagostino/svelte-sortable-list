@@ -6,9 +6,11 @@ export interface SortableListProps {
 	transitionDuration: number;
 	hasDropMarker: boolean;
 	hasLockedAxis: boolean;
+	hasBoundaries: boolean;
 }
 
-export interface SortableItemProps extends Omit<SortableListProps, 'items' | 'hasLockedAxis'> {
+export interface SortableItemProps
+	extends Omit<SortableListProps, 'items' | 'hasLockedAxis' | 'hasBoundaries'> {
 	item: Item;
 	index: number;
 }

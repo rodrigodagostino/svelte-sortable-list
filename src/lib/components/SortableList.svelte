@@ -19,6 +19,7 @@
 	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
+	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
@@ -170,12 +171,40 @@
 		);
 	}
 
-	function handlePointerMove(event: PointerEvent) {
+	function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
-		ghostRef.style.transform =
-			`translate3d(${direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis) ? event.clientX - ghostOrigin.x : 0}px, ` +
-			`${direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis) ? event.clientY - ghostOrigin.y : 0}px, 0)`;
+		if (!hasBoundaries) {
+			const x =
+				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
+					? clientX - ghostOrigin.x
+					: 0;
+			const y =
+				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
+					? clientY - ghostOrigin.y
+					: 0;
+			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+		} else {
+			const { left: minX, right: maxX, top: minY, bottom: maxY } = listRef.getBoundingClientRect();
+			const { width: ghostRectWidth, height: ghostRectHeight } = ghostRef.getBoundingClientRect();
+			const x =
+				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
+					? clientX - (ghostOrigin.x - draggedItem.x) < minX
+						? minX - draggedItem.x
+						: clientX + ghostRectWidth - (ghostOrigin.x - draggedItem.x) > maxX
+							? maxX - draggedItem.x - ghostRectWidth
+							: clientX - ghostOrigin.x
+					: 0;
+			const y =
+				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
+					? clientY - (ghostOrigin.y - draggedItem.y) < minY
+						? minY - draggedItem.y
+						: clientY + ghostRectHeight - (ghostOrigin.y - draggedItem.y) > maxY
+							? maxY - draggedItem.y - ghostRectHeight
+							: clientY - ghostOrigin.y
+					: 0;
+			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+		}
 
 		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, swapThreshold);
 		if (collidingItem) targetItem = collidingItem;
