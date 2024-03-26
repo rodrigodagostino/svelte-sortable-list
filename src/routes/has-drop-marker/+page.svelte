@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>With drop marker | Svelte Sortable List</title>
+	<title>Has drop marker | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {items} hasDropMarker={true} let:item on:sort={handleSort}>
