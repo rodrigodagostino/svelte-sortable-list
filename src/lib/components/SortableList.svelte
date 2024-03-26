@@ -364,16 +364,18 @@
 		}
 	}
 
-	async function handleRemove(itemId: unknown) {
-		if (items.length > 1 && focusedItem) {
-			// Focus the next/previous item (if it exists) before removing.
-			const step = focusedItem.index !== items.length - 1 ? 1 : -1;
-			const adjacentFocusedItemId = items[focusedItem.index + step].id;
-			getFocusedItemElement(listRef, 'id', adjacentFocusedItemId)?.focus();
-		} else {
-			// Focus the list (if there are no items left) before removing.
-			focusedItem = null;
-			listRef.focus();
+	function handleRemove(itemId: unknown) {
+		if (focusedItem) {
+			if (items.length > 1) {
+				// Focus the next/previous item (if it exists) before removing.
+				const step = focusedItem.index !== items.length - 1 ? 1 : -1;
+				const adjacentFocusedItemId = items[focusedItem.index + step].id;
+				getFocusedItemElement(listRef, 'id', adjacentFocusedItemId)?.focus();
+			} else {
+				// Focus the list (if there are no items left) before removing.
+				focusedItem = null;
+				listRef.focus();
+			}
 		}
 
 		dispatch('remove', { id: itemId });
