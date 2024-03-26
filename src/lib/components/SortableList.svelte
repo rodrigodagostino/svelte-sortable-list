@@ -23,7 +23,7 @@
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
-	let ghostOrigin: { x: number; y: number };
+	let pointerOrigin: { x: number; y: number };
 	let itemsOrigin: ItemData[] | null = null;
 	let draggedItem: ItemData | null = null;
 	let targetItem: ItemData | null = null;
@@ -156,7 +156,7 @@
 		isDragging = true;
 		await tick();
 		draggedItem = getItemData(currItem);
-		ghostOrigin = { x: event.clientX, y: event.clientY };
+		pointerOrigin = { x: event.clientX, y: event.clientY };
 		itemsOrigin = getItemsData(listRef);
 		setGhostStyles('init');
 
@@ -177,11 +177,11 @@
 		if (!hasBoundaries) {
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - ghostOrigin.x
+					? clientX - pointerOrigin.x
 					: 0;
 			const y =
 				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - ghostOrigin.y
+					? clientY - pointerOrigin.y
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 		} else {
@@ -189,19 +189,19 @@
 			const { width: ghostRectWidth, height: ghostRectHeight } = ghostRef.getBoundingClientRect();
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - (ghostOrigin.x - draggedItem.x) < minX
+					? clientX - (pointerOrigin.x - draggedItem.x) < minX
 						? minX - draggedItem.x
-						: clientX + ghostRectWidth - (ghostOrigin.x - draggedItem.x) > maxX
+						: clientX + ghostRectWidth - (pointerOrigin.x - draggedItem.x) > maxX
 							? maxX - draggedItem.x - ghostRectWidth
-							: clientX - ghostOrigin.x
+							: clientX - pointerOrigin.x
 					: 0;
 			const y =
 				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - (ghostOrigin.y - draggedItem.y) < minY
+					? clientY - (pointerOrigin.y - draggedItem.y) < minY
 						? minY - draggedItem.y
-						: clientY + ghostRectHeight - (ghostOrigin.y - draggedItem.y) > maxY
+						: clientY + ghostRectHeight - (pointerOrigin.y - draggedItem.y) > maxY
 							? maxY - draggedItem.y - ghostRectHeight
-							: clientY - ghostOrigin.y
+							: clientY - pointerOrigin.y
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 		}
