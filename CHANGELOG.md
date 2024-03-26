@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.3] (2024-03-26)
+
+### Added
+
+- Add boundaries feature.
+
+### Changed
+
+- Rename `ghostOrigin` state to `pointerOrigin`.
+
+### Docs
+
+- Rename **“With drop marker”** demo page to **“Has drop marker”**.
+- Rename **“Locked axis”** demo page to **“Has locked axis”**.
+- Rename **“Direction horizontal (locked axis)”** demo page to **“Direction horizontal (has locked axis)”**.
+
 ## [0.7.2] (2024-03-25)
 
 ### Added
@@ -76,7 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Docs
 
-- Rename most pages and routes containing “With”.
+- Rename most demo pages and routes containing “With”.
 
 ## [0.6.1] (2024-03-14)
 
@@ -267,7 +283,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.3...HEAD
+[0.7.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.6.2...v0.7.0
