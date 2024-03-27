@@ -16,6 +16,7 @@
 	export let focusedItem: ItemData | null;
 	export let draggedItem: ItemData | null;
 	export let targetItem: ItemData | null;
+
 	export let isDragging: boolean;
 	export let isDropping: boolean;
 	export let isSelecting: boolean;
@@ -128,7 +129,6 @@
 	class:is-dropping={isDropping && draggedItem?.id === String(item.id)}
 	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
-	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:transform={styleTransform}
 	style:transition={styleTransition}

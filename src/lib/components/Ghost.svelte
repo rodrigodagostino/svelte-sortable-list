@@ -2,16 +2,23 @@
 	import type { ItemData } from '$lib/types.js';
 
 	export let node: HTMLLIElement;
+	export let transitionDuration: number;
+	export let hasRemoveOnDragOut: boolean;
 	export let draggedItem: ItemData | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
+	export let isBetweenBounds: boolean;
 </script>
 
 <li
 	bind:this={node}
 	class="ghost sortable-item"
+	class:has-remove-on-drag-out={hasRemoveOnDragOut}
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
+	class:is-between-bounds={isBetweenBounds}
+	class:is-out-of-bounds={!isBetweenBounds}
+	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={isDragging ? 'grabbing' : 'grab'}
 	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 	style:transform="translate3d(0, 0, 0)"

@@ -20,6 +20,7 @@
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
+	export let hasRemoveOnDragOut: SortableListProps['hasRemoveOnDragOut'] = false;
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLLIElement;
@@ -35,14 +36,15 @@
 	let isSelecting = false;
 	let isDeselecting = false;
 	let isCanceling = false;
+	let isBetweenBounds = true;
 
 	let hasHandle = $$slots.handle;
 	let hasRemove = $$slots.remove;
 
 	const dispatch = createEventDispatcher();
 
-	function setGhostStyles(action: 'init' | 'set' | 'unset') {
-		if (action === 'init' || action === 'set') {
+	function setGhostStyles(action: 'init' | 'set' | 'remove' | 'unset') {
+		if (action === 'init' || action === 'set' || action === 'remove') {
 			if (!draggedItem) return;
 
 			ghostRef.style.width = `${draggedItem.width}px`;
@@ -54,39 +56,44 @@
 				ghostRef.style.top = `${draggedItem.y}px`;
 			}
 
-			if (action === 'set') {
-				ghostRef.style.left = `${ghostRef.getBoundingClientRect().x}px`;
-				ghostRef.style.top = `${ghostRef.getBoundingClientRect().y}px`;
+			if (action === 'set' || action === 'remove') {
+				const ghostRect = ghostRef.getBoundingClientRect();
+				ghostRef.style.left = `${ghostRect.x}px`;
+				ghostRef.style.top = `${ghostRect.y}px`;
 				ghostRef.style.transform = 'translate3d(0, 0, 0)';
 				// setTimeout will allow the values above to be properly set before setting the ones below.
 				setTimeout(() => {
 					if (!draggedItem) return;
 
 					ghostRef.style.transition =
-						`left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-						`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-						`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-						`z-index 0s ${transitionDuration}ms`;
+						action === 'set'
+							? `left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+								`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+								`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+								`z-index 0s ${transitionDuration}ms`
+							: `z-index 0s ${transitionDuration}ms`;
 					// zIndex is only set and then re-set to force the transitionend event
 					// (along with the handleGhostDrop() function) to be fired when the ghost
 					// is dragged and dropped without being moved.
 					ghostRef.style.zIndex = '9999';
-					if (!targetItem) {
-						ghostRef.style.left = `${draggedItem.x}px`;
-						ghostRef.style.top = `${draggedItem.y}px`;
-					} else {
-						ghostRef.style.left =
-							direction === 'vertical'
-								? `${draggedItem.x}px`
-								: draggedItem.index < targetItem.index
-									? `${targetItem.x + targetItem.width - draggedItem.width}px`
-									: `${targetItem.x}px`;
-						ghostRef.style.top =
-							direction === 'vertical'
-								? draggedItem.index < targetItem.index
-									? `${targetItem.y + targetItem.height - draggedItem.height}px`
-									: `${targetItem.y}px`
-								: `${draggedItem.y}px`;
+					if (action === 'set') {
+						if (!targetItem) {
+							ghostRef.style.left = `${draggedItem.x}px`;
+							ghostRef.style.top = `${draggedItem.y}px`;
+						} else {
+							ghostRef.style.left =
+								direction === 'vertical'
+									? `${draggedItem.x}px`
+									: draggedItem.index < targetItem.index
+										? `${targetItem.x + targetItem.width - draggedItem.width}px`
+										: `${targetItem.x}px`;
+							ghostRef.style.top =
+								direction === 'vertical'
+									? draggedItem.index < targetItem.index
+										? `${targetItem.y + targetItem.height - draggedItem.height}px`
+										: `${targetItem.y}px`
+									: `${draggedItem.y}px`;
+						}
 					}
 				}, 0);
 			}
@@ -174,6 +181,30 @@
 	function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
+		const {
+			left: listLeft,
+			top: listTop,
+			right: listRight,
+			bottom: listBottom,
+		} = listRef.getBoundingClientRect();
+		const {
+			left: ghostLeft,
+			top: ghostTop,
+			right: ghostRight,
+			bottom: ghostBottom,
+			width: ghostWidth,
+			height: ghostHeight,
+		} = ghostRef.getBoundingClientRect();
+
+		if (
+			ghostRight < listLeft ||
+			ghostLeft > listRight ||
+			ghostBottom < listTop ||
+			ghostTop > listBottom
+		)
+			isBetweenBounds = false;
+		else isBetweenBounds = true;
+
 		if (!hasBoundaries) {
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
@@ -185,22 +216,20 @@
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 		} else {
-			const { left: minX, right: maxX, top: minY, bottom: maxY } = listRef.getBoundingClientRect();
-			const { width: ghostRectWidth, height: ghostRectHeight } = ghostRef.getBoundingClientRect();
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - (pointerOrigin.x - draggedItem.x) < minX
-						? minX - draggedItem.x
-						: clientX + ghostRectWidth - (pointerOrigin.x - draggedItem.x) > maxX
-							? maxX - draggedItem.x - ghostRectWidth
+					? clientX - (pointerOrigin.x - draggedItem.x) < listLeft
+						? listLeft - draggedItem.x
+						: clientX + ghostWidth - (pointerOrigin.x - draggedItem.x) > listRight
+							? listRight - draggedItem.x - ghostWidth
 							: clientX - pointerOrigin.x
 					: 0;
 			const y =
 				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - (pointerOrigin.y - draggedItem.y) < minY
-						? minY - draggedItem.y
-						: clientY + ghostRectHeight - (pointerOrigin.y - draggedItem.y) > maxY
-							? maxY - draggedItem.y - ghostRectHeight
+					? clientY - (pointerOrigin.y - draggedItem.y) < listTop
+						? listTop - draggedItem.y
+						: clientY + ghostHeight - (pointerOrigin.y - draggedItem.y) > listBottom
+							? listBottom - draggedItem.y - ghostHeight
 							: clientY - pointerOrigin.y
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
@@ -214,8 +243,10 @@
 	function handlePointerUp() {
 		if (!isDragging || isDropping) return;
 
+		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItem?.id) handleRemove(draggedItem.id);
+
 		isDragging = false;
-		setGhostStyles('set');
+		setGhostStyles(!isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set');
 		isDropping = true;
 
 		function handleGhostDrop({ propertyName }: TransitionEvent) {
@@ -227,6 +258,7 @@
 				targetItem = null;
 				itemsOrigin = null;
 				isDropping = false;
+				isBetweenBounds = true;
 
 				ghostRef.removeEventListener('transitionend', handleGhostDrop);
 			}
@@ -387,6 +419,7 @@
 		bind:this={listRef}
 		class="sortable-list has-direction-{direction}"
 		style:--gap="{gap}px"
+		style:--transition-duration="{transitionDuration}ms"
 		style:pointer-events={focusedItem ? 'none' : 'auto'}
 		role="listbox"
 		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
@@ -422,7 +455,15 @@
 			</SortableItem>
 		{/each}
 	</ul>
-	<Ghost bind:node={ghostRef} {draggedItem} {isDragging} {isDropping} />
+	<Ghost
+		bind:node={ghostRef}
+		{transitionDuration}
+		{hasRemoveOnDragOut}
+		{draggedItem}
+		{isDragging}
+		{isDropping}
+		{isBetweenBounds}
+	/>
 	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>

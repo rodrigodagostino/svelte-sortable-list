@@ -22,6 +22,9 @@
 	--black: #15151a;
 	--black-rich: #000;
 
+	--rose-300: #fda4af;
+	--rose-400: #fb7185;
+
 	--box-shadow-1: 0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
 		0 4px 4px rgba(54, 57, 90, 0.1), 0 6px 8px rgba(54, 57, 90, 0.1),
 		0 8px 16px rgba(54, 57, 90, 0.1);
@@ -55,8 +58,8 @@
 	box-shadow: none;
 	opacity: 1;
 	transition:
-		box-shadow 240ms,
-		opacity 0s 320ms;
+		background-color calc(var(--transition-duration) / 3 * 2),
+		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
 .sortable-item:not(.ghost) .sortable-item__inner > * {
@@ -67,7 +70,7 @@
 .sortable-item:not(.ghost).is-dragging .sortable-item__inner {
 	opacity: 0.5;
 	transition:
-		box-shadow 240ms,
+		box-shadow calc(var(--transition-duration) / 3 * 2),
 		opacity 0s;
 }
 
@@ -91,7 +94,7 @@
 	padding: 0.75rem 0.5rem;
 	border: none;
 	border-radius: 0.25rem;
-	transition: background-color 240ms;
+	transition: background-color calc(var(--transition-duration) / 3 * 2);
 }
 
 .sortable-item__handle {
@@ -128,4 +131,18 @@
 
 .ghost.is-dragging .sortable-item__inner {
 	box-shadow: var(--box-shadow-1);
+}
+
+.ghost.is-dropping.has-remove-on-drag-out:not(.is-between-bounds) .sortable-item__inner {
+	opacity: 0;
+	transition: opacity var(--transition-duration);
+}
+
+.ghost.is-out-of-bounds.has-remove-on-drag-out .sortable-item__inner {
+	background-color: var(--rose-300);
+	border-color: var(--rose-400);
+	transition:
+		background-color calc(var(--transition-duration) / 3 * 2),
+		border-color calc(var(--transition-duration) / 3 * 2),
+		box-shadow calc(var(--transition-duration) / 3 * 2);
 }

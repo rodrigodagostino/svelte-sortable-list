@@ -7,10 +7,14 @@ export interface SortableListProps {
 	hasDropMarker: boolean;
 	hasLockedAxis: boolean;
 	hasBoundaries: boolean;
+	hasRemoveOnDragOut: boolean;
 }
 
 export interface SortableItemProps
-	extends Omit<SortableListProps, 'items' | 'hasLockedAxis' | 'hasBoundaries'> {
+	extends Omit<
+		SortableListProps,
+		'items' | 'hasLockedAxis' | 'hasBoundaries' | 'hasRemoveOnDragOut'
+	> {
 	item: Item;
 	index: number;
 }
