@@ -55,6 +55,13 @@
 		</a>
 		<a
 			class="app-nav__link"
+			href="/has-remove-on-drag-out"
+			aria-current={$page.url.pathname === '/has-remove-on-drag-out' ? 'page' : undefined}
+		>
+			Has remove on drag out
+		</a>
+		<a
+			class="app-nav__link"
 			href="/direction-horizontal"
 			aria-current={$page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
 		>
