@@ -34,22 +34,7 @@
 			: !hasHandle
 				? 'grab'
 				: 'initial';
-	$: styleTransform =
-		(isDragging || isDropping || isSelecting || isDeselecting) &&
-		draggedItem !== null &&
-		targetItem !== null
-			? draggedItem.id !== String(item.id)
-				? !isCanceling && index > draggedItem.index && index <= targetItem.index
-					? `translate3d(${direction === 'vertical' ? `0, -${draggedItem.height + gap}px` : `-${draggedItem.width + gap}px, 0`}, 0)`
-					: !isCanceling && index < draggedItem.index && index >= targetItem.index
-						? `translate3d(${direction === 'vertical' ? `0, ${draggedItem.height + gap}px` : `${draggedItem.width + gap}px, 0`}, 0)`
-						: 'translate3d(0, 0, 0)'
-				: !isCanceling && draggedItem.index < targetItem.index
-					? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y + targetItem.height - draggedItem.y - draggedItem.height}px` : `${targetItem.x + targetItem.width - draggedItem.x - draggedItem.width}px, 0`}, 0)`
-					: !isCanceling && draggedItem.index > targetItem.index
-						? `translate3d(${direction === 'vertical' ? `0, ${targetItem.y - draggedItem.y}px` : `${targetItem.x - draggedItem.x}px, 0`}, 0)`
-						: 'translate3d(0, 0, 0)'
-			: 'translate3d(0, 0, 0)';
+	$: styleTransform = getStyleTransform(draggedItem, targetItem, isCanceling);
 	$: styleTransition =
 		isDragging || isDropping || isSelecting || isDeselecting
 			? `transform ${transitionDuration}ms`
@@ -58,6 +43,47 @@
 		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
 			? 'hidden'
 			: 'visible';
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleTransform(...args: unknown[]) {
+		if (
+			(isDragging || isDropping || isSelecting || isDeselecting) &&
+			draggedItem !== null &&
+			targetItem !== null
+		) {
+			if (isCanceling) return 'translate3d(0, 0, 0)';
+
+			if (draggedItem.id !== String(item.id)) {
+				if (
+					(index > draggedItem.index && index <= targetItem.index) ||
+					(index < draggedItem.index && index >= targetItem.index)
+				) {
+					const operator = index > draggedItem.index && index <= targetItem.index ? '-' : '';
+					const x = direction === 'vertical' ? '0' : `${operator}${draggedItem.width + gap}px`;
+					const y = direction === 'vertical' ? `${operator}${draggedItem.height + gap}px` : '0';
+					return `translate3d(${x}, ${y}, 0)`;
+				} else {
+					return 'translate3d(0, 0, 0)';
+				}
+			} else {
+				const draggedItemWidth = draggedItem.index < targetItem.index ? draggedItem.width : 0;
+				const draggedItemHeight = draggedItem.index < targetItem.index ? draggedItem.height : 0;
+				const targetItemWidth = draggedItem.index < targetItem.index ? targetItem.width : 0;
+				const targetItemHeight = draggedItem.index < targetItem.index ? targetItem.height : 0;
+				const x =
+					direction === 'vertical'
+						? '0'
+						: `${targetItem.x + targetItemWidth - draggedItem.x - draggedItemWidth}px`;
+				const y =
+					direction === 'vertical'
+						? `${targetItem.y + targetItemHeight - draggedItem.y - draggedItemHeight}px`
+						: '0';
+				return `translate3d(${x}, ${y}, 0)`;
+			}
+		} else {
+			return 'translate3d(0, 0, 0)';
+		}
+	}
 
 	async function setInteractiveElementsTabIndex() {
 		await tick();
