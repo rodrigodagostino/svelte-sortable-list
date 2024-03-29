@@ -67,11 +67,10 @@
 	transition: opacity 0s var(--transition-duration);
 }
 
-.sortable-item:not(.ghost).is-dragging .sortable-item__inner {
+.sortable-item:not(.ghost).is-dragging .sortable-item__inner,
+.sortable-item:not(.ghost).is-dropping .sortable-item__inner {
 	opacity: 0.5;
-	transition:
-		box-shadow calc(var(--transition-duration) / 3 * 2),
-		opacity 0s;
+	transition: opacity 0s;
 }
 
 .sortable-item:not(.ghost).is-dragging .sortable-item__inner > * {
@@ -133,9 +132,12 @@
 	box-shadow: var(--box-shadow-1);
 }
 
-.ghost.is-dropping.has-remove-on-drag-out:not(.is-between-bounds) .sortable-item__inner {
+.ghost.is-removing .sortable-item__inner {
 	opacity: 0;
-	transition: opacity var(--transition-duration);
+	transition:
+		background-color calc(var(--transition-duration) / 3 * 2),
+		border-color calc(var(--transition-duration) / 3 * 2),
+		opacity var(--transition-duration);
 }
 
 .ghost.is-out-of-bounds.has-remove-on-drag-out .sortable-item__inner {

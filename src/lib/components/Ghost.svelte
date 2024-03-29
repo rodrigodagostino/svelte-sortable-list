@@ -7,6 +7,7 @@
 	export let draggedItem: ItemData | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
+	export let isRemoving: boolean;
 	export let isBetweenBounds: boolean;
 </script>
 
@@ -18,6 +19,7 @@
 	class:is-dropping={isDropping}
 	class:is-between-bounds={isBetweenBounds}
 	class:is-out-of-bounds={!isBetweenBounds}
+	class:is-removing={isRemoving}
 	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={isDragging ? 'grabbing' : 'grab'}
 	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}

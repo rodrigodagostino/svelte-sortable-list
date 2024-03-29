@@ -36,6 +36,7 @@
 	let isSelecting = false;
 	let isDeselecting = false;
 	let isCanceling = false;
+	let isRemoving = false;
 	let isBetweenBounds = true;
 
 	let hasHandle = $$slots.handle;
@@ -248,6 +249,7 @@
 		isDragging = false;
 		setGhostStyles(!isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set');
 		isDropping = true;
+		isBetweenBounds = true;
 
 		function handleGhostDrop({ propertyName }: TransitionEvent) {
 			if (propertyName === 'top' || propertyName === 'z-index') {
@@ -258,7 +260,6 @@
 				targetItem = null;
 				itemsOrigin = null;
 				isDropping = false;
-				isBetweenBounds = true;
 
 				ghostRef.removeEventListener('transitionend', handleGhostDrop);
 			}
@@ -408,6 +409,18 @@
 				focusedItem = null;
 				listRef.focus();
 			}
+		} else if (isDragging) {
+			isRemoving = true;
+
+			function handleGhostDrop({ propertyName }: TransitionEvent) {
+				if (propertyName === 'top' || propertyName === 'z-index') {
+					isRemoving = false;
+
+					ghostRef.removeEventListener('transitionend', handleGhostDrop);
+				}
+			}
+
+			ghostRef.addEventListener('transitionend', handleGhostDrop);
 		}
 
 		dispatch('remove', { id: itemId });
@@ -436,15 +449,18 @@
 				{direction}
 				{transitionDuration}
 				{hasDropMarker}
-				{itemsOrigin}
+				{hasRemoveOnDragOut}
+				bind:itemsOrigin
 				bind:focusedItem
 				bind:draggedItem
 				bind:targetItem
-				bind:isDragging
-				bind:isDropping
+				{isDragging}
+				{isDropping}
 				bind:isSelecting
 				bind:isDeselecting
 				bind:isCanceling
+				{isRemoving}
+				{isBetweenBounds}
 				{hasHandle}
 				{hasRemove}
 				on:remove={() => handleRemove(String(item.id))}
@@ -462,6 +478,7 @@
 		{draggedItem}
 		{isDragging}
 		{isDropping}
+		{isRemoving}
 		{isBetweenBounds}
 	/>
 	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">

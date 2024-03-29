@@ -10,6 +10,7 @@
 	export let direction: SortableItemProps['direction'];
 	export let transitionDuration: SortableItemProps['transitionDuration'];
 	export let hasDropMarker: SortableItemProps['hasDropMarker'];
+	export let hasRemoveOnDragOut: SortableItemProps['hasRemoveOnDragOut'];
 
 	let itemRef: HTMLLIElement;
 	export let itemsOrigin: ItemData[] | null;
@@ -22,6 +23,8 @@
 	export let isSelecting: boolean;
 	export let isDeselecting: boolean;
 	export let isCanceling: boolean;
+	export let isRemoving: boolean;
+	export let isBetweenBounds: boolean;
 
 	export let hasHandle: boolean;
 	export let hasRemove: boolean;
@@ -34,11 +37,17 @@
 			: !hasHandle
 				? 'grab'
 				: 'initial';
-	$: styleTransform = getStyleTransform(draggedItem, targetItem, isCanceling);
+	$: styleTransform = getStyleTransform(
+		draggedItem,
+		targetItem,
+		isCanceling,
+		isRemoving,
+		isBetweenBounds
+	);
 	$: styleTransition =
-		isDragging || isDropping || isSelecting || isDeselecting
+		isDragging || (isDropping && !isRemoving) || isSelecting || isDeselecting
 			? `transform ${transitionDuration}ms`
-			: '';
+			: 'none';
 	$: styleVisibility =
 		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
 			? 'hidden'
@@ -47,41 +56,50 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (
-			(isDragging || isDropping || isSelecting || isDeselecting) &&
-			draggedItem !== null &&
-			targetItem !== null
-		) {
-			if (isCanceling) return 'translate3d(0, 0, 0)';
+			(!isDragging && !isDropping && !isSelecting && !isDeselecting) ||
+			isCanceling ||
+			!draggedItem
+		)
+			return 'translate3d(0, 0, 0)';
 
-			if (draggedItem.id !== String(item.id)) {
-				if (
-					(index > draggedItem.index && index <= targetItem.index) ||
-					(index < draggedItem.index && index >= targetItem.index)
-				) {
-					const operator = index > draggedItem.index && index <= targetItem.index ? '-' : '';
-					const x = direction === 'vertical' ? '0' : `${operator}${draggedItem.width + gap}px`;
-					const y = direction === 'vertical' ? `${operator}${draggedItem.height + gap}px` : '0';
-					return `translate3d(${x}, ${y}, 0)`;
-				} else {
-					return 'translate3d(0, 0, 0)';
-				}
-			} else {
-				const draggedItemWidth = draggedItem.index < targetItem.index ? draggedItem.width : 0;
-				const draggedItemHeight = draggedItem.index < targetItem.index ? draggedItem.height : 0;
-				const targetItemWidth = draggedItem.index < targetItem.index ? targetItem.width : 0;
-				const targetItemHeight = draggedItem.index < targetItem.index ? targetItem.height : 0;
-				const x =
-					direction === 'vertical'
-						? '0'
-						: `${targetItem.x + targetItemWidth - draggedItem.x - draggedItemWidth}px`;
-				const y =
-					direction === 'vertical'
-						? `${targetItem.y + targetItemHeight - draggedItem.y - draggedItemHeight}px`
-						: '0';
+		if (!isBetweenBounds && hasRemoveOnDragOut) {
+			if (index > draggedItem.index) {
+				const x = direction === 'vertical' ? '0' : `-${draggedItem.width + gap}px`;
+				const y = direction === 'vertical' ? `-${draggedItem.height + gap}px` : '0';
 				return `translate3d(${x}, ${y}, 0)`;
+			} else {
+				return 'translate3d(0, 0, 0)';
+			}
+		}
+
+		if (!targetItem) return 'translate3d(0, 0, 0)';
+
+		if (draggedItem.id !== String(item.id)) {
+			if (
+				(index > draggedItem.index && index <= targetItem.index) ||
+				(index < draggedItem.index && index >= targetItem.index)
+			) {
+				const operator = index > draggedItem.index && index <= targetItem.index ? '-' : '';
+				const x = direction === 'vertical' ? '0' : `${operator}${draggedItem.width + gap}px`;
+				const y = direction === 'vertical' ? `${operator}${draggedItem.height + gap}px` : '0';
+				return `translate3d(${x}, ${y}, 0)`;
+			} else {
+				return 'translate3d(0, 0, 0)';
 			}
 		} else {
-			return 'translate3d(0, 0, 0)';
+			const draggedItemWidth = draggedItem.index < targetItem.index ? draggedItem.width : 0;
+			const draggedItemHeight = draggedItem.index < targetItem.index ? draggedItem.height : 0;
+			const targetItemWidth = draggedItem.index < targetItem.index ? targetItem.width : 0;
+			const targetItemHeight = draggedItem.index < targetItem.index ? targetItem.height : 0;
+			const x =
+				direction === 'vertical'
+					? '0'
+					: `${targetItem.x + targetItemWidth - draggedItem.x - draggedItemWidth}px`;
+			const y =
+				direction === 'vertical'
+					? `${targetItem.y + targetItemHeight - draggedItem.y - draggedItemHeight}px`
+					: '0';
+			return `translate3d(${x}, ${y}, 0)`;
 		}
 	}
 
@@ -172,7 +190,7 @@
 	on:blur={setInteractiveElementsTabIndex}
 	on:pointerdown={handlePointerDown}
 	in:scaleFly={{ x: -120 }}
-	out:scaleFly={{ x: 120 }}
+	out:scaleFly={{ x: 120, duration: isRemoving ? 0 : 400 }}
 >
 	<div class="sortable-item__inner">
 		{#if hasHandle}
