@@ -56,6 +56,15 @@ export function checkIfInteractive(target: Element, rootElement: Element) {
 	return false;
 }
 
+export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData, threshold: number = 1) {
+	return (
+		a.x + a.width * threshold > b.x &&
+		a.x < b.x + b.width * threshold &&
+		a.y + a.height * threshold > b.y &&
+		a.y < b.y + b.height * threshold
+	);
+}
+
 function getIntersectionRect(r1: ItemData, r2: ItemData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
@@ -66,14 +75,7 @@ function getIntersectionRect(r1: ItemData, r2: ItemData) {
 }
 
 export function getCollidingItem(ghost: ItemData, items: ItemData[], threshold: number) {
-	const collidingItems = items.filter((targetItem) => {
-		return (
-			ghost.x + ghost.width * threshold > targetItem.x &&
-			ghost.x < targetItem.x + targetItem.width * threshold &&
-			ghost.y + ghost.height * threshold > targetItem.y &&
-			ghost.y < targetItem.y + targetItem.height * threshold
-		);
-	});
+	const collidingItems = items.filter((targetItem) => areColliding(ghost, targetItem, threshold));
 	if (collidingItems.length > 1) {
 		collidingItems.sort((a, b) => {
 			const aIntersectionRect = getIntersectionRect(ghost, a);

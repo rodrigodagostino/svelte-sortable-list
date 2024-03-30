@@ -3,6 +3,7 @@
 	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
 	import {
+		areColliding,
 		checkIfInteractive,
 		getCollidingItem,
 		getFocusedItemElement,
@@ -181,29 +182,10 @@
 	function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
 
-		const {
-			left: listLeft,
-			top: listTop,
-			right: listRight,
-			bottom: listBottom,
-		} = listRef.getBoundingClientRect();
-		const {
-			left: ghostLeft,
-			top: ghostTop,
-			right: ghostRight,
-			bottom: ghostBottom,
-			width: ghostWidth,
-			height: ghostHeight,
-		} = ghostRef.getBoundingClientRect();
+		const listRect = listRef.getBoundingClientRect();
+		const ghostRect = ghostRef.getBoundingClientRect();
 
-		if (
-			ghostRight < listLeft ||
-			ghostLeft > listRight ||
-			ghostBottom < listTop ||
-			ghostTop > listBottom
-		)
-			isBetweenBounds = false;
-		else isBetweenBounds = true;
+		isBetweenBounds = areColliding(ghostRect, listRect);
 
 		if (!hasBoundaries) {
 			const x =
@@ -218,18 +200,18 @@
 		} else {
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - (pointerOrigin.x - draggedItem.x) < listLeft
-						? listLeft - draggedItem.x
-						: clientX + ghostWidth - (pointerOrigin.x - draggedItem.x) > listRight
-							? listRight - draggedItem.x - ghostWidth
+					? clientX - (pointerOrigin.x - draggedItem.x) < listRect.x
+						? listRect.x - draggedItem.x
+						: clientX + ghostRect.width - (pointerOrigin.x - draggedItem.x) > listRect.right
+							? listRect.right - draggedItem.x - ghostRect.width
 							: clientX - pointerOrigin.x
 					: 0;
 			const y =
 				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - (pointerOrigin.y - draggedItem.y) < listTop
-						? listTop - draggedItem.y
-						: clientY + ghostHeight - (pointerOrigin.y - draggedItem.y) > listBottom
-							? listBottom - draggedItem.y - ghostHeight
+					? clientY - (pointerOrigin.y - draggedItem.y) < listRect.y
+						? listRect.y - draggedItem.y
+						: clientY + ghostRect.height - (pointerOrigin.y - draggedItem.y) > listRect.bottom
+							? listRect.bottom - draggedItem.y - ghostRect.height
 							: clientY - pointerOrigin.y
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
