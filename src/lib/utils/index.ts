@@ -25,7 +25,7 @@ export function getFocusedItemElement(list: HTMLUListElement, key: 'id' | 'index
 
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
-export function checkIfInteractive(target: Element, rootElement: Element) {
+export function hasInteractiveElements(target: Element, rootElement: Element) {
 	const DISABLED_ELEMENTS = [
 		'a',
 		'audio',

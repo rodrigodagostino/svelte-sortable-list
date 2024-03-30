@@ -4,11 +4,11 @@
 	import SortableItem from '$lib/components/SortableItem.svelte';
 	import {
 		areColliding,
-		checkIfInteractive,
 		getCollidingItem,
 		getFocusedItemElement,
 		getItemData,
 		getItemsData,
+		hasInteractiveElements,
 		screenReaderText,
 	} from '$lib/utils/index.js';
 	import type { ItemData, SortableListProps } from '$lib/types.js';
@@ -157,7 +157,7 @@
 		if (slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
 
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
-		if (!currItem || checkIfInteractive(target, currItem)) return;
+		if (!currItem || hasInteractiveElements(target, currItem)) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
