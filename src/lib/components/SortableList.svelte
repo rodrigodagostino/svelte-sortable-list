@@ -39,8 +39,7 @@
 	let isRemoving = false;
 	let isBetweenBounds = true;
 
-	let hasHandle = $$slots.handle;
-	let hasRemove = $$slots.remove;
+	let slots = $$slots;
 
 	const dispatch = createEventDispatcher();
 
@@ -154,7 +153,7 @@
 			return;
 
 		const target = event.target as HTMLElement;
-		if ($$slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
+		if (slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
 
 		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
 		if (!currItem || checkIfInteractive(target, currItem)) return;
@@ -476,8 +475,7 @@
 				bind:isCanceling
 				{isRemoving}
 				{isBetweenBounds}
-				{hasHandle}
-				{hasRemove}
+				{slots}
 				on:remove={() => handleRemove(String(item.id))}
 			>
 				<slot name="handle" slot="handle" />

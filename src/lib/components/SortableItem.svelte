@@ -26,15 +26,17 @@
 	export let isRemoving: boolean;
 	export let isBetweenBounds: boolean;
 
-	export let hasHandle: boolean;
-	export let hasRemove: boolean;
+	export let slots: {
+		handle?: boolean;
+		remove?: boolean;
+	};
 
 	const dispatch = createEventDispatcher();
 
 	$: styleCursor =
 		isDragging && draggedItem?.id === String(item.id)
 			? 'grabbing'
-			: !hasHandle
+			: !slots.handle
 				? 'grab'
 				: 'initial';
 	$: styleTransform = getStyleTransform(
@@ -197,7 +199,7 @@
 	out:scaleFly={{ x: 120, duration: isRemoving ? 0 : 400 }}
 >
 	<div class="sortable-item__inner">
-		{#if hasHandle}
+		{#if slots.handle}
 			<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
 				<slot name="handle" />
 			</div>
@@ -205,7 +207,7 @@
 		<div class="sortable-item__content">
 			<slot {item} {index} />
 		</div>
-		{#if hasRemove}
+		{#if slots.remove}
 			<button class="sortable-item__remove" on:click={() => dispatch('remove')}>
 				<slot name="remove" />
 			</button>
