@@ -300,25 +300,33 @@
 
 				await tick();
 				const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
-				focusedItemElement && setItemStyles(focusedItemElement);
+				if (!focusedItemElement) return;
+
+				setItemStyles(focusedItemElement);
 				if (draggedItem)
 					liveText = screenReaderText.dropped(draggedItem, targetItem || null, listRef);
 
-				const timeoutId = setTimeout(async () => {
-					dispatchSort(draggedItem, targetItem);
+				async function handleItemDrop({ propertyName }: TransitionEvent) {
+					if (propertyName === 'z-index') {
+						dispatchSort(draggedItem, targetItem);
 
-					draggedItem = null;
-					targetItem = null;
-					itemsOrigin = null;
-					isDeselecting = false;
+						draggedItem = null;
+						targetItem = null;
+						itemsOrigin = null;
+						isDeselecting = false;
 
-					await tick();
-					const focusedItemElement =
-						focusedItem && getFocusedItemElement(listRef, 'id', focusedItem.id);
-					focusedItemElement?.focus();
+						await tick();
+						const focusedItemElement =
+							focusedItem && getFocusedItemElement(listRef, 'id', focusedItem.id);
+						if (!focusedItemElement) return;
 
-					clearTimeout(timeoutId);
-				}, transitionDuration);
+						focusedItemElement.focus();
+
+						focusedItemElement.removeEventListener('transitionend', handleItemDrop);
+					}
+				}
+
+				focusedItemElement.addEventListener('transitionend', handleItemDrop);
 			}
 		}
 
@@ -385,15 +393,22 @@
 			isCanceling = true;
 			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
-			const timeoutId = setTimeout(() => {
-				draggedItem = null;
-				targetItem = null;
-				itemsOrigin = null;
-				isDeselecting = false;
-				isCanceling = false;
+			const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
+			if (!focusedItemElement) return;
 
-				clearTimeout(timeoutId);
-			}, transitionDuration);
+			function handleItemDrop({ propertyName }: TransitionEvent) {
+				if (propertyName === 'z-index') {
+					draggedItem = null;
+					targetItem = null;
+					itemsOrigin = null;
+					isDeselecting = false;
+					isCanceling = false;
+
+					focusedItemElement?.removeEventListener('transitionend', handleItemDrop);
+				}
+			}
+
+			focusedItemElement.addEventListener('transitionend', handleItemDrop);
 		}
 	}
 

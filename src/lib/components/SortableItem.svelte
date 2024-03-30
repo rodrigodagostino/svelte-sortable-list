@@ -46,8 +46,8 @@
 	);
 	$: styleTransition =
 		isDragging || (isDropping && !isRemoving) || isSelecting || isDeselecting
-			? `transform ${transitionDuration}ms`
-			: 'none';
+			? `transform ${transitionDuration}ms, z-index ${transitionDuration}ms`
+			: `z-index ${transitionDuration}ms`;
 	$: styleVisibility =
 		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
 			? 'hidden'
@@ -123,15 +123,19 @@
 			isDeselecting = true;
 			isCanceling = true;
 
-			const timeoutId = setTimeout(() => {
-				draggedItem = null;
-				targetItem = null;
-				itemsOrigin = null;
-				isDeselecting = false;
-				isCanceling = false;
+			function handleItemDrop({ propertyName }: TransitionEvent) {
+				if (propertyName === 'transform') {
+					draggedItem = null;
+					targetItem = null;
+					itemsOrigin = null;
+					isDeselecting = false;
+					isCanceling = false;
 
-				clearTimeout(timeoutId);
-			}, transitionDuration);
+					itemRef.removeEventListener('transitionend', handleItemDrop);
+				}
+			}
+
+			itemRef.addEventListener('transitionend', handleItemDrop);
 		}
 	}
 
@@ -227,9 +231,14 @@
 			flex-shrink: 0;
 		}
 
-		&:focus-visible,
-		&.is-selecting,
+		&.is-selecting {
+			z-index: 3;
+		}
+
 		&.is-deselecting {
+			// The following z-index is different from the one in .is-selecting for
+			// the sole purpose of ensuring the «transitionend» event is fired when
+			// the item is dropped using the keyboard.
 			z-index: 2;
 		}
 
