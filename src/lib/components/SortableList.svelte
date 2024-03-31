@@ -500,16 +500,16 @@
 		&.has-direction-vertical {
 			flex-direction: column;
 
-			:global(.sortable-item + .sortable-item) {
-				margin-top: var(--gap);
+			:global(.sortable-item:not(:last-of-type)) {
+				margin-bottom: var(--gap);
 			}
 		}
 
 		&.has-direction-horizontal {
 			flex-direction: row;
 
-			:global(.sortable-item + .sortable-item) {
-				margin-left: var(--gap);
+			:global(.sortable-item:not(:last-of-type)) {
+				margin-right: var(--gap);
 			}
 		}
 	}
