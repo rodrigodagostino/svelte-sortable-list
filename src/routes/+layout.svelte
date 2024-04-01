@@ -113,6 +113,10 @@
 
 		.container {
 			align-items: center;
+
+			& > :global(.form__button) {
+				margin-top: 2rem;
+			}
 		}
 	}
 

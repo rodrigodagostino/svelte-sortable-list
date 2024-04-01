@@ -170,6 +170,38 @@ code {
 	min-height: 100svh;
 }
 
+.form {
+	display: flex;
+	margin-top: 3rem;
+}
+
+.form__input {
+	border: none;
+	border: 0.0625rem solid var(--gray-200);
+	padding-inline: 0.75rem;
+}
+
+.form__button {
+	display: flex;
+	align-items: center;
+	height: 3rem;
+	padding: 0.75em 1em;
+	background-color: var(--gray-800);
+	border: none;
+	color: var(--white);
+	line-height: 1;
+	transition: background-color 240ms;
+}
+
+.form__button:focus-visible,
+.form__button:hover {
+	background-color: var(--gray-600);
+}
+
+.form__button:active {
+	background-color: var(--gray-950);
+}
+
 @media (min-width: 48em) {
 	.app {
 		grid-template-columns: 1fr 22rem;

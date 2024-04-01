@@ -3,7 +3,7 @@
 	import { defaultItems } from '../fixtures.js';
 	import '$lib/styles.css';
 
-	let items: SortableListProps['items'] = defaultItems;
+	let items: SortableListProps['items'] = [...defaultItems];
 	let newItem: string;
 
 	function handleSort(event: CustomEvent) {
@@ -26,6 +26,8 @@
 	<IconRemove slot="remove" />
 </SortableList>
 
+<button class="form__button" on:click={() => (items = defaultItems)}>Reset</button>
+
 <form
 	class="form"
 	on:submit|preventDefault={() => (items = [...items, { id: Date.now(), text: newItem }])}
@@ -33,37 +35,3 @@
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="form__button">Add item</button>
 </form>
-
-<style lang="scss">
-	.form {
-		display: flex;
-		margin-top: 3rem;
-
-		&__input {
-			border: none;
-			border: 0.0625rem solid var(--gray-200);
-			padding-inline: 0.75rem;
-		}
-
-		&__button {
-			display: flex;
-			align-items: center;
-			height: 3rem;
-			padding: 0.75em 1em;
-			background-color: var(--gray-800);
-			border: none;
-			color: var(--white);
-			line-height: 1;
-			transition: background-color 240ms;
-
-			&:focus,
-			&:hover {
-				background-color: var(--gray-600);
-			}
-
-			&:active {
-				background-color: var(--gray-950);
-			}
-		}
-	}
-</style>

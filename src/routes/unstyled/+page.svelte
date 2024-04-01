@@ -2,7 +2,7 @@
 	import { SortableList, reorderItems, type SortableListProps } from '$lib/index.js';
 	import { defaultItems } from '../fixtures.js';
 
-	let items: SortableListProps['items'] = defaultItems;
+	let items: SortableListProps['items'] = [...defaultItems];
 
 	function handleSort(event: CustomEvent) {
 		const { oldIndex, newIndex } = event.detail;

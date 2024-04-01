@@ -3,7 +3,7 @@
 	import { varyingItems } from '../fixtures.js';
 	import '$lib/styles.css';
 
-	let items: SortableListProps['items'] = varyingItems;
+	let items: SortableListProps['items'] = [...varyingItems];
 
 	function handleSort(event: CustomEvent) {
 		const { oldIndex, newIndex } = event.detail;

@@ -3,7 +3,7 @@
 	import { disabledItems } from '../fixtures.js';
 	import '$lib/styles.css';
 
-	let items: SortableListProps['items'] = disabledItems;
+	let items: SortableListProps['items'] = [...disabledItems];
 
 	function handleSort(event: CustomEvent) {
 		const { oldIndex, newIndex } = event.detail;
