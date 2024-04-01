@@ -27,10 +27,38 @@
 		</a>
 		<a
 			class="app-nav__link"
+			href="/varying-heights"
+			aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
+		>
+			Varying heights
+		</a>
+		<a
+			class="app-nav__link"
 			href="/with-handle"
 			aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
 		>
 			With handle
+		</a>
+		<a
+			class="app-nav__link"
+			href="/disabled-items"
+			aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
+		>
+			Disabled items
+		</a>
+		<a
+			class="app-nav__link"
+			href="/dynamic-items"
+			aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
+		>
+			Dynamic items
+		</a>
+		<a
+			class="app-nav__link"
+			href="/has-boundaries"
+			aria-current={$page.url.pathname === '/has-boundaries' ? 'page' : undefined}
+		>
+			Has boundaries
 		</a>
 		<a
 			class="app-nav__link"
@@ -45,20 +73,6 @@
 			aria-current={$page.url.pathname === '/has-locked-axis' ? 'page' : undefined}
 		>
 			Has locked axis
-		</a>
-		<a
-			class="app-nav__link"
-			href="/has-boundaries"
-			aria-current={$page.url.pathname === '/has-boundaries' ? 'page' : undefined}
-		>
-			Has boundaries
-		</a>
-		<a
-			class="app-nav__link"
-			href="/has-remove-on-drag-out"
-			aria-current={$page.url.pathname === '/has-remove-on-drag-out' ? 'page' : undefined}
-		>
-			Has remove on drag out
 		</a>
 		<a
 			class="app-nav__link"
@@ -78,24 +92,10 @@
 		</a>
 		<a
 			class="app-nav__link"
-			href="/varying-heights"
-			aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
+			href="/has-remove-on-drag-out"
+			aria-current={$page.url.pathname === '/has-remove-on-drag-out' ? 'page' : undefined}
 		>
-			Varying heights
-		</a>
-		<a
-			class="app-nav__link"
-			href="/dynamic-items"
-			aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
-		>
-			Dynamic items
-		</a>
-		<a
-			class="app-nav__link"
-			href="/disabled-items"
-			aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
-		>
-			Disabled items
+			Has remove on drag out
 		</a>
 	</div>
 </nav>
