@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { props } from './stores.js';
 	import './styles.css';
 </script>
 
@@ -8,6 +9,100 @@
 		<slot />
 	</div>
 </main>
+<aside class="app-controls">
+	<div class="container">
+		<table>
+			<thead>
+				<tr>
+					<th></th>
+					<th>Prop</th>
+					<th>Value</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td></td>
+					<td><label for="gap">gap</label></td>
+					<td><input id="gap" type="number" min="0" bind:value={$props.gap} /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="direction">direction</label></td>
+					<td>
+						<select id="direction" bind:value={$props.direction}>
+							<option value="vertical">vertical</option>
+							<option value="horizontal">horizontal</option>
+						</select>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="swap-threshold">swapThreshold</label></td>
+					<td>
+						<input
+							id="swap-threshold"
+							type="number"
+							min="0"
+							step="0.1"
+							bind:value={$props.swapThreshold}
+						/>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="transition-duration">transitionDuration</label></td>
+					<td>
+						<input
+							id="transition-duration"
+							type="number"
+							min="0"
+							bind:value={$props.transitionDuration}
+						/>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="has-drop-marker">hasDropMarker</label></td>
+					<td>
+						<input id="has-drop-marker" type="checkbox" bind:checked={$props.hasDropMarker} />
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="has-locked-axis">hasLockedAxis</label></td>
+					<td>
+						<input id="has-locked-axis" type="checkbox" bind:checked={$props.hasLockedAxis} />
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="has-boundaries">hasBoundaries</label></td>
+					<td><input id="has-boundaries" type="checkbox" bind:checked={$props.hasBoundaries} /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><label for="has-remove-on-drag-out">hasRemoveOnDragOut</label></td>
+					<td>
+						<input
+							id="has-remove-on-drag-out"
+							type="checkbox"
+							bind:checked={$props.hasRemoveOnDragOut}
+						/>
+					</td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</aside>
 <nav class="app-nav">
 	<div class="container">
 		<a
@@ -112,11 +207,49 @@
 		padding: 3rem;
 
 		.container {
-			align-items: center;
-
 			& > :global(.form__button) {
 				margin-top: 2rem;
 			}
+		}
+	}
+
+	.app-controls {
+		overflow: auto;
+		padding-block: 1.5rem;
+		background-color: var(--white);
+
+		table {
+			border-collapse: collapse;
+		}
+
+		tr:nth-child(odd) td {
+			background-color: var(--gray-100);
+		}
+
+		th:not(:first-child):not(:last-child),
+		td:not(:first-child):not(:last-child) {
+			padding: 0.625rem 1.25rem;
+		}
+
+		th {
+			border-bottom: 1px solid var(--gray-200);
+			text-align: start;
+
+			&:first-child,
+			&:last-child {
+				width: 0;
+			}
+		}
+
+		td {
+			font-family: monospace;
+		}
+
+		input,
+		select {
+			max-width: 100%;
+			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+			border-radius: 0.25rem;
 		}
 	}
 
@@ -127,7 +260,7 @@
 		.container {
 			align-items: center;
 			justify-content: center;
-			gap: 0.5rem;
+			gap: 0.75rem;
 		}
 
 		&__link {
@@ -145,11 +278,25 @@
 		align-items: center;
 	}
 
+	@media (min-width: 26em) {
+		.app-controls {
+			table {
+				table-layout: auto;
+			}
+
+			th {
+				&:first-child,
+				&:last-child {
+					width: 50%;
+				}
+			}
+		}
+	}
+
 	@media (min-width: 48em) {
 		.app-nav {
-			position: fixed;
-			inset: 0;
-			left: calc(100% - 22rem);
+			grid-column: 2/-1;
+			grid-row: 1/3;
 
 			.container {
 				align-items: start;

@@ -92,20 +92,16 @@ input,
 textarea,
 select,
 button {
+	min-width: 0;
+	border: 1px solid var(--gray-400);
 	color: inherit;
 	font: inherit;
 	letter-spacing: inherit;
 }
 
-input,
-textarea,
-button {
-	border: 1px solid var(--gray-400);
-	min-width: 0;
-}
-
 input:focus-visible,
 textarea:focus-visible,
+select:focus-visible,
 button:focus-visible {
 	outline: 0.125rem solid var(--gray-800);
 }
@@ -204,6 +200,9 @@ code {
 
 @media (min-width: 48em) {
 	.app {
-		grid-template-columns: 1fr 22rem;
+		grid-template-columns: 1fr 21rem;
+		grid-template-rows: 1fr 18rem;
+		height: 100vh;
+		height: 100svh;
 	}
 }

@@ -1,5 +1,18 @@
 import type { SortableListProps } from '$lib/types.js';
 
+export const defaultProps: Omit<SortableListProps, 'items'> = {
+	gap: 12,
+	direction: 'vertical',
+	swapThreshold: 1,
+	transitionDuration: 320,
+	hasDropMarker: false,
+	hasLockedAxis: false,
+	hasBoundaries: false,
+	hasRemoveOnDragOut: false,
+};
+
+Object.freeze(defaultProps);
+
 export const defaultItems: SortableListProps['items'] = [
 	{
 		id: 1,
@@ -23,6 +36,8 @@ export const defaultItems: SortableListProps['items'] = [
 	},
 ];
 
+Object.freeze(defaultItems);
+
 export const varyingItems: SortableListProps['items'] = [
 	{
 		id: 1,
@@ -45,6 +60,8 @@ export const varyingItems: SortableListProps['items'] = [
 		text: 'List item 5 with a bit more of content that will break into more multiple lines',
 	},
 ];
+
+Object.freeze(varyingItems);
 
 export const disabledItems: SortableListProps['items'] = [
 	{
@@ -73,3 +90,5 @@ export const disabledItems: SortableListProps['items'] = [
 		isDisabled: false,
 	},
 ];
+
+Object.freeze(disabledItems);

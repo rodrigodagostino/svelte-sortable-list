@@ -1,10 +1,16 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { SortableList, IconRemove, reorderItems, type SortableListProps } from '$lib/index.js';
-	import { defaultItems } from '../fixtures.js';
+	import { defaultItems, defaultProps } from '../fixtures.js';
+	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items: SortableListProps['items'] = [...defaultItems];
 	let newItem: string;
+
+	onMount(() => {
+		$props = { ...defaultProps };
+	});
 
 	function handleSort(event: CustomEvent) {
 		const { oldIndex, newIndex } = event.detail;
@@ -21,7 +27,7 @@
 	<title>Dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {items} let:item on:sort={handleSort} on:remove={handleRemove}>
+<SortableList {items} {...$props} let:item on:sort={handleSort} on:remove={handleRemove}>
 	{item.text}
 	<IconRemove slot="remove" />
 </SortableList>

@@ -1,9 +1,18 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { SortableList, reorderItems, type SortableListProps } from '$lib/index.js';
-	import { varyingItems } from '../fixtures.js';
+	import { defaultProps, varyingItems } from '../fixtures.js';
+	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items: SortableListProps['items'] = [...varyingItems];
+
+	onMount(() => {
+		$props = {
+			...defaultProps,
+			hasRemoveOnDragOut: true,
+		};
+	});
 
 	function handleSort(event: CustomEvent) {
 		const { oldIndex, newIndex } = event.detail;
@@ -20,13 +29,7 @@
 	<title>Has remove on drag out | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList
-	{items}
-	hasRemoveOnDragOut={true}
-	let:item
-	on:sort={handleSort}
-	on:remove={handleRemove}
->
+<SortableList {items} {...$props} let:item on:sort={handleSort} on:remove={handleRemove}>
 	{item.text}
 </SortableList>
 
