@@ -21,7 +21,7 @@
 	class:is-out-of-bounds={!isBetweenBounds}
 	class:is-removing={isRemoving}
 	style:--transition-duration="{transitionDuration}ms"
-	style:cursor={isDragging ? 'grabbing' : 'grab'}
+	style:cursor={isDragging ? 'grabbing' : !isRemoving ? 'grab' : 'initial'}
 	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 	style:transform="translate3d(0, 0, 0)"
 	data-id={draggedItem?.id}

@@ -39,6 +39,10 @@
 			: !slots.handle
 				? 'grab'
 				: 'initial';
+	$: styleWidth = getStyleWidth(draggedItem, isBetweenBounds);
+	$: styleHeight = getStyleHeight(draggedItem, isBetweenBounds);
+	$: styleMargin = getStyleMargin(draggedItem, isBetweenBounds);
+	$: styleOverflow = isDragging && hasRemoveOnDragOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		draggedItem,
 		targetItem,
@@ -47,13 +51,48 @@
 		isBetweenBounds
 	);
 	$: styleTransition =
-		isDragging || (isDropping && !isRemoving) || isSelecting || isDeselecting
-			? `transform ${transitionDuration}ms, z-index ${transitionDuration}ms`
+		isDragging || isDropping || isSelecting || isDeselecting
+			? `width ${transitionDuration}ms, height ${transitionDuration}ms,` +
+				`margin ${transitionDuration}ms, transform ${transitionDuration}ms,` +
+				`z-index ${transitionDuration}ms`
 			: `z-index ${transitionDuration}ms`;
 	$: styleVisibility =
 		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
 			? 'hidden'
 			: 'visible';
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleWidth(...args: unknown[]) {
+		if (!hasRemoveOnDragOut) return undefined;
+
+		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		else if (draggedItem?.id === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
+			return `${draggedItem.width}px`;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleHeight(...args: unknown[]) {
+		if (!hasRemoveOnDragOut) return undefined;
+
+		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		else if (draggedItem?.id === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
+			return `${draggedItem.height}px`;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleMargin(...args: unknown[]) {
+		if (!hasRemoveOnDragOut) return undefined;
+
+		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		else if (
+			draggedItem?.id === String(item.id) &&
+			itemsOrigin &&
+			draggedItem.index !== itemsOrigin.length - 1 &&
+			isBetweenBounds &&
+			hasRemoveOnDragOut
+		)
+			return direction === 'vertical' ? '0 0 var(--gap) 0' : '0 var(--gap) 0 0';
+	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
@@ -63,16 +102,6 @@
 			!draggedItem
 		)
 			return 'translate3d(0, 0, 0)';
-
-		if (!isBetweenBounds && hasRemoveOnDragOut) {
-			if (index > draggedItem.index) {
-				const x = direction === 'vertical' ? '0' : `-${draggedItem.width + gap}px`;
-				const y = direction === 'vertical' ? `-${draggedItem.height + gap}px` : '0';
-				return `translate3d(${x}, ${y}, 0)`;
-			} else {
-				return 'translate3d(0, 0, 0)';
-			}
-		}
 
 		if (!targetItem) return 'translate3d(0, 0, 0)';
 
@@ -180,6 +209,10 @@
 	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
 	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
 	style:cursor={styleCursor}
+	style:width={styleWidth}
+	style:height={styleHeight}
+	style:margin={styleMargin}
+	style:overflow={styleOverflow}
 	style:transform={styleTransform}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
