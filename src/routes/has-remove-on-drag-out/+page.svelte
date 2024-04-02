@@ -20,8 +20,8 @@
 	}
 
 	function handleRemove(event: CustomEvent) {
-		const { id } = event.detail;
-		items = items.filter((i) => String(i.id) !== id);
+		const { itemId } = event.detail;
+		items = items.filter((item) => String(item.id) !== itemId);
 	}
 </script>
 

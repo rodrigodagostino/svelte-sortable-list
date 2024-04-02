@@ -418,7 +418,7 @@
 			ghostRef.addEventListener('transitionend', handleGhostDrop);
 		}
 
-		dispatch('remove', { id: itemId });
+		dispatch('remove', { itemId });
 	}
 </script>
 
