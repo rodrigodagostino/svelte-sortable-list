@@ -13,8 +13,8 @@
 	});
 
 	function handleSort(event: CustomEvent) {
-		const { oldIndex, newIndex } = event.detail;
-		items = reorderItems(items, oldIndex, newIndex);
+		const { prevIndex, nextIndex } = event.detail;
+		items = reorderItems(items, prevIndex, nextIndex);
 	}
 
 	function handleRemove(event: CustomEvent) {

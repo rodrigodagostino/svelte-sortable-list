@@ -145,7 +145,7 @@
 			typeof targetItem.index === 'number' &&
 			draggedItem.index !== targetItem.index
 		) {
-			dispatch('sort', { oldIndex: draggedItem.index, newIndex: targetItem.index });
+			dispatch('sort', { prevIndex: draggedItem.index, nextIndex: targetItem.index });
 		}
 	}
 
