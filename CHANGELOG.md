@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] (2024-04-01)
+
+### Docs
+
+- Extract `items` to fixtures file.
+- Add a reset button to demo pages with removable items.
+- Add controls to demo pages.
+
 ## [0.7.4] (2024-04-01)
 
 ### Added
@@ -299,7 +307,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.1...v0.7.2
