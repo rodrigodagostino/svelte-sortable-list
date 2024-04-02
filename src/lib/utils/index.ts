@@ -88,14 +88,10 @@ export function getCollidingItem(ghost: ItemData, items: ItemData[], threshold: 
 	return collidingItems[0];
 }
 
-export function reorderItems<T>(array: T[], from: number, to: number) {
-	const reorderedItems = structuredClone(array);
-	reorderedItems.splice(
-		to < 0 ? reorderedItems.length + to : to,
-		0,
-		reorderedItems.splice(from, 1)[0]
-	);
-	return reorderedItems;
+export function sortItems<T>(array: T[], from: number, to: number) {
+	const sortedItems = structuredClone(array);
+	sortedItems.splice(to < 0 ? sortedItems.length + to : to, 0, sortedItems.splice(from, 1)[0]);
+	return sortedItems;
 }
 
 export const screenReaderText = {

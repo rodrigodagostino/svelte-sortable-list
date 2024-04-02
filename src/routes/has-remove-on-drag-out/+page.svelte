@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SortableList, reorderItems, type SortableListProps } from '$lib/index.js';
+	import { SortableList, sortItems, type SortableListProps } from '$lib/index.js';
 	import { defaultProps, varyingItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
@@ -16,7 +16,7 @@
 
 	function handleSort(event: CustomEvent) {
 		const { prevIndex, nextIndex } = event.detail;
-		items = reorderItems(items, prevIndex, nextIndex);
+		items = sortItems(items, prevIndex, nextIndex);
 	}
 
 	function handleRemove(event: CustomEvent) {
