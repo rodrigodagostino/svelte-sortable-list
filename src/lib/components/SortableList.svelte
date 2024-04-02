@@ -5,8 +5,8 @@
 	import {
 		areColliding,
 		getCollidingItem,
-		getFocusedItemElement,
 		getItemData,
+		getItemElement,
 		getItemsData,
 		hasInteractiveElements,
 		screenReaderText,
@@ -271,7 +271,7 @@
 				isSelecting = true;
 
 				await tick();
-				const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
+				const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
 				draggedItem = focusedItemElement && getItemData(focusedItemElement);
 				itemsOrigin = getItemsData(listRef);
 				if (draggedItem !== null) liveText = screenReaderText.lifted(draggedItem, listRef);
@@ -280,7 +280,7 @@
 				isDeselecting = true;
 
 				await tick();
-				const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
+				const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
 				if (!focusedItemElement) return;
 
 				setItemStyles(focusedItemElement);
@@ -297,8 +297,7 @@
 						isDeselecting = false;
 
 						await tick();
-						const focusedItemElement =
-							focusedItem && getFocusedItemElement(listRef, 'id', focusedItem.id);
+						const focusedItemElement = focusedItem && getItemElement(listRef, 'id', focusedItem.id);
 						if (!focusedItemElement) return;
 
 						focusedItemElement.focus();
@@ -331,7 +330,7 @@
 				)
 					return;
 
-				const focusedItemElement = getFocusedItemElement(
+				const focusedItemElement = getItemElement(
 					listRef,
 					'index',
 					String(focusedItem?.index + step)
@@ -374,7 +373,7 @@
 			isCanceling = true;
 			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
-			const focusedItemElement = getFocusedItemElement(listRef, 'id', focusedItem.id);
+			const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
 			if (!focusedItemElement) return;
 
 			function handleItemDrop({ propertyName }: TransitionEvent) {
@@ -398,8 +397,8 @@
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = focusedItem.index !== items.length - 1 ? 1 : -1;
-				const adjacentFocusedItemId = items[focusedItem.index + step].id;
-				getFocusedItemElement(listRef, 'id', adjacentFocusedItemId)?.focus();
+				const adjacentItemId = items[focusedItem.index + step].id;
+				getItemElement(listRef, 'id', adjacentItemId)?.focus();
 			} else {
 				// Focus the list (if there are no items left) before removing.
 				focusedItem = null;
