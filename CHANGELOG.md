@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] (2024-04-09)
+
+### Add
+
+- Expose stylesheets to allow them to be imported from outside the package.
+
+### Changed
+
+- Rename `getFocusedItemElement()` function to `getItemElement()`.
+- Rename `oldIndex`/`newIndex` to `prevIndex`/`nextIndex` in `dispatch('sort')` function.
+- Rename `id` to `itemId` in `dispatch('remove')` function.
+- Rename `reorderItems()` function to `sortItems()`.
+
+### Docs
+
+- Write proper README.
+
 ## [0.8.0] (2024-04-01)
 
 ### Docs
@@ -307,7 +324,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.7.2...v0.7.3
