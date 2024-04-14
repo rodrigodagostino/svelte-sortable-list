@@ -295,8 +295,9 @@
 			font-family: monospace;
 		}
 
-		input,
+		input:not([type='checkbox']),
 		select {
+			width: 7.75rem;
 			max-width: 100%;
 			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 			border-radius: 0.25rem;
