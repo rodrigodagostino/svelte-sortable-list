@@ -158,14 +158,6 @@ code {
 	border-width: 0;
 }
 
-.app {
-	display: grid;
-	grid-template-columns: 1fr;
-	width: 100%;
-	min-height: 100vh;
-	min-height: 100svh;
-}
-
 .form {
 	display: flex;
 	margin-top: 3rem;
@@ -177,7 +169,7 @@ code {
 	padding-inline: 0.75rem;
 }
 
-.form__button {
+.button {
 	display: flex;
 	align-items: center;
 	height: 3rem;
@@ -189,20 +181,11 @@ code {
 	transition: background-color 240ms;
 }
 
-.form__button:focus-visible,
-.form__button:hover {
+.button:focus-visible,
+.button:hover {
 	background-color: var(--gray-600);
 }
 
-.form__button:active {
+.button:active {
 	background-color: var(--gray-950);
-}
-
-@media (min-width: 48em) {
-	.app {
-		grid-template-columns: 1fr 21rem;
-		grid-template-rows: 1fr 18rem;
-		height: 100vh;
-		height: 100svh;
-	}
 }

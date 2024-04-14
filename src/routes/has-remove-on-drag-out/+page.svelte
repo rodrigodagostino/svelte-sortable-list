@@ -33,4 +33,4 @@
 	{item.text}
 </SortableList>
 
-<button class="form__button" on:click={() => (items = varyingItems)}>Reset</button>
+<button class="button" on:click={() => (items = varyingItems)}>Reset</button>

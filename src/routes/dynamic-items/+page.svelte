@@ -32,12 +32,12 @@
 	<IconRemove slot="remove" />
 </SortableList>
 
-<button class="form__button" on:click={() => (items = defaultItems)}>Reset</button>
+<button class="button" on:click={() => (items = defaultItems)}>Reset</button>
 
 <form
 	class="form"
 	on:submit|preventDefault={() => (items = [...items, { id: Date.now(), text: newItem }])}
 >
 	<input type="text" class="form__input" bind:value={newItem} required />
-	<button type="submit" class="form__button">Add item</button>
+	<button type="submit" class="button">Add item</button>
 </form>
