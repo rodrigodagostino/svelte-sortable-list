@@ -6,6 +6,12 @@
 	let isControlsExpanded = true;
 </script>
 
+<svelte:window
+	on:keydown={(event) => {
+		event.key === 'a' && (isControlsExpanded = !isControlsExpanded);
+	}}
+/>
+
 <div id="app" class="app" class:is-controls-expanded={isControlsExpanded}>
 	<main class="app-main">
 		<div class="container">
