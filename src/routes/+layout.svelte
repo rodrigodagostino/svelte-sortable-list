@@ -266,7 +266,9 @@
 			transform: translateY(-50%);
 			height: 2.25rem;
 			font-size: 0.875rem;
-			transition: transform 320ms;
+			transition:
+				background-color 240ms,
+				transform 320ms;
 		}
 
 		.container {
@@ -389,6 +391,7 @@
 			}
 
 			&__toggle {
+				right: 1.25rem;
 				transform: translate(0, -100%);
 			}
 		}
