@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { scaleFly } from '$lib/transitions/index.js';
-	import { getItemData, screenReaderText } from '$lib/utils/index.js';
+	import { getId, getIndex, screenReaderText } from '$lib/utils/index.js';
 	import type { ItemData, SortableItemProps } from '$lib/types.js';
 
 	export let item: SortableItemProps['item'];
@@ -14,9 +14,9 @@
 
 	let itemRef: HTMLLIElement;
 	export let itemsOrigin: ItemData[] | null;
-	export let focusedItem: ItemData | null;
-	export let draggedItem: ItemData | null;
-	export let targetItem: ItemData | null;
+	export let draggedItem: HTMLLIElement | null;
+	export let targetItem: HTMLLIElement | null;
+	export let focusedItem: HTMLLIElement | null;
 
 	export let isDragging: boolean;
 	export let isDropping: boolean;
@@ -33,8 +33,19 @@
 
 	const dispatch = createEventDispatcher();
 
+	$: draggedItemId = (draggedItem && getId(draggedItem)) ?? null;
+	$: draggedItemIndex = (draggedItem && getIndex(draggedItem)) ?? null;
+	// itemsOrigin is used as a reliable reference to the item’s position in the list
+	// without the risk of catching in-between values while the item is translating.
+	$: draggedItemRect =
+		typeof draggedItemIndex === 'number' && itemsOrigin ? itemsOrigin[draggedItemIndex] : null;
+	$: targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
+	$: targetItemRect =
+		typeof targetItemIndex === 'number' && itemsOrigin ? itemsOrigin[targetItemIndex] : null;
+	$: focusedItemId = focusedItem ? getId(focusedItem) : null;
+
 	$: styleCursor =
-		isDragging && draggedItem?.id === String(item.id)
+		isDragging && draggedItemId === String(item.id)
 			? 'grabbing'
 			: !slots.handle
 				? 'grab'
@@ -57,7 +68,7 @@
 				`z-index ${transitionDuration}ms`
 			: `z-index ${transitionDuration}ms`;
 	$: styleVisibility =
-		(isDragging || isDropping) && draggedItem?.id === String(item.id) && !hasDropMarker
+		(isDragging || isDropping) && draggedItemId === String(item.id) && !hasDropMarker
 			? 'hidden'
 			: 'visible';
 
@@ -65,29 +76,29 @@
 	function getStyleWidth(...args: unknown[]) {
 		if (!hasRemoveOnDragOut) return undefined;
 
-		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
-		else if (draggedItem?.id === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
-			return `${draggedItem.width}px`;
+		if (draggedItemId === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		else if (draggedItemId === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
+			return `${draggedItemRect?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!hasRemoveOnDragOut) return undefined;
 
-		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
-		else if (draggedItem?.id === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
-			return `${draggedItem.height}px`;
+		if (draggedItemId === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		else if (draggedItemId === String(item.id) && isBetweenBounds && hasRemoveOnDragOut)
+			return `${draggedItemRect?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
 		if (!hasRemoveOnDragOut) return undefined;
 
-		if (draggedItem?.id === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
+		if (draggedItemId === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
 		else if (
-			draggedItem?.id === String(item.id) &&
+			draggedItemId === String(item.id) &&
 			itemsOrigin &&
-			draggedItem.index !== itemsOrigin.length - 1 &&
+			draggedItemIndex !== itemsOrigin.length - 1 &&
 			isBetweenBounds &&
 			hasRemoveOnDragOut
 		)
@@ -97,38 +108,42 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (
+			!itemsOrigin ||
+			!draggedItem ||
+			!targetItem ||
+			draggedItemIndex === null ||
+			draggedItemRect === null ||
+			targetItemIndex === null ||
+			targetItemRect === null ||
 			(!isDragging && !isDropping && !isSelecting && !isDeselecting) ||
-			isCanceling ||
-			!draggedItem
+			isCanceling
 		)
 			return 'translate3d(0, 0, 0)';
 
-		if (!targetItem) return 'translate3d(0, 0, 0)';
-
-		if (draggedItem.id !== String(item.id)) {
+		if (draggedItemId !== String(item.id)) {
 			if (
-				(index > draggedItem.index && index <= targetItem.index) ||
-				(index < draggedItem.index && index >= targetItem.index)
+				(index > draggedItemIndex && index <= targetItemIndex) ||
+				(index < draggedItemIndex && index >= targetItemIndex)
 			) {
-				const operator = index > draggedItem.index && index <= targetItem.index ? '-' : '';
-				const x = direction === 'vertical' ? '0' : `${operator}${draggedItem.width + gap}px`;
-				const y = direction === 'vertical' ? `${operator}${draggedItem.height + gap}px` : '0';
+				const operator = index > draggedItemIndex && index <= targetItemIndex ? '-' : '';
+				const x = direction === 'vertical' ? '0' : `${operator}${draggedItemRect.width + gap}px`;
+				const y = direction === 'vertical' ? `${operator}${draggedItemRect.height + gap}px` : '0';
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
 				return 'translate3d(0, 0, 0)';
 			}
 		} else {
-			const draggedItemWidth = draggedItem.index < targetItem.index ? draggedItem.width : 0;
-			const draggedItemHeight = draggedItem.index < targetItem.index ? draggedItem.height : 0;
-			const targetItemWidth = draggedItem.index < targetItem.index ? targetItem.width : 0;
-			const targetItemHeight = draggedItem.index < targetItem.index ? targetItem.height : 0;
+			const draggedItemWidth = draggedItemIndex < targetItemIndex ? draggedItemRect.width : 0;
+			const draggedItemHeight = draggedItemIndex < targetItemIndex ? draggedItemRect.height : 0;
+			const targetItemWidth = draggedItemIndex < targetItemIndex ? targetItemRect.width : 0;
+			const targetItemHeight = draggedItemIndex < targetItemIndex ? targetItemRect.height : 0;
 			const x =
 				direction === 'vertical'
 					? '0'
-					: `${targetItem.x + targetItemWidth - draggedItem.x - draggedItemWidth}px`;
+					: `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
 			const y =
 				direction === 'vertical'
-					? `${targetItem.y + targetItemHeight - draggedItem.y - draggedItemHeight}px`
+					? `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`
 					: '0';
 			return `translate3d(${x}, ${y}, 0)`;
 		}
@@ -141,10 +156,43 @@
 				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
-			.forEach((el) => (el.tabIndex = focusedItem?.id === String(item.id) ? 0 : -1));
+			.forEach((el) => (el.tabIndex = focusedItemId === String(item.id) ? 0 : -1));
 	}
 
-	onMount(() => setInteractiveElementsTabIndex());
+	onMount(() => {
+		setInteractiveElementsTabIndex();
+	});
+
+	async function handleFocus() {
+		await tick();
+		focusedItem = itemRef;
+		await tick();
+		setInteractiveElementsTabIndex();
+	}
+
+	async function handleFocusOut(event: FocusEvent) {
+		const relatedTarget = event.relatedTarget as HTMLElement | null;
+		if (relatedTarget && !relatedTarget.closest('.sortable-item')) {
+			cleanUp();
+		}
+		await tick();
+		setInteractiveElementsTabIndex();
+	}
+
+	function handlePointerDown(event: PointerEvent) {
+		// Prevent item focus on pointer down.
+		event.preventDefault();
+	}
+
+	async function handleDocumentPointerDown(event: PointerEvent) {
+		const target = event.target as HTMLElement;
+		const focusedItemId = focusedItem && getId(focusedItem);
+		if (focusedItemId === String(item.id) && !target.closest('.sortable-item')) {
+			cleanUp();
+			await tick();
+			setInteractiveElementsTabIndex();
+		}
+	}
 
 	function cleanUp() {
 		focusedItem = null;
@@ -169,34 +217,6 @@
 			itemRef.addEventListener('transitionend', handleItemDrop);
 		}
 	}
-
-	async function handleFocus() {
-		await tick();
-		focusedItem = getItemData(itemRef);
-		await tick();
-		setInteractiveElementsTabIndex();
-	}
-
-	async function handleFocusOut(event: FocusEvent) {
-		const relatedTarget = event.relatedTarget as HTMLElement | null;
-		if (relatedTarget && !relatedTarget.closest('.sortable-item')) cleanUp();
-		await tick();
-		setInteractiveElementsTabIndex();
-	}
-
-	function handlePointerDown(event: PointerEvent) {
-		// Prevent item focus on pointer down.
-		event.preventDefault();
-	}
-
-	async function handleDocumentPointerDown(event: PointerEvent) {
-		const target = event.target as HTMLElement;
-		if (focusedItem?.id === String(item.id) && !target.closest('.sortable-item')) {
-			cleanUp();
-			await tick();
-			setInteractiveElementsTabIndex();
-		}
-	}
 </script>
 
 <svelte:document on:pointerdown={handleDocumentPointerDown} />
@@ -204,10 +224,11 @@
 <li
 	bind:this={itemRef}
 	class="sortable-item"
-	class:is-dragging={isDragging && draggedItem?.id === String(item.id)}
-	class:is-dropping={isDropping && draggedItem?.id === String(item.id)}
-	class:is-selecting={isSelecting && draggedItem?.id === String(item.id)}
-	class:is-deselecting={isDeselecting && draggedItem?.id === String(item.id)}
+	class:is-dragging={isDragging && draggedItemId === String(item.id)}
+	class:is-dropping={isDropping && draggedItemId === String(item.id)}
+	class:is-selecting={isSelecting && draggedItemId === String(item.id)}
+	class:is-deselecting={isDeselecting && draggedItemId === String(item.id)}
+	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:width={styleWidth}
 	style:height={styleHeight}
@@ -220,9 +241,9 @@
 	data-id={item.id}
 	data-index={index}
 	role="option"
-	tabindex={focusedItem?.id === String(item.id) ? 0 : -1}
+	tabindex={focusedItemId === String(item.id) ? 0 : -1}
 	aria-roledescription={screenReaderText.item(index, item.isDisabled || false)}
-	aria-selected={focusedItem?.id === String(item.id)}
+	aria-selected={focusedItemId === String(item.id)}
 	aria-disabled={item.isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}

@@ -2,16 +2,16 @@
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
+	import type { ItemData, SortableListProps } from '$lib/types.js';
 	import {
 		areColliding,
 		getCollidingItem,
-		getItemData,
-		getItemElement,
+		getId,
+		getIndex,
 		getItemsData,
 		hasInteractiveElements,
 		screenReaderText,
 	} from '$lib/utils/index.js';
-	import type { ItemData, SortableListProps } from '$lib/types.js';
 
 	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
@@ -27,9 +27,9 @@
 	let ghostRef: HTMLLIElement;
 	let pointerOrigin: { x: number; y: number };
 	let itemsOrigin: ItemData[] | null = null;
-	let draggedItem: ItemData | null = null;
-	let targetItem: ItemData | null = null;
-	let focusedItem: ItemData | null = null;
+	let draggedItem: HTMLLIElement | null = null;
+	let targetItem: HTMLLIElement | null = null;
+	let focusedItem: HTMLLIElement | null = null;
 	let liveText: string = '';
 
 	let isDragging = false;
@@ -46,19 +46,22 @@
 
 	function setGhostStyles(action: 'init' | 'set' | 'remove' | 'unset') {
 		if (action === 'init' || action === 'set' || action === 'remove') {
-			if (!draggedItem) return;
+			if (!draggedItem || !itemsOrigin) return;
 
-			ghostRef.style.width = `${draggedItem.width}px`;
-			ghostRef.style.height = `${draggedItem.height}px`;
+			const ghostRect = ghostRef.getBoundingClientRect();
+			const draggedItemRect = itemsOrigin[getIndex(draggedItem)!];
+			const targetItemRect = targetItem && itemsOrigin[getIndex(targetItem)!];
+
+			ghostRef.style.width = `${draggedItemRect.width}px`;
+			ghostRef.style.height = `${draggedItemRect.height}px`;
 			ghostRef.style.zIndex = '10000';
 
 			if (action === 'init') {
-				ghostRef.style.left = `${draggedItem.x}px`;
-				ghostRef.style.top = `${draggedItem.y}px`;
+				ghostRef.style.left = `${draggedItemRect.x}px`;
+				ghostRef.style.top = `${draggedItemRect.y}px`;
 			}
 
 			if (action === 'set' || action === 'remove') {
-				const ghostRect = ghostRef.getBoundingClientRect();
 				ghostRef.style.left = `${ghostRect.x}px`;
 				ghostRef.style.top = `${ghostRect.y}px`;
 				ghostRef.style.transform = 'translate3d(0, 0, 0)';
@@ -77,23 +80,29 @@
 					// (along with the handleGhostDrop() function) to be fired when the ghost
 					// is dragged and dropped without being moved.
 					ghostRef.style.zIndex = '9999';
+
+					const draggedItemIndex = getIndex(draggedItem)!;
+					const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
+
 					if (action === 'set') {
 						if (!targetItem) {
-							ghostRef.style.left = `${draggedItem.x}px`;
-							ghostRef.style.top = `${draggedItem.y}px`;
+							ghostRef.style.left = `${draggedItemRect.x}px`;
+							ghostRef.style.top = `${draggedItemRect.y}px`;
 						} else {
+							if (targetItemIndex === null || !targetItemRect) return;
+
 							ghostRef.style.left =
 								direction === 'vertical'
-									? `${draggedItem.x}px`
-									: draggedItem.index < targetItem.index
-										? `${targetItem.x + targetItem.width - draggedItem.width}px`
-										: `${targetItem.x}px`;
+									? `${draggedItemRect.x}px`
+									: draggedItemIndex < targetItemIndex
+										? `${targetItemRect.x + targetItemRect.width - draggedItemRect.width}px`
+										: `${targetItemRect.x}px`;
 							ghostRef.style.top =
 								direction === 'vertical'
-									? draggedItem.index < targetItem.index
-										? `${targetItem.y + targetItem.height - draggedItem.height}px`
-										: `${targetItem.y}px`
-									: `${draggedItem.y}px`;
+									? draggedItemIndex < targetItemIndex
+										? `${targetItemRect.y + targetItemRect.height - draggedItemRect.height}px`
+										: `${targetItemRect.y}px`
+									: `${draggedItemRect.y}px`;
 						}
 					}
 				}, 0);
@@ -106,46 +115,52 @@
 	function setItemStyles(currItem: HTMLLIElement) {
 		if (!draggedItem || !targetItem || !itemsOrigin) return;
 
+		const draggedItemIndex = getIndex(draggedItem)!;
+		const targetItemIndex = getIndex(targetItem)!;
+
 		const itemsInBetween =
-			draggedItem.index < targetItem.index
+			draggedItemIndex < targetItemIndex
 				? itemsOrigin.filter(
 						(item) =>
 							draggedItem &&
 							targetItem &&
-							item.index > draggedItem.index &&
-							item.index <= targetItem.index
+							item.index > draggedItemIndex &&
+							item.index <= targetItemIndex
 					)
 				: itemsOrigin.filter(
 						(item) =>
 							draggedItem &&
 							targetItem &&
-							item.index < draggedItem.index &&
-							item.index >= targetItem.index
+							item.index < draggedItemIndex &&
+							item.index >= targetItemIndex
 					);
 		const currItemTranslateX =
 			direction === 'horizontal'
-				? draggedItem.index < targetItem.index
+				? draggedItemIndex < targetItemIndex
 					? itemsInBetween.reduce((sum, item) => sum + item.width + gap, 0)
 					: itemsInBetween.reduce((sum, item) => sum - item.width - gap, 0)
 				: 0;
 		const currItemTranslateY =
 			direction === 'vertical'
-				? draggedItem.index < targetItem.index
+				? draggedItemIndex < targetItemIndex
 					? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
 					: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0)
 				: 0;
 		currItem.style.transform = `translate3d(${currItemTranslateX}px, ${currItemTranslateY}px, 0)`;
 	}
 
-	function dispatchSort(draggedItem: ItemData | null, targetItem: ItemData | null) {
+	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
+		const draggerItemIndex = draggedItem && getIndex(draggedItem);
+		const targetItemIndex = targetItem && getIndex(targetItem);
+
 		if (
 			draggedItem !== null &&
 			targetItem !== null &&
-			typeof draggedItem.index === 'number' &&
-			typeof targetItem.index === 'number' &&
-			draggedItem.index !== targetItem.index
+			typeof draggerItemIndex === 'number' &&
+			typeof targetItemIndex === 'number' &&
+			draggerItemIndex !== targetItemIndex
 		) {
-			dispatch('sort', { prevIndex: draggedItem.index, nextIndex: targetItem.index });
+			dispatch('sort', { prevIndex: draggerItemIndex, nextIndex: targetItemIndex });
 		}
 	}
 
@@ -163,7 +178,7 @@
 
 		isDragging = true;
 		await tick();
-		draggedItem = getItemData(currItem);
+		draggedItem = currItem;
 		pointerOrigin = { x: event.clientX, y: event.clientY };
 		itemsOrigin = getItemsData(listRef);
 		setGhostStyles('init');
@@ -180,10 +195,11 @@
 	}
 
 	function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!isDragging || !ghostRef || !itemsOrigin || draggedItem === null) return;
+		if (!isDragging || !ghostRef || !itemsOrigin || !draggedItem) return;
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
+		const draggedItemRect = itemsOrigin[getIndex(draggedItem)!];
 
 		isBetweenBounds = areColliding(ghostRect, listRect);
 
@@ -200,32 +216,36 @@
 		} else {
 			const x =
 				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - (pointerOrigin.x - draggedItem.x) < listRect.x
-						? listRect.x - draggedItem.x
-						: clientX + ghostRect.width - (pointerOrigin.x - draggedItem.x) > listRect.right
-							? listRect.right - draggedItem.x - ghostRect.width
+					? clientX - (pointerOrigin.x - draggedItemRect.x) < listRect.x
+						? listRect.x - draggedItemRect.x
+						: clientX + ghostRect.width - (pointerOrigin.x - draggedItemRect.x) > listRect.right
+							? listRect.right - draggedItemRect.x - ghostRect.width
 							: clientX - pointerOrigin.x
 					: 0;
 			const y =
 				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - (pointerOrigin.y - draggedItem.y) < listRect.y
-						? listRect.y - draggedItem.y
-						: clientY + ghostRect.height - (pointerOrigin.y - draggedItem.y) > listRect.bottom
-							? listRect.bottom - draggedItem.y - ghostRect.height
+					? clientY - (pointerOrigin.y - draggedItemRect.y) < listRect.y
+						? listRect.y - draggedItemRect.y
+						: clientY + ghostRect.height - (pointerOrigin.y - draggedItemRect.y) > listRect.bottom
+							? listRect.bottom - draggedItemRect.y - ghostRect.height
 							: clientY - pointerOrigin.y
 					: 0;
 			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 		}
 
-		const collidingItem = getCollidingItem(getItemData(ghostRef), itemsOrigin, swapThreshold);
-		if (collidingItem) targetItem = collidingItem;
+		const collidingItemData = getCollidingItem(ghostRef, itemsOrigin, swapThreshold);
+		if (collidingItemData)
+			targetItem = listRef.querySelector<HTMLLIElement>(
+				`.sortable-item[data-id="${collidingItemData.id}"]`
+			);
 		else targetItem = null;
 	}
 
 	function handlePointerUp() {
 		if (!isDragging || isDropping) return;
 
-		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItem?.id) handleRemove(draggedItem.id);
+		const draggedItemId = draggedItem && getId(draggedItem);
+		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
 
 		isDragging = false;
 		setGhostStyles(!isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set');
@@ -257,7 +277,6 @@
 
 		const { key } = event;
 		const target = event.target as HTMLElement;
-		const items = listRef.querySelectorAll<HTMLLIElement>('.sortable-item');
 
 		if (key === ' ') {
 			// Prevent default only if the target is a sortable item.
@@ -271,21 +290,16 @@
 				isSelecting = true;
 
 				await tick();
-				const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
-				draggedItem = focusedItemElement && getItemData(focusedItemElement);
+				draggedItem = focusedItem;
 				itemsOrigin = getItemsData(listRef);
-				if (draggedItem !== null) liveText = screenReaderText.lifted(draggedItem, listRef);
+				if (draggedItem) liveText = screenReaderText.lifted(draggedItem);
 			} else {
 				isSelecting = false;
 				isDeselecting = true;
 
 				await tick();
-				const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
-				if (!focusedItemElement) return;
-
-				setItemStyles(focusedItemElement);
-				if (draggedItem)
-					liveText = screenReaderText.dropped(draggedItem, targetItem || null, listRef);
+				focusedItem && setItemStyles(focusedItem);
+				if (draggedItem) liveText = screenReaderText.dropped(draggedItem, targetItem);
 
 				async function handleItemDrop({ propertyName }: TransitionEvent) {
 					if (propertyName === 'z-index') {
@@ -297,16 +311,13 @@
 						isDeselecting = false;
 
 						await tick();
-						const focusedItemElement = focusedItem && getItemElement(listRef, 'id', focusedItem.id);
-						if (!focusedItemElement) return;
+						focusedItem?.focus();
 
-						focusedItemElement.focus();
-
-						focusedItemElement.removeEventListener('transitionend', handleItemDrop);
+						focusedItem?.removeEventListener('transitionend', handleItemDrop);
 					}
 				}
 
-				focusedItemElement.addEventListener('transitionend', handleItemDrop);
+				focusedItem.addEventListener('transitionend', handleItemDrop);
 			}
 		}
 
@@ -314,9 +325,12 @@
 			event.preventDefault();
 
 			const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
+			const draggedItemIndex = (draggedItem && getIndex(draggedItem)) ?? null;
+			const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
+			const focusedItemIndex = (focusedItem && getIndex(focusedItem)) ?? null;
 
 			if (!isSelecting) {
-				if (!focusedItem) {
+				if (!focusedItem || focusedItemIndex === null) {
 					const firstItemElement = listRef.querySelector<HTMLLIElement>('.sortable-item');
 					firstItemElement?.focus();
 					return;
@@ -325,43 +339,44 @@
 				// Prevent focusing the previous item if the current one is the first,
 				// and focusing the next item if the current one is the last.
 				if (
-					(key === 'ArrowUp' && focusedItem?.index === 0) ||
-					(key === 'ArrowDown' && focusedItem?.index === items.length - 1)
+					(key === 'ArrowUp' && focusedItemIndex === 0) ||
+					(key === 'ArrowDown' && focusedItemIndex === items.length - 1)
 				)
 					return;
 
-				const focusedItemElement = getItemElement(
-					listRef,
-					'index',
-					String(focusedItem?.index + step)
-				);
-				focusedItemElement?.focus();
+				step === 1
+					? (focusedItem.nextElementSibling as HTMLLIElement)?.focus()
+					: (focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
 				if (!draggedItem || !itemsOrigin) return;
 				// Prevent moving the selected item if it’s the first or last item,
 				// or is at the top or bottom of the list.
 				if (
-					((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItem.index === 0 && !targetItem) ||
-					((key === 'ArrowUp' || key === 'ArrowLeft') && targetItem && targetItem.index === 0) ||
+					((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItemIndex === 0 && !targetItem) ||
+					((key === 'ArrowUp' || key === 'ArrowLeft') && targetItemIndex === 0) ||
 					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						draggedItem.index === itemsOrigin.length - 1 &&
+						draggedItemIndex === itemsOrigin.length - 1 &&
 						!targetItem) ||
 					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						targetItem &&
-						targetItem.index === itemsOrigin.length - 1)
+						targetItemIndex === itemsOrigin.length - 1)
 				)
 					return;
 
-				targetItem = !targetItem
-					? itemsOrigin?.find((item) => draggedItem && item.index === draggedItem.index + step) ||
-						null
-					: itemsOrigin?.find((item) => targetItem && item.index === targetItem.index + step) ||
-						null;
+				if (!targetItem) {
+					targetItem =
+						step === 1
+							? (draggedItem.nextElementSibling as HTMLLIElement)
+							: (draggedItem.previousElementSibling as HTMLLIElement);
+				} else {
+					targetItem =
+						step === 1
+							? (targetItem.nextElementSibling as HTMLLIElement)
+							: (targetItem.previousElementSibling as HTMLLIElement);
+				}
 
 				await tick();
-				draggedItem && setItemStyles(items[draggedItem.index]);
-				if (targetItem !== null)
-					liveText = screenReaderText.dragged(draggedItem, targetItem, listRef, key);
+				draggedItem && draggedItemIndex && setItemStyles(draggedItem);
+				if (targetItem) liveText = screenReaderText.dragged(draggedItem, targetItem, key);
 			}
 		}
 
@@ -373,9 +388,6 @@
 			isCanceling = true;
 			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
-			const focusedItemElement = getItemElement(listRef, 'id', focusedItem.id);
-			if (!focusedItemElement) return;
-
 			function handleItemDrop({ propertyName }: TransitionEvent) {
 				if (propertyName === 'z-index') {
 					draggedItem = null;
@@ -384,21 +396,22 @@
 					isDeselecting = false;
 					isCanceling = false;
 
-					focusedItemElement?.removeEventListener('transitionend', handleItemDrop);
+					focusedItem?.removeEventListener('transitionend', handleItemDrop);
 				}
 			}
 
-			focusedItemElement.addEventListener('transitionend', handleItemDrop);
+			focusedItem.addEventListener('transitionend', handleItemDrop);
 		}
 	}
 
-	function handleRemove(itemId: string) {
+	async function handleRemove(itemId: unknown) {
 		if (focusedItem) {
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
-				const step = focusedItem.index !== items.length - 1 ? 1 : -1;
-				const adjacentItemId = items[focusedItem.index + step].id;
-				getItemElement(listRef, 'id', adjacentItemId)?.focus();
+				const step = getIndex(focusedItem) !== items.length - 1 ? 1 : -1;
+				step === 1
+					? (focusedItem.nextElementSibling as HTMLLIElement)?.focus()
+					: (focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
 				// Focus the list (if there are no items left) before removing.
 				focusedItem = null;

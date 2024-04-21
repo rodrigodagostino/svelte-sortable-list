@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { ItemData } from '$lib/types.js';
+	import { getId } from '$lib/utils/index.js';
 
 	export let node: HTMLLIElement;
 	export let transitionDuration: number;
 	export let hasRemoveOnDragOut: boolean;
-	export let draggedItem: ItemData | null;
+	export let draggedItem: HTMLLIElement | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
 	export let isRemoving: boolean;
@@ -24,12 +24,10 @@
 	style:cursor={isDragging ? 'grabbing' : !isRemoving ? 'grab' : 'initial'}
 	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
 	style:transform="translate3d(0, 0, 0)"
-	data-id={draggedItem?.id}
+	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
-	<div class="sortable-item__inner">
-		{@html draggedItem?.innerHTML || '<span>GHOST</span>'}
-	</div>
+	{@html draggedItem?.innerHTML.trim() || '<span>GHOST</span>'}
 </li>
 
 <style lang="scss">

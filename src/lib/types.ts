@@ -29,5 +29,4 @@ export interface ItemData {
 	y: number;
 	width: number;
 	height: number;
-	innerHTML: string;
 }
