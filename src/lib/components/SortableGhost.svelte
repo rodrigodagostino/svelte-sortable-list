@@ -27,7 +27,9 @@
 	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
-	{@html draggedItem?.innerHTML.trim() || '<span>GHOST</span>'}
+	<div class="sortable-item__inner">
+		{@html draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
+	</div>
 </div>
 
 <style lang="scss">
