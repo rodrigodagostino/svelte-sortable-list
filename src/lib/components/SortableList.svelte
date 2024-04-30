@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
-	import Ghost from '$lib/components/Ghost.svelte';
+	import SortableGhost from '$lib/components/SortableGhost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
 	import type { ItemData, SortableListProps } from '$lib/types.js';
 	import {
@@ -24,7 +24,7 @@
 	export let hasRemoveOnDragOut: SortableListProps['hasRemoveOnDragOut'] = false;
 
 	let listRef: HTMLUListElement;
-	let ghostRef: HTMLLIElement;
+	let ghostRef: HTMLDivElement;
 	let pointerOrigin: { x: number; y: number };
 	let itemsOrigin: ItemData[] | null = null;
 	let draggedItem: HTMLLIElement | null = null;
@@ -478,7 +478,7 @@
 			</SortableItem>
 		{/each}
 	</ul>
-	<Ghost
+	<SortableGhost
 		bind:node={ghostRef}
 		{transitionDuration}
 		{hasRemoveOnDragOut}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getId } from '$lib/utils/index.js';
 
-	export let node: HTMLLIElement;
+	export let node: HTMLDivElement;
 	export let transitionDuration: number;
 	export let hasRemoveOnDragOut: boolean;
 	export let draggedItem: HTMLLIElement | null;
@@ -11,9 +11,9 @@
 	export let isBetweenBounds: boolean;
 </script>
 
-<li
+<div
 	bind:this={node}
-	class="ghost sortable-item"
+	class="sortable-ghost sortable-item"
 	class:has-remove-on-drag-out={hasRemoveOnDragOut}
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
@@ -28,10 +28,10 @@
 	aria-hidden="true"
 >
 	{@html draggedItem?.innerHTML.trim() || '<span>GHOST</span>'}
-</li>
+</div>
 
 <style lang="scss">
-	.ghost {
+	.sortable-ghost {
 		position: fixed;
 		list-style: none;
 		user-select: none;
