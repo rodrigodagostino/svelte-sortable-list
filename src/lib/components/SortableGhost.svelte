@@ -13,7 +13,7 @@
 
 <div
 	bind:this={node}
-	class="sortable-ghost sortable-item"
+	class="sortable-ghost"
 	class:has-remove-on-drag-out={hasRemoveOnDragOut}
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
@@ -27,7 +27,7 @@
 	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
-	<div class="sortable-item__inner">
+	<div class="sortable-ghost__inner">
 		{@html draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
 	</div>
 </div>
@@ -39,5 +39,11 @@
 		user-select: none;
 		backface-visibility: hidden;
 		z-index: 9999;
+
+		&__inner {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
 	}
 </style>

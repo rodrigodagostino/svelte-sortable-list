@@ -488,7 +488,7 @@
 		{isRemoving}
 		{isBetweenBounds}
 	/>
-	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">
+	<div class="sortable-live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
 {:else}
@@ -526,13 +526,7 @@
 		}
 	}
 
-	:global(.sortable-item__inner) {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.live-region {
+	.sortable-live-region {
 		position: absolute;
 		left: 0px;
 		top: 0px;

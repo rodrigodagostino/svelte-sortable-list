@@ -48,7 +48,8 @@
 	outline: 0.125rem solid var(--gray-800);
 }
 
-.sortable-item__inner {
+.sortable-item__inner,
+.sortable-ghost__inner {
 	max-width: 18rem;
 	padding: 0.5rem 1.75rem;
 	background-color: var(--white);
@@ -62,28 +63,29 @@
 		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
-.sortable-item:not(.sortable-ghost) .sortable-item__inner > * {
+.sortable-item .sortable-item__inner > * {
 	opacity: 1;
 	transition: opacity 0s var(--transition-duration);
 }
 
-.sortable-item:not(.sortable-ghost).is-dragging .sortable-item__inner,
-.sortable-item:not(.sortable-ghost).is-dropping .sortable-item__inner {
+.sortable-item.is-dragging .sortable-item__inner,
+.sortable-item.is-dropping .sortable-item__inner {
 	opacity: 0.5;
 	transition: opacity 0s;
 }
 
-.sortable-item:not(.sortable-ghost).is-dragging .sortable-item__inner > * {
+.sortable-item.is-dragging .sortable-item__inner > * {
 	opacity: 0;
 	transition: opacity 0s;
 }
 
-.sortable-item.is-selecting .sortable-item__inner {
-	box-shadow: var(--box-shadow-1);
-}
-
 .sortable-item[aria-disabled="true"] .sortable-item__inner {
 	opacity: 0.5;
+}
+
+.sortable-item.is-selecting .sortable-item__inner,
+.sortable-ghost.is-dragging .sortable-ghost__inner {
+	box-shadow: var(--box-shadow-1);
 }
 
 .sortable-item__handle,
@@ -128,11 +130,7 @@
 	margin-inline-end: -1rem;
 }
 
-.sortable-ghost.is-dragging .sortable-item__inner {
-	box-shadow: var(--box-shadow-1);
-}
-
-.sortable-ghost.is-removing .sortable-item__inner {
+.sortable-ghost.is-removing .sortable-ghost__inner {
 	opacity: 0;
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
@@ -140,7 +138,7 @@
 		opacity var(--transition-duration);
 }
 
-.sortable-ghost.is-out-of-bounds.has-remove-on-drag-out .sortable-item__inner {
+.sortable-ghost.is-out-of-bounds.has-remove-on-drag-out .sortable-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 	transition:

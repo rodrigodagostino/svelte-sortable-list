@@ -277,6 +277,12 @@
 		backface-visibility: hidden;
 		z-index: 1;
 
+		&__inner {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
 		&__handle,
 		&__content {
 			display: flex;
