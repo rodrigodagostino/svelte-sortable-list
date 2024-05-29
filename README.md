@@ -27,6 +27,7 @@ Live demo:
 - [Types](#types)
 - [Styles](#styles)
   - [Selectors](#selectors)
+  - [Custom properties](#custom-properties)
 - [Motivation](#motivation)
 
 ## Features
@@ -131,7 +132,7 @@ The following is a list of steps to navigate and operate the Sortable List:
 | `gap`                | Number       | `12`         | Number equal to or above `0`.                                                                                               | Separation between items (in pixels).                                                                                                                                                                                                                                           |
 | `direction`          | String       | `'vertical'` | `'vertical'` or `'horizontal'`                                                                                              | Orientation in which items will be arranged.                                                                                                                                                                                                                                    |
 | `swapThreshold`      | Number       | `1`          | Number above `0`.                                                                                                           | Percentage of the target that the dragged item must cover to trigger the items swap. This value will be honored as long as there is only one item colliding with the dragged item. Otherwise, the item with most covered area by the dragged item will be marked as the target. |
-| `transitionDuration` | Number       | `320`        | Number equal to or above `0`.                                                                                               | Time the swap transition takes to complete (milliseconds). Assign a value of `0` the remove animations.                                                                                                                                                                         |
+| `transitionDuration` | Number       | `320`        | Number equal to or above `0`.                                                                                               | Time the swap transition takes to complete (in milliseconds). Assign a value of `0` the remove animations.                                                                                                                                                                      |
 | `hasDropMarker`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                            |
 | `hasLockedAxis`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                       |
 | `hasBoundaries`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                 |
@@ -302,6 +303,12 @@ This is a list of the selectors you can use to style the list and the list items
 | `.ghost.has-remove-on-drag-out`        | The shadow element while the remove on drag out feature is enabled. |
 
 In order to simplify its styles assignment, the Ghost element also receives the `.sortable-item` class. This way, you can point to the `.sortable-item` class and set the appearance of the Sortable Items and the Ghost at the same time.
+
+### Custom properties
+
+| Custom property         | Description                                                   |
+| ----------------------- | ------------------------------------------------------------- |
+| `--transition-duration` | Time the swap transition takes to complete (in milliseconds). |
 
 ## Motivation
 
