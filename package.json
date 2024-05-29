@@ -1,5 +1,5 @@
 {
-	"name": "svelte-sortable-list",
+	"name": "@rodrigodagostino/svelte-sortable-list",
 	"version": "0.8.3",
 	"license": "MIT",
 	"type": "module",
