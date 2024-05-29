@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] (2024-05-28)
+
+### Changed
+
+- Switch items data for nodes.
+- Rename `Ghost` component to `SortableGhost` and change its tag to `<div>`.
+- Rename `SortableGhost` and live region classes.
+- Rename package.
+
+### Fix
+
+- Repair broken `SortableGhost` entrance transition.
+
+### Docs
+
+- Add **“Custom properties”** to README.
+
 ## [0.8.3] (2024-04-16)
 
 ### Docs
@@ -336,7 +353,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.0...v0.8.1
