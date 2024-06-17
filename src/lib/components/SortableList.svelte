@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
-	import SortableGhost from '$lib/components/SortableGhost.svelte';
+	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
 	import type { ItemData, SortableListProps } from '$lib/types.js';
 	import {
@@ -478,7 +478,7 @@
 			</SortableItem>
 		{/each}
 	</ul>
-	<SortableGhost
+	<Ghost
 		bind:node={ghostRef}
 		{transitionDuration}
 		{hasRemoveOnDragOut}
@@ -488,7 +488,7 @@
 		{isRemoving}
 		{isBetweenBounds}
 	/>
-	<div class="sortable-live-region" role="log" aria-live="assertive" aria-atomic="true">
+	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
 {:else}
@@ -526,7 +526,7 @@
 		}
 	}
 
-	.sortable-live-region {
+	.live-region {
 		position: absolute;
 		left: 0px;
 		top: 0px;

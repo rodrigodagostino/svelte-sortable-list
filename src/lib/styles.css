@@ -49,7 +49,7 @@
 }
 
 .sortable-item__inner,
-.sortable-ghost__inner {
+.ghost__inner {
 	max-width: 18rem;
 	padding: 0.5rem 1.75rem;
 	background-color: var(--white);
@@ -84,7 +84,7 @@
 }
 
 .sortable-item.is-selecting .sortable-item__inner,
-.sortable-ghost.is-dragging .sortable-ghost__inner {
+.ghost.is-dragging .ghost__inner {
 	box-shadow: var(--box-shadow-1);
 }
 
@@ -130,7 +130,7 @@
 	margin-inline-end: -1rem;
 }
 
-.sortable-ghost.is-removing .sortable-ghost__inner {
+.ghost.is-removing .ghost__inner {
 	opacity: 0;
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
@@ -138,7 +138,7 @@
 		opacity var(--transition-duration);
 }
 
-.sortable-ghost.is-out-of-bounds.has-remove-on-drag-out .sortable-ghost__inner {
+.ghost.is-out-of-bounds.has-remove-on-drag-out .ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 	transition:

@@ -13,7 +13,7 @@
 
 <div
 	bind:this={node}
-	class="sortable-ghost"
+	class="ghost"
 	class:has-remove-on-drag-out={hasRemoveOnDragOut}
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
@@ -27,13 +27,13 @@
 	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
-	<div class="sortable-ghost__inner">
+	<div class="ghost__inner">
 		{@html draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
 	</div>
 </div>
 
 <style lang="scss">
-	.sortable-ghost {
+	.ghost {
 		position: fixed;
 		list-style: none;
 		user-select: none;
