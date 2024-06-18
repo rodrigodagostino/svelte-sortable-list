@@ -281,26 +281,33 @@ To customize the appearance of the list items and not cause any conflicts or int
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
-| Selector                               | Points to                                                           |
-| -------------------------------------- | ------------------------------------------------------------------- |
-| `.sortable-list`                       | The main container element.                                         |
-| `.sortable-item`                       | Each of the list items.                                             |
-| `.sortable-item.is-dragging`           | The item that is being dragged through a pointer.                   |
-| `.sortable-item.is-dropping`           | The item that is being dropped through a pointer.                   |
-| `.sortable-item.is-selecting`          | The item that is selected/lifted through keyboard.                  |
-| `.sortable-item.is-deselecting`        | The item that is being dropped through keyboard.                    |
-| `.sortable-item[aria-disabled="true"]` | Each item that is disabled.                                         |
-| `.sortable-item__inner`                | The item content wrapper element.                                   |
-| `.sortable-item__handle`               | The **Handle Slot** container element.                              |
-| `.sortable-item__content`              | The **Default Slot** container element.                             |
-| `.sortable-item__remove`               | The **Remove Slot** container element.                              |
-| `.ghost`                               | The shadow element displayed under the pointer when dragging.       |
-| `.ghost.is-dragging`                   | The shadow element while is being dragged.                          |
-| `.ghost.is-dropping`                   | The shadow element while is being dropped.                          |
-| `.ghost.is-between-bounds`             | The shadow element while is inside the list limits.                 |
-| `.ghost.is-out-of-bounds`              | The shadow element while is outside the list limits.                |
-| `.ghost.is-removing`                   | The shadow element while the dragged item is being removed.         |
-| `.ghost.has-remove-on-drag-out`        | The shadow element while the remove on drag out feature is enabled. |
+| Selector                                | Points to                                                                                             |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `.sortable-list`                        | The list element.                                                                                     |
+| `.sortable-list.is-dragging`            | The list element while an item is being dragged by a pointing device.                                 |
+| `.sortable-list.is-dropping`            | The list element while an item is being dropped by a pointing device.                                 |
+| `.sortable-list.is-selecting`           | The list element while an item is being dragged by the keyboard.                                      |
+| `.sortable-list.is-deselecting`         | The list element while an item is being dropped by the keyboard.                                      |
+| `.sortable-list.is-between-bounds`      | The list element while the dragged item is inside the list limits.                                    |
+| `.sortable-list.is-out-of-bounds`       | The list element while the dragged item is outside the list limits.                                   |
+| `.sortable-list.is-removing`            | The list element while the dragged out item is being removed.                                         |
+| `.sortable-list.has-remove-on-drag-out` | The list element while the remove on drag out feature is enabled.                                     |
+| `.sortable-item`                        | Each list item element.                                                                               |
+| `.sortable-item.is-dragging`            | The item element that is being dragged by a pointing device.                                          |
+| `.sortable-item.is-dropping`            | The item element that is being dropped by a pointing device.                                          |
+| `.sortable-item.is-selecting`           | The item element that is being dragged by the keyboard.                                               |
+| `.sortable-item.is-deselecting`         | The item element that is being dropped by the keyboard.                                               |
+| `.sortable-item.is-removing`            | The item element that is being removed by being dragged outside the list limits by a pointing device. |
+| `.sortable-item[aria-disabled="true"]`  | Each item element that is disabled.                                                                   |
+| `.sortable-item__inner`                 | The content wrapper element inside each item element.                                                 |
+| `.sortable-item__handle`                | The **Handle Slot** container element.                                                                |
+| `.sortable-item__content`               | The **Default Slot** container element.                                                               |
+| `.sortable-item__remove`                | The **Remove Slot** container element.                                                                |
+| `.ghost`                                | The shadow element displayed under the pointer when dragging.                                         |
+| `.ghost.is-dragging`                    | The shadow element while it’s being dragged by a pointing device.                                     |
+| `.ghost.is-dropping`                    | The shadow element while it’s being dropped by a pointing device.                                     |
+| `.ghost.is-between-bounds`              | The shadow element while it’s inside the list limits.                                                 |
+| `.ghost.is-out-of-bounds`               | The shadow element while it’s outside the list limits.                                                |
 
 In order to simplify its styles assignment, the Ghost element also receives the `.sortable-item` class. This way, you can point to the `.sortable-item` class and set the appearance of the Sortable Items and the Ghost at the same time.
 

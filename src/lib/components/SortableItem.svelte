@@ -228,6 +228,7 @@
 	class:is-dropping={isDropping && draggedItemId === String(item.id)}
 	class:is-selecting={isSelecting && draggedItemId === String(item.id)}
 	class:is-deselecting={isDeselecting && draggedItemId === String(item.id)}
+	class:is-removing={isRemoving && draggedItemId === String(item.id)}
 	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:width={styleWidth}

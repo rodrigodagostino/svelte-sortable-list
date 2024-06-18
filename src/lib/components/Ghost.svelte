@@ -3,7 +3,6 @@
 
 	export let node: HTMLDivElement;
 	export let transitionDuration: number;
-	export let hasRemoveOnDragOut: boolean;
 	export let draggedItem: HTMLLIElement | null;
 	export let isDragging: boolean;
 	export let isDropping: boolean;
@@ -14,12 +13,10 @@
 <div
 	bind:this={node}
 	class="ghost"
-	class:has-remove-on-drag-out={hasRemoveOnDragOut}
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
 	class:is-between-bounds={isBetweenBounds}
 	class:is-out-of-bounds={!isBetweenBounds}
-	class:is-removing={isRemoving}
 	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={isDragging ? 'grabbing' : !isRemoving ? 'grab' : 'initial'}
 	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}

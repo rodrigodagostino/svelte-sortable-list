@@ -439,6 +439,14 @@
 	<ul
 		bind:this={listRef}
 		class="sortable-list has-direction-{direction}"
+		class:is-dragging={isDragging}
+		class:is-dropping={isDropping}
+		class:is-selecting={isSelecting}
+		class:is-deselecting={isDeselecting}
+		class:is-between-bounds={isBetweenBounds}
+		class:is-out-of-bounds={!isBetweenBounds}
+		class:is-removing={isRemoving}
+		class:has-remove-on-drag-out={hasRemoveOnDragOut}
 		style:--gap="{gap}px"
 		style:--transition-duration="{transitionDuration}ms"
 		style:pointer-events={focusedItem ? 'none' : 'auto'}
@@ -481,7 +489,6 @@
 	<Ghost
 		bind:node={ghostRef}
 		{transitionDuration}
-		{hasRemoveOnDragOut}
 		{draggedItem}
 		{isDragging}
 		{isDropping}
