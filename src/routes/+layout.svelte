@@ -169,6 +169,13 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/grid-items"
+				aria-current={$page.url.pathname === '/grid-items' ? 'page' : undefined}
+			>
+				Grid items
+			</a>
+			<a
+				class="app-nav__link"
 				href="/has-boundaries"
 				aria-current={$page.url.pathname === '/has-boundaries' ? 'page' : undefined}
 			>

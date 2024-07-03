@@ -16,6 +16,7 @@
 	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
 	export let direction: SortableListProps['direction'] = 'vertical';
+	export let layout: SortableListProps['layout'] = 'list';
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
 	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
@@ -435,68 +436,61 @@
 	}
 </script>
 
-{#if items}
-	<ul
-		bind:this={listRef}
-		class="sortable-list has-direction-{direction}"
-		style:--gap="{gap}px"
-		style:--transition-duration="{transitionDuration}ms"
-		style:pointer-events={focusedItem ? 'none' : 'auto'}
-		role="listbox"
-		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
-		aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
-		tabindex="0"
-		on:pointerdown={handlePointerDown}
-		on:keydown={handleKeyDown}
-	>
-		{#each items as item, index (item.id)}
-			<SortableItem
-				{item}
-				{index}
-				{gap}
-				{direction}
-				{transitionDuration}
-				{hasDropMarker}
-				{hasRemoveOnDragOut}
-				bind:itemsOrigin
-				bind:focusedItem
-				bind:draggedItem
-				bind:targetItem
-				{isDragging}
-				{isDropping}
-				bind:isSelecting
-				bind:isDeselecting
-				bind:isCanceling
-				{isRemoving}
-				{isBetweenBounds}
-				{slots}
-				on:remove={() => handleRemove(String(item.id))}
-			>
-				<slot name="handle" slot="handle" />
-				<slot {item} {index} />
-				<slot name="remove" slot="remove" />
-			</SortableItem>
-		{/each}
-	</ul>
-	<SortableGhost
-		bind:node={ghostRef}
-		{transitionDuration}
-		{hasRemoveOnDragOut}
-		{draggedItem}
-		{isDragging}
-		{isDropping}
-		{isRemoving}
-		{isBetweenBounds}
-	/>
-	<div class="sortable-live-region" role="log" aria-live="assertive" aria-atomic="true">
-		{liveText}
-	</div>
-{:else}
-	<p>
-		To display your list, provide an array of <code>items</code> to
-		<code>{'<SortableList />'}</code>.
-	</p>
-{/if}
+<ul
+	bind:this={listRef}
+	class="sortable-list has-direction-{direction} has-layout-{layout}"
+	style:--gap="{gap}px"
+	style:--transition-duration="{transitionDuration}ms"
+	style:pointer-events={focusedItem ? 'none' : 'auto'}
+	role="listbox"
+	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
+	aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
+	tabindex="0"
+	on:pointerdown={handlePointerDown}
+	on:keydown={handleKeyDown}
+>
+	{#each items as item, index (item.id)}
+		<SortableItem
+			{item}
+			{index}
+			{gap}
+			{direction}
+			{transitionDuration}
+			{hasDropMarker}
+			{hasRemoveOnDragOut}
+			bind:itemsOrigin
+			bind:focusedItem
+			bind:draggedItem
+			bind:targetItem
+			{isDragging}
+			{isDropping}
+			bind:isSelecting
+			bind:isDeselecting
+			bind:isCanceling
+			{isRemoving}
+			{isBetweenBounds}
+			{slots}
+			on:remove={() => handleRemove(String(item.id))}
+		>
+			<slot name="handle" slot="handle" />
+			<slot {item} {index} />
+			<slot name="remove" slot="remove" />
+		</SortableItem>
+	{/each}
+</ul>
+<SortableGhost
+	bind:node={ghostRef}
+	{transitionDuration}
+	{hasRemoveOnDragOut}
+	{draggedItem}
+	{isDragging}
+	{isDropping}
+	{isRemoving}
+	{isBetweenBounds}
+/>
+<div class="sortable-live-region" role="log" aria-live="assertive" aria-atomic="true">
+	{liveText}
+</div>
 
 <style lang="scss">
 	.sortable-list,
@@ -509,19 +503,33 @@
 		padding: 0;
 		touch-action: none;
 
-		&.has-direction-vertical {
-			flex-direction: column;
+		&.has-layout-list {
+			&.has-direction-vertical {
+				flex-direction: column;
 
-			:global(.sortable-item:not(:last-of-type)) {
-				margin-bottom: var(--gap);
+				:global(.sortable-item:not(:last-of-type)) {
+					margin-bottom: var(--gap);
+				}
+			}
+
+			&.has-direction-horizontal {
+				flex-direction: row;
+				flex-wrap: nowrap;
+
+				:global(.sortable-item:not(:last-of-type)) {
+					margin-right: var(--gap);
+				}
 			}
 		}
 
-		&.has-direction-horizontal {
-			flex-direction: row;
+		&.has-layout-grid {
+			flex-wrap: wrap;
+			gap: var(--gap);
+			justify-content: space-between;
 
-			:global(.sortable-item:not(:last-of-type)) {
-				margin-right: var(--gap);
+			:global(.sortable-item) {
+				flex-basis: calc(33.333% - var(--gap));
+				margin-bottom: var(--gap);
 			}
 		}
 	}
