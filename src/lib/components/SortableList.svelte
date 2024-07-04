@@ -25,6 +25,8 @@
 
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
+	let ghostStatus: 'init' | 'set' | 'remove' | 'unset' = 'unset';
+	let pointer: { x: number; y: number };
 	let pointerOrigin: { x: number; y: number };
 	let itemsOrigin: ItemData[] | null = null;
 	let draggedItem: HTMLLIElement | null = null;
@@ -43,74 +45,6 @@
 	let slots = $$slots;
 
 	const dispatch = createEventDispatcher();
-
-	function setGhostStyles(action: 'init' | 'set' | 'remove' | 'unset') {
-		if (action === 'init' || action === 'set' || action === 'remove') {
-			if (!draggedItem || !itemsOrigin) return;
-
-			const ghostRect = ghostRef.getBoundingClientRect();
-			const draggedItemRect = itemsOrigin[getIndex(draggedItem)!];
-			const targetItemRect = targetItem && itemsOrigin[getIndex(targetItem)!];
-
-			ghostRef.style.width = `${draggedItemRect.width}px`;
-			ghostRef.style.height = `${draggedItemRect.height}px`;
-			ghostRef.style.zIndex = '10000';
-
-			if (action === 'init') {
-				ghostRef.style.left = `${draggedItemRect.x}px`;
-				ghostRef.style.top = `${draggedItemRect.y}px`;
-			}
-
-			if (action === 'set' || action === 'remove') {
-				ghostRef.style.left = `${ghostRect.x}px`;
-				ghostRef.style.top = `${ghostRect.y}px`;
-				ghostRef.style.transform = 'translate3d(0, 0, 0)';
-				// setTimeout will allow the values above to be properly set before setting the ones below.
-				setTimeout(() => {
-					if (!draggedItem) return;
-
-					ghostRef.style.transition =
-						action === 'set'
-							? `left ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`top ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`transform ${transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`z-index 0s ${transitionDuration}ms`
-							: `z-index 0s ${transitionDuration}ms`;
-					// zIndex is only set and then re-set to force the transitionend event
-					// (along with the handleGhostDrop() function) to be fired when the ghost
-					// is dragged and dropped without being moved.
-					ghostRef.style.zIndex = '9999';
-
-					const draggedItemIndex = getIndex(draggedItem)!;
-					const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
-
-					if (action === 'set') {
-						if (!targetItem) {
-							ghostRef.style.left = `${draggedItemRect.x}px`;
-							ghostRef.style.top = `${draggedItemRect.y}px`;
-						} else {
-							if (targetItemIndex === null || !targetItemRect) return;
-
-							ghostRef.style.left =
-								direction === 'vertical'
-									? `${draggedItemRect.x}px`
-									: draggedItemIndex < targetItemIndex
-										? `${targetItemRect.x + targetItemRect.width - draggedItemRect.width}px`
-										: `${targetItemRect.x}px`;
-							ghostRef.style.top =
-								direction === 'vertical'
-									? draggedItemIndex < targetItemIndex
-										? `${targetItemRect.y + targetItemRect.height - draggedItemRect.height}px`
-										: `${targetItemRect.y}px`
-									: `${draggedItemRect.y}px`;
-						}
-					}
-				}, 0);
-			}
-		} else {
-			ghostRef.style.removeProperty('transition');
-		}
-	}
 
 	function setItemStyles(currItem: HTMLLIElement) {
 		if (!draggedItem || !targetItem || !itemsOrigin) return;
@@ -181,7 +115,7 @@
 		draggedItem = currItem;
 		pointerOrigin = { x: event.clientX, y: event.clientY };
 		itemsOrigin = getItemsData(listRef);
-		setGhostStyles('init');
+		ghostStatus = 'init';
 
 		currItem.addEventListener('pointermove', handlePointerMove);
 		currItem.addEventListener(
@@ -199,39 +133,9 @@
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
-		const draggedItemRect = itemsOrigin[getIndex(draggedItem)!];
 
+		pointer = { x: clientX, y: clientY };
 		isBetweenBounds = areColliding(ghostRect, listRect);
-
-		if (!hasBoundaries) {
-			const x =
-				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - pointerOrigin.x
-					: 0;
-			const y =
-				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - pointerOrigin.y
-					: 0;
-			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-		} else {
-			const x =
-				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? clientX - (pointerOrigin.x - draggedItemRect.x) < listRect.x
-						? listRect.x - draggedItemRect.x
-						: clientX + ghostRect.width - (pointerOrigin.x - draggedItemRect.x) > listRect.right
-							? listRect.right - draggedItemRect.x - ghostRect.width
-							: clientX - pointerOrigin.x
-					: 0;
-			const y =
-				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? clientY - (pointerOrigin.y - draggedItemRect.y) < listRect.y
-						? listRect.y - draggedItemRect.y
-						: clientY + ghostRect.height - (pointerOrigin.y - draggedItemRect.y) > listRect.bottom
-							? listRect.bottom - draggedItemRect.y - ghostRect.height
-							: clientY - pointerOrigin.y
-					: 0;
-			ghostRef.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-		}
 
 		const collidingItemData = getCollidingItem(ghostRef, itemsOrigin, swapThreshold);
 		if (collidingItemData)
@@ -248,7 +152,7 @@
 		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
 
 		isDragging = false;
-		setGhostStyles(!isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set');
+		ghostStatus = !isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
 		isDropping = true;
 		isBetweenBounds = true;
 
@@ -256,7 +160,7 @@
 			if (propertyName === 'top' || propertyName === 'z-index') {
 				dispatchSort(draggedItem, targetItem);
 
-				setGhostStyles('unset');
+				ghostStatus = 'unset';
 				draggedItem = null;
 				targetItem = null;
 				itemsOrigin = null;
@@ -487,9 +391,17 @@
 		{/each}
 	</ul>
 	<Ghost
-		bind:node={ghostRef}
+		bind:ghostRef
+		{ghostStatus}
+		{direction}
 		{transitionDuration}
+		{hasLockedAxis}
+		{hasBoundaries}
+		{pointer}
+		{pointerOrigin}
+		{itemsOrigin}
 		{draggedItem}
+		{targetItem}
 		{isDragging}
 		{isDropping}
 		{isRemoving}
