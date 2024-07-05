@@ -197,15 +197,6 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/direction-horizontal-has-locked-axis"
-				aria-current={$page.url.pathname === '/direction-horizontal-has-locked-axis'
-					? 'page'
-					: undefined}
-			>
-				Direction horizontal (has locked axis)
-			</a>
-			<a
-				class="app-nav__link"
 				href="/has-remove-on-drag-out"
 				aria-current={$page.url.pathname === '/has-remove-on-drag-out' ? 'page' : undefined}
 			>
