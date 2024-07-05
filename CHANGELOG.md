@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] (2024-07-05)
+
+### Added
+
+- Extend CSS classes to all elements associated with states.
+
+### Changed
+
+- Undo ghost and live region classes renaming.
+- Move ghost styles manipulation logic into `Ghost` component.
+- Remove unnecessary `setItemStyles()` function.
+
+### Docs
+
+- Remove **“Direction horizontal (has locked axis)”** demo page.
+
 ## [0.9.1] (2024-05-28)
 
 ### Changed
@@ -359,7 +375,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.2...HEAD
+[0.9.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.3...v0.9.0
 [0.8.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.2...v0.8.3
