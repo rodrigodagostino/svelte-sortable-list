@@ -46,43 +46,6 @@
 
 	const dispatch = createEventDispatcher();
 
-	function setItemStyles(currItem: HTMLLIElement) {
-		if (!draggedItem || !targetItem || !itemsOrigin) return;
-
-		const draggedItemIndex = getIndex(draggedItem)!;
-		const targetItemIndex = getIndex(targetItem)!;
-
-		const itemsInBetween =
-			draggedItemIndex < targetItemIndex
-				? itemsOrigin.filter(
-						(item) =>
-							draggedItem &&
-							targetItem &&
-							item.index > draggedItemIndex &&
-							item.index <= targetItemIndex
-					)
-				: itemsOrigin.filter(
-						(item) =>
-							draggedItem &&
-							targetItem &&
-							item.index < draggedItemIndex &&
-							item.index >= targetItemIndex
-					);
-		const currItemTranslateX =
-			direction === 'horizontal'
-				? draggedItemIndex < targetItemIndex
-					? itemsInBetween.reduce((sum, item) => sum + item.width + gap, 0)
-					: itemsInBetween.reduce((sum, item) => sum - item.width - gap, 0)
-				: 0;
-		const currItemTranslateY =
-			direction === 'vertical'
-				? draggedItemIndex < targetItemIndex
-					? itemsInBetween.reduce((sum, item) => sum + item.height + gap, 0)
-					: itemsInBetween.reduce((sum, item) => sum - item.height - gap, 0)
-				: 0;
-		currItem.style.transform = `translate3d(${currItemTranslateX}px, ${currItemTranslateY}px, 0)`;
-	}
-
 	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
 		const draggerItemIndex = draggedItem && getIndex(draggedItem);
 		const targetItemIndex = targetItem && getIndex(targetItem);
@@ -201,8 +164,6 @@
 				isSelecting = false;
 				isDeselecting = true;
 
-				await tick();
-				focusedItem && setItemStyles(focusedItem);
 				if (draggedItem) liveText = screenReaderText.dropped(draggedItem, targetItem);
 
 				async function handleItemDrop({ propertyName }: TransitionEvent) {
@@ -278,8 +239,6 @@
 							: (targetItem.previousElementSibling as HTMLLIElement);
 				}
 
-				await tick();
-				draggedItem && draggedItemIndex && setItemStyles(draggedItem);
 				if (targetItem) liveText = screenReaderText.dragged(draggedItem, targetItem, key);
 			}
 		}
