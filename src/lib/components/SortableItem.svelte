@@ -92,17 +92,8 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (!hasRemoveOnDragOut) return undefined;
-
 		if (draggedItemId === String(item.id) && !isBetweenBounds && hasRemoveOnDragOut) return '0';
-		else if (
-			draggedItemId === String(item.id) &&
-			itemsOrigin &&
-			draggedItemIndex !== itemsOrigin.length - 1 &&
-			isBetweenBounds &&
-			hasRemoveOnDragOut
-		)
-			return direction === 'vertical' ? '0 0 var(--gap) 0' : '0 var(--gap) 0 0';
+		else return direction === 'vertical' ? 'calc(var(--gap) / 2) 0' : '0 calc(var(--gap) / 2)';
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -386,21 +386,16 @@
 		display: flex;
 		padding: 0;
 		touch-action: none;
+		padding-inline: calc(var(--gap) / 2);
+		margin: calc(var(--gap) / 2 * -1);
+		outline-offset: calc(var(--gap) / 2 * -1);
 
 		&.has-direction-vertical {
 			flex-direction: column;
-
-			:global(.sortable-item:not(:last-of-type)) {
-				margin-bottom: var(--gap);
-			}
 		}
 
 		&.has-direction-horizontal {
 			flex-direction: row;
-
-			:global(.sortable-item:not(:last-of-type)) {
-				margin-right: var(--gap);
-			}
 		}
 	}
 
