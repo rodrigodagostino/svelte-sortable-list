@@ -41,6 +41,7 @@ Live demo:
 - Remove item by dragging out.
 - Touch screen support.
 - Accessible (keyboard navigation and screen reader support).
+- RTL support.
 - Customizable transition animations.
 - Un-opinionated styling.
 - Typescript definitions.
