@@ -363,7 +363,7 @@
 		.app-nav {
 			position: fixed;
 			inset: 0;
-			left: auto;
+			margin-inline-start: auto;
 			width: 20.25rem;
 
 			.container {
