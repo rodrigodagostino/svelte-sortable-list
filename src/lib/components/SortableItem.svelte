@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount, tick } from 'svelte';
-	import { scaleFly } from '$lib/transitions/index.js';
+	import { scaleFade } from '$lib/transitions/index.js';
 	import { getId, getIndex, screenReaderText } from '$lib/utils/index.js';
 	import type { ItemData, SortableItemProps } from '$lib/types.js';
 
@@ -245,8 +245,8 @@
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
 	on:pointerdown={handlePointerDown}
-	in:scaleFly={{ x: -120 }}
-	out:scaleFly={{ x: 120, duration: isRemoving ? 0 : 400 }}
+	in:scaleFade
+	out:scaleFade={{ duration: isRemoving ? 0 : 400 }}
 >
 	<div class="sortable-item__inner">
 		{#if slots.handle}
