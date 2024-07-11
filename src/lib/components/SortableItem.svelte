@@ -44,6 +44,10 @@
 		typeof targetItemIndex === 'number' && itemsOrigin ? itemsOrigin[targetItemIndex] : null;
 	$: focusedItemId = focusedItem ? getId(focusedItem) : null;
 
+	$: {
+		if (isSelecting) setInteractiveElementsTabIndex();
+	}
+
 	$: styleCursor =
 		isDragging && draggedItemId === String(item.id)
 			? 'grabbing'
@@ -147,7 +151,7 @@
 				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
-			.forEach((el) => (el.tabIndex = focusedItemId === String(item.id) ? 0 : -1));
+			.forEach((el) => (el.tabIndex = !isSelecting && focusedItemId === String(item.id) ? 0 : -1));
 	}
 
 	onMount(() => {
