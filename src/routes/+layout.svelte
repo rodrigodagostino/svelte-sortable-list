@@ -234,6 +234,7 @@
 	.app-main {
 		justify-content: center;
 		padding: 3rem;
+		scrollbar-gutter: stable;
 
 		.container {
 			& > :global(.button) {
