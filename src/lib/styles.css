@@ -58,9 +58,21 @@
 	text-transform: uppercase;
 	box-shadow: none;
 	opacity: 1;
+}
+
+.sortable-item__inner {
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
+		border-color calc(var(--transition-duration) / 3 * 2),
 		box-shadow calc(var(--transition-duration) / 3 * 2);
+}
+
+.ghost__inner {
+	transition:
+		background-color calc(var(--transition-duration) / 3 * 2),
+		border-color calc(var(--transition-duration) / 3 * 2),
+		box-shadow calc(var(--transition-duration) / 3 * 2),
+		opacity var(--transition-duration);
 }
 
 .sortable-item[aria-disabled="true"] .sortable-item__inner {
@@ -138,17 +150,9 @@
  */
 .sortable-list.is-removing + .ghost .ghost__inner {
 	opacity: 0;
-	transition:
-		background-color calc(var(--transition-duration) / 3 * 2),
-		border-color calc(var(--transition-duration) / 3 * 2),
-		opacity var(--transition-duration);
 }
 
 .sortable-list.has-remove-on-drag-out + .ghost.is-out-of-bounds .ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
-	transition:
-		background-color calc(var(--transition-duration) / 3 * 2),
-		border-color calc(var(--transition-duration) / 3 * 2),
-		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
