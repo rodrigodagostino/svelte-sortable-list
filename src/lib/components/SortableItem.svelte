@@ -56,7 +56,7 @@
 				: 'initial';
 	$: styleWidth = getStyleWidth(draggedItem, isBetweenBounds);
 	$: styleHeight = getStyleHeight(draggedItem, isBetweenBounds);
-	$: styleMargin = getStyleMargin(draggedItem, isBetweenBounds);
+	$: styleMargin = getStyleMargin(direction, draggedItem, isBetweenBounds);
 	$: styleOverflow = isDragging && hasRemoveOnDragOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		draggedItem,
