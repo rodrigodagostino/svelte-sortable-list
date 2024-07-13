@@ -19,11 +19,11 @@
 	export let isBetweenBounds: boolean;
 
 	$: {
-		setGhostStyles(ghostStatus);
+		setPositionStyles(ghostStatus);
 	}
 	$: styleTransform = getStyleTransform(pointer);
 
-	function setGhostStyles(status: 'init' | 'set' | 'remove' | 'unset') {
+	function setPositionStyles(status: 'init' | 'set' | 'remove' | 'unset') {
 		if (status === 'init' || status === 'set' || status === 'remove') {
 			if (!draggedItem || !itemsOrigin) return;
 
