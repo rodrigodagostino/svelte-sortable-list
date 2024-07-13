@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] (2024-07-13)
+
+### Added
+
+- Create `scaleFade` custom transition.
+
+### Fixed
+
+- Prevent an abrupt drop of the list when the last item is removed.
+- Prevent tabbing onto interactive elements if the current item is being dragged through the keyboard.
+- Replace `SortableItem` in and out transitions with `scaleFade` (which does not involve translation) to prevent possible container overflow when adding/removing an item.
+- Restore missing transitions during the deletion of an item by dropping it outside of the list’s bounds.
+
+### Docs
+
+- Add a stable scrollbar to **Main**.
+
 ## [0.9.2] (2024-07-05)
 
 ### Added
@@ -38,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename `SortableGhost` and live region classes.
 - Rename package.
 
-### Fix
+### Fixed
 
 - Repair broken `SortableGhost` entrance transition.
 
@@ -375,7 +392,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.8.3...v0.9.0
