@@ -384,11 +384,10 @@
 
 	.sortable-list {
 		display: flex;
-		padding: 0;
-		touch-action: none;
 		padding-inline: calc(var(--gap) / 2);
 		margin: calc(var(--gap) / 2 * -1);
 		outline-offset: calc(var(--gap) / 2 * -1);
+		touch-action: none;
 
 		&.has-direction-vertical {
 			flex-direction: column;
