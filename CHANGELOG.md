@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.4] (2024-07-14)
+
+### Changed
+
+- Move opinionated ghost and list styles into the CSS stylesheet.
+
+### Fixed
+
+- Update item margin when `direction` changes.
+- Bound items to the expected list limits when `hasBoundaries` is active.
+
 ## [0.9.3] (2024-07-13)
 
 ### Added
@@ -79,7 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Add
 
-- Expose stylesheets to allow them to be imported from outside the package.
+- Expose stylesheet to be imported from outside the package.
 
 ### Changed
 
@@ -392,7 +403,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.4...HEAD
+[0.9.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.0...v0.9.1
