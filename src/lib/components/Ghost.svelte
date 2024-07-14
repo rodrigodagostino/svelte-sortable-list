@@ -168,11 +168,5 @@
 		user-select: none;
 		backface-visibility: hidden;
 		z-index: 9999;
-
-		&__inner {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-		}
 	}
 </style>
