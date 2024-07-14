@@ -352,6 +352,7 @@
 	<Ghost
 		bind:ghostRef
 		{ghostStatus}
+		{gap}
 		{direction}
 		{transitionDuration}
 		{hasLockedAxis}

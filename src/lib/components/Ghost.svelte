@@ -4,6 +4,7 @@
 
 	export let ghostRef: HTMLDivElement;
 	export let ghostStatus: 'init' | 'set' | 'remove' | 'unset';
+	export let gap: number;
 	export let direction: 'horizontal' | 'vertical';
 	export let transitionDuration: number;
 	export let hasLockedAxis: boolean;
@@ -109,25 +110,35 @@
 					? pointer.y - pointerOrigin.y
 					: 0;
 			return `translate3d(${x}px, ${y}px, 0)`;
-		} else {
-			const x =
-				direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
-					? pointer.x - (pointerOrigin.x - draggedItemData.x) < listRect.x
-						? listRect.x - draggedItemData.x
-						: pointer.x + ghostRect.width - (pointerOrigin.x - draggedItemData.x) > listRect.right
-							? listRect.right - draggedItemData.x - ghostRect.width
-							: pointer.x - pointerOrigin.x
-					: 0;
-			const y =
-				direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
-					? pointer.y - (pointerOrigin.y - draggedItemData.y) < listRect.y
-						? listRect.y - draggedItemData.y
-						: pointer.y + ghostRect.height - (pointerOrigin.y - draggedItemData.y) > listRect.bottom
-							? listRect.bottom - draggedItemData.y - ghostRect.height
-							: pointer.y - pointerOrigin.y
-					: 0;
-			return `translate3d(${x}px, ${y}px, 0)`;
 		}
+
+		const x =
+			direction === 'horizontal' || (direction === 'vertical' && !hasLockedAxis)
+				? // If the ghost is dragged to the left of the list,
+					// place it to the right of the left edge of the list.
+					pointer.x - (pointerOrigin.x - draggedItemData.x) < listRect.x + gap / 2
+					? listRect.x - draggedItemData.x + gap / 2
+					: // If the ghost is dragged to the right of the list,
+						// place it to the left of the right edge of the list.
+						pointer.x + ghostRect.width - (pointerOrigin.x - draggedItemData.x) >
+						  listRect.right - gap / 2
+						? listRect.right - draggedItemData.x - ghostRect.width - gap / 2
+						: pointer.x - pointerOrigin.x
+				: 0;
+		const y =
+			direction === 'vertical' || (direction === 'horizontal' && !hasLockedAxis)
+				? // If the ghost is dragged above the top of the list,
+					// place it below the top edge of the list.
+					pointer.y - (pointerOrigin.y - draggedItemData.y) < listRect.y + gap / 2
+					? listRect.y - draggedItemData.y + gap / 2
+					: // If the ghost is dragged below the bottom of the list,
+						// place it above the bottom edge of the list.
+						pointer.y + ghostRect.height - (pointerOrigin.y - draggedItemData.y) >
+						  listRect.bottom - gap / 2
+						? listRect.bottom - draggedItemData.y - ghostRect.height - gap / 2
+						: pointer.y - pointerOrigin.y
+				: 0;
+		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 </script>
 
