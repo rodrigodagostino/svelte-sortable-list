@@ -385,17 +385,19 @@
 
 	.sortable-list {
 		display: flex;
-		padding-inline: calc(var(--gap) / 2);
+		padding-inline-start: 0;
 		margin: calc(var(--gap) / 2 * -1);
 		outline-offset: calc(var(--gap) / 2 * -1);
 		touch-action: none;
 
 		&.has-direction-vertical {
 			flex-direction: column;
+			padding-inline: calc(var(--gap) / 2);
 		}
 
 		&.has-direction-horizontal {
 			flex-direction: row;
+			padding-block: calc(var(--gap) / 2);
 		}
 	}
 
