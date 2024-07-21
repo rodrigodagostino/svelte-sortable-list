@@ -10,10 +10,26 @@ export interface SortableListProps {
 	hasRemoveOnDragOut: boolean;
 }
 
+export interface SortableListCoordinates {
+	pointer: { x: number; y: number };
+	pointerOrigin: { x: number; y: number };
+	itemsOrigin: ItemData[] | null;
+}
+
+export interface SortableListElements {
+	draggedItem: HTMLLIElement | null;
+	targetItem: HTMLLIElement | null;
+	focusedItem: HTMLLIElement | null;
+}
+
 export interface SortableItemProps
 	extends Omit<SortableListProps, 'items' | 'hasLockedAxis' | 'hasBoundaries'> {
 	item: Item;
 	index: number;
+}
+
+export interface GhostProps {
+	status: 'init' | 'set' | 'remove' | 'unset';
 }
 
 interface Item {

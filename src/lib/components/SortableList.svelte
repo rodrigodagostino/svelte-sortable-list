@@ -2,7 +2,7 @@
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
-	import type { ItemData, SortableListProps } from '$lib/types.js';
+	import type { GhostProps, SortableListProps } from '$lib/types.js';
 	import {
 		areColliding,
 		getCollidingItem,
@@ -12,6 +12,25 @@
 		hasInteractiveElements,
 		screenReaderText,
 	} from '$lib/utils/index.js';
+	import {
+		setDraggedItem,
+		setFocusedItem,
+		setIsBetweenBounds,
+		setIsCanceling,
+		setIsKeyboardDragging,
+		setIsKeyboardDropping,
+		setIsPointerDragging,
+		setIsPointerDropping,
+		setIsRemoving,
+		setItemsOrigin,
+		setListProps,
+		setPointer,
+		setPointerOrigin,
+		setTargetItem,
+	} from '$lib/stores/index.js';
+
+	let listRef: HTMLUListElement;
+	let ghostRef: HTMLDivElement;
 
 	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
@@ -23,32 +42,53 @@
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
 	export let hasRemoveOnDragOut: SortableListProps['hasRemoveOnDragOut'] = false;
 
-	let listRef: HTMLUListElement;
-	let ghostRef: HTMLDivElement;
-	let ghostStatus: 'init' | 'set' | 'remove' | 'unset' = 'unset';
-	let pointer: { x: number; y: number };
-	let pointerOrigin: { x: number; y: number };
-	let itemsOrigin: ItemData[] | null = null;
-	let draggedItem: HTMLLIElement | null = null;
-	let targetItem: HTMLLIElement | null = null;
-	let focusedItem: HTMLLIElement | null = null;
+	const props = setListProps({
+		items,
+		gap,
+		direction,
+		swapThreshold,
+		transitionDuration,
+		hasDropMarker,
+		hasLockedAxis,
+		hasBoundaries,
+		hasRemoveOnDragOut,
+	});
+	$: $props = {
+		items,
+		gap,
+		direction,
+		swapThreshold,
+		transitionDuration,
+		hasDropMarker,
+		hasLockedAxis,
+		hasBoundaries,
+		hasRemoveOnDragOut,
+	};
+
+	let ghostStatus: GhostProps['status'] = 'unset';
+	const pointer = setPointer({ x: 0, y: 0 });
+	const pointerOrigin = setPointerOrigin({ x: 0, y: 0 });
+	const itemsOrigin = setItemsOrigin(null);
+	const draggedItem = setDraggedItem(null);
+	const targetItem = setTargetItem(null);
+	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
 
-	let isPointerDragging = false;
-	let isPointerDropping = false;
-	let isKeyboardDragging = false;
-	let isKeyboardDropping = false;
-	let isCanceling = false;
-	let isRemoving = false;
-	let isBetweenBounds = true;
+	const isPointerDragging = setIsPointerDragging(false);
+	const isPointerDropping = setIsPointerDropping(false);
+	const isKeyboardDragging = setIsKeyboardDragging(false);
+	const isKeyboardDropping = setIsKeyboardDropping(false);
+	const isCanceling = setIsCanceling(false);
+	const isRemoving = setIsRemoving(false);
+	const isBetweenBounds = setIsBetweenBounds(true);
 
 	let slots = $$slots;
 
 	const dispatch = createEventDispatcher();
 
 	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
-		const draggerItemIndex = draggedItem && getIndex(draggedItem);
-		const targetItemIndex = targetItem && getIndex(targetItem);
+		const draggerItemIndex = $draggedItem && getIndex($draggedItem);
+		const targetItemIndex = $targetItem && getIndex($targetItem);
 
 		if (
 			draggedItem !== null &&
@@ -63,12 +103,12 @@
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
-			isPointerDragging ||
-			isPointerDropping ||
-			isKeyboardDragging ||
-			isKeyboardDropping ||
-			isCanceling ||
-			focusedItem
+			$isPointerDragging ||
+			$isPointerDropping ||
+			$isKeyboardDragging ||
+			$isKeyboardDropping ||
+			$isCanceling ||
+			$focusedItem
 		)
 			return;
 
@@ -80,11 +120,11 @@
 
 		currItem.setPointerCapture(event.pointerId);
 
-		isPointerDragging = true;
+		$isPointerDragging = true;
 		await tick();
-		draggedItem = currItem;
-		pointerOrigin = { x: event.clientX, y: event.clientY };
-		itemsOrigin = getItemsData(listRef);
+		$draggedItem = currItem;
+		$pointerOrigin = { x: event.clientX, y: event.clientY };
+		$itemsOrigin = getItemsData(listRef);
 		ghostStatus = 'init';
 
 		currItem.addEventListener('pointermove', handlePointerMove);
@@ -99,42 +139,42 @@
 	}
 
 	function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!isPointerDragging || !ghostRef || !itemsOrigin || !draggedItem) return;
+		if (!$isPointerDragging || !ghostRef || !$itemsOrigin || !$draggedItem) return;
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
 
-		pointer = { x: clientX, y: clientY };
-		isBetweenBounds = areColliding(ghostRect, listRect);
+		$pointer = { x: clientX, y: clientY };
+		$isBetweenBounds = areColliding(ghostRect, listRect);
 
-		const collidingItemData = getCollidingItem(ghostRef, itemsOrigin, swapThreshold);
+		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, swapThreshold);
 		if (collidingItemData)
-			targetItem = listRef.querySelector<HTMLLIElement>(
+			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
-		else targetItem = null;
+		else $targetItem = null;
 	}
 
 	function handlePointerUp() {
-		if (!isPointerDragging || isPointerDropping) return;
+		if (!$isPointerDragging || $isPointerDropping) return;
 
-		const draggedItemId = draggedItem && getId(draggedItem);
-		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
+		const draggedItemId = $draggedItem && getId($draggedItem);
+		if (!$isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
 
-		isPointerDragging = false;
-		ghostStatus = !isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
-		isPointerDropping = true;
-		isBetweenBounds = true;
+		$isPointerDragging = false;
+		ghostStatus = !$isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
+		$isPointerDropping = true;
+		$isBetweenBounds = true;
 
 		function handleGhostDrop({ propertyName }: TransitionEvent) {
 			if (propertyName === 'top' || propertyName === 'z-index') {
-				dispatchSort(draggedItem, targetItem);
+				dispatchSort($draggedItem, $targetItem);
 
 				ghostStatus = 'unset';
-				draggedItem = null;
-				targetItem = null;
-				itemsOrigin = null;
-				isPointerDropping = false;
+				$draggedItem = null;
+				$targetItem = null;
+				$itemsOrigin = null;
+				$isPointerDropping = false;
 
 				ghostRef.removeEventListener('transitionend', handleGhostDrop);
 			}
@@ -144,7 +184,7 @@
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
-		if (isKeyboardDropping) {
+		if ($isKeyboardDropping) {
 			event.preventDefault();
 			return;
 		}
@@ -158,38 +198,38 @@
 			if (target.classList.contains('ssl-item')) event.preventDefault();
 			else return;
 
-			if (!focusedItem || target.getAttribute('aria-disabled') === 'true') return;
+			if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-			if (!isKeyboardDragging) {
-				isKeyboardDragging = true;
+			if (!$isKeyboardDragging) {
+				$isKeyboardDragging = true;
 
 				await tick();
-				draggedItem = focusedItem;
-				itemsOrigin = getItemsData(listRef);
-				if (draggedItem) liveText = screenReaderText.lifted(draggedItem);
+				$draggedItem = $focusedItem;
+				$itemsOrigin = getItemsData(listRef);
+				if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
 			} else {
-				isKeyboardDragging = false;
-				isKeyboardDropping = true;
+				$isKeyboardDragging = false;
+				$isKeyboardDropping = true;
 
-				if (draggedItem) liveText = screenReaderText.dropped(draggedItem, targetItem);
+				if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
 
 				async function handleItemDrop({ propertyName }: TransitionEvent) {
 					if (propertyName === 'z-index') {
-						dispatchSort(draggedItem, targetItem);
+						dispatchSort($draggedItem, $targetItem);
 
-						draggedItem = null;
-						targetItem = null;
-						itemsOrigin = null;
-						isKeyboardDropping = false;
+						$draggedItem = null;
+						$targetItem = null;
+						$itemsOrigin = null;
+						$isKeyboardDropping = false;
 
 						await tick();
-						focusedItem?.focus();
+						$focusedItem?.focus();
 
-						focusedItem?.removeEventListener('transitionend', handleItemDrop);
+						$focusedItem?.removeEventListener('transitionend', handleItemDrop);
 					}
 				}
 
-				focusedItem.addEventListener('transitionend', handleItemDrop);
+				$focusedItem.addEventListener('transitionend', handleItemDrop);
 			}
 		}
 
@@ -197,12 +237,12 @@
 			event.preventDefault();
 
 			const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
-			const draggedItemIndex = (draggedItem && getIndex(draggedItem)) ?? null;
-			const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
-			const focusedItemIndex = (focusedItem && getIndex(focusedItem)) ?? null;
+			const draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
+			const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
+			const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
-			if (!isKeyboardDragging) {
-				if (!focusedItem || focusedItemIndex === null) {
+			if (!$isKeyboardDragging) {
+				if (!$focusedItem || focusedItemIndex === null) {
 					const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
 					firstItemElement?.focus();
 					return;
@@ -217,82 +257,82 @@
 					return;
 
 				step === 1
-					? (focusedItem.nextElementSibling as HTMLLIElement)?.focus()
-					: (focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+					? ($focusedItem.nextElementSibling as HTMLLIElement)?.focus()
+					: ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
-				if (!draggedItem || !itemsOrigin) return;
+				if (!$draggedItem || !$itemsOrigin) return;
 				// Prevent moving the selected item if it’s the first or last item,
 				// or is at the top or bottom of the list.
 				if (
 					((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItemIndex === 0 && !targetItem) ||
 					((key === 'ArrowUp' || key === 'ArrowLeft') && targetItemIndex === 0) ||
 					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						draggedItemIndex === itemsOrigin.length - 1 &&
+						draggedItemIndex === $itemsOrigin.length - 1 &&
 						!targetItem) ||
 					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						targetItemIndex === itemsOrigin.length - 1)
+						targetItemIndex === $itemsOrigin.length - 1)
 				)
 					return;
 
-				if (!targetItem) {
-					targetItem =
+				if (!$targetItem) {
+					$targetItem =
 						step === 1
-							? (draggedItem.nextElementSibling as HTMLLIElement)
-							: (draggedItem.previousElementSibling as HTMLLIElement);
+							? ($draggedItem.nextElementSibling as HTMLLIElement)
+							: ($draggedItem.previousElementSibling as HTMLLIElement);
 				} else {
-					targetItem =
+					$targetItem =
 						step === 1
-							? (targetItem.nextElementSibling as HTMLLIElement)
-							: (targetItem.previousElementSibling as HTMLLIElement);
+							? ($targetItem.nextElementSibling as HTMLLIElement)
+							: ($targetItem.previousElementSibling as HTMLLIElement);
 				}
 
-				if (targetItem) liveText = screenReaderText.dragged(draggedItem, targetItem, key);
+				if ($targetItem) liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
 			}
 		}
 
 		if (key === 'Escape') {
-			if (!focusedItem || !isKeyboardDragging) return;
+			if (!$focusedItem || !$isKeyboardDragging) return;
 
-			isKeyboardDragging = false;
-			isKeyboardDropping = true;
-			isCanceling = true;
-			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
+			$isKeyboardDragging = false;
+			$isKeyboardDropping = true;
+			$isCanceling = true;
+			if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
 
 			function handleItemDrop({ propertyName }: TransitionEvent) {
 				if (propertyName === 'z-index') {
-					draggedItem = null;
-					targetItem = null;
-					itemsOrigin = null;
-					isKeyboardDropping = false;
-					isCanceling = false;
+					$draggedItem = null;
+					$targetItem = null;
+					$itemsOrigin = null;
+					$isKeyboardDropping = false;
+					$isCanceling = false;
 
-					focusedItem?.removeEventListener('transitionend', handleItemDrop);
+					$focusedItem?.removeEventListener('transitionend', handleItemDrop);
 				}
 			}
 
-			focusedItem.addEventListener('transitionend', handleItemDrop);
+			$focusedItem.addEventListener('transitionend', handleItemDrop);
 		}
 	}
 
 	async function handleRemove(itemId: unknown) {
-		if (focusedItem) {
+		if ($focusedItem) {
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
-				const step = getIndex(focusedItem) !== items.length - 1 ? 1 : -1;
+				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
 				step === 1
-					? (focusedItem.nextElementSibling as HTMLLIElement)?.focus()
-					: (focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+					? ($focusedItem.nextElementSibling as HTMLLIElement)?.focus()
+					: ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
 				// Focus the list (if there are no items left) before removing.
-				focusedItem = null;
+				$focusedItem = null;
 				listRef.focus();
 			}
-		} else if (isPointerDragging) {
-			isRemoving = true;
+		} else if ($isPointerDragging) {
+			$isRemoving = true;
 
 			function handleGhostDrop({ propertyName }: TransitionEvent) {
 				if (propertyName === 'top' || propertyName === 'z-index') {
-					isRemoving = false;
+					$isRemoving = false;
 
 					ghostRef.removeEventListener('transitionend', handleGhostDrop);
 				}
@@ -309,71 +349,33 @@
 	<ul
 		bind:this={listRef}
 		class="ssl-list has-direction-{direction}"
-		class:is-pointer-dragging={isPointerDragging}
-		class:is-pointer-dropping={isPointerDropping}
-		class:is-keyboard-dragging={isKeyboardDragging}
-		class:is-keyboard-dropping={isKeyboardDropping}
-		class:is-between-bounds={isBetweenBounds}
-		class:is-out-of-bounds={!isBetweenBounds}
-		class:is-removing={isRemoving}
+		class:is-pointer-dragging={$isPointerDragging}
+		class:is-pointer-dropping={$isPointerDropping}
+		class:is-keyboard-dragging={$isKeyboardDragging}
+		class:is-keyboard-dropping={$isKeyboardDropping}
+		class:is-between-bounds={$isBetweenBounds}
+		class:is-out-of-bounds={!$isBetweenBounds}
+		class:is-removing={$isRemoving}
 		class:has-remove-on-drag-out={hasRemoveOnDragOut}
 		style:--gap="{gap}px"
 		style:--transition-duration="{transitionDuration}ms"
-		style:pointer-events={focusedItem ? 'none' : 'auto'}
+		style:pointer-events={$focusedItem ? 'none' : 'auto'}
 		role="listbox"
 		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
-		aria-activedescendant={focusedItem ? `ssl-item-${focusedItem.id}` : null}
+		aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
 		tabindex="0"
 		on:pointerdown={handlePointerDown}
 		on:keydown={handleKeyDown}
 	>
 		{#each items as item, index (item.id)}
-			<SortableItem
-				{item}
-				{index}
-				{gap}
-				{direction}
-				{transitionDuration}
-				{hasDropMarker}
-				{hasRemoveOnDragOut}
-				bind:itemsOrigin
-				bind:focusedItem
-				bind:draggedItem
-				bind:targetItem
-				{isPointerDragging}
-				{isPointerDropping}
-				bind:isKeyboardDragging
-				bind:isKeyboardDropping
-				bind:isCanceling
-				{isRemoving}
-				{isBetweenBounds}
-				{slots}
-				on:remove={() => handleRemove(String(item.id))}
-			>
+			<SortableItem {item} {index} {slots} on:remove={() => handleRemove(String(item.id))}>
 				<slot name="handle" slot="handle" />
 				<slot {item} {index} />
 				<slot name="remove" slot="remove" />
 			</SortableItem>
 		{/each}
 	</ul>
-	<Ghost
-		bind:ghostRef
-		{ghostStatus}
-		{gap}
-		{direction}
-		{transitionDuration}
-		{hasLockedAxis}
-		{hasBoundaries}
-		{pointer}
-		{pointerOrigin}
-		{itemsOrigin}
-		{draggedItem}
-		{targetItem}
-		{isPointerDragging}
-		{isPointerDropping}
-		{isRemoving}
-		{isBetweenBounds}
-	/>
+	<Ghost bind:ghostRef status={ghostStatus} />
 	<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
