@@ -82,8 +82,8 @@
 	opacity: 0.5;
 }
 
-.ssl-item.is-selecting .ssl-item__inner,
-.ssl-ghost.is-dragging .ssl-ghost__inner {
+.ssl-item.is-keyboard-dragging .ssl-item__inner,
+.ssl-ghost.is-pointer-dragging .ssl-ghost__inner {
 	box-shadow: var(--box-shadow-1);
 }
 
@@ -134,13 +134,13 @@
 	transition: opacity 0s var(--transition-duration);
 }
 
-.ssl-item.is-dragging .ssl-item__inner,
-.ssl-item.is-dropping .ssl-item__inner {
+.ssl-item.is-pointer-dragging .ssl-item__inner,
+.ssl-item.is-pointer-dropping .ssl-item__inner {
 	opacity: 0.5;
 	transition: opacity 0s;
 }
 
-.ssl-item.is-dragging .ssl-item__inner > * {
+.ssl-item.is-pointer-dragging .ssl-item__inner > * {
 	opacity: 0;
 	transition: opacity 0s;
 }

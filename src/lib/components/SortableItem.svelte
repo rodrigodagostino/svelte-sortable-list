@@ -18,10 +18,10 @@
 	export let targetItem: HTMLLIElement | null;
 	export let focusedItem: HTMLLIElement | null;
 
-	export let isDragging: boolean;
-	export let isDropping: boolean;
-	export let isSelecting: boolean;
-	export let isDeselecting: boolean;
+	export let isPointerDragging: boolean;
+	export let isPointerDropping: boolean;
+	export let isKeyboardDragging: boolean;
+	export let isKeyboardDropping: boolean;
 	export let isCanceling: boolean;
 	export let isRemoving: boolean;
 	export let isBetweenBounds: boolean;
@@ -45,11 +45,11 @@
 	$: focusedItemId = focusedItem ? getId(focusedItem) : null;
 
 	$: {
-		if (isSelecting) setInteractiveElementsTabIndex();
+		if (isKeyboardDragging) setInteractiveElementsTabIndex();
 	}
 
 	$: styleCursor =
-		isDragging && draggedItemId === String(item.id)
+		isPointerDragging && draggedItemId === String(item.id)
 			? 'grabbing'
 			: !slots.handle
 				? 'grab'
@@ -57,7 +57,7 @@
 	$: styleWidth = getStyleWidth(draggedItem, isBetweenBounds);
 	$: styleHeight = getStyleHeight(draggedItem, isBetweenBounds);
 	$: styleMargin = getStyleMargin(direction, draggedItem, isBetweenBounds);
-	$: styleOverflow = isDragging && hasRemoveOnDragOut ? 'hidden' : undefined;
+	$: styleOverflow = isPointerDragging && hasRemoveOnDragOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		draggedItem,
 		targetItem,
@@ -66,13 +66,13 @@
 		isBetweenBounds
 	);
 	$: styleTransition =
-		isDragging || isDropping || isSelecting || isDeselecting
+		isPointerDragging || isPointerDropping || isKeyboardDragging || isKeyboardDropping
 			? `width ${transitionDuration}ms, height ${transitionDuration}ms,` +
 				`margin ${transitionDuration}ms, transform ${transitionDuration}ms,` +
 				`z-index ${transitionDuration}ms`
 			: `z-index ${transitionDuration}ms`;
 	$: styleVisibility =
-		(isDragging || isDropping) && draggedItemId === String(item.id) && !hasDropMarker
+		(isPointerDragging || isPointerDropping) && draggedItemId === String(item.id) && !hasDropMarker
 			? 'hidden'
 			: 'visible';
 
@@ -110,7 +110,7 @@
 			draggedItemRect === null ||
 			targetItemIndex === null ||
 			targetItemRect === null ||
-			(!isDragging && !isDropping && !isSelecting && !isDeselecting) ||
+			(!isPointerDragging && !isPointerDropping && !isKeyboardDragging && !isKeyboardDropping) ||
 			isCanceling
 		)
 			return 'translate3d(0, 0, 0)';
@@ -151,7 +151,9 @@
 				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
-			.forEach((el) => (el.tabIndex = !isSelecting && focusedItemId === String(item.id) ? 0 : -1));
+			.forEach(
+				(el) => (el.tabIndex = !isKeyboardDragging && focusedItemId === String(item.id) ? 0 : -1)
+			);
 	}
 
 	onMount(() => {
@@ -192,9 +194,9 @@
 	function cleanUp() {
 		focusedItem = null;
 
-		if (isSelecting) {
-			isSelecting = false;
-			isDeselecting = true;
+		if (isKeyboardDragging) {
+			isKeyboardDragging = false;
+			isKeyboardDropping = true;
 			isCanceling = true;
 
 			function handleItemDrop({ propertyName }: TransitionEvent) {
@@ -202,7 +204,7 @@
 					draggedItem = null;
 					targetItem = null;
 					itemsOrigin = null;
-					isDeselecting = false;
+					isKeyboardDropping = false;
 					isCanceling = false;
 
 					itemRef.removeEventListener('transitionend', handleItemDrop);
@@ -219,10 +221,10 @@
 <li
 	bind:this={itemRef}
 	class="ssl-item"
-	class:is-dragging={isDragging && draggedItemId === String(item.id)}
-	class:is-dropping={isDropping && draggedItemId === String(item.id)}
-	class:is-selecting={isSelecting && draggedItemId === String(item.id)}
-	class:is-deselecting={isDeselecting && draggedItemId === String(item.id)}
+	class:is-pointer-dragging={isPointerDragging && draggedItemId === String(item.id)}
+	class:is-pointer-dropping={isPointerDropping && draggedItemId === String(item.id)}
+	class:is-keyboard-dragging={isKeyboardDragging && draggedItemId === String(item.id)}
+	class:is-keyboard-dropping={isKeyboardDropping && draggedItemId === String(item.id)}
 	class:is-removing={isRemoving && draggedItemId === String(item.id)}
 	style:--transition-duration="{transitionDuration}ms"
 	style:cursor={styleCursor}
@@ -252,7 +254,7 @@
 		{#if slots.handle}
 			<div
 				class="ssl-item__handle"
-				style:cursor={isDragging ? 'grabbing' : 'grab'}
+				style:cursor={isPointerDragging ? 'grabbing' : 'grab'}
 				aria-hidden="true"
 			>
 				<slot name="handle" />
@@ -277,19 +279,19 @@
 		backface-visibility: hidden;
 		z-index: 1;
 
-		&.is-selecting {
+		&.is-keyboard-dragging {
 			z-index: 3;
 		}
 
-		&.is-deselecting {
-			// The following z-index is different from the one in .is-selecting for
+		&.is-keyboard-dropping {
+			// The following z-index is different from the one in .is-keyboard-dragging for
 			// the sole purpose of ensuring the «transitionend» event is fired when
 			// the item is dropped using the keyboard.
 			z-index: 2;
 		}
 
-		&.is-dragging,
-		&.is-dropping {
+		&.is-pointer-dragging,
+		&.is-pointer-dropping {
 			z-index: 0;
 		}
 

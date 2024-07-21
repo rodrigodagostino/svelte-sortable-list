@@ -34,10 +34,10 @@
 	let focusedItem: HTMLLIElement | null = null;
 	let liveText: string = '';
 
-	let isDragging = false;
-	let isDropping = false;
-	let isSelecting = false;
-	let isDeselecting = false;
+	let isPointerDragging = false;
+	let isPointerDropping = false;
+	let isKeyboardDragging = false;
+	let isKeyboardDropping = false;
 	let isCanceling = false;
 	let isRemoving = false;
 	let isBetweenBounds = true;
@@ -62,7 +62,14 @@
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
-		if (isDragging || isDropping || isSelecting || isDeselecting || isCanceling || focusedItem)
+		if (
+			isPointerDragging ||
+			isPointerDropping ||
+			isKeyboardDragging ||
+			isKeyboardDropping ||
+			isCanceling ||
+			focusedItem
+		)
 			return;
 
 		const target = event.target as HTMLElement;
@@ -73,7 +80,7 @@
 
 		currItem.setPointerCapture(event.pointerId);
 
-		isDragging = true;
+		isPointerDragging = true;
 		await tick();
 		draggedItem = currItem;
 		pointerOrigin = { x: event.clientX, y: event.clientY };
@@ -92,7 +99,7 @@
 	}
 
 	function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!isDragging || !ghostRef || !itemsOrigin || !draggedItem) return;
+		if (!isPointerDragging || !ghostRef || !itemsOrigin || !draggedItem) return;
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
@@ -109,14 +116,14 @@
 	}
 
 	function handlePointerUp() {
-		if (!isDragging || isDropping) return;
+		if (!isPointerDragging || isPointerDropping) return;
 
 		const draggedItemId = draggedItem && getId(draggedItem);
 		if (!isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
 
-		isDragging = false;
+		isPointerDragging = false;
 		ghostStatus = !isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
-		isDropping = true;
+		isPointerDropping = true;
 		isBetweenBounds = true;
 
 		function handleGhostDrop({ propertyName }: TransitionEvent) {
@@ -127,7 +134,7 @@
 				draggedItem = null;
 				targetItem = null;
 				itemsOrigin = null;
-				isDropping = false;
+				isPointerDropping = false;
 
 				ghostRef.removeEventListener('transitionend', handleGhostDrop);
 			}
@@ -137,7 +144,7 @@
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
-		if (isDeselecting) {
+		if (isKeyboardDropping) {
 			event.preventDefault();
 			return;
 		}
@@ -153,16 +160,16 @@
 
 			if (!focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-			if (!isSelecting) {
-				isSelecting = true;
+			if (!isKeyboardDragging) {
+				isKeyboardDragging = true;
 
 				await tick();
 				draggedItem = focusedItem;
 				itemsOrigin = getItemsData(listRef);
 				if (draggedItem) liveText = screenReaderText.lifted(draggedItem);
 			} else {
-				isSelecting = false;
-				isDeselecting = true;
+				isKeyboardDragging = false;
+				isKeyboardDropping = true;
 
 				if (draggedItem) liveText = screenReaderText.dropped(draggedItem, targetItem);
 
@@ -173,7 +180,7 @@
 						draggedItem = null;
 						targetItem = null;
 						itemsOrigin = null;
-						isDeselecting = false;
+						isKeyboardDropping = false;
 
 						await tick();
 						focusedItem?.focus();
@@ -194,7 +201,7 @@
 			const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
 			const focusedItemIndex = (focusedItem && getIndex(focusedItem)) ?? null;
 
-			if (!isSelecting) {
+			if (!isKeyboardDragging) {
 				if (!focusedItem || focusedItemIndex === null) {
 					const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
 					firstItemElement?.focus();
@@ -244,10 +251,10 @@
 		}
 
 		if (key === 'Escape') {
-			if (!focusedItem || !isSelecting) return;
+			if (!focusedItem || !isKeyboardDragging) return;
 
-			isSelecting = false;
-			isDeselecting = true;
+			isKeyboardDragging = false;
+			isKeyboardDropping = true;
 			isCanceling = true;
 			if (draggedItem) liveText = screenReaderText.canceled(draggedItem);
 
@@ -256,7 +263,7 @@
 					draggedItem = null;
 					targetItem = null;
 					itemsOrigin = null;
-					isDeselecting = false;
+					isKeyboardDropping = false;
 					isCanceling = false;
 
 					focusedItem?.removeEventListener('transitionend', handleItemDrop);
@@ -280,7 +287,7 @@
 				focusedItem = null;
 				listRef.focus();
 			}
-		} else if (isDragging) {
+		} else if (isPointerDragging) {
 			isRemoving = true;
 
 			function handleGhostDrop({ propertyName }: TransitionEvent) {
@@ -302,10 +309,10 @@
 	<ul
 		bind:this={listRef}
 		class="ssl-list has-direction-{direction}"
-		class:is-dragging={isDragging}
-		class:is-dropping={isDropping}
-		class:is-selecting={isSelecting}
-		class:is-deselecting={isDeselecting}
+		class:is-pointer-dragging={isPointerDragging}
+		class:is-pointer-dropping={isPointerDropping}
+		class:is-keyboard-dragging={isKeyboardDragging}
+		class:is-keyboard-dropping={isKeyboardDropping}
 		class:is-between-bounds={isBetweenBounds}
 		class:is-out-of-bounds={!isBetweenBounds}
 		class:is-removing={isRemoving}
@@ -333,10 +340,10 @@
 				bind:focusedItem
 				bind:draggedItem
 				bind:targetItem
-				{isDragging}
-				{isDropping}
-				bind:isSelecting
-				bind:isDeselecting
+				{isPointerDragging}
+				{isPointerDropping}
+				bind:isKeyboardDragging
+				bind:isKeyboardDropping
 				bind:isCanceling
 				{isRemoving}
 				{isBetweenBounds}
@@ -362,8 +369,8 @@
 		{itemsOrigin}
 		{draggedItem}
 		{targetItem}
-		{isDragging}
-		{isDropping}
+		{isPointerDragging}
+		{isPointerDropping}
 		{isRemoving}
 		{isBetweenBounds}
 	/>

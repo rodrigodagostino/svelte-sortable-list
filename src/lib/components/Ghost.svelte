@@ -14,8 +14,8 @@
 	export let itemsOrigin: ItemData[] | null;
 	export let draggedItem: HTMLLIElement | null;
 	export let targetItem: HTMLLIElement | null;
-	export let isDragging: boolean;
-	export let isDropping: boolean;
+	export let isPointerDragging: boolean;
+	export let isPointerDropping: boolean;
 	export let isRemoving: boolean;
 	export let isBetweenBounds: boolean;
 
@@ -94,7 +94,7 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
-		if (!isDragging || !draggedItem || !itemsOrigin) return 'translate3d(0, 0, 0)';
+		if (!isPointerDragging || !draggedItem || !itemsOrigin) return 'translate3d(0, 0, 0)';
 
 		const listRect = ghostRef.previousElementSibling!.getBoundingClientRect()!;
 		const ghostRect = ghostRef.getBoundingClientRect()!;
@@ -145,14 +145,14 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	class:is-dragging={isDragging}
-	class:is-dropping={isDropping}
+	class:is-pointer-dragging={isPointerDragging}
+	class:is-pointer-dropping={isPointerDropping}
 	class:is-between-bounds={isBetweenBounds}
 	class:is-out-of-bounds={!isBetweenBounds}
 	style:--transition-duration="{transitionDuration}ms"
-	style:cursor={isDragging ? 'grabbing' : !isRemoving ? 'grab' : 'initial'}
+	style:cursor={isPointerDragging ? 'grabbing' : !isRemoving ? 'grab' : 'initial'}
 	style:transform={styleTransform}
-	style:visibility={isDragging || isDropping ? 'visible' : 'hidden'}
+	style:visibility={isPointerDragging || isPointerDropping ? 'visible' : 'hidden'}
 	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
