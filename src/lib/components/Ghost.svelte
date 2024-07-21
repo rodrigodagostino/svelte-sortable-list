@@ -144,7 +144,7 @@
 
 <div
 	bind:this={ghostRef}
-	class="ghost"
+	class="ssl-ghost"
 	class:is-dragging={isDragging}
 	class:is-dropping={isDropping}
 	class:is-between-bounds={isBetweenBounds}
@@ -156,13 +156,13 @@
 	data-id={draggedItem && getId(draggedItem)}
 	aria-hidden="true"
 >
-	<div class="ghost__inner">
+	<div class="ssl-ghost__inner">
 		{@html draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
 	</div>
 </div>
 
 <style lang="scss">
-	.ghost {
+	.ssl-ghost {
 		position: fixed;
 		list-style: none;
 		user-select: none;

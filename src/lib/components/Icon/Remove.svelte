@@ -1,4 +1,5 @@
 <svg
+	class="ssl-icon-remove"
 	width="0.875rem"
 	height="0.875rem"
 	viewBox="0 0 24 24"

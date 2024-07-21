@@ -66,9 +66,9 @@
 			return;
 
 		const target = event.target as HTMLElement;
-		if (slots.handle && (!target || !target.closest('.sortable-item__handle'))) return;
+		if (slots.handle && (!target || !target.closest('.ssl-item__handle'))) return;
 
-		const currItem: HTMLLIElement | null = target.closest('.sortable-item');
+		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
 		if (!currItem || hasInteractiveElements(target, currItem)) return;
 
 		currItem.setPointerCapture(event.pointerId);
@@ -103,7 +103,7 @@
 		const collidingItemData = getCollidingItem(ghostRef, itemsOrigin, swapThreshold);
 		if (collidingItemData)
 			targetItem = listRef.querySelector<HTMLLIElement>(
-				`.sortable-item[data-id="${collidingItemData.id}"]`
+				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
 		else targetItem = null;
 	}
@@ -148,7 +148,7 @@
 		if (key === ' ') {
 			// Prevent default only if the target is a sortable item.
 			// This allows interactive elements (like buttons) to operate normally.
-			if (target.classList.contains('sortable-item')) event.preventDefault();
+			if (target.classList.contains('ssl-item')) event.preventDefault();
 			else return;
 
 			if (!focusedItem || target.getAttribute('aria-disabled') === 'true') return;
@@ -196,7 +196,7 @@
 
 			if (!isSelecting) {
 				if (!focusedItem || focusedItemIndex === null) {
-					const firstItemElement = listRef.querySelector<HTMLLIElement>('.sortable-item');
+					const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
 					firstItemElement?.focus();
 					return;
 				}
@@ -301,7 +301,7 @@
 {#if items}
 	<ul
 		bind:this={listRef}
-		class="sortable-list has-direction-{direction}"
+		class="ssl-list has-direction-{direction}"
 		class:is-dragging={isDragging}
 		class:is-dropping={isDropping}
 		class:is-selecting={isSelecting}
@@ -315,7 +315,7 @@
 		style:pointer-events={focusedItem ? 'none' : 'auto'}
 		role="listbox"
 		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
-		aria-activedescendant={focusedItem ? `sortable-item-${focusedItem.id}` : null}
+		aria-activedescendant={focusedItem ? `ssl-item-${focusedItem.id}` : null}
 		tabindex="0"
 		on:pointerdown={handlePointerDown}
 		on:keydown={handleKeyDown}
@@ -367,7 +367,7 @@
 		{isRemoving}
 		{isBetweenBounds}
 	/>
-	<div class="live-region" role="log" aria-live="assertive" aria-atomic="true">
+	<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
 		{liveText}
 	</div>
 {:else}
@@ -378,12 +378,12 @@
 {/if}
 
 <style lang="scss">
-	.sortable-list,
-	.sortable-list :global(*) {
+	.ssl-list,
+	.ssl-list :global(*) {
 		box-sizing: border-box;
 	}
 
-	.sortable-list {
+	.ssl-list {
 		display: flex;
 		padding-inline-start: 0;
 		margin: calc(var(--gap) / 2 * -1);
@@ -401,7 +401,7 @@
 		}
 	}
 
-	.live-region {
+	.ssl-live-region {
 		position: absolute;
 		left: 0px;
 		top: 0px;

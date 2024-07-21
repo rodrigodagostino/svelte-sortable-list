@@ -167,7 +167,7 @@
 
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
-		if (relatedTarget && !relatedTarget.closest('.sortable-item')) {
+		if (relatedTarget && !relatedTarget.closest('.ssl-item')) {
 			cleanUp();
 		}
 		await tick();
@@ -182,7 +182,7 @@
 	async function handleDocumentPointerDown(event: PointerEvent) {
 		const target = event.target as HTMLElement;
 		const focusedItemId = focusedItem && getId(focusedItem);
-		if (focusedItemId === String(item.id) && !target.closest('.sortable-item')) {
+		if (focusedItemId === String(item.id) && !target.closest('.ssl-item')) {
 			cleanUp();
 			await tick();
 			setInteractiveElementsTabIndex();
@@ -218,7 +218,7 @@
 
 <li
 	bind:this={itemRef}
-	class="sortable-item"
+	class="ssl-item"
 	class:is-dragging={isDragging && draggedItemId === String(item.id)}
 	class:is-dropping={isDropping && draggedItemId === String(item.id)}
 	class:is-selecting={isSelecting && draggedItemId === String(item.id)}
@@ -233,7 +233,7 @@
 	style:transform={styleTransform}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
-	id="sortable-item-{item.id}"
+	id="ssl-item-{item.id}"
 	data-id={item.id}
 	data-index={index}
 	role="option"
@@ -248,21 +248,21 @@
 	in:scaleFade
 	out:scaleFade={{ duration: isRemoving ? 0 : 400 }}
 >
-	<div class="sortable-item__inner">
+	<div class="ssl-item__inner">
 		{#if slots.handle}
 			<div
-				class="sortable-item__handle"
+				class="ssl-item__handle"
 				style:cursor={isDragging ? 'grabbing' : 'grab'}
 				aria-hidden="true"
 			>
 				<slot name="handle" />
 			</div>
 		{/if}
-		<div class="sortable-item__content">
+		<div class="ssl-item__content">
 			<slot {item} {index} />
 		</div>
 		{#if slots.remove}
-			<button class="sortable-item__remove" on:click={() => dispatch('remove')}>
+			<button class="ssl-item__remove" on:click={() => dispatch('remove')}>
 				<slot name="remove" />
 			</button>
 		{/if}
@@ -270,7 +270,7 @@
 </li>
 
 <style lang="scss">
-	.sortable-item {
+	.ssl-item {
 		position: relative;
 		list-style: none;
 		user-select: none;

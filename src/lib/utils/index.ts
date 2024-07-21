@@ -21,7 +21,7 @@ export function getItemData(item: HTMLElement): ItemData {
 }
 
 export function getItemsData(list: HTMLUListElement): ItemData[] {
-	return Array.from(list.querySelectorAll<HTMLLIElement>('.sortable-item')).map((item) =>
+	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemData(item)
 	);
 }
@@ -46,7 +46,7 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 	while (target !== rootElement) {
 		if (
 			DISABLED_ELEMENTS.includes(target.tagName.toLowerCase()) &&
-			!target.classList.contains('sortable-item__handle')
+			!target.classList.contains('ssl-item__handle')
 		)
 			return true;
 		const role = target.getAttribute('role');
