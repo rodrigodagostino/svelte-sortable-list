@@ -1,4 +1,4 @@
-import type { ItemData } from '$lib/types.js';
+import type { ItemData } from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string | undefined {
 	return String(element.dataset.id);

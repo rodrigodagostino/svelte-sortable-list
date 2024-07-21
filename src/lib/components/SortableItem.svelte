@@ -15,7 +15,7 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
-	import type { SortableItemProps } from '$lib/types.js';
+	import type { SortableItemProps } from '$lib/types/index.js';
 	import { getId, getIndex, screenReaderText } from '$lib/utils/index.js';
 
 	let itemRef: HTMLLIElement;

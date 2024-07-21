@@ -11,7 +11,7 @@
 		getPointerOrigin,
 		getTargetItem,
 	} from '$lib/stores/index.js';
-	import type { GhostProps } from '$lib/types.js';
+	import type { GhostProps } from '$lib/types/index.js';
 	import { getId, getIndex } from '$lib/utils/index.js';
 
 	export let ghostRef: HTMLDivElement;

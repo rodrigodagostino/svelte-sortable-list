@@ -4,7 +4,7 @@ import type {
 	SortableListCoordinates,
 	SortableListElements,
 	SortableListProps,
-} from '$lib/types.js';
+} from '$lib/types/index.js';
 
 export function setWritableContext<T>(key: string, context: T): Writable<T> {
 	const uniqueKey = Symbol.for(key);

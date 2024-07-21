@@ -1,4 +1,4 @@
-import type { SortableListProps } from '$lib/types.js';
+import type { SortableListProps } from '$lib/types/index.js';
 
 export const defaultProps: Omit<SortableListProps, 'items'> = {
 	gap: 12,

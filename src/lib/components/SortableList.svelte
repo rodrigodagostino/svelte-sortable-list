@@ -2,7 +2,7 @@
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import SortableItem from '$lib/components/SortableItem.svelte';
-	import type { GhostProps, SortableListProps } from '$lib/types.js';
+	import type { GhostProps, SortableListProps } from '$lib/types/index.js';
 	import {
 		areColliding,
 		getCollidingItem,
