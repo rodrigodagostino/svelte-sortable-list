@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.6] (2024-07-21)
+
+### Fixed
+
+- Display the expected cursor when dragging from a handle starts.
+
 ## [0.9.5] (2024-07-16)
 
 ### Fixed
@@ -409,7 +415,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.6...HEAD
+[0.9.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.4...v0.9.5
 [0.9.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.2...v0.9.3
