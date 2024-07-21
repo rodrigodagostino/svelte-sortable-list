@@ -250,7 +250,11 @@
 >
 	<div class="sortable-item__inner">
 		{#if slots.handle}
-			<div class="sortable-item__handle" style:cursor="grab" aria-hidden="true">
+			<div
+				class="sortable-item__handle"
+				style:cursor={isDragging ? 'grabbing' : 'grab'}
+				aria-hidden="true"
+			>
 				<slot name="handle" />
 			</div>
 		{/if}
