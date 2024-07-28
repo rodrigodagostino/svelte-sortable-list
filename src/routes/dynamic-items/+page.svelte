@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SortableList, SortableItem, Remove, IconRemove, sortItems } from '$lib/index.js';
+	import {
+		SortableList,
+		SortableItem,
+		Remove,
+		IconRemove,
+		removeItem,
+		sortItems,
+	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
@@ -19,7 +26,7 @@
 
 	function handleRemove(event: CustomEvent) {
 		const { itemId } = event.detail;
-		items = items.filter((item) => String(item.id) !== String(itemId));
+		items = removeItem(items, itemId);
 	}
 </script>
 
