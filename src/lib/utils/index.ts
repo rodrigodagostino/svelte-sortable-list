@@ -104,6 +104,10 @@ export function sortItems(items: SortableItemData[], from: number, to: number) {
 	return sortedItems;
 }
 
+export function removeItem(items: SortableItemData[], itemId: string | number) {
+	return items.filter((item) => String(item.id) !== String(itemId));
+}
+
 export const screenReaderText = {
 	item: (index: number, isDisabled: boolean) => {
 		return `Draggable item at position ${index + 1}. ${!isDisabled ? 'Press Space Bar to lift it.' : ''}`;
