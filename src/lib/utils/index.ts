@@ -1,4 +1,4 @@
-import type { ItemData } from '$lib/types/index.js';
+import type { ElementData, SortableItemData } from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string | undefined {
 	return String(element.dataset.id);
@@ -8,7 +8,7 @@ export function getIndex(element: HTMLElement): number | undefined {
 	return Number(element.dataset.index);
 }
 
-export function getItemData(item: HTMLElement): ItemData {
+export function getItemData(item: HTMLElement): ElementData {
 	const itemRect = item.getBoundingClientRect();
 	return {
 		id: item.dataset.id!,
@@ -20,7 +20,7 @@ export function getItemData(item: HTMLElement): ItemData {
 	};
 }
 
-export function getItemsData(list: HTMLUListElement): ItemData[] {
+export function getItemsData(list: HTMLUListElement): ElementData[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemData(item)
 	);
@@ -59,7 +59,11 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 	return false;
 }
 
-export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData, threshold: number = 1) {
+export function areColliding(
+	a: DOMRect | ElementData,
+	b: DOMRect | ElementData,
+	threshold: number = 1
+) {
 	return (
 		a.x + a.width * threshold > b.x &&
 		a.x < b.x + b.width * threshold &&
@@ -68,7 +72,7 @@ export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData, thres
 	);
 }
 
-function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
+function getIntersectionRect(r1: DOMRect | ElementData, r2: DOMRect | ElementData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
 	const x2 = Math.min(r1.x + r1.width, r2.x + r2.width);
@@ -77,7 +81,7 @@ function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(ghost: HTMLElement, items: ItemData[], threshold: number) {
+export function getCollidingItem(ghost: HTMLElement, items: ElementData[], threshold: number) {
 	const ghostRect = ghost.getBoundingClientRect();
 	const collidingItems = items.filter((targetItem) =>
 		areColliding(ghostRect, targetItem, threshold)
@@ -94,8 +98,8 @@ export function getCollidingItem(ghost: HTMLElement, items: ItemData[], threshol
 	return collidingItems[0];
 }
 
-export function sortItems<T>(array: T[], from: number, to: number) {
-	const sortedItems = structuredClone(array);
+export function sortItems(items: SortableItemData[], from: number, to: number) {
+	const sortedItems = structuredClone(items);
 	sortedItems.splice(to < 0 ? sortedItems.length + to : to, 0, sortedItems.splice(from, 1)[0]);
 	return sortedItems;
 }

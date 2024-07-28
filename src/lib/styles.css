@@ -87,8 +87,8 @@
 	box-shadow: var(--box-shadow-1);
 }
 
-.ssl-item__handle,
-.ssl-item__remove {
+.ssl-handle,
+.ssl-remove {
 	flex-shrink: 0;
 	display: flex;
 	padding: 0.75rem 0.5rem;
@@ -97,24 +97,24 @@
 	transition: background-color calc(var(--transition-duration) / 3 * 2);
 }
 
-.ssl-item__handle:hover,
-.ssl-item__remove:focus,
-.ssl-item__remove:hover {
+.ssl-handle:hover,
+.ssl-remove:focus,
+.ssl-remove:hover {
 	background-color: var(--gray-100);
 }
 
-.ssl-item__handle,
-.ssl-item__remove {
+.ssl-handle,
+.ssl-remove {
 	color: var(--gray-400);
 }
 
-.ssl-item__handle:hover,
-.ssl-item__remove:focus,
-.ssl-item__remove:hover {
+.ssl-handle:hover,
+.ssl-remove:focus,
+.ssl-remove:hover {
 	color: var(--gray-600);
 }
 
-.ssl-item__handle {
+.ssl-handle {
 	margin-inline-start: -1rem;
 }
 
@@ -122,7 +122,7 @@
 	margin-block: 0.625rem;
 }
 
-.ssl-item__remove {
+.ssl-remove {
 	margin-inline-end: -1rem;
 }
 

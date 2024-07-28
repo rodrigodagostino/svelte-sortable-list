@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
-	import SortableItem from '$lib/components/SortableItem.svelte';
-	import type { GhostProps, SortableListProps } from '$lib/types/index.js';
+	import type { GhostProps, SortableListProps, SortableItemProps } from '$lib/types/index.js';
 	import {
 		areColliding,
 		getCollidingItem,
@@ -32,7 +31,6 @@
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
 
-	export let items: SortableListProps['items'];
 	export let gap: SortableListProps['gap'] = 12;
 	export let direction: SortableListProps['direction'] = 'vertical';
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
@@ -43,7 +41,6 @@
 	export let hasRemoveOnDragOut: SortableListProps['hasRemoveOnDragOut'] = false;
 
 	const props = setListProps({
-		items,
 		gap,
 		direction,
 		swapThreshold,
@@ -54,7 +51,6 @@
 		hasRemoveOnDragOut,
 	});
 	$: $props = {
-		items,
 		gap,
 		direction,
 		swapThreshold,
@@ -82,24 +78,7 @@
 	const isRemoving = setIsRemoving(false);
 	const isBetweenBounds = setIsBetweenBounds(true);
 
-	let slots = $$slots;
-
 	const dispatch = createEventDispatcher();
-
-	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
-		const draggerItemIndex = $draggedItem && getIndex($draggedItem);
-		const targetItemIndex = $targetItem && getIndex($targetItem);
-
-		if (
-			draggedItem !== null &&
-			targetItem !== null &&
-			typeof draggerItemIndex === 'number' &&
-			typeof targetItemIndex === 'number' &&
-			draggerItemIndex !== targetItemIndex
-		) {
-			dispatch('sort', { prevIndex: draggerItemIndex, nextIndex: targetItemIndex });
-		}
-	}
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
@@ -113,10 +92,12 @@
 			return;
 
 		const target = event.target as HTMLElement;
-		if (slots.handle && (!target || !target.closest('.ssl-item__handle'))) return;
-
 		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
+		// If the item has an interactive element and we’re clicking on it, prevent dragging.
 		if (!currItem || hasInteractiveElements(target, currItem)) return;
+		// If the item has a handle, but we’re not dragging from it, prevent dragging.
+		const hasHandle = !!currItem?.querySelector('[data-role="handle"]');
+		if (hasHandle && !target.closest('[data-role="handle"]')) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
@@ -159,7 +140,7 @@
 		if (!$isPointerDragging || $isPointerDropping) return;
 
 		const draggedItemId = $draggedItem && getId($draggedItem);
-		if (!$isBetweenBounds && hasRemoveOnDragOut && draggedItemId) handleRemove(draggedItemId);
+		if (!$isBetweenBounds && hasRemoveOnDragOut && draggedItemId) dispatchRemove(draggedItemId);
 
 		$isPointerDragging = false;
 		ghostStatus = !$isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
@@ -250,6 +231,7 @@
 
 				// Prevent focusing the previous item if the current one is the first,
 				// and focusing the next item if the current one is the last.
+				const items = listRef.children;
 				if (
 					(key === 'ArrowUp' && focusedItemIndex === 0) ||
 					(key === 'ArrowDown' && focusedItemIndex === items.length - 1)
@@ -314,8 +296,24 @@
 		}
 	}
 
-	async function handleRemove(itemId: unknown) {
+	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
+		const draggerItemIndex = $draggedItem && getIndex($draggedItem);
+		const targetItemIndex = $targetItem && getIndex($targetItem);
+
+		if (
+			draggedItem !== null &&
+			targetItem !== null &&
+			typeof draggerItemIndex === 'number' &&
+			typeof targetItemIndex === 'number' &&
+			draggerItemIndex !== targetItemIndex
+		) {
+			dispatch('sort', { prevIndex: draggerItemIndex, nextIndex: targetItemIndex });
+		}
+	}
+
+	async function dispatchRemove(itemId: SortableItemProps['id']) {
 		if ($focusedItem) {
+			const items = listRef.children;
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
@@ -345,46 +343,39 @@
 	}
 </script>
 
-{#if items}
-	<ul
-		bind:this={listRef}
-		class="ssl-list has-direction-{direction}"
-		class:is-pointer-dragging={$isPointerDragging}
-		class:is-pointer-dropping={$isPointerDropping}
-		class:is-keyboard-dragging={$isKeyboardDragging}
-		class:is-keyboard-dropping={$isKeyboardDropping}
-		class:is-between-bounds={$isBetweenBounds}
-		class:is-out-of-bounds={!$isBetweenBounds}
-		class:is-removing={$isRemoving}
-		class:has-remove-on-drag-out={hasRemoveOnDragOut}
-		style:--gap="{gap}px"
-		style:--transition-duration="{transitionDuration}ms"
-		style:pointer-events={$focusedItem ? 'none' : 'auto'}
-		role="listbox"
-		aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
-		aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
-		tabindex="0"
-		on:pointerdown={handlePointerDown}
-		on:keydown={handleKeyDown}
-	>
-		{#each items as item, index (item.id)}
-			<SortableItem {item} {index} {slots} on:remove={() => handleRemove(String(item.id))}>
-				<slot name="handle" slot="handle" />
-				<slot {item} {index} />
-				<slot name="remove" slot="remove" />
-			</SortableItem>
-		{/each}
-	</ul>
-	<Ghost bind:ghostRef status={ghostStatus} />
-	<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
-		{liveText}
-	</div>
-{:else}
-	<p>
-		To display your list, provide an array of <code>items</code> to
-		<code>{'<SortableList />'}</code>.
-	</p>
-{/if}
+<ul
+	bind:this={listRef}
+	class="ssl-list has-direction-{direction}"
+	class:is-pointer-dragging={$isPointerDragging}
+	class:is-pointer-dropping={$isPointerDropping}
+	class:is-keyboard-dragging={$isKeyboardDragging}
+	class:is-keyboard-dropping={$isKeyboardDropping}
+	class:is-between-bounds={$isBetweenBounds}
+	class:is-out-of-bounds={!$isBetweenBounds}
+	class:is-removing={$isRemoving}
+	class:has-remove-on-drag-out={hasRemoveOnDragOut}
+	style:--gap="{gap}px"
+	style:--transition-duration="{transitionDuration}ms"
+	style:pointer-events={$focusedItem ? 'none' : 'auto'}
+	role="listbox"
+	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
+	aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
+	tabindex="0"
+	on:pointerdown={handlePointerDown}
+	on:keydown={handleKeyDown}
+	on:removestart={(event) => dispatchRemove(event.detail.itemId)}
+>
+	<slot>
+		<p>
+			To display your list, provide an array of <code>items</code> to
+			<code>{'<SortableList />'}</code>.
+		</p>
+	</slot>
+</ul>
+<Ghost bind:ghostRef status={ghostStatus} />
+<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
+	{liveText}
+</div>
 
 <style lang="scss">
 	.ssl-list,

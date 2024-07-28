@@ -1,5 +1,4 @@
 export interface SortableListProps {
-	items: Item[];
 	gap: number;
 	direction: 'vertical' | 'horizontal';
 	swapThreshold: number;
@@ -13,7 +12,7 @@ export interface SortableListProps {
 export interface SortableListCoordinates {
 	pointer: { x: number; y: number };
 	pointerOrigin: { x: number; y: number };
-	itemsOrigin: ItemData[] | null;
+	itemsOrigin: ElementData[] | null;
 }
 
 export interface SortableListElements {
@@ -22,23 +21,21 @@ export interface SortableListElements {
 	focusedItem: HTMLLIElement | null;
 }
 
-export interface SortableItemProps
-	extends Omit<SortableListProps, 'items' | 'hasLockedAxis' | 'hasBoundaries'> {
-	item: Item;
+export interface SortableItemProps {
+	id: string | number;
 	index: number;
+	isDisabled?: boolean;
+}
+
+export interface SortableItemData extends Omit<SortableItemProps, 'index'> {
+	[key: string]: unknown;
 }
 
 export interface GhostProps {
 	status: 'init' | 'set' | 'remove' | 'unset';
 }
 
-interface Item {
-	id: string | number;
-	[key: string]: unknown;
-	isDisabled?: boolean;
-}
-
-export interface ItemData {
+export interface ElementData {
 	id: string;
 	index: number;
 	x: number;

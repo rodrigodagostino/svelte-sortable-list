@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import {
 		getDraggedItem,
 		getFocusedItem,
@@ -20,8 +20,9 @@
 
 	let itemRef: HTMLLIElement;
 
-	export let item: SortableItemProps['item'];
+	export let id: SortableItemProps['id'];
 	export let index: SortableItemProps['index'];
+	export let isDisabled: SortableItemProps['isDisabled'] = false;
 
 	const listProps = getListProps();
 
@@ -38,16 +39,16 @@
 	const isRemoving = getIsRemoving();
 	const isBetweenBounds = getIsBetweenBounds();
 
-	export let slots: {
-		handle?: boolean;
-		remove?: boolean;
-	};
+	let hasHandle = false;
 
-	const dispatch = createEventDispatcher();
+	onMount(() => {
+		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
+		setInteractiveElementsTabIndex();
+	});
 
 	$: draggedItemId = ($draggedItem && getId($draggedItem)) ?? null;
 	$: draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
-	// itemsOrigin is used as a reliable reference to the item’s position in the list
+	// $itemsOrigin is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while the item is translating.
 	$: draggedItemRect =
 		typeof draggedItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[draggedItemIndex] : null;
@@ -56,14 +57,12 @@
 		typeof targetItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[targetItemIndex] : null;
 	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
 
-	$: {
-		if ($isKeyboardDragging) setInteractiveElementsTabIndex();
-	}
+	$: if ($isKeyboardDragging) setInteractiveElementsTabIndex();
 
 	$: styleCursor =
-		$isPointerDragging && draggedItemId === String(item.id)
+		$isPointerDragging && draggedItemId === String(id)
 			? 'grabbing'
-			: !slots.handle
+			: !hasHandle
 				? 'grab'
 				: 'initial';
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
@@ -85,7 +84,7 @@
 			: `z-index ${$listProps.transitionDuration}ms`;
 	$: styleVisibility =
 		($isPointerDragging || $isPointerDropping) &&
-		draggedItemId === String(item.id) &&
+		draggedItemId === String(id) &&
 		!$listProps.hasDropMarker
 			? 'hidden'
 			: 'visible';
@@ -94,9 +93,9 @@
 	function getStyleWidth(...args: unknown[]) {
 		if (!$listProps.hasRemoveOnDragOut) return undefined;
 
-		if (draggedItemId === String(item.id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return '0';
-		else if (draggedItemId === String(item.id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		else if (draggedItemId === String(id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return `${draggedItemRect?.width}px`;
 	}
 
@@ -104,15 +103,15 @@
 	function getStyleHeight(...args: unknown[]) {
 		if (!$listProps.hasRemoveOnDragOut) return undefined;
 
-		if (draggedItemId === String(item.id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return '0';
-		else if (draggedItemId === String(item.id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		else if (draggedItemId === String(id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return `${draggedItemRect?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (draggedItemId === String(item.id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return '0';
 		else
 			return $listProps.direction === 'vertical'
@@ -138,7 +137,7 @@
 		)
 			return 'translate3d(0, 0, 0)';
 
-		if (draggedItemId !== String(item.id)) {
+		if (draggedItemId !== String(id)) {
 			if (
 				(index > draggedItemIndex && index <= targetItemIndex) ||
 				(index < draggedItemIndex && index >= targetItemIndex)
@@ -181,13 +180,9 @@
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach(
-				(el) => (el.tabIndex = !$isKeyboardDragging && focusedItemId === String(item.id) ? 0 : -1)
+				(el) => (el.tabIndex = !$isKeyboardDragging && focusedItemId === String(id) ? 0 : -1)
 			);
 	}
-
-	onMount(() => {
-		setInteractiveElementsTabIndex();
-	});
 
 	async function handleFocus() {
 		await tick();
@@ -213,7 +208,7 @@
 	async function handleDocumentPointerDown(event: PointerEvent) {
 		const target = event.target as HTMLElement;
 		const focusedItemId = $focusedItem && getId($focusedItem);
-		if (focusedItemId === String(item.id) && !target.closest('.ssl-item')) {
+		if (focusedItemId === String(id) && !target.closest('.ssl-item')) {
 			cleanUp();
 			await tick();
 			setInteractiveElementsTabIndex();
@@ -250,11 +245,11 @@
 <li
 	bind:this={itemRef}
 	class="ssl-item"
-	class:is-pointer-dragging={$isPointerDragging && draggedItemId === String(item.id)}
-	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(item.id)}
-	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(item.id)}
-	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(item.id)}
-	class:is-removing={$isRemoving && draggedItemId === String(item.id)}
+	class:is-pointer-dragging={$isPointerDragging && draggedItemId === String(id)}
+	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
+	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
+	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	class:is-removing={$isRemoving && draggedItemId === String(id)}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:width={styleWidth}
@@ -264,14 +259,14 @@
 	style:transform={styleTransform}
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
-	id="ssl-item-{item.id}"
-	data-id={item.id}
+	id="ssl-item-{id}"
+	data-id={id}
 	data-index={index}
 	role="option"
-	tabindex={focusedItemId === String(item.id) ? 0 : -1}
-	aria-roledescription={screenReaderText.item(index, item.isDisabled || false)}
-	aria-selected={focusedItemId === String(item.id)}
-	aria-disabled={item.isDisabled}
+	tabindex={focusedItemId === String(id) ? 0 : -1}
+	aria-roledescription={screenReaderText.item(index, isDisabled || false)}
+	aria-selected={focusedItemId === String(id)}
+	aria-disabled={isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:blur={setInteractiveElementsTabIndex}
@@ -280,23 +275,7 @@
 	out:scaleFade={{ duration: $isRemoving ? 0 : 400 }}
 >
 	<div class="ssl-item__inner">
-		{#if slots.handle}
-			<div
-				class="ssl-item__handle"
-				style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
-				aria-hidden="true"
-			>
-				<slot name="handle" />
-			</div>
-		{/if}
-		<div class="ssl-item__content">
-			<slot {item} {index} />
-		</div>
-		{#if slots.remove}
-			<button class="ssl-item__remove" on:click={() => dispatch('remove')}>
-				<slot name="remove" />
-			</button>
-		{/if}
+		<slot />
 	</div>
 </li>
 
