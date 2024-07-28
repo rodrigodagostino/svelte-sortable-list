@@ -1,6 +1,6 @@
-import type { SortableListProps } from '$lib/types/index.js';
+import type { SortableItemData, SortableListProps } from '$lib/types/index.js';
 
-export const defaultProps: Omit<SortableListProps, 'items'> = {
+export const defaultProps: SortableListProps = {
 	gap: 12,
 	direction: 'vertical',
 	swapThreshold: 1,
@@ -13,7 +13,7 @@ export const defaultProps: Omit<SortableListProps, 'items'> = {
 
 Object.freeze(defaultProps);
 
-export const defaultItems: SortableListProps['items'] = [
+export const defaultItems: SortableItemData[] = [
 	{
 		id: 1,
 		text: 'List item 1',
@@ -38,7 +38,7 @@ export const defaultItems: SortableListProps['items'] = [
 
 Object.freeze(defaultItems);
 
-export const varyingItems: SortableListProps['items'] = [
+export const varyingItems: SortableItemData[] = [
 	{
 		id: 1,
 		text: 'List item 1',
@@ -63,7 +63,7 @@ export const varyingItems: SortableListProps['items'] = [
 
 Object.freeze(varyingItems);
 
-export const disabledItems: SortableListProps['items'] = [
+export const disabledItems: SortableItemData[] = [
 	{
 		id: 1,
 		text: 'List item 1',

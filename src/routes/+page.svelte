@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SortableList, sortItems, type SortableListProps } from '$lib/index.js';
+	import { SortableItem, SortableList, sortItems } from '$lib/index.js';
 	import { defaultItems, defaultProps } from './fixtures.js';
 	import { props } from './stores.js';
 	import '$lib/styles.css';
 
-	let items: SortableListProps['items'] = [...defaultItems];
+	let items = [...defaultItems];
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -21,6 +21,12 @@
 	<title>Basic | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {items} {...$props} let:item on:sort={handleSort}>
-	{item.text}
+<SortableList {...$props} on:sort={handleSort}>
+	{#each items as item, index (item.id)}
+		<SortableItem id={item.id} {index}>
+			<div class="ssl-item__content">
+				{item.text}
+			</div>
+		</SortableItem>
+	{/each}
 </SortableList>
