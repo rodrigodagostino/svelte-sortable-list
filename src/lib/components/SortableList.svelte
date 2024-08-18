@@ -238,9 +238,8 @@
 				)
 					return;
 
-				step === 1
-					? ($focusedItem.nextElementSibling as HTMLLIElement)?.focus()
-					: ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+				if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
+				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
 				if (!$draggedItem || !$itemsOrigin) return;
 				// Prevent moving the selected item if it’s the first or last item,
@@ -317,9 +316,8 @@
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
-				step === 1
-					? ($focusedItem.nextElementSibling as HTMLLIElement)?.focus()
-					: ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+				if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
+				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 			} else {
 				// Focus the list (if there are no items left) before removing.
 				$focusedItem = null;
@@ -368,7 +366,7 @@
 	<slot>
 		<p>
 			To display your list, provide an array of <code>items</code> to
-			<code>{'<SortableList />'}</code>.
+			<code>{'<SortableList>'}</code>.
 		</p>
 	</slot>
 </ul>

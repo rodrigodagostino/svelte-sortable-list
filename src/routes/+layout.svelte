@@ -8,7 +8,7 @@
 
 <svelte:window
 	on:keydown={(event) => {
-		event.key === 'a' && (isControlsExpanded = !isControlsExpanded);
+		if (event.key === 'a') isControlsExpanded = !isControlsExpanded;
 	}}
 />
 
