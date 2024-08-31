@@ -46,7 +46,7 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 	while (target !== rootElement) {
 		if (
 			DISABLED_ELEMENTS.includes(target.tagName.toLowerCase()) &&
-			!target.classList.contains('ssl-item__handle')
+			!target.classList.contains('ssl-handle')
 		)
 			return true;
 		const role = target.getAttribute('role');
