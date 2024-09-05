@@ -311,33 +311,37 @@
 	}
 
 	async function dispatchRemove(itemId: SortableItemProps['id']) {
-		if ($focusedItem) {
-			const items = listRef.children;
-			if (items.length > 1) {
-				// Focus the next/previous item (if it exists) before removing.
-				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
-				if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
-				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
-			} else {
-				// Focus the list (if there are no items left) before removing.
-				$focusedItem = null;
-				listRef.focus();
-			}
-		} else if ($isPointerDragging) {
+		if ($isPointerDragging) {
 			$isRemoving = true;
 
 			function handleGhostDrop({ propertyName }: TransitionEvent) {
 				if (propertyName === 'top' || propertyName === 'z-index') {
-					$isRemoving = false;
-
-					ghostRef.removeEventListener('transitionend', handleGhostDrop);
+					dispatch('remove', { itemId });
+					// setTimeout will allow the `remove` event to be handled before setting the $isRemoving state.
+					setTimeout(() => {
+						$isRemoving = false;
+						ghostRef.removeEventListener('transitionend', handleGhostDrop);
+					}, 0);
 				}
 			}
 
 			ghostRef.addEventListener('transitionend', handleGhostDrop);
+		} else {
+			if ($focusedItem) {
+				const items = listRef.children;
+				if (items.length > 1) {
+					// Focus the next/previous item (if it exists) before removing.
+					const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
+					if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
+					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+				} else {
+					// Focus the list (if there are no items left) before removing.
+					$focusedItem = null;
+					listRef.focus();
+				}
+			}
+			dispatch('remove', { itemId });
 		}
-
-		dispatch('remove', { itemId });
 	}
 </script>
 

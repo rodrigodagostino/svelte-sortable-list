@@ -65,9 +65,14 @@
 			: !hasHandle
 				? 'grab'
 				: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
-	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isBetweenBounds);
+	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds, $isRemoving);
+	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds, $isRemoving);
+	$: styleMargin = getStyleMargin(
+		$listProps.direction,
+		$draggedItem,
+		$isBetweenBounds,
+		$isRemoving
+	);
 	$: styleOverflow = $isPointerDragging && $listProps.hasRemoveOnDragOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
@@ -93,7 +98,10 @@
 	function getStyleWidth(...args: unknown[]) {
 		if (!$listProps.hasRemoveOnDragOut) return undefined;
 
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (
+			draggedItemId === String(id) &&
+			((!$isBetweenBounds && $listProps.hasRemoveOnDragOut) || $isRemoving)
+		)
 			return '0';
 		else if (draggedItemId === String(id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
 			return `${draggedItemRect?.width}px`;
@@ -103,15 +111,21 @@
 	function getStyleHeight(...args: unknown[]) {
 		if (!$listProps.hasRemoveOnDragOut) return undefined;
 
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (
+			draggedItemId === String(id) &&
+			(($listProps.hasRemoveOnDragOut && !$isBetweenBounds) || $isRemoving)
+		)
 			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		else if (draggedItemId === String(id) && $listProps.hasRemoveOnDragOut && $isBetweenBounds)
 			return `${draggedItemRect?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		if (
+			draggedItemId === String(id) &&
+			(($listProps.hasRemoveOnDragOut && !$isBetweenBounds) || $isRemoving)
+		)
 			return '0';
 		else
 			return $listProps.direction === 'vertical'
