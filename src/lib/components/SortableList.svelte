@@ -14,8 +14,8 @@
 	import {
 		setDraggedItem,
 		setFocusedItem,
-		setIsBetweenBounds,
-		setIsCanceling,
+		setIsGhostBetweenBounds,
+		setIsCancelingKeyboardDragging,
 		setIsKeyboardDragging,
 		setIsKeyboardDropping,
 		setIsPointerDragging,
@@ -38,7 +38,7 @@
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
-	export let hasRemoveOnDragOut: SortableListProps['hasRemoveOnDragOut'] = false;
+	export let hasRemoveOnDropOut: SortableListProps['hasRemoveOnDropOut'] = false;
 
 	const props = setListProps({
 		gap,
@@ -48,7 +48,7 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
-		hasRemoveOnDragOut,
+		hasRemoveOnDropOut,
 	});
 	$: $props = {
 		gap,
@@ -58,7 +58,7 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
-		hasRemoveOnDragOut,
+		hasRemoveOnDropOut,
 	};
 
 	let ghostStatus: GhostProps['status'] = 'unset';
@@ -74,9 +74,9 @@
 	const isPointerDropping = setIsPointerDropping(false);
 	const isKeyboardDragging = setIsKeyboardDragging(false);
 	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isCanceling = setIsCanceling(false);
+	const isCancelingKeyboardDragging = setIsCancelingKeyboardDragging(false);
+	const isGhostBetweenBounds = setIsGhostBetweenBounds(true);
 	const isRemoving = setIsRemoving(false);
-	const isBetweenBounds = setIsBetweenBounds(true);
 
 	const dispatch = createEventDispatcher();
 
@@ -86,7 +86,7 @@
 			$isPointerDropping ||
 			$isKeyboardDragging ||
 			$isKeyboardDropping ||
-			$isCanceling ||
+			$isCancelingKeyboardDragging ||
 			$focusedItem
 		)
 			return;
@@ -126,7 +126,7 @@
 		const ghostRect = ghostRef.getBoundingClientRect();
 
 		$pointer = { x: clientX, y: clientY };
-		$isBetweenBounds = areColliding(ghostRect, listRect);
+		$isGhostBetweenBounds = areColliding(ghostRect, listRect);
 
 		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, swapThreshold);
 		if (collidingItemData)
@@ -140,12 +140,13 @@
 		if (!$isPointerDragging || $isPointerDropping) return;
 
 		const draggedItemId = $draggedItem && getId($draggedItem);
-		if (!$isBetweenBounds && hasRemoveOnDragOut && draggedItemId) dispatchRemove(draggedItemId);
+		if (!$isGhostBetweenBounds && hasRemoveOnDropOut && draggedItemId)
+			dispatchRemove(draggedItemId);
 
 		$isPointerDragging = false;
-		ghostStatus = !$isBetweenBounds && hasRemoveOnDragOut ? 'remove' : 'set';
+		ghostStatus = !$isGhostBetweenBounds && hasRemoveOnDropOut ? 'remove' : 'set';
 		$isPointerDropping = true;
-		$isBetweenBounds = true;
+		$isGhostBetweenBounds = true;
 
 		function handleGhostDrop({ propertyName }: TransitionEvent) {
 			if (propertyName === 'top' || propertyName === 'z-index') {
@@ -276,7 +277,7 @@
 
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			$isCanceling = true;
+			$isCancelingKeyboardDragging = true;
 			if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
 
 			function handleItemDrop({ propertyName }: TransitionEvent) {
@@ -285,7 +286,7 @@
 					$targetItem = null;
 					$itemsOrigin = null;
 					$isKeyboardDropping = false;
-					$isCanceling = false;
+					$isCancelingKeyboardDragging = false;
 
 					$focusedItem?.removeEventListener('transitionend', handleItemDrop);
 				}
@@ -348,14 +349,7 @@
 <ul
 	bind:this={listRef}
 	class="ssl-list has-direction-{direction}"
-	class:is-pointer-dragging={$isPointerDragging}
-	class:is-pointer-dropping={$isPointerDropping}
-	class:is-keyboard-dragging={$isKeyboardDragging}
-	class:is-keyboard-dropping={$isKeyboardDropping}
-	class:is-between-bounds={$isBetweenBounds}
-	class:is-out-of-bounds={!$isBetweenBounds}
-	class:is-removing={$isRemoving}
-	class:has-remove-on-drag-out={hasRemoveOnDragOut}
+	class:has-remove-on-drop-out={hasRemoveOnDropOut}
 	style:--gap="{gap}px"
 	style:--transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}

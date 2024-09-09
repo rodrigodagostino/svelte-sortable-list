@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {
 		getDraggedItem,
-		getIsBetweenBounds,
+		getIsGhostBetweenBounds,
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getIsRemoving,
@@ -28,8 +28,8 @@
 
 	const isPointerDragging = getIsPointerDragging();
 	const isPointerDropping = getIsPointerDropping();
+	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
-	const isBetweenBounds = getIsBetweenBounds();
 
 	$: {
 		setPositionStyles(status);
@@ -161,10 +161,10 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	class:is-pointer-dragging={$isPointerDragging}
-	class:is-pointer-dropping={$isPointerDropping}
-	class:is-between-bounds={$isBetweenBounds}
-	class:is-out-of-bounds={!$isBetweenBounds}
+	class:is-dragging={$isPointerDragging}
+	class:is-dropping={$isPointerDropping}
+	class:is-between-bounds={$isGhostBetweenBounds}
+	class:is-out-of-bounds={!$isGhostBetweenBounds}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : !$isRemoving ? 'grab' : 'initial'}
 	style:transform={styleTransform}

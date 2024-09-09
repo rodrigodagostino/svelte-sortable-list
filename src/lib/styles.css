@@ -70,6 +70,10 @@
 		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
+.ssl-item__content {
+	margin-block: 0.625rem;
+}
+
 .ssl-ghost__inner {
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
@@ -83,7 +87,7 @@
 }
 
 .ssl-item.is-keyboard-dragging .ssl-item__inner,
-.ssl-ghost.is-pointer-dragging .ssl-ghost__inner {
+.ssl-ghost.is-dragging .ssl-ghost__inner {
 	box-shadow: var(--box-shadow-1);
 }
 
@@ -118,10 +122,6 @@
 	margin-inline-start: -1rem;
 }
 
-.ssl-item__content {
-	margin-block: 0.625rem;
-}
-
 .ssl-remove {
 	margin-inline-end: -1rem;
 }
@@ -146,13 +146,13 @@
 }
 
 /**
- * hasRemoveOnDragOut
+ * hasRemoveOnDropOut
  */
-.ssl-list.is-removing + .ssl-ghost .ssl-ghost__inner {
+.ssl-list:has(> .ssl-item.is-removing) + .ssl-ghost .ssl-ghost__inner {
 	opacity: 0;
 }
 
-.ssl-list.has-remove-on-drag-out + .ssl-ghost.is-out-of-bounds .ssl-ghost__inner {
+.ssl-list.has-remove-on-drop-out + .ssl-ghost.is-out-of-bounds .ssl-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }

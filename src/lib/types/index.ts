@@ -6,7 +6,7 @@ export interface SortableListProps {
 	hasDropMarker: boolean;
 	hasLockedAxis: boolean;
 	hasBoundaries: boolean;
-	hasRemoveOnDragOut: boolean;
+	hasRemoveOnDropOut: boolean;
 }
 
 export interface SortableListCoordinates {

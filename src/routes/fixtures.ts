@@ -8,7 +8,7 @@ export const defaultProps: SortableListProps = {
 	hasDropMarker: false,
 	hasLockedAxis: false,
 	hasBoundaries: false,
-	hasRemoveOnDragOut: false,
+	hasRemoveOnDropOut: false,
 };
 
 Object.freeze(defaultProps);

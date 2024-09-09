@@ -105,11 +105,11 @@ export function getIsKeyboardDropping() {
 	return getWritableContext<boolean>('isKeyboardDropping');
 }
 
-export function setIsCanceling(context: boolean) {
-	return setWritableContext<boolean>('isCanceling', context);
+export function setIsCancelingKeyboardDragging(context: boolean) {
+	return setWritableContext<boolean>('isCancelingKeyboardDragging', context);
 }
-export function getIsCanceling() {
-	return getWritableContext<boolean>('isCanceling');
+export function getIsCancelingKeyboardDragging() {
+	return getWritableContext<boolean>('isCancelingKeyboardDragging');
 }
 
 export function setIsRemoving(context: boolean) {
@@ -119,9 +119,9 @@ export function getIsRemoving() {
 	return getWritableContext<boolean>('isRemoving');
 }
 
-export function setIsBetweenBounds(context: boolean) {
-	return setWritableContext<boolean>('isBetweenBounds', context);
+export function setIsGhostBetweenBounds(context: boolean) {
+	return setWritableContext<boolean>('isGhostBetweenBounds', context);
 }
-export function getIsBetweenBounds() {
-	return getWritableContext<boolean>('isBetweenBounds');
+export function getIsGhostBetweenBounds() {
+	return getWritableContext<boolean>('isGhostBetweenBounds');
 }

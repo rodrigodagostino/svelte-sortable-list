@@ -108,12 +108,12 @@
 					</tr>
 					<tr>
 						<td></td>
-						<td><label for="has-remove-on-drag-out">hasRemoveOnDragOut</label></td>
+						<td><label for="has-remove-on-drop-out">hasRemoveOnDropOut</label></td>
 						<td>
 							<input
-								id="has-remove-on-drag-out"
+								id="has-remove-on-drop-out"
 								type="checkbox"
-								bind:checked={$props.hasRemoveOnDragOut}
+								bind:checked={$props.hasRemoveOnDropOut}
 							/>
 						</td>
 						<td></td>
@@ -197,10 +197,10 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/has-remove-on-drag-out"
-				aria-current={$page.url.pathname === '/has-remove-on-drag-out' ? 'page' : undefined}
+				href="/has-remove-on-drop-out"
+				aria-current={$page.url.pathname === '/has-remove-on-drop-out' ? 'page' : undefined}
 			>
-				Has remove on drag out
+				Has remove on drop out
 			</a>
 		</div>
 	</nav>

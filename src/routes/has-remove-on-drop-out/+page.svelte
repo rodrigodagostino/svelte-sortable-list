@@ -10,7 +10,7 @@
 	onMount(() => {
 		$props = {
 			...defaultProps,
-			hasRemoveOnDragOut: true,
+			hasRemoveOnDropOut: true,
 		};
 	});
 
@@ -26,7 +26,7 @@
 </script>
 
 <svelte:head>
-	<title>Has remove on drag out | Svelte Sortable List</title>
+	<title>Has remove on drop out | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>

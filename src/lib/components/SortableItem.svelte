@@ -3,8 +3,8 @@
 	import {
 		getDraggedItem,
 		getFocusedItem,
-		getIsBetweenBounds,
-		getIsCanceling,
+		getIsGhostBetweenBounds,
+		getIsCancelingKeyboardDragging,
 		getIsKeyboardDragging,
 		getIsKeyboardDropping,
 		getIsPointerDragging,
@@ -35,9 +35,9 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isKeyboardDragging = getIsKeyboardDragging();
 	const isKeyboardDropping = getIsKeyboardDropping();
-	const isCanceling = getIsCanceling();
+	const isCancelingKeyboardDragging = getIsCancelingKeyboardDragging();
+	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
-	const isBetweenBounds = getIsBetweenBounds();
 
 	let hasHandle = false;
 
@@ -65,21 +65,21 @@
 			: !hasHandle
 				? 'grab'
 				: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds, $isRemoving);
-	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds, $isRemoving);
+	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds, $isRemoving);
+	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds, $isRemoving);
 	$: styleMargin = getStyleMargin(
 		$listProps.direction,
 		$draggedItem,
-		$isBetweenBounds,
+		$isGhostBetweenBounds,
 		$isRemoving
 	);
-	$: styleOverflow = $isPointerDragging && $listProps.hasRemoveOnDragOut ? 'hidden' : undefined;
+	$: styleOverflow = $isPointerDragging && $listProps.hasRemoveOnDropOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
-		$isCanceling,
+		$isCancelingKeyboardDragging,
 		$isRemoving,
-		$isBetweenBounds
+		$isGhostBetweenBounds
 	);
 	$: styleTransition =
 		$isPointerDragging || $isPointerDropping || $isKeyboardDragging || $isKeyboardDropping
@@ -96,27 +96,27 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
-		if (!$listProps.hasRemoveOnDragOut) return undefined;
+		if (!$listProps.hasRemoveOnDropOut) return undefined;
 
 		if (
 			draggedItemId === String(id) &&
-			((!$isBetweenBounds && $listProps.hasRemoveOnDragOut) || $isRemoving)
+			((!$isGhostBetweenBounds && $listProps.hasRemoveOnDropOut) || $isRemoving)
 		)
 			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds && $listProps.hasRemoveOnDragOut)
+		else if (draggedItemId === String(id) && $isGhostBetweenBounds && $listProps.hasRemoveOnDropOut)
 			return `${draggedItemRect?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
-		if (!$listProps.hasRemoveOnDragOut) return undefined;
+		if (!$listProps.hasRemoveOnDropOut) return undefined;
 
 		if (
 			draggedItemId === String(id) &&
-			(($listProps.hasRemoveOnDragOut && !$isBetweenBounds) || $isRemoving)
+			(($listProps.hasRemoveOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
 		)
 			return '0';
-		else if (draggedItemId === String(id) && $listProps.hasRemoveOnDragOut && $isBetweenBounds)
+		else if (draggedItemId === String(id) && $listProps.hasRemoveOnDropOut && $isGhostBetweenBounds)
 			return `${draggedItemRect?.height}px`;
 	}
 
@@ -124,7 +124,7 @@
 	function getStyleMargin(...args: unknown[]) {
 		if (
 			draggedItemId === String(id) &&
-			(($listProps.hasRemoveOnDragOut && !$isBetweenBounds) || $isRemoving)
+			(($listProps.hasRemoveOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
 		)
 			return '0';
 		else
@@ -147,7 +147,7 @@
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
-			$isCanceling
+			$isCancelingKeyboardDragging
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -235,7 +235,7 @@
 		if ($isKeyboardDragging) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			$isCanceling = true;
+			$isCancelingKeyboardDragging = true;
 
 			function handleItemDrop({ propertyName }: TransitionEvent) {
 				if (propertyName === 'transform') {
@@ -243,7 +243,7 @@
 					$targetItem = null;
 					$itemsOrigin = null;
 					$isKeyboardDropping = false;
-					$isCanceling = false;
+					$isCancelingKeyboardDragging = false;
 
 					itemRef.removeEventListener('transitionend', handleItemDrop);
 				}
@@ -286,7 +286,7 @@
 	on:blur={setInteractiveElementsTabIndex}
 	on:pointerdown={handlePointerDown}
 	in:scaleFade
-	out:scaleFade={{ duration: $isRemoving ? 0 : 400 }}
+	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
 >
 	<div class="ssl-item__inner">
 		<slot />
