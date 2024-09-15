@@ -1,6 +1,6 @@
 # Svelte Sortable List
 
-A package to create accessible reorderable lists in Svelte.
+A package to create accessible sortable lists in Svelte.
 
 ![NPM Version](https://img.shields.io/npm/v/@rodrigodagostino/svelte-sortable-list) [![Latest release](https://img.shields.io/github/release/rodrigodagostino/svelte-sortable-list.svg)](https://github.com/rodrigodagostino/svelte-sortable-list/releases/latest) [![License](https://img.shields.io/github/license/rodrigodagostino/svelte-sortable-list.svg)](LICENSE.md)
 
@@ -19,11 +19,11 @@ Live demo:
   - [Import it](#import-it)
   - [Use it](#use-it)
 - [Keyboard navigation](#keyboard-navigation)
-- [Props](#props)
-- [Slot props](#slot-props)
-- [Events](#events)
+- [Components](#components)
+  - [`<SortableList>` props](#sortablelist-props)
+  - [`<SortableList>` events](#sortablelist-events)
+  - [`<SortableItem>` props](#sortableitem-props)
 - [Utilities](#utilities)
-- [Slots](#slots)
 - [Types](#types)
 - [Styles](#styles)
   - [Selectors](#selectors)
@@ -32,17 +32,16 @@ Live demo:
 
 ## Features
 
+- Accessibility focused (keyboard navigation and screen reader support).
 - Drag and drop.
 - Handle.
 - Drop marker.
 - Varying heights.
-- Vertical and horizontal disposition.
+- Vertical and horizontal direction.
 - Lockable axis.
-- Remove item by dragging out.
+- Remove on drop outside.
 - Touch screen support.
-- Accessible (keyboard navigation and screen reader support).
 - RTL support.
-- Customizable transition animations.
 - Un-opinionated styling.
 - Typescript definitions.
 - No dependencies.
@@ -52,15 +51,15 @@ Live demo:
 ### Install it
 
 ```bash
+pnpm install @rodrigodagostino/svelte-sortable-list
+```
+
+```bash
 npm install @rodrigodagostino/svelte-sortable-list
 ```
 
 ```bash
-yarn install @rodrigodagostino/svelte-sortable-list
-```
-
-```bash
-pnpm install @rodrigodagostino/svelte-sortable-list
+yarn add @rodrigodagostino/svelte-sortable-list
 ```
 
 ### Import it
@@ -75,28 +74,29 @@ pnpm install @rodrigodagostino/svelte-sortable-list
 
 ```ts
 <script lang="ts">
-	import { SortableList, sortItems, type SortableListProps } from 'svelte-sortable-list';
-	import 'svelte-sortable-list/styles.css';
+	import { SortableItem, SortableList, sortItems } from '$lib/index.js';
+	import type { SortableItemData } from '$lib/types/index.js';
+	import '$lib/styles.css';
 
-	let items: SortableListProps['items'] = [
+	let items: SortableItemData[] = [
 		{
-			id: 1,
+			id: 'list-item-1',
 			text: 'List item 1',
 		},
 		{
-			id: 2,
+			id: 'list-item-2',
 			text: 'List item 2',
 		},
 		{
-			id: 3,
+			id: 'list-item-3',
 			text: 'List item 3',
 		},
 		{
-			id: 4,
+			id: 'list-item-4',
 			text: 'List item 4',
 		},
 		{
-			id: 5,
+			id: 'list-item-5',
 			text: 'List item 5',
 		},
 	];
@@ -107,8 +107,14 @@ pnpm install @rodrigodagostino/svelte-sortable-list
 	}
 </script>
 
-<SortableList {items} {...$props} let:item on:sort={handleSort}>
-	{item.text}
+<SortableList on:sort={handleSort}>
+	{#each items as item, index (item.id)}
+		<SortableItem id={item.id} {index}>
+			<div class="ssl-item__content">
+				{item.text}
+			</div>
+		</SortableItem>
+	{/each}
 </SortableList>
 ```
 
@@ -125,152 +131,161 @@ The following is a list of steps to navigate and operate the Sortable List:
 7. Press `arrow down` or `arrow right` to move the lifted item to the next position.
 8. Press `escape` to cancel the lift and return the item to its initial position.
 
-## Props
+## Components
 
-| Prop                 | Type         | Default      | Possible values                                                                                                             | Description                                                                                                                                                                                                                                                                     |
-| -------------------- | ------------ | ------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `items`              | Object array | `undefined`  | Array of objects containing a mandatory `id`, an optional `isDisabled` and any other property to be used in the list items. | List of items data. Each item must contain an `id` property and can contain an `isDisabled` property to make use of the disabled items feature.                                                                                                                                 |
-| `gap`                | Number       | `12`         | Number equal to or above `0`.                                                                                               | Separation between items (in pixels).                                                                                                                                                                                                                                           |
-| `direction`          | String       | `'vertical'` | `'vertical'` or `'horizontal'`                                                                                              | Orientation in which items will be arranged.                                                                                                                                                                                                                                    |
-| `swapThreshold`      | Number       | `1`          | Number above `0`.                                                                                                           | Percentage of the target that the dragged item must cover to trigger the items swap. This value will be honored as long as there is only one item colliding with the dragged item. Otherwise, the item with most covered area by the dragged item will be marked as the target. |
-| `transitionDuration` | Number       | `320`        | Number equal to or above `0`.                                                                                               | Time the swap transition takes to complete (in milliseconds). Assign a value of `0` the remove animations.                                                                                                                                                                      |
-| `hasDropMarker`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                            |
-| `hasLockedAxis`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                       |
-| `hasBoundaries`      | Boolean      | `false`      | `true` or `false`                                                                                                           | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                 |
-| `hasRemoveOnDragOut` | Boolean      | `false`      | `true` or `false`                                                                                                           | if `true`, items will be removed when dragged outside of the list boundaries. This needs to be accompanied by the `on:remove` event handler for it to work as expected.                                                                                                         |
+The following is a list of the available components inside the package:
 
-## Slot props
+| Component        | Description                                                                                                                                                               |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<SortableList>` | The primary container. Provides the main structure, drag-and-drop interactions and emits the available events.                                                            |
+| `<SortableItem>` | An individual item within `<SortableList>`. Holds the data and content for each list item, as well as the `<Handle>` and `<Remove>` components when needed.               |
+| `<Handle>`       | An element that limits the draggable area of a list item to itself. Including it inside a `<SortableItem>` will directly activate the handle functionality for that item. |
+| `<Remove>`       | A `<button>` element that (when pressed) removes an item. Including it inside a `<SortableItem>` will directly allow it to dispatch the `remove` event for that item.     |
+| `<IconHandle>`   | A **grip** icon. Since it doesn’t include any kind of interactivity, you can use your own icon instead.                                                                   |
+| `<IconRemove>`   | An **x mark** icon. Since it doesn’t include any kind of interactivity, you can use your own icon instead.                                                                |
 
-Slot props will give you access to the individual item data.
+### `<SortableList>` props
 
-| Prop    | Provides access to                      |
-| ------- | --------------------------------------- |
-| `item`  | Item data coming from the `items` prop. |
-| `index` | Item index.                             |
+| Prop                 | Type    | Default      | Possible values                | Description                                                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------------- | ------- | ------------ | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gap`                | Number  | `12`         | Number equal to or above `0`.  | Separation between items (in pixels).                                                                                                                                                                                                                                                                                                                                                                                      |
+| `direction`          | String  | `'vertical'` | `'vertical'` or `'horizontal'` | Orientation in which items will be arranged.                                                                                                                                                                                                                                                                                                                                                                               |
+| `swapThreshold`      | Number  | `1`          | Number above `0`.              | Portions of the dragged item and the target item that need to overlap for the items to switch positions. This value will be honored as long as there is only one item colliding with the dragged item. Otherwise, the item with the most covered area by the dragged item will be marked as the target. For example, `0.5` stands for half of the dragged and target item, `1` for the full size, `2` for double the size. |
+| `transitionDuration` | Number  | `320`        | Number equal to or above `0`.  | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.                                                                                                                                                                                                                                                |
+| `hasDropMarker`      | Boolean | `false`      | `true` or `false`              | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                                                                                                                                                                       |
+| `hasLockedAxis`      | Boolean | `false`      | `true` or `false`              | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                                                                                                                                                                  |
+| `hasBoundaries`      | Boolean | `false`      | `true` or `false`              | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                                                                                                                                                            |
+| `hasRemoveOnDropOut` | Boolean | `false`      | `true` or `false`              | if `true`, items will be removed when dragged and dropped outside of the list boundaries. This needs to be coupled with the `on:remove` event handler for it to complete the removal process.                                                                                                                                                                                                                              |
 
-Example:
-
-```ts
-<SortableList let:item let:index>
-	{index} - {item.text}
-</SortableList>
-```
-
-## Events
+### `<SortableList>` events
 
 | Name        | Type          | Trigger                    | Returns                                                         |
 | ----------- | ------------- | -------------------------- | --------------------------------------------------------------- |
 | `on:sort`   | `CustomEvent` | An item switches position. | `event: { detail: { prevIndex: number, nextIndex: number } } }` |
 | `on:remove` | `CustomEvent` | An item is removed.        | `event: { detail: { itemId: number } } }`                       |
 
+### `<SortableItem>` props
+
+| Prop         | Type    | Default     | Possible values   | Description                                          |
+| ------------ | ------- | ----------- | ----------------- | ---------------------------------------------------- |
+| `id`         | String  | `undefined` | Unique string.    | Unique identifier for each item.                     |
+| `index`      | Number  | `undefined` | Unique number.    | Position of the item in the list.                    |
+| `isDisabled` | Boolean | `false`     | `true` or `false` | If `true`, will prevent the item from being dragged. |
+
 ## Utilities
 
-| Function      | Description                                                                            |
-| ------------- | -------------------------------------------------------------------------------------- |
-| `sortItems()` | Provides an easy mechanism to reorder items (in combination with the `on:sort` event). |
+| Function       | Description                                                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sortItems()`  | Provides an easy mechanism to reorder items (should be used in combination with the [`on:sort` event](#sortablelist-events)).                   |
+| `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`on:remove` event](#sortablelist-events)). |
 
 Example:
 
 ```ts
 <script lang="ts">
-	import { sortItems } from 'svelte-sortable-list';
+	import {
+		SortableList,
+		SortableItem,
+		Remove,
+		IconRemove,
+		removeItem,
+		sortItems,
+	} from '$lib/index.js';
+	import type { SortableItemData } from '$lib/types/index.js';
+
+	let items: SortableItemData[] = [
+		{
+			id: 'list-item-1',
+			text: 'List item 1',
+		},
+		{
+			id: 'list-item-2',
+			text: 'List item 2',
+		},
+		{
+			id: 'list-item-3',
+			text: 'List item 3',
+		},
+		{
+			id: 'list-item-4',
+			text: 'List item 4',
+		},
+		{
+			id: 'list-item-5',
+			text: 'List item 5',
+		},
+	];
 
 	function handleSort(event: CustomEvent) {
 		const { prevIndex, nextIndex } = event.detail;
 		items = sortItems(items, prevIndex, nextIndex);
 	}
+
+	function handleRemove(event: CustomEvent) {
+		const { itemId } = event.detail;
+		items = removeItem(items, itemId);
+	}
 </script>
 
-<SortableList {items} let:item on:sort={handleSort}>
-	{item.text}
-</SortableList>
-```
-
-## Slots
-
-| Name     | Description                                                                                                                                                                             |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `handle` | Activates the **Handle** feature. To do so, assign an element or component to the `slot="handle"`.                                                                                      |
-| `remove` | Activates the **Remove** feature. To do so, assign an element or component to the `slot="remove"`. Make sure to include the `on:remove` event handler to properly run the item removal. |
-
-Example:
-
-```ts
-<SortableList {items} let:item on:remove={handleRemove}>
-	<IconHandle slot="handle" />
-	{item.text}
-	<IconRemove slot="remove" />
-</SortableList>
-```
-
-## Icons
-
-If you want to avoid bringing in your own icons, you can use the ones provided in the package:
-
-| Name     | Description         |
-| -------- | ------------------- |
-| `Handle` | Handle icon.        |
-| `Remove` | Remove button icon. |
-
-Example:
-
-```ts
-<script lang="ts">
-	import { IconHandle, IconRemove } from 'svelte-sortable-list';
-</script>
-
-<SortableList {items} let:item on:remove={handleRemove}>
-	<IconHandle slot="handle" />
-	{item.text}
-	<IconRemove slot="remove" />
+<SortableList on:sort={handleSort} on:remove={handleRemove}>
+	{#each items as item, index (item.id)}
+		<SortableItem id={item.id} {index}>
+			<div class="ssl-item__content">
+				{item.text}
+			</div>
+			<Remove itemId={item.id}>
+				<IconRemove />
+			</Remove>
+		</SortableItem>
+	{/each}
 </SortableList>
 ```
 
 ## Types
 
-| Type                | Description                                 |
-| ------------------- | ------------------------------------------- |
-| `SortableListProps` | Provides definitions for your `items` prop. |
+| Type               | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `SortableItemData` | Provides definitions for your list of items. |
 
 Example:
 
 ```ts
 <script lang="ts">
-	import { type SortableListProps } from 'svelte-sortable-list';
+	import type { SortableItemData } from '$lib/types/index.js';
 
-	let items: SortableListProps['items'] = [
-		{
-			id: 1,
-			text: 'List item 1',
-			isDisabled: false,
-		},
-		{
-			id: 2,
-			text: 'List item 2',
-			isDisabled: true,
-		},
-		{
-			id: 3,
-			text: 'List item 3',
-			isDisabled: true,
-		},
-		{
-			id: 4,
-			text: 'List item 4',
-			isDisabled: false,
-		},
-		{
-			id: 5,
-			text: 'List item 5',
-			isDisabled: false,
-		},
-	];
+	let items: SortableItemData[] = [
+	{
+		id: 'list-item-1',
+		text: 'List item 1',
+		isDisabled: false,
+	},
+	{
+		id: 'list-item-2',
+		text: 'List item 2',
+		isDisabled: true,
+	},
+	{
+		id: 'list-item-3',
+		text: 'List item 3',
+		isDisabled: true,
+	},
+	{
+		id: 'list-item-4',
+		text: 'List item 4',
+		isDisabled: false,
+	},
+	{
+		id: 'list-item-5',
+		text: 'List item 5',
+		isDisabled: false,
+	},
+];
 </script>
 ```
 
 ## Styles
 
-If you want to make use of the styles present in the demo pages, import them in your app like so:
+If you want to make use of the styles present in the demo pages, import them in your project like so:
 
 ```ts
 import 'svelte-sortable-list/styles.css';
@@ -278,49 +293,39 @@ import 'svelte-sortable-list/styles.css';
 
 ### Selectors
 
-To customize the appearance of the list items and not cause any conflicts or interferences with the base styles and transitions, the usage of the `.sortable-item` selector must be avoided, pointing instead to `.sortable-item__inner`, which is the direct child of the aforementioned selector.
+To customize the appearance of the list items and not cause any conflicts or interferences with the core styles and transitions, the usage of the `.ssl-item` selector must be avoided, pointing instead to `.ssl-item__inner`, which is the direct child of the aforementioned selector.
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
-| Selector                                | Points to                                                                                             |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `.sortable-list`                        | The list element.                                                                                     |
-| `.sortable-list.is-dragging`            | The list element while an item is being dragged by a pointing device.                                 |
-| `.sortable-list.is-dropping`            | The list element while an item is being dropped by a pointing device.                                 |
-| `.sortable-list.is-selecting`           | The list element while an item is being dragged by the keyboard.                                      |
-| `.sortable-list.is-deselecting`         | The list element while an item is being dropped by the keyboard.                                      |
-| `.sortable-list.is-between-bounds`      | The list element while the dragged item is inside the list limits.                                    |
-| `.sortable-list.is-out-of-bounds`       | The list element while the dragged item is outside the list limits.                                   |
-| `.sortable-list.is-removing`            | The list element while the dragged out item is being removed.                                         |
-| `.sortable-list.has-remove-on-drag-out` | The list element while the remove on drag out feature is enabled.                                     |
-| `.sortable-item`                        | Each list item element.                                                                               |
-| `.sortable-item.is-dragging`            | The item element that is being dragged by a pointing device.                                          |
-| `.sortable-item.is-dropping`            | The item element that is being dropped by a pointing device.                                          |
-| `.sortable-item.is-selecting`           | The item element that is being dragged by the keyboard.                                               |
-| `.sortable-item.is-deselecting`         | The item element that is being dropped by the keyboard.                                               |
-| `.sortable-item.is-removing`            | The item element that is being removed by being dragged outside the list limits by a pointing device. |
-| `.sortable-item[aria-disabled="true"]`  | Each item element that is disabled.                                                                   |
-| `.sortable-item__inner`                 | The content wrapper element inside each item element.                                                 |
-| `.sortable-item__handle`                | The **Handle Slot** container element.                                                                |
-| `.sortable-item__content`               | The **Default Slot** container element.                                                               |
-| `.sortable-item__remove`                | The **Remove Slot** container element.                                                                |
-| `.ghost`                                | The shadow element displayed under the pointer when dragging.                                         |
-| `.ghost.is-dragging`                    | The shadow element while it’s being dragged by a pointing device.                                     |
-| `.ghost.is-dropping`                    | The shadow element while it’s being dropped by a pointing device.                                     |
-| `.ghost.is-between-bounds`              | The shadow element while it’s inside the list limits.                                                 |
-| `.ghost.is-out-of-bounds`               | The shadow element while it’s outside the list limits.                                                |
-
-In order to simplify its styles assignment, the Ghost element also receives the `.sortable-item` class. This way, you can point to the `.sortable-item` class and set the appearance of the Sortable Items and the Ghost at the same time.
+| Selector                           | Points to                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `.ssl-list`                        | The `<SortableList>` main container.                                                                    |
+| `.ssl-list.has-remove-on-drop-out` | The `<SortableList>` main container while `hasRemoveOnDropOut` is enabled.                              |
+| `.ssl-item`                        | Each `<SortableItem>` main container.                                                                   |
+| `.ssl-item.is-pointer-dragging`    | The `<SortableItem>` that is being dragged by a pointing device.                                        |
+| `.ssl-item.is-pointer-dropping`    | The `<SortableItem>` that is being dropped by a pointing device.                                        |
+| `.ssl-item.is-keyboard-dragging`   | The `<SortableItem>` that is being dragged by the keyboard.                                             |
+| `.ssl-item.is-keyboard-dropping`   | The `<SortableItem>` that is being dropped by the keyboard.                                             |
+| `.ssl-item.is-removing`            | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
+| `.ssl-item[aria-disabled="true"]`  | Each `<SortableItem>` that is disabled.                                                                 |
+| `.ssl-item__inner`                 | The content wrapper element inside each `<SortableItem>`.                                               |
+| `.ssl-ghost`                       | The shadow element displayed under the pointer when dragging.                                           |
+| `.ssl-ghost.is-dragging`           | The shadow element while it’s being dragged by a pointing device.                                       |
+| `.ssl-ghost.is-dropping`           | The shadow element while it’s being dropped by a pointing device.                                       |
+| `.ssl-ghost.is-between-bounds`     | The shadow element while it’s inside the list limits.                                                   |
+| `.ssl-ghost.is-out-of-bounds`      | The shadow element while it’s outside the list limits.                                                  |
+| `.ssl-handle`                      | The `<Handle>` main container.                                                                          |
+| `.ssl-remove`                      | The `<Remove>` main container.                                                                          |
 
 ### Custom properties
 
-| Custom property         | Description                                                   |
-| ----------------------- | ------------------------------------------------------------- |
-| `--transition-duration` | Time the swap transition takes to complete (in milliseconds). |
+| Custom property         | Description                                                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `--transition-duration` | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). |
 
 ## Motivation
 
-While working on a SvelteKit app, I ran into the need of adding drag-and-drop capabilities to a couple of items lists, for which I decided to make use of [SortableJS](https://sortablejs.github.io/Sortable), which is certainly a popular option. I implemented it through a Svelte Action and it provided just what I needed, or so it seemed. After a while I realized I was not only missing touch screen support (since it was built with the HTML Drag and Drop API), but also accessibility was nowhere to be seen, and seems there are [no plans to work on it](https://github.com/SortableJS/Sortable/issues/1176).
+While working on a SvelteKit project, I ran into the need of adding drag-and-drop capabilities to a couple of items lists, for which I decided to make use of [SortableJS](https://sortablejs.github.io/Sortable), which is certainly a popular option. I implemented it through a Svelte Action and it provided just what I needed, or so it seemed. After a while I realized I was not only missing touch screen support (since it was built with the HTML Drag and Drop API), but also accessibility was nowhere to be seen, and seems there are [no plans to work on it](https://github.com/SortableJS/Sortable/issues/1176).
 
 I was not able to find any other suitable option, so this problem felt like a good opportunity to build my own package. And so while doing some research to try and understand the implications of such feature, I ran into a very [interesting article](https://baseweb.design/blog/drag-and-drop-list) and a very [interesting talk](https://youtu.be/y_XkQ2qMTSA) by Vojtech Miksu which really guided me through the different paths available, their advantages, pain points and limitations to create a drag-and-drop system, putting particular focus on accessibility and touch screen support.
 
