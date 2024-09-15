@@ -141,6 +141,13 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/no-animations"
+				aria-current={$page.url.pathname === '/no-animations' ? 'page' : undefined}
+			>
+				No animations
+			</a>
+			<a
+				class="app-nav__link"
 				href="/varying-heights"
 				aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
 			>
