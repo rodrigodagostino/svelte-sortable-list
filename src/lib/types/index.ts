@@ -10,8 +10,8 @@ export interface SortableListProps {
 }
 
 export interface SortableListCoordinates {
-	pointer: { x: number; y: number };
-	pointerOrigin: { x: number; y: number };
+	pointer: { x: number; y: number } | null;
+	pointerOrigin: { x: number; y: number } | null;
 	itemsOrigin: ElementData[] | null;
 }
 

@@ -31,130 +31,139 @@
 	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
 
-	$: {
-		setPositionStyles(status);
+	$: styleWidth = getStyleWidth($draggedItem);
+	$: styleHeight = getStyleHeight($draggedItem);
+	$: styleLeft = getStyleLeft(status);
+	$: styleTop = getStyleTop(status);
+	$: styleTransform = getStyleTransform(status, $pointer);
+	$: styleTransition = getStyleTransition(status);
+	$: styleZIndex = getStyleZIndex(status);
+
+	function getStyleWidth(draggedItem: HTMLElement | null) {
+		if (!draggedItem || !$itemsOrigin) return '0';
+
+		const draggedItemRect = $itemsOrigin[getIndex(draggedItem)!];
+		return `${draggedItemRect.width}px`;
 	}
-	$: styleTransform = getStyleTransform($pointer);
 
-	function setPositionStyles(status: 'init' | 'set' | 'remove' | 'unset') {
-		if (status === 'init' || status === 'set' || status === 'remove') {
-			if (!$draggedItem || !$itemsOrigin) return;
+	function getStyleHeight(draggedItem: HTMLElement | null) {
+		if (!draggedItem || !$itemsOrigin) return '0';
 
-			const ghostRect = ghostRef.getBoundingClientRect();
-			const draggedItemRect = $itemsOrigin[getIndex($draggedItem)!];
-			const targetItemRect = $targetItem && $itemsOrigin[getIndex($targetItem)!];
+		const draggedItemRect = $itemsOrigin[getIndex(draggedItem)!];
+		return `${draggedItemRect.height}px`;
+	}
 
-			ghostRef.style.width = `${draggedItemRect.width}px`;
-			ghostRef.style.height = `${draggedItemRect.height}px`;
-			ghostRef.style.zIndex = '10000';
+	function getStyleLeft(status: GhostProps['status']) {
+		if (status === 'unset' || !$draggedItem || !$itemsOrigin) return '0';
 
-			if (status === 'init') {
-				ghostRef.style.left = `${draggedItemRect.x}px`;
-				ghostRef.style.top = `${draggedItemRect.y}px`;
-			}
+		const draggedItemRect = $itemsOrigin[getIndex($draggedItem)!];
+		return `${draggedItemRect.x}px`;
+	}
 
-			if (status === 'set' || status === 'remove') {
-				ghostRef.style.left = `${ghostRect.x}px`;
-				ghostRef.style.top = `${ghostRect.y}px`;
-				ghostRef.style.transform = 'translate3d(0, 0, 0)';
-				// setTimeout will allow the values above to be properly set before setting the ones below.
-				setTimeout(() => {
-					if (!draggedItem) return;
+	function getStyleTop(status: GhostProps['status']) {
+		if (status === 'unset' || !$draggedItem || !$itemsOrigin) return '0';
 
-					ghostRef.style.transition =
-						status === 'set'
-							? `left ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`top ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`transform ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-								`z-index 0s ${$listProps.transitionDuration}ms`
-							: `z-index 0s ${$listProps.transitionDuration}ms`;
-					// zIndex is only set and then re-set to force the transitionend event
-					// (along with the handleGhostDrop() function) to be fired when the ghost
-					// is dragged and dropped without being moved.
-					ghostRef.style.zIndex = '9999';
-
-					const draggedItemIndex = getIndex($draggedItem)!;
-					const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
-
-					if (status === 'set') {
-						if (!$targetItem) {
-							ghostRef.style.left = `${draggedItemRect.x}px`;
-							ghostRef.style.top = `${draggedItemRect.y}px`;
-						} else {
-							if (targetItemIndex === null || !targetItemRect) return;
-
-							ghostRef.style.left =
-								$listProps.direction === 'vertical'
-									? `${draggedItemRect.x}px`
-									: draggedItemIndex < targetItemIndex
-										? `${targetItemRect.x + targetItemRect.width - draggedItemRect.width}px`
-										: `${targetItemRect.x}px`;
-							ghostRef.style.top =
-								$listProps.direction === 'vertical'
-									? draggedItemIndex < targetItemIndex
-										? `${targetItemRect.y + targetItemRect.height - draggedItemRect.height}px`
-										: `${targetItemRect.y}px`
-									: `${draggedItemRect.y}px`;
-						}
-					}
-				}, 0);
-			}
-		} else {
-			ghostRef?.style.removeProperty('transition');
-		}
+		const draggedItemRect = $itemsOrigin[getIndex($draggedItem)!];
+		return `${draggedItemRect.y}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleTransform(...args: unknown[]) {
-		if (!$isPointerDragging || !$draggedItem || !$itemsOrigin) return 'translate3d(0, 0, 0)';
+	function getStyleTransform(status: GhostProps['status'], ...args: unknown[]) {
+		if (status === 'unset' || !$pointer || !$pointerOrigin || !$draggedItem || !$itemsOrigin)
+			return 'translate3d(0, 0, 0)';
 
 		const listRect = ghostRef.previousElementSibling!.getBoundingClientRect()!;
 		const ghostRect = ghostRef.getBoundingClientRect()!;
-		const draggedItemData = $itemsOrigin[getIndex($draggedItem)!];
+		const draggedItemOrigin = $itemsOrigin[getIndex($draggedItem)!];
 
-		if (!$listProps.hasBoundaries) {
+		if (status === 'init') {
+			if (!$listProps.hasBoundaries) {
+				const x =
+					$listProps.direction === 'horizontal' ||
+					($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
+						? $pointer.x - $pointerOrigin.x
+						: 0;
+				const y =
+					$listProps.direction === 'vertical' ||
+					($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
+						? $pointer.y - $pointerOrigin.y
+						: 0;
+				return `translate3d(${x}px, ${y}px, 0)`;
+			}
+
 			const x =
 				$listProps.direction === 'horizontal' ||
 				($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
-					? $pointer.x - $pointerOrigin.x
+					? // If the ghost is dragged to the left of the list,
+						// place it to the right of the left edge of the list.
+						$pointer.x - ($pointerOrigin.x - draggedItemOrigin.x) < listRect.x + $listProps.gap / 2
+						? listRect.x - draggedItemOrigin.x + $listProps.gap / 2
+						: // If the ghost is dragged to the right of the list,
+							// place it to the left of the right edge of the list.
+							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemOrigin.x) >
+							  listRect.right - $listProps.gap / 2
+							? listRect.right - draggedItemOrigin.x - ghostRect.width - $listProps.gap / 2
+							: $pointer.x - $pointerOrigin.x
 					: 0;
 			const y =
 				$listProps.direction === 'vertical' ||
 				($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
-					? $pointer.y - $pointerOrigin.y
+					? // If the ghost is dragged above the top of the list,
+						// place it right below the top edge of the list.
+						$pointer.y - ($pointerOrigin.y - draggedItemOrigin.y) < listRect.y + $listProps.gap / 2
+						? listRect.y - draggedItemOrigin.y + $listProps.gap / 2
+						: // If the ghost is dragged below the bottom of the list,
+							// place it right above the bottom edge of the list.
+							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemOrigin.y) >
+							  listRect.bottom - $listProps.gap / 2
+							? listRect.bottom - draggedItemOrigin.y - ghostRect.height - $listProps.gap / 2
+							: $pointer.y - $pointerOrigin.y
 					: 0;
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 
-		const x =
-			$listProps.direction === 'horizontal' ||
-			($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
-				? // If the ghost is dragged to the left of the list,
-					// place it to the right of the left edge of the list.
-					$pointer.x - ($pointerOrigin.x - draggedItemData.x) < listRect.x + $listProps.gap / 2
-					? listRect.x - draggedItemData.x + $listProps.gap / 2
-					: // If the ghost is dragged to the right of the list,
-						// place it to the left of the right edge of the list.
-						$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemData.x) >
-						  listRect.right - $listProps.gap / 2
-						? listRect.right - draggedItemData.x - ghostRect.width - $listProps.gap / 2
-						: $pointer.x - $pointerOrigin.x
-				: 0;
-		const y =
-			$listProps.direction === 'vertical' ||
-			($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
-				? // If the ghost is dragged above the top of the list,
-					// place it below the top edge of the list.
-					$pointer.y - ($pointerOrigin.y - draggedItemData.y) < listRect.y + $listProps.gap / 2
-					? listRect.y - draggedItemData.y + $listProps.gap / 2
-					: // If the ghost is dragged below the bottom of the list,
-						// place it above the bottom edge of the list.
-						$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemData.y) >
-						  listRect.bottom - $listProps.gap / 2
-						? listRect.bottom - draggedItemData.y - ghostRect.height - $listProps.gap / 2
-						: $pointer.y - $pointerOrigin.y
-				: 0;
-		return `translate3d(${x}px, ${y}px, 0)`;
+		if (status === 'set') {
+			if (!$targetItem) return 'translate3d(0, 0, 0)';
+			const targetItemOrigin = $itemsOrigin[getIndex($targetItem)!];
+			const x =
+				$listProps.direction === 'horizontal'
+					? draggedItemOrigin.x < targetItemOrigin.x
+						? targetItemOrigin.x +
+							targetItemOrigin.width -
+							(draggedItemOrigin.x + draggedItemOrigin.width)
+						: targetItemOrigin.x - draggedItemOrigin.x
+					: 0;
+			const y =
+				$listProps.direction === 'vertical'
+					? draggedItemOrigin.y < targetItemOrigin.y
+						? targetItemOrigin.y +
+							targetItemOrigin.height -
+							(draggedItemOrigin.y + draggedItemOrigin.height)
+						: targetItemOrigin.y - draggedItemOrigin.y
+					: 0;
+			return `translate3d(${x}px, ${y}px, 0)`;
+		}
+
+		if (status === 'remove') return ghostRef.style.transform;
+	}
+
+	function getStyleTransition(status: GhostProps['status']) {
+		if (status === 'unset' || status === 'init') return undefined;
+		if (status === 'set')
+			return (
+				`transform ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+				`z-index 0s ${$listProps.transitionDuration}ms`
+			);
+		if (status === 'remove') return `z-index 0s ${$listProps.transitionDuration}ms`;
+	}
+
+	function getStyleZIndex(status: GhostProps['status']) {
+		if (status === 'unset') return undefined;
+		if (status === 'init') return '10000';
+		// zIndex is only set and then re-set to force the transitionend event
+		// (along with the handleGhostDrop() function) to be fired when the ghost
+		// is dragged and dropped without being moved.
+		if (status === 'set' || status === 'remove') return '9999';
 	}
 </script>
 
@@ -167,12 +176,19 @@
 	class:is-out-of-bounds={!$isGhostBetweenBounds}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : !$isRemoving ? 'grab' : 'initial'}
+	style:width={styleWidth}
+	style:height={styleHeight}
+	style:left={styleLeft}
+	style:top={styleTop}
 	style:transform={styleTransform}
+	style:transition={styleTransition}
 	style:visibility={$isPointerDragging || $isPointerDropping ? 'visible' : 'hidden'}
+	style:z-index={styleZIndex}
 	data-id={$draggedItem && getId($draggedItem)}
 	aria-hidden="true"
 >
 	<div class="ssl-ghost__inner">
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 		{@html $draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
 	</div>
 </div>

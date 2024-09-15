@@ -62,8 +62,8 @@
 	};
 
 	let ghostStatus: GhostProps['status'] = 'unset';
-	const pointer = setPointer({ x: 0, y: 0 });
-	const pointerOrigin = setPointerOrigin({ x: 0, y: 0 });
+	const pointer = setPointer(null);
+	const pointerOrigin = setPointerOrigin(null);
 	const itemsOrigin = setItemsOrigin(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
@@ -103,8 +103,9 @@
 
 		$isPointerDragging = true;
 		await tick();
-		$draggedItem = currItem;
+		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
+		$draggedItem = currItem;
 		$itemsOrigin = getItemsData(listRef);
 		ghostStatus = 'init';
 
@@ -153,9 +154,11 @@
 				dispatchSort($draggedItem, $targetItem);
 
 				ghostStatus = 'unset';
+				$pointer = null;
+				$pointerOrigin = null;
+				$itemsOrigin = null;
 				$draggedItem = null;
 				$targetItem = null;
-				$itemsOrigin = null;
 				$isPointerDropping = false;
 
 				ghostRef.removeEventListener('transitionend', handleGhostDrop);
