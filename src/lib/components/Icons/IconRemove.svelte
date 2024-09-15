@@ -9,6 +9,7 @@
 	stroke-linejoin="round"
 	stroke-width="3"
 	pointer-events="none"
+	{...$$restProps}
 >
 	<path d="m20.5 3.5-17 17" />
 	<path d="m3.5 3.5 17 17" />

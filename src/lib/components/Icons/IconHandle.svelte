@@ -4,6 +4,7 @@
 	height="0.875rem"
 	viewBox="0 0 320 512"
 	pointer-events="none"
+	{...$$restProps}
 >
 	<circle cx="80" cy="96" r="48" />
 	<circle cx="240" cy="96" r="48" />
