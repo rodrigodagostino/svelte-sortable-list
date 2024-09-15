@@ -28,6 +28,13 @@
 		const { itemId } = event.detail;
 		items = removeItem(items, itemId);
 	}
+
+	function toKebabCase(str: string) {
+		return str
+			.replace(/([a-z])([A-Z])/g, '$1-$2')
+			.replace(/[\s_]+/g, '-')
+			.toLowerCase();
+	}
 </script>
 
 <svelte:head>
@@ -51,7 +58,8 @@
 
 <form
 	class="form"
-	on:submit|preventDefault={() => (items = [...items, { id: `${Date.now()}`, text: newItem }])}
+	on:submit|preventDefault={() =>
+		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }])}
 >
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>
