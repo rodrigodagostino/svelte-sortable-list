@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] (2024-09-15)
+
+### BREAKING
+
+- Rename the elements CSS classes to contain a package prefix.
+- Rename props, states and CSS classes to better describe what they are a reference to.
+- Rename `<Handle>` and `<Remove>` icon components to `<IconHandle>` and `<IconRemove>`.
+- Extract `<SortableItem>` out of `<SortableList>`.
+
+### Added
+
+- Create `<Handle>` and `<Remove>` components.
+- Create `removeItem()` function.
+
+### Changed
+
+- Switch props for stores + Context API to allow for a more flexible structure.
+- Limit the `id` prop in `<SortableItem>` to only admit strings as its value.
+
+### Fixed
+
+- Remove an item only _after_ `isRemoving` is set back to `false`.
+- Prevent `<Ghost>` flickering on dropping on mobile devices.
+- Prevent break down after dropping an item when the `transitionDuration` is set to `0`.
+- Prevent `<SortableItem>` focus on `pointerdown` only if the target is the item itself, its content wrapper or its handle.
+
+### Chores
+
+- Move types to a new `types` directory.
+- Update ESLint, Prettier, TS, and GIT configurations.
+
+### Docs
+
+- Implement latest structure in the demo pages.
+- Implement `removeItem()` in the demo pages.
+- Add **“No animations”** demo page.
+- Add **“Interactive items”** demo page.
+- Update the README to reflect the latest changes.
+
 ## [0.9.6] (2024-07-21)
 
 ### Fixed
@@ -40,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevent an abrupt drop of the list when the last item is removed.
 - Prevent tabbing onto interactive elements if the current item is being dragged through the keyboard.
-- Replace `SortableItem` in and out transitions with `scaleFade` (which does not involve translation) to prevent possible container overflow when adding/removing an item.
+- Replace `<SortableItem>` in and out transitions with `scaleFade` (which does not involve translation) to prevent possible container overflow when adding/removing an item.
 - Restore missing transitions during the deletion of an item by dropping it outside of the list’s bounds.
 
 ### Docs
@@ -56,7 +95,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Undo ghost and live region classes renaming.
-- Move ghost styles manipulation logic into `Ghost` component.
+- Move ghost styles manipulation logic into the `<Ghost>` component.
 - Remove unnecessary `setItemStyles()` function.
 
 ### Docs
@@ -74,13 +113,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Switch items data for nodes.
-- Rename `Ghost` component to `SortableGhost` and change its tag to `<div>`.
-- Rename `SortableGhost` and live region classes.
+- Rename `<Ghost>` component to `<SortableGhost>` and change its tag to `<div>`.
+- Rename `<SortableGhost>` and live region classes.
 - Rename package.
 
 ### Fixed
 
-- Repair broken `SortableGhost` entrance transition.
+- Repair broken `<SortableGhost>` entrance transition.
 
 ### Docs
 
@@ -237,7 +276,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle interruption of keyboard navigation caused by pointer interaction.
 - Trigger swap consistently when ghost hovers over the adjacent items of the dragged item (by including the dragged item in the list of colliding items).
-- Pass down `gap` and `transitionDuration` props to the **SortableItem** component to actually make use of the values assigned to the **SortableList** component.
+- Pass down `gap` and `transitionDuration` props to the `<SortableItem>` component to actually make use of the values assigned to the `<SortableList>` component.
 
 ## [0.6.0] (2024-03-04)
 
@@ -250,15 +289,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Extract **SortableItem** component.
-- Extract **Ghost** component.
-- Render **SortableList** only if `items` prop is provided.
+- Extract `<SortableItem>` component.
+- Extract `<Ghost>` component.
+- Render `<SortableList>` only if `items` prop is provided.
 - Add default value to `key` prop.
 - Ensure `id` prop consistency.
 
 ### Fixed
 
-- Prevent focus loss after removing a **SortableItem**.
+- Prevent focus loss after removing a `<SortableItem>`.
 - Allow interactive elements (like buttons) in an item to be tabbable and operate normally only when that item is focused.
 - Prevent dragging with pointer while dragging with keyboard is occurring.
 - Prevent screen reading of an item’s content after dropping it.
@@ -376,7 +415,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `transitionDuration` prop to the **SortableList** component.
+- Add `transitionDuration` prop to the `<SortableList>` component.
 
 ### Fixed
 
@@ -402,7 +441,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Move sort handling outside of the **SortableList** component.
+- Move sort handling outside of the `<SortableList>` component.
 
 ## [0.1.0] (2024-01-08)
 
@@ -415,7 +454,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.6...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.6...v0.10.0
 [0.9.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.4...v0.9.5
 [0.9.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.3...v0.9.4
