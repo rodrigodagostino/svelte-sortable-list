@@ -93,11 +93,11 @@
 
 		const target = event.target as HTMLElement;
 		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
-		// If the item has an interactive element and we’re clicking on it, prevent dragging.
-		if (!currItem || hasInteractiveElements(target, currItem)) return;
-		// If the item has a handle, but we’re not dragging from it, prevent dragging.
+		// Prevent dragging if the item has a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem?.querySelector('[data-role="handle"]');
 		if (hasHandle && !target.closest('[data-role="handle"]')) return;
+		// Prevent dragging if the item has an interactive element and we’re clicking on it.
+		if (!currItem || (!hasHandle && hasInteractiveElements(target, currItem))) return;
 
 		currItem.setPointerCapture(event.pointerId);
 

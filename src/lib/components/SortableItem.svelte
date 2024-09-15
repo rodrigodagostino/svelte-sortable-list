@@ -190,7 +190,7 @@
 		await tick();
 		itemRef
 			?.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
+				'a, audio, button, input, label, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach(
@@ -215,8 +215,15 @@
 	}
 
 	function handlePointerDown(event: PointerEvent) {
-		// Prevent item focus on pointer down.
-		event.preventDefault();
+		// Prevent item focus on `pointerdown` only if the target is the item itself,
+		// its content wrapper or its handle.
+		const target = event.target as HTMLElement;
+		if (
+			target.classList.contains('ssl-item') ||
+			target.classList.contains('ssl-item__inner') ||
+			target.classList.contains('ssl-handle')
+		)
+			event.preventDefault();
 	}
 
 	async function handleDocumentPointerDown(event: PointerEvent) {
