@@ -51,7 +51,7 @@
 
 <form
 	class="form"
-	on:submit|preventDefault={() => (items = [...items, { id: Date.now(), text: newItem }])}
+	on:submit|preventDefault={() => (items = [...items, { id: `${Date.now()}`, text: newItem }])}
 >
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>

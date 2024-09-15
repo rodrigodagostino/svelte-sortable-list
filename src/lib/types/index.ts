@@ -22,7 +22,7 @@ export interface SortableListElements {
 }
 
 export interface SortableItemProps {
-	id: string | number;
+	id: string;
 	index: number;
 	isDisabled?: boolean;
 }
