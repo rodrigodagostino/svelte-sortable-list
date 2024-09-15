@@ -6,12 +6,6 @@
 	let isControlsExpanded = true;
 </script>
 
-<svelte:window
-	on:keydown={(event) => {
-		if (event.key === 'a') isControlsExpanded = !isControlsExpanded;
-	}}
-/>
-
 <div id="app" class="app" class:is-controls-expanded={isControlsExpanded}>
 	<main class="app-main">
 		<div class="container">
@@ -169,6 +163,13 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/interactive-items"
+				aria-current={$page.url.pathname === '/interactive-items' ? 'page' : undefined}
+			>
+				Interactive items
+			</a>
+			<a
+				class="app-nav__link"
 				href="/dynamic-items"
 				aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
 			>
@@ -322,6 +323,7 @@
 		}
 
 		&__link {
+			color: var(--white);
 			text-decoration: none;
 
 			&[aria-current='page'] {

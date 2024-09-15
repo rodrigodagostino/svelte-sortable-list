@@ -92,3 +92,38 @@ export const disabledItems: SortableItemData[] = [
 ];
 
 Object.freeze(disabledItems);
+
+export const interactiveItems: SortableItemData[] = [
+	{
+		id: 'list-item-1',
+		text: 'List item 1',
+		type: 'input',
+	},
+	{
+		id: 'list-item-2',
+		text: 'List item 2',
+		type: 'textarea',
+	},
+	{
+		id: 'list-item-3',
+		text: 'List item 3',
+		type: 'select',
+	},
+	{
+		id: 'list-item-4',
+		text: 'List item 4',
+		type: 'checkbox',
+	},
+	{
+		id: 'list-item-5',
+		text: 'List item 5',
+		type: 'button',
+	},
+	{
+		id: 'list-item-6',
+		text: 'List item 6',
+		type: 'a',
+	},
+];
+
+Object.freeze(interactiveItems);
