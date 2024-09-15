@@ -149,23 +149,27 @@
 		$isPointerDropping = true;
 		$isGhostBetweenBounds = true;
 
-		function handleGhostDrop({ propertyName }: TransitionEvent) {
+		function handleGhostDrop() {
+			dispatchSort($draggedItem, $targetItem);
+
+			ghostStatus = 'unset';
+			$pointer = null;
+			$pointerOrigin = null;
+			$itemsOrigin = null;
+			$draggedItem = null;
+			$targetItem = null;
+			$isPointerDropping = false;
+		}
+
+		function handleTransitionEnd({ propertyName }: TransitionEvent) {
 			if (propertyName === 'top' || propertyName === 'z-index') {
-				dispatchSort($draggedItem, $targetItem);
-
-				ghostStatus = 'unset';
-				$pointer = null;
-				$pointerOrigin = null;
-				$itemsOrigin = null;
-				$draggedItem = null;
-				$targetItem = null;
-				$isPointerDropping = false;
-
-				ghostRef.removeEventListener('transitionend', handleGhostDrop);
+				handleGhostDrop();
+				ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
 			}
 		}
 
-		ghostRef.addEventListener('transitionend', handleGhostDrop);
+		if (transitionDuration > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
+		else handleGhostDrop();
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
@@ -198,23 +202,28 @@
 
 				if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
 
-				async function handleItemDrop({ propertyName }: TransitionEvent) {
+				async function handleItemDrop() {
+					dispatchSort($draggedItem, $targetItem);
+
+					$draggedItem = null;
+					$targetItem = null;
+					$itemsOrigin = null;
+					$isKeyboardDropping = false;
+
+					await tick();
+					$focusedItem?.focus();
+				}
+
+				function handleTransitionEnd({ propertyName }: TransitionEvent) {
 					if (propertyName === 'z-index') {
-						dispatchSort($draggedItem, $targetItem);
-
-						$draggedItem = null;
-						$targetItem = null;
-						$itemsOrigin = null;
-						$isKeyboardDropping = false;
-
-						await tick();
-						$focusedItem?.focus();
-
-						$focusedItem?.removeEventListener('transitionend', handleItemDrop);
+						handleItemDrop();
+						$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
 					}
 				}
 
-				$focusedItem.addEventListener('transitionend', handleItemDrop);
+				if (transitionDuration > 0)
+					$focusedItem.addEventListener('transitionend', handleTransitionEnd);
+				else handleItemDrop();
 			}
 		}
 
@@ -283,19 +292,24 @@
 			$isCancelingKeyboardDragging = true;
 			if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
 
-			function handleItemDrop({ propertyName }: TransitionEvent) {
-				if (propertyName === 'z-index') {
-					$draggedItem = null;
-					$targetItem = null;
-					$itemsOrigin = null;
-					$isKeyboardDropping = false;
-					$isCancelingKeyboardDragging = false;
+			function handleItemDrop() {
+				$draggedItem = null;
+				$targetItem = null;
+				$itemsOrigin = null;
+				$isKeyboardDropping = false;
+				$isCancelingKeyboardDragging = false;
+			}
 
-					$focusedItem?.removeEventListener('transitionend', handleItemDrop);
+			function handleTransitionEnd({ propertyName }: TransitionEvent) {
+				if (propertyName === 'z-index') {
+					handleItemDrop();
+					$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
 				}
 			}
 
-			$focusedItem.addEventListener('transitionend', handleItemDrop);
+			if (transitionDuration > 0)
+				$focusedItem.addEventListener('transitionend', handleTransitionEnd);
+			else handleItemDrop();
 		}
 	}
 
@@ -318,18 +332,23 @@
 		if ($isPointerDragging) {
 			$isRemoving = true;
 
-			function handleGhostDrop({ propertyName }: TransitionEvent) {
+			function handleGhostDrop() {
+				$isRemoving = false;
+			}
+
+			function handleTransitionEnd({ propertyName }: TransitionEvent) {
 				if (propertyName === 'top' || propertyName === 'z-index') {
 					dispatch('remove', { itemId });
 					// setTimeout will allow the `remove` event to be handled before setting the $isRemoving state.
 					setTimeout(() => {
-						$isRemoving = false;
-						ghostRef.removeEventListener('transitionend', handleGhostDrop);
-					}, 0);
+						handleGhostDrop();
+						ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
+					});
 				}
 			}
 
-			ghostRef.addEventListener('transitionend', handleGhostDrop);
+			if (transitionDuration > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
+			else handleGhostDrop();
 		} else {
 			if ($focusedItem) {
 				const items = listRef.children;

@@ -160,9 +160,8 @@
 	function getStyleZIndex(status: GhostProps['status']) {
 		if (status === 'unset') return undefined;
 		if (status === 'init') return '10000';
-		// zIndex is only set and then re-set to force the transitionend event
-		// (along with the handleGhostDrop() function) to be fired when the ghost
-		// is dragged and dropped without being moved.
+		// zIndex is only set and then re-set to force the transitionend event to be fired
+		// when the ghost is dragged and dropped without being moved.
 		if (status === 'set' || status === 'remove') return '9999';
 	}
 </script>

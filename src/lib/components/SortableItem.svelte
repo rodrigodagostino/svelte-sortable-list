@@ -237,19 +237,24 @@
 			$isKeyboardDropping = true;
 			$isCancelingKeyboardDragging = true;
 
-			function handleItemDrop({ propertyName }: TransitionEvent) {
-				if (propertyName === 'transform') {
-					$draggedItem = null;
-					$targetItem = null;
-					$itemsOrigin = null;
-					$isKeyboardDropping = false;
-					$isCancelingKeyboardDragging = false;
+			function handleItemDrop() {
+				$draggedItem = null;
+				$targetItem = null;
+				$itemsOrigin = null;
+				$isKeyboardDropping = false;
+				$isCancelingKeyboardDragging = false;
+			}
 
-					itemRef.removeEventListener('transitionend', handleItemDrop);
+			function handleTransitionEnd({ propertyName }: TransitionEvent) {
+				if (propertyName === 'transform') {
+					handleItemDrop();
+					itemRef.removeEventListener('transitionend', handleTransitionEnd);
 				}
 			}
 
-			itemRef.addEventListener('transitionend', handleItemDrop);
+			if ($listProps.transitionDuration > 0)
+				itemRef.addEventListener('transitionend', handleTransitionEnd);
+			else handleItemDrop();
 		}
 	}
 </script>
