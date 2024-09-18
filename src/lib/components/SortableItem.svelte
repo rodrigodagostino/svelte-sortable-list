@@ -160,10 +160,10 @@
 				const x =
 					$listProps.direction === 'vertical'
 						? '0'
-						: `${operator}${draggedItemRect.width + $listProps.gap}px`;
+						: `${operator}${draggedItemRect.width + $listProps.gap!}px`;
 				const y =
 					$listProps.direction === 'vertical'
-						? `${operator}${draggedItemRect.height + $listProps.gap}px`
+						? `${operator}${draggedItemRect.height + $listProps.gap!}px`
 						: '0';
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -259,7 +259,7 @@
 				}
 			}
 
-			if ($listProps.transitionDuration > 0)
+			if ($listProps.transitionDuration! > 0)
 				itemRef.addEventListener('transitionend', handleTransitionEnd);
 			else handleItemDrop();
 		}

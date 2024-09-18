@@ -168,7 +168,7 @@
 			}
 		}
 
-		if (transitionDuration > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
+		if (transitionDuration! > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
 		else handleGhostDrop();
 	}
 
@@ -221,7 +221,7 @@
 					}
 				}
 
-				if (transitionDuration > 0)
+				if (transitionDuration! > 0)
 					$focusedItem.addEventListener('transitionend', handleTransitionEnd);
 				else handleItemDrop();
 			}
@@ -307,7 +307,7 @@
 				}
 			}
 
-			if (transitionDuration > 0)
+			if (transitionDuration! > 0)
 				$focusedItem.addEventListener('transitionend', handleTransitionEnd);
 			else handleItemDrop();
 		}
@@ -347,7 +347,7 @@
 				}
 			}
 
-			if (transitionDuration > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
+			if (transitionDuration! > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
 			else handleGhostDrop();
 		} else {
 			if ($focusedItem) {

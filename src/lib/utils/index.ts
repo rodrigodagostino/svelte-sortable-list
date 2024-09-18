@@ -1,4 +1,9 @@
-import type { ElementData, SortableItemData } from '$lib/types/index.js';
+import type {
+	ElementData,
+	SortableItemData,
+	SortableItemProps,
+	SortableListProps,
+} from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string | undefined {
 	return String(element.dataset.id);
@@ -81,7 +86,11 @@ function getIntersectionRect(r1: DOMRect | ElementData, r2: DOMRect | ElementDat
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(ghost: HTMLElement, items: ElementData[], threshold: number) {
+export function getCollidingItem(
+	ghost: HTMLElement,
+	items: ElementData[],
+	threshold: SortableListProps['swapThreshold']
+) {
 	const ghostRect = ghost.getBoundingClientRect();
 	const collidingItems = items.filter((targetItem) =>
 		areColliding(ghostRect, targetItem, threshold)
@@ -104,12 +113,12 @@ export function sortItems(items: SortableItemData[], from: number, to: number) {
 	return sortedItems;
 }
 
-export function removeItem(items: SortableItemData[], itemId: string | number) {
+export function removeItem(items: SortableItemData[], itemId: SortableItemProps['id']) {
 	return items.filter((item) => String(item.id) !== String(itemId));
 }
 
 export const screenReaderText = {
-	item: (index: number, isDisabled: boolean) => {
+	item: (index: SortableItemProps['index'], isDisabled: SortableItemProps['isDisabled']) => {
 		return `Draggable item at position ${index + 1}. ${!isDisabled ? 'Press Space Bar to lift it.' : ''}`;
 	},
 

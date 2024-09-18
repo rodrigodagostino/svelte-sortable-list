@@ -96,13 +96,13 @@
 				($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedItemOrigin.x) < listRect.x + $listProps.gap / 2
-						? listRect.x - draggedItemOrigin.x + $listProps.gap / 2
+						$pointer.x - ($pointerOrigin.x - draggedItemOrigin.x) < listRect.x + $listProps.gap! / 2
+						? listRect.x - draggedItemOrigin.x + $listProps.gap! / 2
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
 							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemOrigin.x) >
-							  listRect.right - $listProps.gap / 2
-							? listRect.right - draggedItemOrigin.x - ghostRect.width - $listProps.gap / 2
+							  listRect.right - $listProps.gap! / 2
+							? listRect.right - draggedItemOrigin.x - ghostRect.width - $listProps.gap! / 2
 							: $pointer.x - $pointerOrigin.x
 					: 0;
 			const y =
@@ -110,13 +110,13 @@
 				($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedItemOrigin.y) < listRect.y + $listProps.gap / 2
-						? listRect.y - draggedItemOrigin.y + $listProps.gap / 2
+						$pointer.y - ($pointerOrigin.y - draggedItemOrigin.y) < listRect.y + $listProps.gap! / 2
+						? listRect.y - draggedItemOrigin.y + $listProps.gap! / 2
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
 							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemOrigin.y) >
-							  listRect.bottom - $listProps.gap / 2
-							? listRect.bottom - draggedItemOrigin.y - ghostRect.height - $listProps.gap / 2
+							  listRect.bottom - $listProps.gap! / 2
+							? listRect.bottom - draggedItemOrigin.y - ghostRect.height - $listProps.gap! / 2
 							: $pointer.y - $pointerOrigin.y
 					: 0;
 			return `translate3d(${x}px, ${y}px, 0)`;

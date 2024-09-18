@@ -1,12 +1,12 @@
 export interface SortableListProps {
-	gap: number;
-	direction: 'vertical' | 'horizontal';
-	swapThreshold: number;
-	transitionDuration: number;
-	hasDropMarker: boolean;
-	hasLockedAxis: boolean;
-	hasBoundaries: boolean;
-	hasRemoveOnDropOut: boolean;
+	gap?: number;
+	direction?: 'vertical' | 'horizontal';
+	swapThreshold?: number;
+	transitionDuration?: number;
+	hasDropMarker?: boolean;
+	hasLockedAxis?: boolean;
+	hasBoundaries?: boolean;
+	hasRemoveOnDropOut?: boolean;
 }
 
 export interface SortableListCoordinates {
