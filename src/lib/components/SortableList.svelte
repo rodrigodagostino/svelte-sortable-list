@@ -377,6 +377,7 @@
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	role="listbox"
 	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
+	aria-orientation={direction}
 	aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
