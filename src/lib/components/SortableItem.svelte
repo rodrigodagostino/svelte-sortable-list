@@ -190,7 +190,7 @@
 		await tick();
 		itemRef
 			?.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, label, optgroup, option, select, textarea, video, ' +
+				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach(

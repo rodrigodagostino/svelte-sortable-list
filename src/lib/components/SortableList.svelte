@@ -181,37 +181,124 @@
 		const { key } = event;
 		const target = event.target as HTMLElement;
 
-		if (key === ' ') {
-			// Prevent default only if the target is a sortable item.
-			// This allows interactive elements (like buttons) to operate normally.
-			if (target.classList.contains('ssl-item')) event.preventDefault();
-			else return;
+		if (target === listRef || target === $focusedItem) {
+			if (key === ' ') {
+				// Prevent default only if the target is a sortable item.
+				// This allows interactive elements (like buttons) to operate normally.
+				if (target.classList.contains('ssl-item')) event.preventDefault();
+				else return;
 
-			if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
+				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-			if (!$isKeyboardDragging) {
-				$isKeyboardDragging = true;
+				if (!$isKeyboardDragging) {
+					$isKeyboardDragging = true;
 
-				await tick();
-				$draggedItem = $focusedItem;
-				$itemsOrigin = getItemsData(listRef);
-				if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
-			} else {
+					await tick();
+					$draggedItem = $focusedItem;
+					$itemsOrigin = getItemsData(listRef);
+					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
+				} else {
+					$isKeyboardDragging = false;
+					$isKeyboardDropping = true;
+
+					if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
+
+					async function handleItemDrop() {
+						dispatchSort($draggedItem, $targetItem);
+
+						$draggedItem = null;
+						$targetItem = null;
+						$itemsOrigin = null;
+						$isKeyboardDropping = false;
+
+						await tick();
+						$focusedItem?.focus();
+					}
+
+					function handleTransitionEnd({ propertyName }: TransitionEvent) {
+						if (propertyName === 'z-index') {
+							handleItemDrop();
+							$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
+						}
+					}
+
+					if (transitionDuration! > 0)
+						$focusedItem.addEventListener('transitionend', handleTransitionEnd);
+					else handleItemDrop();
+				}
+			}
+
+			if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+				event.preventDefault();
+
+				const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
+				const draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
+				const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
+				const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
+
+				if (!$isKeyboardDragging) {
+					if (!$focusedItem || focusedItemIndex === null) {
+						const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
+						firstItemElement?.focus();
+						return;
+					}
+
+					// Prevent focusing the previous item if the current one is the first,
+					// and focusing the next item if the current one is the last.
+					const items = listRef.children;
+					if (
+						(key === 'ArrowUp' && focusedItemIndex === 0) ||
+						(key === 'ArrowDown' && focusedItemIndex === items.length - 1)
+					)
+						return;
+
+					if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
+					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+				} else {
+					if (!$draggedItem || !$itemsOrigin) return;
+					// Prevent moving the selected item if it’s the first or last item,
+					// or is at the top or bottom of the list.
+					if (
+						((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItemIndex === 0 && !targetItem) ||
+						((key === 'ArrowUp' || key === 'ArrowLeft') && targetItemIndex === 0) ||
+						((key === 'ArrowDown' || key === 'ArrowRight') &&
+							draggedItemIndex === $itemsOrigin.length - 1 &&
+							!targetItem) ||
+						((key === 'ArrowDown' || key === 'ArrowRight') &&
+							targetItemIndex === $itemsOrigin.length - 1)
+					)
+						return;
+
+					if (!$targetItem) {
+						$targetItem =
+							step === 1
+								? ($draggedItem.nextElementSibling as HTMLLIElement)
+								: ($draggedItem.previousElementSibling as HTMLLIElement);
+					} else {
+						$targetItem =
+							step === 1
+								? ($targetItem.nextElementSibling as HTMLLIElement)
+								: ($targetItem.previousElementSibling as HTMLLIElement);
+					}
+
+					if ($targetItem) liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
+				}
+			}
+
+			if (key === 'Escape') {
+				if (!$focusedItem || !$isKeyboardDragging) return;
+
 				$isKeyboardDragging = false;
 				$isKeyboardDropping = true;
+				$isCancelingKeyboardDragging = true;
+				if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
 
-				if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
-
-				async function handleItemDrop() {
-					dispatchSort($draggedItem, $targetItem);
-
+				function handleItemDrop() {
 					$draggedItem = null;
 					$targetItem = null;
 					$itemsOrigin = null;
 					$isKeyboardDropping = false;
-
-					await tick();
-					$focusedItem?.focus();
+					$isCancelingKeyboardDragging = false;
 				}
 
 				function handleTransitionEnd({ propertyName }: TransitionEvent) {
@@ -225,91 +312,6 @@
 					$focusedItem.addEventListener('transitionend', handleTransitionEnd);
 				else handleItemDrop();
 			}
-		}
-
-		if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
-			event.preventDefault();
-
-			const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
-			const draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
-			const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
-			const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
-
-			if (!$isKeyboardDragging) {
-				if (!$focusedItem || focusedItemIndex === null) {
-					const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
-					firstItemElement?.focus();
-					return;
-				}
-
-				// Prevent focusing the previous item if the current one is the first,
-				// and focusing the next item if the current one is the last.
-				const items = listRef.children;
-				if (
-					(key === 'ArrowUp' && focusedItemIndex === 0) ||
-					(key === 'ArrowDown' && focusedItemIndex === items.length - 1)
-				)
-					return;
-
-				if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
-				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
-			} else {
-				if (!$draggedItem || !$itemsOrigin) return;
-				// Prevent moving the selected item if it’s the first or last item,
-				// or is at the top or bottom of the list.
-				if (
-					((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItemIndex === 0 && !targetItem) ||
-					((key === 'ArrowUp' || key === 'ArrowLeft') && targetItemIndex === 0) ||
-					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						draggedItemIndex === $itemsOrigin.length - 1 &&
-						!targetItem) ||
-					((key === 'ArrowDown' || key === 'ArrowRight') &&
-						targetItemIndex === $itemsOrigin.length - 1)
-				)
-					return;
-
-				if (!$targetItem) {
-					$targetItem =
-						step === 1
-							? ($draggedItem.nextElementSibling as HTMLLIElement)
-							: ($draggedItem.previousElementSibling as HTMLLIElement);
-				} else {
-					$targetItem =
-						step === 1
-							? ($targetItem.nextElementSibling as HTMLLIElement)
-							: ($targetItem.previousElementSibling as HTMLLIElement);
-				}
-
-				if ($targetItem) liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
-			}
-		}
-
-		if (key === 'Escape') {
-			if (!$focusedItem || !$isKeyboardDragging) return;
-
-			$isKeyboardDragging = false;
-			$isKeyboardDropping = true;
-			$isCancelingKeyboardDragging = true;
-			if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
-
-			function handleItemDrop() {
-				$draggedItem = null;
-				$targetItem = null;
-				$itemsOrigin = null;
-				$isKeyboardDropping = false;
-				$isCancelingKeyboardDragging = false;
-			}
-
-			function handleTransitionEnd({ propertyName }: TransitionEvent) {
-				if (propertyName === 'z-index') {
-					handleItemDrop();
-					$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
-				}
-			}
-
-			if (transitionDuration! > 0)
-				$focusedItem.addEventListener('transitionend', handleTransitionEnd);
-			else handleItemDrop();
 		}
 	}
 

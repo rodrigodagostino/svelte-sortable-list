@@ -39,7 +39,6 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 		'audio',
 		'button',
 		'input',
-		'label',
 		'optgroup',
 		'option',
 		'select',
