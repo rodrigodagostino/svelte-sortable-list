@@ -46,6 +46,22 @@
 		setInteractiveElementsTabIndex();
 	});
 
+	$: {
+		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
+	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	async function setInteractiveElementsTabIndex(...args: unknown[]) {
+		await tick();
+		itemRef
+			?.querySelectorAll<HTMLElement>(
+				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
+					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
+			)
+			.forEach(
+				(el) => (el.tabIndex = !$isKeyboardDragging && focusedItemId === String(id) ? 0 : -1)
+			);
+	}
+
 	$: draggedItemId = ($draggedItem && getId($draggedItem)) ?? null;
 	$: draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
 	// $itemsOrigin is used as a reliable reference to the item’s position in the list
@@ -56,8 +72,6 @@
 	$: targetItemRect =
 		typeof targetItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[targetItemIndex] : null;
 	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
-
-	$: if ($isKeyboardDragging) setInteractiveElementsTabIndex();
 
 	$: styleCursor =
 		$isPointerDragging && draggedItemId === String(id)
@@ -186,32 +200,18 @@
 		}
 	}
 
-	async function setInteractiveElementsTabIndex() {
-		await tick();
-		itemRef
-			?.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
-					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
-			)
-			.forEach(
-				(el) => (el.tabIndex = !$isKeyboardDragging && focusedItemId === String(id) ? 0 : -1)
-			);
-	}
-
 	async function handleFocus() {
 		await tick();
 		$focusedItem = itemRef;
-		await tick();
-		setInteractiveElementsTabIndex();
 	}
 
+	// `focusout` is preferred over `blur` because it detects
+	// the loss of focus on the current element and it’s descendants too.
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
-		if (relatedTarget && !relatedTarget.closest('.ssl-item')) {
+		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
 			cleanUp();
 		}
-		await tick();
-		setInteractiveElementsTabIndex();
 	}
 
 	function handlePointerDown(event: PointerEvent) {
@@ -231,11 +231,8 @@
 
 	async function handleDocumentPointerDown(event: PointerEvent) {
 		const target = event.target as HTMLElement;
-		const focusedItemId = $focusedItem && getId($focusedItem);
 		if (focusedItemId === String(id) && !target.closest('.ssl-item')) {
 			cleanUp();
-			await tick();
-			setInteractiveElementsTabIndex();
 		}
 	}
 
@@ -298,7 +295,6 @@
 	aria-disabled={isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	on:blur={setInteractiveElementsTabIndex}
 	on:pointerdown={handlePointerDown}
 	in:scaleFade
 	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
