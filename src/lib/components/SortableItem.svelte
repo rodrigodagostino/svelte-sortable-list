@@ -86,7 +86,7 @@
 			? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
 				`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
 				`z-index ${$listProps.transitionDuration}ms`
-			: `z-index ${$listProps.transitionDuration}ms`;
+			: `none`;
 	$: styleVisibility =
 		($isPointerDragging || $isPointerDropping) &&
 		draggedItemId === String(id) &&
@@ -316,15 +316,21 @@
 		backface-visibility: hidden;
 		z-index: 1;
 
+		&:focus,
+		&:focus-visible,
+		&:focus-within {
+			z-index: 2;
+		}
+
 		&.is-keyboard-dragging {
-			z-index: 3;
+			z-index: 4;
 		}
 
 		&.is-keyboard-dropping {
 			// The following z-index is different from the one in .is-keyboard-dragging for
 			// the sole purpose of ensuring the «transitionend» event is fired when
 			// the item is dropped using the keyboard.
-			z-index: 2;
+			z-index: 3;
 		}
 
 		&.is-pointer-dragging,
