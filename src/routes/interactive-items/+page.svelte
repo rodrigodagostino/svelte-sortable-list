@@ -66,10 +66,6 @@
 </SortableList>
 
 <style lang="scss">
-	:global(.ssl-list) {
-		align-items: stretch;
-	}
-
 	label:not(:has(input[type='checkbox'])) {
 		display: flex;
 		flex-direction: column;
