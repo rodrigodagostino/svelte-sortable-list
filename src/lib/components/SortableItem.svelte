@@ -221,7 +221,10 @@
 		if (
 			target.classList.contains('ssl-item') ||
 			target.classList.contains('ssl-item__inner') ||
-			target.classList.contains('ssl-handle')
+			target.classList.contains('ssl-handle') ||
+			// For some unknown reason to me, clicking/tapping on a `<label>`
+			// puts the focus on the current `<SortableItem>`, so let’s prevent that.
+			target.tagName === 'LABEL'
 		)
 			event.preventDefault();
 	}
