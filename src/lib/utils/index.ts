@@ -1,9 +1,4 @@
-import type {
-	ElementData,
-	SortableItemData,
-	SortableItemProps,
-	SortableListProps,
-} from '$lib/types/index.js';
+import type { ElementData, SortableItemProps, SortableListProps } from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string | undefined {
 	return String(element.dataset.id);
@@ -106,14 +101,16 @@ export function getCollidingItem(
 	return collidingItems[0];
 }
 
-export function sortItems(items: SortableItemData[], from: number, to: number) {
-	const sortedItems = structuredClone(items);
-	sortedItems.splice(to < 0 ? sortedItems.length + to : to, 0, sortedItems.splice(from, 1)[0]);
-	return sortedItems;
+export function sortItems<T>(items: T[], from: number, to: number) {
+	const clone = structuredClone(items);
+	clone.splice(to < 0 ? clone.length + to : to, 0, clone.splice(from, 1)[0]);
+	return clone;
 }
 
-export function removeItem(items: SortableItemData[], itemId: SortableItemProps['id']) {
-	return items.filter((item) => String(item.id) !== String(itemId));
+export function removeItem<T>(items: T[], index: SortableItemProps['index']) {
+	const clone = structuredClone(items);
+	clone.splice(index, 1);
+	return clone;
 }
 
 export const screenReaderText = {
