@@ -1,4 +1,4 @@
-import type { ElementData, SortableItemProps, SortableListProps } from '$lib/types/index.js';
+import type { ItemData, SortableItemProps, SortableListProps } from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string {
 	return String(element.dataset.id);
@@ -8,7 +8,7 @@ export function getIndex(element: HTMLElement): number {
 	return Number(element.dataset.index);
 }
 
-export function getItemData(item: HTMLElement): ElementData {
+export function getItemData(item: HTMLElement): ItemData {
 	const itemRect = item.getBoundingClientRect();
 	return {
 		id: item.dataset.id!,
@@ -20,7 +20,7 @@ export function getItemData(item: HTMLElement): ElementData {
 	};
 }
 
-export function getItemsData(list: HTMLUListElement): ElementData[] {
+export function getItemsData(list: HTMLUListElement): ItemData[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemData(item)
 	);
@@ -58,11 +58,7 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 	return false;
 }
 
-export function areColliding(
-	a: DOMRect | ElementData,
-	b: DOMRect | ElementData,
-	threshold: number = 1
-) {
+export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData, threshold: number = 1) {
 	return (
 		a.x + a.width * threshold > b.x &&
 		a.x < b.x + b.width * threshold &&
@@ -71,7 +67,7 @@ export function areColliding(
 	);
 }
 
-function getIntersectionRect(r1: DOMRect | ElementData, r2: DOMRect | ElementData) {
+function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
 	const x1 = Math.max(r1.x, r2.x);
 	const y1 = Math.max(r1.y, r2.y);
 	const x2 = Math.min(r1.x + r1.width, r2.x + r2.width);
@@ -82,7 +78,7 @@ function getIntersectionRect(r1: DOMRect | ElementData, r2: DOMRect | ElementDat
 
 export function getCollidingItem(
 	ghost: HTMLElement,
-	items: ElementData[],
+	items: ItemData[],
 	threshold: SortableListProps['swapThreshold']
 ) {
 	const ghostRect = ghost.getBoundingClientRect();

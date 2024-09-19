@@ -12,7 +12,7 @@ export interface SortableListProps {
 export interface SortableListCoordinates {
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
-	itemsOrigin: ElementData[] | null;
+	itemsOrigin: ItemData[] | null;
 }
 
 export interface SortableListElements {
@@ -35,7 +35,7 @@ export interface GhostProps {
 	status: 'init' | 'set' | 'remove' | 'unset';
 }
 
-export interface ElementData {
+export interface ItemData {
 	id: string;
 	index: number;
 	x: number;
