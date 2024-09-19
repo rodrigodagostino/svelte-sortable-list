@@ -43,3 +43,15 @@ export interface ItemData {
 	width: number;
 	height: number;
 }
+
+export interface SortEventDetail {
+	prevItemId: string;
+	prevItemIndex: number;
+	nextItemId: string;
+	nextItemIndex: number;
+}
+
+export interface RemoveEventDetail {
+	itemId: string;
+	itemIndex: number;
+}

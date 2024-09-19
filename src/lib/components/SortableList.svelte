@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
-	import type { GhostProps, SortableListProps } from '$lib/types/index.js';
+	import type {
+		GhostProps,
+		RemoveEventDetail,
+		SortableListProps,
+		SortEventDetail,
+	} from '$lib/types/index.js';
 	import {
 		areColliding,
 		getCollidingItem,
@@ -78,7 +83,10 @@
 	const isGhostBetweenBounds = setIsGhostBetweenBounds(true);
 	const isRemoving = setIsRemoving(false);
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{
+		sort: SortEventDetail;
+		remove: RemoveEventDetail;
+	}>();
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
