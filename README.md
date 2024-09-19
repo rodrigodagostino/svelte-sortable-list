@@ -101,9 +101,9 @@ yarn add @rodrigodagostino/svelte-sortable-list
 		},
 	];
 
-	function handleSort(event: CustomEvent) {
-		const { prevIndex, nextIndex } = event.detail;
-		items = sortItems(items, prevIndex, nextIndex);
+	function handleSort(event: CustomEvent<SortEventDetail>) {
+		const { prevItemIndex, nextItemIndex } = event.detail;
+		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 </script>
 
@@ -159,10 +159,10 @@ The following is a list of the available components inside the package:
 
 ### `<SortableList>` events
 
-| Name        | Type          | Trigger                    | Returns                                                         |
-| ----------- | ------------- | -------------------------- | --------------------------------------------------------------- |
-| `on:sort`   | `CustomEvent` | An item switches position. | `event: { detail: { prevIndex: number, nextIndex: number } } }` |
-| `on:remove` | `CustomEvent` | An item is removed.        | `event: { detail: { itemId: number } } }`                       |
+| Name        | Type          | Trigger                    | Returns                                                                                                                                                                                                                                                             |
+| ----------- | ------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `on:sort`   | `CustomEvent` | An item switches position. | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemIndex: number<br>&nbsp;&nbsp;}<br>}</pre> |
+| `on:remove` | `CustomEvent` | An item is removed.        | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;itemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;itemIndex: number<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                          |
 
 ### `<SortableItem>` props
 
@@ -216,14 +216,14 @@ Example:
 		},
 	];
 
-	function handleSort(event: CustomEvent) {
-		const { prevIndex, nextIndex } = event.detail;
-		items = sortItems(items, prevIndex, nextIndex);
+	function handleSort(event: CustomEvent<SortEventDetail>) {
+		const { prevItemIndex, nextItemIndex } = event.detail;
+		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent) {
-		const { itemId } = event.detail;
-		items = removeItem(items, itemId);
+	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
+		const { itemIndex } = event.detail;
+		items = removeItem(items, itemIndex);
 	}
 </script>
 
@@ -233,7 +233,7 @@ Example:
 			<div class="ssl-item__content">
 				{item.text}
 			</div>
-			<Remove itemId={item.id}>
+			<Remove>
 				<IconRemove />
 			</Remove>
 		</SortableItem>

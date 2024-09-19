@@ -7,6 +7,8 @@
 		IconRemove,
 		removeItem,
 		sortItems,
+		type SortEventDetail,
+		type RemoveEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
@@ -19,14 +21,14 @@
 		$props = { ...defaultProps };
 	});
 
-	function handleSort(event: CustomEvent) {
-		const { prevIndex, nextIndex } = event.detail;
-		items = sortItems(items, prevIndex, nextIndex);
+	function handleSort(event: CustomEvent<SortEventDetail>) {
+		const { prevItemIndex, nextItemIndex } = event.detail;
+		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent) {
-		const { itemId } = event.detail;
-		items = removeItem(items, itemId);
+	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
+		const { itemIndex } = event.detail;
+		items = removeItem(items, itemIndex);
 	}
 
 	function toKebabCase(str: string) {
@@ -47,7 +49,7 @@
 			<div class="ssl-item__content">
 				{item.text}
 			</div>
-			<Remove itemId={item.id}>
+			<Remove>
 				<IconRemove />
 			</Remove>
 		</SortableItem>
