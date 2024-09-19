@@ -1,9 +1,5 @@
 <script lang="ts">
-	import type { SortableItemProps } from '$lib/types/index.js';
-
 	let removeRef: HTMLButtonElement;
-
-	export let itemId: SortableItemProps['id'];
 
 	function dispatch(name: string, detail: object) {
 		const event = new CustomEvent(name, { bubbles: true, detail });
@@ -15,7 +11,7 @@
 	bind:this={removeRef}
 	class="ssl-remove"
 	data-role="remove"
-	on:click|self={() => dispatch('removestart', { itemId })}
+	on:click|self={() => dispatch('removestart', { item: removeRef.closest('.ssl-item') })}
 >
 	<slot />
 </button>

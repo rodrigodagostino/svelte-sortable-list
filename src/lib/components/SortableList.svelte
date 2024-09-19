@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
-	import type { GhostProps, SortableListProps, SortableItemProps } from '$lib/types/index.js';
+	import type { GhostProps, SortableListProps } from '$lib/types/index.js';
 	import {
 		areColliding,
 		getCollidingItem,
@@ -140,9 +140,7 @@
 	function handlePointerUp() {
 		if (!$isPointerDragging || $isPointerDropping) return;
 
-		const draggedItemId = $draggedItem && getId($draggedItem);
-		if (!$isGhostBetweenBounds && hasRemoveOnDropOut && draggedItemId)
-			dispatchRemove(draggedItemId);
+		if ($draggedItem && !$isGhostBetweenBounds && hasRemoveOnDropOut) dispatchRemove($draggedItem);
 
 		$isPointerDragging = false;
 		ghostStatus = !$isGhostBetweenBounds && hasRemoveOnDropOut ? 'remove' : 'set';
@@ -150,7 +148,7 @@
 		$isGhostBetweenBounds = true;
 
 		function handleGhostDrop() {
-			dispatchSort($draggedItem, $targetItem);
+			if ($draggedItem && $targetItem) dispatchSort($draggedItem, $targetItem);
 
 			ghostStatus = 'unset';
 			$pointer = null;
@@ -204,7 +202,7 @@
 					if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
 
 					async function handleItemDrop() {
-						dispatchSort($draggedItem, $targetItem);
+						if ($draggedItem && $targetItem) dispatchSort($draggedItem, $targetItem);
 
 						$draggedItem = null;
 						$targetItem = null;
@@ -315,22 +313,32 @@
 		}
 	}
 
-	function dispatchSort(draggedItem: HTMLLIElement | null, targetItem: HTMLLIElement | null) {
-		const draggerItemIndex = $draggedItem && getIndex($draggedItem);
-		const targetItemIndex = $targetItem && getIndex($targetItem);
+	function dispatchSort(draggedItem: HTMLLIElement, targetItem: HTMLLIElement) {
+		const draggedItemId = getId(draggedItem);
+		const draggedItemIndex = getIndex(draggedItem);
+		const targetItemId = getId(targetItem);
+		const targetItemIndex = getIndex(targetItem);
 
 		if (
 			draggedItem !== null &&
 			targetItem !== null &&
-			typeof draggerItemIndex === 'number' &&
+			typeof draggedItemIndex === 'number' &&
 			typeof targetItemIndex === 'number' &&
-			draggerItemIndex !== targetItemIndex
+			draggedItemIndex !== targetItemIndex
 		) {
-			dispatch('sort', { prevIndex: draggerItemIndex, nextIndex: targetItemIndex });
+			dispatch('sort', {
+				prevItemId: draggedItemId,
+				prevItemIndex: draggedItemIndex,
+				nextItemId: targetItemId,
+				nextItemIndex: targetItemIndex,
+			});
 		}
 	}
 
-	async function dispatchRemove(itemId: SortableItemProps['id']) {
+	async function dispatchRemove(item: HTMLLIElement) {
+		const itemId = getId(item);
+		const itemIndex = getIndex(item);
+
 		if ($isPointerDragging) {
 			$isRemoving = true;
 
@@ -340,7 +348,7 @@
 
 			function handleTransitionEnd({ propertyName }: TransitionEvent) {
 				if (propertyName === 'top' || propertyName === 'z-index') {
-					dispatch('remove', { itemId });
+					dispatch('remove', { itemId, itemIndex });
 					// setTimeout will allow the `remove` event to be handled before setting the $isRemoving state.
 					setTimeout(() => {
 						handleGhostDrop();
@@ -365,7 +373,7 @@
 					listRef.focus();
 				}
 			}
-			dispatch('remove', { itemId });
+			dispatch('remove', { itemId, itemIndex });
 		}
 	}
 </script>
@@ -384,7 +392,7 @@
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
-	on:removestart={(event) => dispatchRemove(event.detail.itemId)}
+	on:removestart={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>
 		<p>
