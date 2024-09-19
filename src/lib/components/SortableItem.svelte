@@ -253,7 +253,7 @@
 			}
 
 			function handleTransitionEnd({ propertyName }: TransitionEvent) {
-				if (propertyName === 'transform') {
+				if (propertyName === 'z-index') {
 					handleItemDrop();
 					itemRef.removeEventListener('transitionend', handleTransitionEnd);
 				}
