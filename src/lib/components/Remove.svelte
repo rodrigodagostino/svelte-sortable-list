@@ -11,7 +11,7 @@
 	bind:this={removeRef}
 	class="ssl-remove"
 	data-role="remove"
-	on:click|self={() => dispatch('removestart', { item: removeRef.closest('.ssl-item') })}
+	on:click={() => dispatch('removestart', { item: removeRef.closest('.ssl-item') })}
 >
 	<slot />
 </button>
