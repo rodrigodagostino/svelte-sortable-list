@@ -1,17 +1,12 @@
 <script lang="ts">
-	let removeRef: HTMLButtonElement;
+	import { dispatch } from '$lib/utils/index.js';
 
-	function dispatch(name: string, detail: object) {
-		const event = new CustomEvent(name, { bubbles: true, detail });
-		removeRef.dispatchEvent(event);
+	function handleClick(event: Event) {
+		const target = event.target as HTMLElement;
+		dispatch(target, 'removestart', { item: target.closest('.ssl-item') });
 	}
 </script>
 
-<button
-	bind:this={removeRef}
-	class="ssl-remove"
-	data-role="remove"
-	on:click={() => dispatch('removestart', { item: removeRef.closest('.ssl-item') })}
->
+<button class="ssl-remove" data-role="remove" on:click={handleClick}>
 	<slot />
 </button>
