@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] (2024-09-19)
+
+### BREAKING
+
+- Increase the flexibility in the `sortItems()` and `removeItem()` functions to prevent type errors.
+- Refactor the `on:sort` and `on:remove` events to match the latest changes made to the `sortItems()` and `removeItem()` functions.
+
+### Added
+
+- Add `on:sort` and `on:remove` events type definitions.
+
+### Fixed
+
+- Add the `aria-orientation` attribute to `<SortableList>`.
+- Set the `<SortableList>` props as optional.
+- Prevent the keyboard events assigned to `<SortableList>` from interfering with the native behavior of the interactive elements inside `<SortableItem>`.
+- Prevent `<SortableItem>` from being focused when a `<label>` is clicked/tapped.
+- Elevate `<SortableItem>` above its siblings when it is focused.
+- Assign the correct `tabindex` to interactive elements inside `<SortableItem>`s when the dragged item is dropped.
+- Clean up properly when keyboard dragging is canceled.
+
+### Docs
+
+- Update the README and the demo pages to reflect the latest changes.
+
 ## [0.10.0] (2024-09-15)
 
 ### BREAKING
@@ -40,8 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Docs
 
-- Implement latest structure in the demo pages.
-- Implement `removeItem()` in the demo pages.
+- Implement the latest structure in the demo pages.
+- Implement the `removeItem()` function in the demo pages.
 - Add **“No animations”** demo page.
 - Add **“Interactive items”** demo page.
 - Update the README to reflect the latest changes.
@@ -454,7 +479,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.6...v0.10.0
 [0.9.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.5...v0.9.6
 [0.9.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.4...v0.9.5
