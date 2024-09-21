@@ -240,7 +240,6 @@
 	}
 
 	.app-main {
-		justify-content: center;
 		padding: 3rem;
 		scrollbar-gutter: stable;
 
@@ -336,6 +335,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		margin-block: auto;
 	}
 
 	@media (min-width: 26em) {
