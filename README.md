@@ -144,6 +144,22 @@ The following is a list of the available components inside the package:
 | `<IconHandle>`   | A **grip** icon. Since it doesn’t include any kind of interactivity, you can use your own icon instead.                                                                   |
 | `<IconRemove>`   | An **x mark** icon. Since it doesn’t include any kind of interactivity, you can use your own icon instead.                                                                |
 
+You can create your own `<Remove>` component if you require it that way. Do so by importing the `dispatch()` function from this package (or create your own dispatcher), and make sure to use the event name and detail included in the example:
+
+```ts
+<script lang="ts">
+	import { dispatch } from '@rodrigodagostino/svelte-sortable-list';
+	import { Button } from '$lib/components';
+
+	function handleRemove(event: MouseEvent) {
+		const target = event.target as HTMLElement;
+		if (target) dispatch(target, 'removestart', { item: target.closest('.ssl-item') });
+	};
+</script>
+
+<Button on:click={handleRemove}>Remove</Button>
+```
+
 ### `<SortableList>` props
 
 | Prop                 | Type    | Default      | Possible values                | Description                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -159,10 +175,10 @@ The following is a list of the available components inside the package:
 
 ### `<SortableList>` events
 
-| Name        | Type          | Trigger                    | Returns                                                                                                                                                                                                                                                             |
-| ----------- | ------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `on:sort`   | `CustomEvent` | An item switches position. | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemIndex: number<br>&nbsp;&nbsp;}<br>}</pre> |
-| `on:remove` | `CustomEvent` | An item is removed.        | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;itemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;itemIndex: number<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                          |
+| Name        | Type                             | Trigger                    | Returns                                                                                                                                                                                                                                                             |
+| ----------- | -------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `on:sort`   | `CustomEvent<SortEventDetail>`   | An item switches position. | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemIndex: number<br>&nbsp;&nbsp;}<br>}</pre> |
+| `on:remove` | `CustomEvent<RemoveEventDetail>` | An item is removed.        | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;itemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;itemIndex: number<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                          |
 
 ### `<SortableItem>` props
 
