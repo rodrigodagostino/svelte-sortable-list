@@ -112,6 +112,14 @@
 						</td>
 						<td></td>
 					</tr>
+					<tr>
+						<td></td>
+						<td><label for="is-disabled">isDisabled</label></td>
+						<td>
+							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
+						</td>
+						<td></td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
@@ -153,6 +161,13 @@
 				aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
 			>
 				With handle
+			</a>
+			<a
+				class="app-nav__link"
+				href="/disabled-list"
+				aria-current={$page.url.pathname === '/disabled-list' ? 'page' : undefined}
+			>
+				Disabled list
 			</a>
 			<a
 				class="app-nav__link"
