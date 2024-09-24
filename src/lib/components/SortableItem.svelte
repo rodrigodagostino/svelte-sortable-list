@@ -58,7 +58,14 @@
 					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
 			)
 			.forEach(
-				(el) => (el.tabIndex = !$isKeyboardDragging && focusedItemId === String(id) ? 0 : -1)
+				(el) =>
+					(el.tabIndex =
+						!$isKeyboardDragging &&
+						focusedItemId === String(id) &&
+						!$listProps.isDisabled &&
+						!isDisabled
+							? 0
+							: -1)
 			);
 	}
 
@@ -275,6 +282,7 @@
 	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
 	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
 	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	class:is-disabled={$listProps.isDisabled || isDisabled}
 	class:is-removing={$isRemoving && draggedItemId === String(id)}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={styleCursor}
@@ -290,9 +298,9 @@
 	data-index={index}
 	role="option"
 	tabindex={focusedItemId === String(id) ? 0 : -1}
-	aria-roledescription={screenReaderText.item(index, isDisabled || false)}
+	aria-roledescription={screenReaderText.item(index, $listProps.isDisabled || isDisabled)}
 	aria-selected={focusedItemId === String(id)}
-	aria-disabled={isDisabled}
+	aria-disabled={$listProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	on:pointerdown={handlePointerDown}

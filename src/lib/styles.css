@@ -67,7 +67,8 @@
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
 		border-color calc(var(--transition-duration) / 3 * 2),
-		box-shadow calc(var(--transition-duration) / 3 * 2);
+		box-shadow calc(var(--transition-duration) / 3 * 2),
+		opacity var(--transition-duration);
 }
 
 .ssl-item__content {

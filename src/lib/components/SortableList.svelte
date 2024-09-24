@@ -44,6 +44,7 @@
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
 	export let hasRemoveOnDropOut: SortableListProps['hasRemoveOnDropOut'] = false;
+	export let isDisabled: SortableListProps['isDisabled'] = false;
 
 	const props = setListProps({
 		gap,
@@ -54,6 +55,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		hasRemoveOnDropOut,
+		isDisabled,
 	});
 	$: $props = {
 		gap,
@@ -64,6 +66,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		hasRemoveOnDropOut,
+		isDisabled,
 	};
 
 	let ghostStatus: GhostProps['status'] = 'unset';
@@ -191,8 +194,8 @@
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
-				if (target.classList.contains('ssl-item')) event.preventDefault();
-				else return;
+				if (!target.classList.contains('ssl-item')) return;
+				else event.preventDefault();
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
@@ -390,6 +393,7 @@
 	bind:this={listRef}
 	class="ssl-list has-direction-{direction}"
 	class:has-remove-on-drop-out={hasRemoveOnDropOut}
+	class:is-disabled={isDisabled}
 	style:--gap="{gap}px"
 	style:--transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
@@ -397,6 +401,7 @@
 	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	aria-orientation={direction}
 	aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
+	aria-disabled={isDisabled}
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
