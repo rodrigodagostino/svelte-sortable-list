@@ -28,8 +28,8 @@ export function getItemsData(list: HTMLUListElement): ItemData[] {
 
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
-export function hasInteractiveElements(target: Element, rootElement: Element) {
-	const DISABLED_ELEMENTS = [
+export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLElement) {
+	const INTERACTIVE_ELEMENTS = [
 		'a',
 		'audio',
 		'button',
@@ -40,16 +40,13 @@ export function hasInteractiveElements(target: Element, rootElement: Element) {
 		'textarea',
 		'video',
 	];
-	const DISABLED_ROLES = ['button', 'checkbox', 'link', 'tab'];
+	const INTERACTIVE_ROLES = ['button', 'checkbox', 'link', 'tab'];
 
-	while (target !== rootElement) {
-		if (
-			DISABLED_ELEMENTS.includes(target.tagName.toLowerCase()) &&
-			!target.classList.contains('ssl-handle')
-		)
-			return true;
+	while (target !== root) {
+		if (target.dataset.role && target.dataset.role !== 'handle') return false;
+		if (INTERACTIVE_ELEMENTS.includes(target.tagName.toLowerCase())) return true;
 		const role = target.getAttribute('role');
-		if (role && DISABLED_ROLES.includes(role.toLowerCase())) return true;
+		if (role && INTERACTIVE_ROLES.includes(role.toLowerCase())) return true;
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) return true;
 
 		if (target.tagName) target = target.parentElement!;

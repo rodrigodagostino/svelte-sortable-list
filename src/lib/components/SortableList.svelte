@@ -13,7 +13,7 @@
 		getId,
 		getIndex,
 		getItemsData,
-		hasInteractiveElements,
+		isOrResidesInInteractiveElement,
 		screenReaderText,
 	} from '$lib/utils/index.js';
 	import {
@@ -108,7 +108,7 @@
 		const hasHandle = !!currItem?.querySelector('[data-role="handle"]');
 		if (hasHandle && !target.closest('[data-role="handle"]')) return;
 		// Prevent dragging if the item has an interactive element and we’re clicking on it.
-		if (!currItem || (!hasHandle && hasInteractiveElements(target, currItem))) return;
+		if (!currItem || (!hasHandle && isOrResidesInInteractiveElement(target, currItem))) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
