@@ -104,11 +104,28 @@
 
 		const target = event.target as HTMLElement;
 		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
-		// Prevent dragging if the item has a handle, but we’re not dragging from it.
-		const hasHandle = !!currItem?.querySelector('[data-role="handle"]');
-		if (hasHandle && !target.closest('[data-role="handle"]')) return;
-		// Prevent dragging if the item has an interactive element and we’re clicking on it.
-		if (!currItem || (!hasHandle && isOrResidesInInteractiveElement(target, currItem))) return;
+		if (!currItem) return;
+
+		const targetIsOrResidesInInteractiveElement = isOrResidesInInteractiveElement(target, currItem);
+		// Prevent default behavior if the current list item doesn’t contain an interactive element or
+		// the target is a <label> with a `for` attribute assigned to it.
+		// NOTE: for some reason that is still unknown to me, clicking/tapping a <label> element
+		// sets the focus on the current <SortableItem>, so let’s prevent that.
+		if (
+			(target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) ||
+			!targetIsOrResidesInInteractiveElement
+		) {
+			event.preventDefault();
+		}
+
+		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
+		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
+		const targetIsOrResidesInHandle = target.closest('[data-role="handle"]');
+		if (hasHandle && !targetIsOrResidesInHandle) return;
+
+		// Prevent dragging if the current list item contains an interactive element
+		// and we’re also not dragging from a handle inside that interactive element.
+		if (targetIsOrResidesInInteractiveElement && !targetIsOrResidesInHandle) return;
 
 		currItem.setPointerCapture(event.pointerId);
 
@@ -295,33 +312,37 @@
 			}
 
 			if (key === 'Escape') {
-				if (!$focusedItem || !$isKeyboardDragging) return;
-
-				$isKeyboardDragging = false;
-				$isKeyboardDropping = true;
-				$isCancelingKeyboardDragging = true;
-				if ($draggedItem) liveText = screenReaderText.canceled($draggedItem);
-
-				function handleItemDrop() {
-					$draggedItem = null;
-					$targetItem = null;
-					$itemsOrigin = null;
-					$isKeyboardDropping = false;
-					$isCancelingKeyboardDragging = false;
-				}
-
-				function handleTransitionEnd({ propertyName }: TransitionEvent) {
-					if (propertyName === 'z-index') {
-						handleItemDrop();
-						$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
-					}
-				}
-
-				if (transitionDuration! > 0)
-					$focusedItem.addEventListener('transitionend', handleTransitionEnd);
-				else handleItemDrop();
+				cleanUp();
 			}
 		}
+	}
+
+	function cleanUp() {
+		if (!$draggedItem || !$isKeyboardDragging) return;
+
+		$isKeyboardDragging = false;
+		$isKeyboardDropping = true;
+		$isCancelingKeyboardDragging = true;
+		liveText = screenReaderText.canceled($draggedItem);
+
+		function handleItemDrop() {
+			$draggedItem = null;
+			$targetItem = null;
+			$itemsOrigin = null;
+			$isKeyboardDropping = false;
+			$isCancelingKeyboardDragging = false;
+		}
+
+		function handleTransitionEnd({ propertyName }: TransitionEvent) {
+			if (propertyName === 'z-index') {
+				handleItemDrop();
+				$draggedItem?.removeEventListener('transitionend', handleTransitionEnd);
+			}
+		}
+
+		if (transitionDuration! > 0)
+			$draggedItem?.addEventListener('transitionend', handleTransitionEnd);
+		else handleItemDrop();
 	}
 
 	function dispatchSort(draggedItem: HTMLLIElement, targetItem: HTMLLIElement) {
@@ -380,7 +401,6 @@
 					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 				} else {
 					// Focus the list (if there are no items left) before removing.
-					$focusedItem = null;
 					listRef.focus();
 				}
 			}
@@ -405,6 +425,7 @@
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
+	on:cleanup={cleanUp}
 	on:removestart={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>

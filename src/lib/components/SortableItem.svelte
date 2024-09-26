@@ -16,7 +16,7 @@
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
 	import type { SortableItemProps } from '$lib/types/index.js';
-	import { getId, getIndex, screenReaderText } from '$lib/utils/index.js';
+	import { dispatch, getId, getIndex, screenReaderText } from '$lib/utils/index.js';
 
 	let itemRef: HTMLLIElement;
 
@@ -40,15 +40,14 @@
 	const isRemoving = getIsRemoving();
 
 	let hasHandle = false;
+	$: {
+		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
+	}
 
 	onMount(() => {
 		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 		setInteractiveElementsTabIndex();
 	});
-
-	$: {
-		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
-	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
 		await tick();
@@ -217,63 +216,11 @@
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
-			cleanUp();
-		}
-	}
-
-	function handlePointerDown(event: PointerEvent) {
-		// Prevent item focus on `pointerdown` only if the target is the item itself,
-		// its content wrapper or its handle.
-		const target = event.target as HTMLElement;
-		if (
-			target.classList.contains('ssl-item') ||
-			target.classList.contains('ssl-item__inner') ||
-			target.classList.contains('ssl-handle') ||
-			// For some unknown reason to me, clicking/tapping on a `<label>`
-			// puts the focus on the current `<SortableItem>`, so let’s prevent that.
-			target.tagName === 'LABEL'
-		)
-			event.preventDefault();
-	}
-
-	async function handleDocumentPointerDown(event: PointerEvent) {
-		const target = event.target as HTMLElement;
-		if (focusedItemId === String(id) && !target.closest('.ssl-item')) {
-			cleanUp();
-		}
-	}
-
-	function cleanUp() {
-		$focusedItem = null;
-
-		if ($isKeyboardDragging) {
-			$isKeyboardDragging = false;
-			$isKeyboardDropping = true;
-			$isCancelingKeyboardDragging = true;
-
-			function handleItemDrop() {
-				$draggedItem = null;
-				$targetItem = null;
-				$itemsOrigin = null;
-				$isKeyboardDropping = false;
-				$isCancelingKeyboardDragging = false;
-			}
-
-			function handleTransitionEnd({ propertyName }: TransitionEvent) {
-				if (propertyName === 'z-index') {
-					handleItemDrop();
-					itemRef.removeEventListener('transitionend', handleTransitionEnd);
-				}
-			}
-
-			if ($listProps.transitionDuration! > 0)
-				itemRef.addEventListener('transitionend', handleTransitionEnd);
-			else handleItemDrop();
+			dispatch(itemRef, 'cleanup', {});
+			$focusedItem = null;
 		}
 	}
 </script>
-
-<svelte:document on:pointerdown={handleDocumentPointerDown} />
 
 <li
 	bind:this={itemRef}
@@ -303,7 +250,6 @@
 	aria-disabled={$listProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	on:pointerdown={handlePointerDown}
 	in:scaleFade
 	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
 >
