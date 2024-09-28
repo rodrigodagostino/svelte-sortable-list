@@ -82,7 +82,7 @@
 	$: styleCursor =
 		$isPointerDragging && draggedItemId === String(id)
 			? 'grabbing'
-			: !hasHandle
+			: !hasHandle && !$listProps.isLocked
 				? 'grab'
 				: 'initial';
 	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds, $isRemoving);
@@ -229,6 +229,7 @@
 	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
 	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
 	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	class:is-locked={$listProps.isLocked}
 	class:is-disabled={$listProps.isDisabled || isDisabled}
 	class:is-removing={$isRemoving && draggedItemId === String(id)}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
@@ -245,7 +246,10 @@
 	data-index={index}
 	role="option"
 	tabindex={focusedItemId === String(id) ? 0 : -1}
-	aria-roledescription={screenReaderText.item(index, $listProps.isDisabled || isDisabled)}
+	aria-roledescription={screenReaderText.item(
+		index,
+		$listProps.isDisabled || isDisabled || $listProps.isLocked
+	)}
 	aria-selected={focusedItemId === String(id)}
 	aria-disabled={$listProps.isDisabled || isDisabled}
 	on:focus={handleFocus}

@@ -7,6 +7,7 @@ export interface SortableListProps {
 	hasLockedAxis?: boolean;
 	hasBoundaries?: boolean;
 	hasRemoveOnDropOut?: boolean;
+	isLocked?: boolean;
 	isDisabled?: boolean;
 }
 

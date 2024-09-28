@@ -44,6 +44,7 @@
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
 	export let hasRemoveOnDropOut: SortableListProps['hasRemoveOnDropOut'] = false;
+	export let isLocked: SortableListProps['isLocked'] = false;
 	export let isDisabled: SortableListProps['isDisabled'] = false;
 
 	const props = setListProps({
@@ -55,6 +56,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		hasRemoveOnDropOut,
+		isLocked,
 		isDisabled,
 	});
 	$: $props = {
@@ -66,6 +68,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		hasRemoveOnDropOut,
+		isLocked,
 		isDisabled,
 	};
 
@@ -117,6 +120,8 @@
 		) {
 			event.preventDefault();
 		}
+
+		if (isLocked) return;
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
@@ -211,7 +216,7 @@
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
-				if (!target.classList.contains('ssl-item')) return;
+				if (isLocked || !target.classList.contains('ssl-item')) return;
 				else event.preventDefault();
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
@@ -413,6 +418,7 @@
 	bind:this={listRef}
 	class="ssl-list has-direction-{direction}"
 	class:has-remove-on-drop-out={hasRemoveOnDropOut}
+	class:is-locked={isLocked}
 	class:is-disabled={isDisabled}
 	style:--gap="{gap}px"
 	style:--transition-duration="{transitionDuration}ms"

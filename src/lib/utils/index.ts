@@ -113,7 +113,10 @@ export function removeItem<T>(items: T[], index: SortableItemProps['index']) {
 
 export const screenReaderText = {
 	item: (index: SortableItemProps['index'], isDisabled: SortableItemProps['isDisabled']) => {
-		return `Draggable item at position ${index + 1}. ${!isDisabled ? 'Press Space Bar to lift it.' : ''}`;
+		return [
+			`Draggable item at position ${index + 1}.`,
+			...(!isDisabled ? ['Press Space Bar to lift it.'] : []),
+		].join(' ');
 	},
 
 	lifted: (draggedItem: HTMLLIElement) => {
