@@ -63,6 +63,36 @@ export const varyingItems: SortableItemData[] = [
 
 Object.freeze(varyingItems);
 
+export const lockedItems: SortableItemData[] = [
+	{
+		id: 'list-item-1',
+		text: 'List item 1',
+		isLocked: false,
+	},
+	{
+		id: 'list-item-2',
+		text: 'List item 2',
+		isLocked: true,
+	},
+	{
+		id: 'list-item-3',
+		text: 'List item 3',
+		isLocked: true,
+	},
+	{
+		id: 'list-item-4',
+		text: 'List item 4',
+		isLocked: false,
+	},
+	{
+		id: 'list-item-5',
+		text: 'List item 5',
+		isLocked: false,
+	},
+];
+
+Object.freeze(lockedItems);
+
 export const disabledItems: SortableItemData[] = [
 	{
 		id: 'list-item-1',

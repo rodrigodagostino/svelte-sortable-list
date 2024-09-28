@@ -179,6 +179,13 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/locked-items"
+				aria-current={$page.url.pathname === '/locked-items' ? 'page' : undefined}
+			>
+				Locked items
+			</a>
+			<a
+				class="app-nav__link"
 				href="/disabled-list"
 				aria-current={$page.url.pathname === '/disabled-list' ? 'page' : undefined}
 			>
