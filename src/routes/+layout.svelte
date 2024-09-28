@@ -114,6 +114,14 @@
 					</tr>
 					<tr>
 						<td></td>
+						<td><label for="is-locked">isLocked</label></td>
+						<td>
+							<input id="is-locked" type="checkbox" bind:checked={$props.isLocked} />
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
 						<td><label for="is-disabled">isDisabled</label></td>
 						<td>
 							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
@@ -161,6 +169,13 @@
 				aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
 			>
 				With handle
+			</a>
+			<a
+				class="app-nav__link"
+				href="/locked-list"
+				aria-current={$page.url.pathname === '/locked-list' ? 'page' : undefined}
+			>
+				Locked list
 			</a>
 			<a
 				class="app-nav__link"
