@@ -121,7 +121,7 @@
 			event.preventDefault();
 		}
 
-		if (isLocked) return;
+		if (isLocked || currItem.classList.contains('is-locked')) return;
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
@@ -216,7 +216,12 @@
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
-				if (isLocked || !target.classList.contains('ssl-item')) return;
+				if (
+					!target.classList.contains('ssl-item') ||
+					isLocked ||
+					target.classList.contains('is-locked')
+				)
+					return;
 				else event.preventDefault();
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;

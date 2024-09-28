@@ -26,6 +26,7 @@ export interface SortableListElements {
 export interface SortableItemProps {
 	id: string;
 	index: number;
+	isLocked?: boolean;
 	isDisabled?: boolean;
 }
 

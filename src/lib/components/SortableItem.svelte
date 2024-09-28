@@ -22,6 +22,7 @@
 
 	export let id: SortableItemProps['id'];
 	export let index: SortableItemProps['index'];
+	export let isLocked: SortableItemProps['isLocked'] = false;
 	export let isDisabled: SortableItemProps['isDisabled'] = false;
 
 	const listProps = getListProps();
@@ -82,7 +83,7 @@
 	$: styleCursor =
 		$isPointerDragging && draggedItemId === String(id)
 			? 'grabbing'
-			: !hasHandle && !$listProps.isLocked
+			: !hasHandle && !$listProps.isLocked && !isLocked
 				? 'grab'
 				: 'initial';
 	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds, $isRemoving);
@@ -229,7 +230,7 @@
 	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
 	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
 	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
-	class:is-locked={$listProps.isLocked}
+	class:is-locked={$listProps.isLocked || isLocked}
 	class:is-disabled={$listProps.isDisabled || isDisabled}
 	class:is-removing={$isRemoving && draggedItemId === String(id)}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
@@ -248,7 +249,7 @@
 	tabindex={focusedItemId === String(id) ? 0 : -1}
 	aria-roledescription={screenReaderText.item(
 		index,
-		$listProps.isDisabled || isDisabled || $listProps.isLocked
+		$listProps.isDisabled || isDisabled || $listProps.isLocked || isLocked
 	)}
 	aria-selected={focusedItemId === String(id)}
 	aria-disabled={$listProps.isDisabled || isDisabled}
