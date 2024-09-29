@@ -86,6 +86,7 @@
 		gap: 0.25rem;
 		width: 200px;
 		padding: 0.5rem 1rem 1rem 0.75rem;
+		margin-inline: unset;
 	}
 
 	legend {
