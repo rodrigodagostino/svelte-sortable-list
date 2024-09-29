@@ -11,7 +11,7 @@ declare global {
 
 	declare namespace svelteHTML {
 		interface HTMLAttributes {
-			'on:cleanup'?: (event: CustomEvent) => void;
+			'on:cleanup'?: (event: CustomEvent<{ item: HTMLElement }>) => void;
 			'on:removestart'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 		}
 	}

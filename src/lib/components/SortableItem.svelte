@@ -217,7 +217,8 @@
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
-			dispatch(itemRef, 'cleanup', {});
+			if (!$focusedItem) return;
+			dispatch(itemRef, 'cleanup', { item: $focusedItem });
 			await tick();
 			$focusedItem = null;
 		}

@@ -321,13 +321,13 @@
 				}
 			}
 
-			if (key === 'Escape') {
-				cleanUp();
+			if (key === 'Escape' && $draggedItem) {
+				cleanUp($draggedItem);
 			}
 		}
 	}
 
-	function cleanUp() {
+	function cleanUp(item: HTMLElement) {
 		if (!$draggedItem || !$isKeyboardDragging) return;
 
 		$isKeyboardDragging = false;
@@ -346,12 +346,11 @@
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
 			if (propertyName === 'z-index') {
 				handleItemDrop();
-				$draggedItem?.removeEventListener('transitionend', handleTransitionEnd);
+				item.removeEventListener('transitionend', handleTransitionEnd);
 			}
 		}
 
-		if (transitionDuration! > 0)
-			$draggedItem?.addEventListener('transitionend', handleTransitionEnd);
+		if (transitionDuration! > 0) item.addEventListener('transitionend', handleTransitionEnd);
 		else handleItemDrop();
 	}
 
@@ -437,7 +436,7 @@
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
-	on:cleanup={cleanUp}
+	on:cleanup={(event) => cleanUp(event.detail.item)}
 	on:removestart={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>
