@@ -422,6 +422,7 @@
 <ul
 	bind:this={listRef}
 	class="ssl-list has-direction-{direction}"
+	class:has-drop-marker={hasDropMarker}
 	class:has-remove-on-drop-out={hasRemoveOnDropOut}
 	class:is-locked={isLocked}
 	class:is-disabled={isDisabled}

@@ -102,12 +102,6 @@
 	transition: background-color calc(var(--transition-duration) / 3 * 2);
 }
 
-.ssl-handle:hover,
-.ssl-remove:focus,
-.ssl-remove:hover {
-	background-color: var(--gray-100);
-}
-
 .ssl-handle,
 .ssl-remove {
 	color: var(--gray-400);
@@ -116,6 +110,7 @@
 .ssl-handle:hover,
 .ssl-remove:focus,
 .ssl-remove:hover {
+	background-color: var(--gray-100);
 	color: var(--gray-600);
 }
 
@@ -128,22 +123,23 @@
 }
 
 /**
- * hasDropMarker 
+ * hasDropMarker
  */
-.ssl-item .ssl-item__inner > * {
-	opacity: 1;
-	transition: opacity 0s var(--transition-duration);
+.ssl-list.has-drop-marker .ssl-item__inner {
+	transition:
+		background-color calc(var(--transition-duration) / 3 * 2),
+		border-color calc(var(--transition-duration) / 3 * 2),
+		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
-.ssl-item.is-pointer-dragging .ssl-item__inner,
-.ssl-item.is-pointer-dropping .ssl-item__inner {
+.ssl-list.has-drop-marker .ssl-item.is-pointer-dragging .ssl-item__inner,
+.ssl-list.has-drop-marker .ssl-item.is-pointer-dropping .ssl-item__inner {
 	opacity: 0.5;
-	transition: opacity 0s;
 }
 
-.ssl-item.is-pointer-dragging .ssl-item__inner > * {
+.ssl-list.has-drop-marker .ssl-item.is-pointer-dragging .ssl-item__inner > *,
+.ssl-list.has-drop-marker .ssl-item.is-pointer-dropping .ssl-item__inner > * {
 	opacity: 0;
-	transition: opacity 0s;
 }
 
 /**
