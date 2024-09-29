@@ -218,6 +218,7 @@
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
 			dispatch(itemRef, 'cleanup', {});
+			await tick();
 			$focusedItem = null;
 		}
 	}
