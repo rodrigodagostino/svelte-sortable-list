@@ -172,6 +172,8 @@ You can create your own `<Remove>` component if you require it that way. Do so b
 | `hasLockedAxis`      | Boolean | `false`      | `true` or `false`              | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                                                                                                                                                                  |
 | `hasBoundaries`      | Boolean | `false`      | `true` or `false`              | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                                                                                                                                                            |
 | `hasRemoveOnDropOut` | Boolean | `false`      | `true` or `false`              | if `true`, items will be removed when dragged and dropped outside of the list boundaries. This needs to be coupled with the `on:remove` event handler for it to complete the removal process.                                                                                                                                                                                                                              |
+| `isLocked`           | Boolean | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard). Interactive elements inside will operate normally.                                                                                                                                                                                                                               |
+| `isDisabled`         | Boolean | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to be dimmed. Interactive elements inside will be disabled.                                                                                                                                                                                             |
 
 ### `<SortableList>` events
 
@@ -182,11 +184,12 @@ You can create your own `<Remove>` component if you require it that way. Do so b
 
 ### `<SortableItem>` props
 
-| Prop         | Type    | Default     | Possible values   | Description                                          |
-| ------------ | ------- | ----------- | ----------------- | ---------------------------------------------------- |
-| `id`         | String  | `undefined` | Unique string.    | Unique identifier for each item.                     |
-| `index`      | Number  | `undefined` | Unique number.    | Position of the item in the list.                    |
-| `isDisabled` | Boolean | `false`     | `true` or `false` | If `true`, will prevent the item from being dragged. |
+| Prop         | Type    | Default     | Possible values   | Description                                                                                 |
+| ------------ | ------- | ----------- | ----------------- | ------------------------------------------------------------------------------------------- |
+| `id`         | String  | `undefined` | Unique string.    | Unique identifier for each item.                                                            |
+| `index`      | Number  | `undefined` | Unique number.    | Position of the item in the list.                                                           |
+| `isLocked`   | Boolean | `false`     | `true` or `false` | If `true`, will prevent the item from being dragged.                                        |
+| `isDisabled` | Boolean | `false`     | `true` or `false` | If `true`, will prevent the item from being dragged and change its appearance to be dimmed. |
 
 ## Utilities
 
@@ -316,14 +319,19 @@ This is a list of the selectors you can use to style the list and the list items
 | Selector                           | Points to                                                                                               |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `.ssl-list`                        | The `<SortableList>` main container.                                                                    |
+| `.ssl-list.has-drop-marker`        | The `<SortableList>` main container while `hasDropMarker` is enabled.                                   |
 | `.ssl-list.has-remove-on-drop-out` | The `<SortableList>` main container while `hasRemoveOnDropOut` is enabled.                              |
+| `.ssl-list.is-locked`              | The `<SortableList>` that is locked.                                                                    |
+| `.ssl-list.is-disabled`            | The `<SortableList>` that is disabled.                                                                  |
 | `.ssl-item`                        | Each `<SortableItem>` main container.                                                                   |
 | `.ssl-item.is-pointer-dragging`    | The `<SortableItem>` that is being dragged by a pointing device.                                        |
 | `.ssl-item.is-pointer-dropping`    | The `<SortableItem>` that is being dropped by a pointing device.                                        |
 | `.ssl-item.is-keyboard-dragging`   | The `<SortableItem>` that is being dragged by the keyboard.                                             |
 | `.ssl-item.is-keyboard-dropping`   | The `<SortableItem>` that is being dropped by the keyboard.                                             |
-| `.ssl-item.is-removing`            | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
+| `.ssl-item.is-locked`              | Each `<SortableItem>` that is locked.                                                                   |
+| `.ssl-item.is-disabled`            | Each `<SortableItem>` that is disabled.                                                                 |
 | `.ssl-item[aria-disabled="true"]`  | Each `<SortableItem>` that is disabled.                                                                 |
+| `.ssl-item.is-removing`            | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
 | `.ssl-item__inner`                 | The content wrapper element inside each `<SortableItem>`.                                               |
 | `.ssl-ghost`                       | The shadow element displayed under the pointer when dragging.                                           |
 | `.ssl-ghost.is-dragging`           | The shadow element while it’s being dragged by a pointing device.                                       |
