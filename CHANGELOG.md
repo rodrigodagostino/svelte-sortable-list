@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.3] (2024-09-29)
+
+### Added
+
+- Add support for disabled list.
+- Add support for locked list.
+- Add support for locked items.
+
+### Changed
+
+- Rename the `hasInteractiveElements()` function to `isOrResidesInInteractiveElement()` and polish it for clarity.
+- Reduce the number of event listeners by moving `<SortableItem>` pointer events to the existing ones in `<SortableList>`.
+- Add `has-drop-marker` CSS class to `<SortableList>`.
+- Handle `<SortableItem>` visibility through `opacity` inline style (instead of `visibility`).
+
+### Fixed
+
+- Prevent focus loss of the selected `<SortableItem>` after dropping it with the keyboard.
+
+### Docs
+
+- Add **“Disabled list”** demo page.
+- Add **“Locked list”** demo page.
+- Add **“Locked items”** demo page.
+- Add repository link to demo layout.
+- Update the README to reflect the latest changes.
+
 ## [0.10.2] (2024-09-21)
 
 ### Added
@@ -179,7 +206,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.1] (2024-04-09)
 
-### Add
+### Added
 
 - Expose stylesheet to be imported from outside the package.
 
@@ -494,7 +521,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.3...HEAD
+[0.10.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.9.6...v0.10.0
