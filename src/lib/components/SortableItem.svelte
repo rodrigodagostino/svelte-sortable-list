@@ -94,6 +94,12 @@
 		$isGhostBetweenBounds,
 		$isRemoving
 	);
+	$: styleOpacity =
+		draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		!$listProps.hasDropMarker
+			? 0
+			: 1;
 	$: styleOverflow = $isPointerDragging && $listProps.hasRemoveOnDropOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
@@ -108,12 +114,6 @@
 				`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
 				`z-index ${$listProps.transitionDuration}ms`
 			: `none`;
-	$: styleVisibility =
-		($isPointerDragging || $isPointerDropping) &&
-		draggedItemId === String(id) &&
-		!$listProps.hasDropMarker
-			? 'hidden'
-			: 'visible';
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
@@ -238,10 +238,10 @@
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:margin={styleMargin}
+	style:opacity={styleOpacity}
 	style:overflow={styleOverflow}
 	style:transform={styleTransform}
 	style:transition={styleTransition}
-	style:visibility={styleVisibility}
 	id="ssl-item-{id}"
 	data-id={id}
 	data-index={index}
