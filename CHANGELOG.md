@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.5] (2024-09-29)
+
+### Changed
+
+- Enforce the `swapThreshold` prop to receive a value between `0.5` and `2`.
+
+### Docs
+
+- Update the README to reflect the latest changes.
+
 ## [0.10.4] (2024-09-29)
 
 ### Fixed
@@ -527,7 +537,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.5...HEAD
+[0.10.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.1...v0.10.2
