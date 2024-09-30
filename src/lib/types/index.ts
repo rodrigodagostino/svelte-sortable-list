@@ -1,7 +1,23 @@
 export interface SortableListProps {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
-	swapThreshold?: number;
+	swapThreshold?:
+		| 0.5
+		| 0.6
+		| 0.7
+		| 0.8
+		| 0.9
+		| 1
+		| 1.1
+		| 1.2
+		| 1.3
+		| 1.4
+		| 1.5
+		| 1.6
+		| 1.7
+		| 1.8
+		| 1.9
+		| 2;
 	transitionDuration?: number;
 	hasDropMarker?: boolean;
 	hasLockedAxis?: boolean;

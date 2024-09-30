@@ -56,7 +56,8 @@
 							<input
 								id="swap-threshold"
 								type="number"
-								min="0"
+								min="0.5"
+								max="2"
 								step="0.1"
 								bind:value={$props.swapThreshold}
 							/>

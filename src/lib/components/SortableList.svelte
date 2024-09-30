@@ -162,7 +162,13 @@
 		$pointer = { x: clientX, y: clientY };
 		$isGhostBetweenBounds = areColliding(ghostRect, listRect);
 
-		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, swapThreshold);
+		const enforcedSwapThreshold =
+			swapThreshold && swapThreshold < 0.5
+				? 0.5
+				: swapThreshold && swapThreshold > 2
+					? 2
+					: swapThreshold;
+		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, enforcedSwapThreshold);
 		if (collidingItemData)
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
