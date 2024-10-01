@@ -43,7 +43,7 @@ export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLE
 	const INTERACTIVE_ROLES = ['button', 'checkbox', 'link', 'tab'];
 
 	while (target !== root) {
-		if (target.dataset.role && target.dataset.role !== 'handle') return false;
+		if (target.dataset.role && target.dataset.role === 'handle') return false;
 		if (INTERACTIVE_ELEMENTS.includes(target.tagName.toLowerCase())) return true;
 		const role = target.getAttribute('role');
 		if (role && INTERACTIVE_ROLES.includes(role.toLowerCase())) return true;
