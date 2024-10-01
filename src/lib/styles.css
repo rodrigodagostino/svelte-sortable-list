@@ -109,9 +109,12 @@
 
 .ssl-handle:hover,
 .ssl-remove:focus,
-.ssl-remove:hover {
+.ssl-remove:hover,
+.ssl-item.is-pointer-dropping .ssl-handle,
+.ssl-ghost .ssl-handle {
 	background-color: var(--gray-100);
 	color: var(--gray-600);
+	transition: background-color calc(var(--transition-duration) / 3 * 2);
 }
 
 .ssl-handle {
