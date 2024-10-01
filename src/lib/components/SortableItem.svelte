@@ -257,7 +257,7 @@
 	aria-disabled={$listProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	in:scaleFade
+	in:scaleFade={{ duration: $listProps.transitionDuration }}
 	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
 >
 	<div class="ssl-item__inner">
