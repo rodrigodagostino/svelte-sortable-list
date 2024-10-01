@@ -389,18 +389,16 @@
 		if ($isPointerDragging) {
 			$isRemoving = true;
 
-			function handleGhostDrop() {
+			async function handleGhostDrop() {
+				dispatch('remove', { itemId, itemIndex });
+				await tick();
 				$isRemoving = false;
 			}
 
 			function handleTransitionEnd({ propertyName }: TransitionEvent) {
 				if (propertyName === 'top' || propertyName === 'z-index') {
-					dispatch('remove', { itemId, itemIndex });
-					// setTimeout will allow the `remove` event to be handled before setting the $isRemoving state.
-					setTimeout(() => {
-						handleGhostDrop();
-						ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
-					});
+					handleGhostDrop();
+					ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
 				}
 			}
 
