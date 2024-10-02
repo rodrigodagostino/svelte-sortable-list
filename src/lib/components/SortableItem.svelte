@@ -102,7 +102,8 @@
 		!$listProps.hasDropMarker
 			? 0
 			: 1;
-	$: styleOverflow = $isPointerDragging && $listProps.hasRemoveOnDropOut ? 'hidden' : undefined;
+	$: styleOverflow =
+		draggedItemId === String(id) && $listProps.hasRemoveOnDropOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
