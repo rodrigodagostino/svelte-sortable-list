@@ -61,9 +61,6 @@
 	text-transform: uppercase;
 	box-shadow: none;
 	opacity: 1;
-}
-
-.ssl-item__inner {
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
 		border-color calc(var(--transition-duration) / 3 * 2),
@@ -73,14 +70,6 @@
 
 .ssl-item__content {
 	margin-block: 0.625rem;
-}
-
-.ssl-ghost__inner {
-	transition:
-		background-color calc(var(--transition-duration) / 3 * 2),
-		border-color calc(var(--transition-duration) / 3 * 2),
-		box-shadow calc(var(--transition-duration) / 3 * 2),
-		opacity var(--transition-duration);
 }
 
 .ssl-item[aria-disabled="true"] .ssl-item__inner {
