@@ -81,11 +81,13 @@
 	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
 
 	$: styleCursor =
-		$isPointerDragging && draggedItemId === String(id)
-			? 'grabbing'
-			: !hasHandle && !$listProps.isLocked && !isLocked
-				? 'grab'
-				: 'initial';
+		$listProps.isDisabled || isDisabled
+			? 'not-allowed'
+			: $isPointerDragging && draggedItemId === String(id)
+				? 'grabbing'
+				: !hasHandle && !$listProps.isLocked && !isLocked
+					? 'grab'
+					: 'initial';
 	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds, $isRemoving);
 	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds, $isRemoving);
 	$: styleMargin = getStyleMargin(
