@@ -88,16 +88,12 @@
 				: !hasHandle && !$listProps.isLocked && !isLocked
 					? 'grab'
 					: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds, $isRemoving);
-	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds, $isRemoving);
-	$: styleMargin = getStyleMargin(
-		$listProps.direction,
-		$draggedItem,
-		$isGhostBetweenBounds,
-		$isRemoving
-	);
+	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds);
+	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds);
+	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isGhostBetweenBounds);
 	$: styleOpacity =
 		draggedItemId === String(id) &&
+		$draggedItem &&
 		($isPointerDragging || $isPointerDropping) &&
 		!$listProps.hasDropMarker
 			? 0
@@ -108,15 +104,13 @@
 		$draggedItem,
 		$targetItem,
 		$isCancelingKeyboardDragging,
-		$isRemoving,
 		$isGhostBetweenBounds
 	);
-	$: styleTransition =
-		$isPointerDragging || $isPointerDropping || $isKeyboardDragging || $isKeyboardDropping
-			? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
-				`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
-				`z-index ${$listProps.transitionDuration}ms`
-			: `none`;
+	$: styleTransition = $draggedItem
+		? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
+			`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
+			`z-index ${$listProps.transitionDuration}ms`
+		: `none`;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
