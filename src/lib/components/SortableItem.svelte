@@ -295,7 +295,7 @@
 			z-index: 0;
 		}
 
-		&[aria-disabled='true'] {
+		&[aria-disabled='true'] > * {
 			pointer-events: none;
 		}
 	}

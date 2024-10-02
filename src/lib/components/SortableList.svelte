@@ -102,8 +102,10 @@
 			$isKeyboardDropping ||
 			$isCancelingKeyboardDragging ||
 			$focusedItem
-		)
+		) {
+			event.preventDefault();
 			return;
+		}
 
 		const target = event.target as HTMLElement;
 		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
@@ -121,7 +123,13 @@
 			event.preventDefault();
 		}
 
-		if (isLocked || currItem.classList.contains('is-locked')) return;
+		if (
+			isLocked ||
+			currItem.classList.contains('is-locked') ||
+			isDisabled ||
+			currItem.getAttribute('aria-disabled') === 'true'
+		)
+			return;
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
