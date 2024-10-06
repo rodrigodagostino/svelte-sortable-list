@@ -112,16 +112,16 @@ export function getIsCancelingKeyboardDragging() {
 	return getWritableContext<boolean>('isCancelingKeyboardDragging');
 }
 
-export function setIsRemoving(context: boolean) {
-	return setWritableContext<boolean>('isRemoving', context);
-}
-export function getIsRemoving() {
-	return getWritableContext<boolean>('isRemoving');
-}
-
 export function setIsGhostBetweenBounds(context: boolean) {
 	return setWritableContext<boolean>('isGhostBetweenBounds', context);
 }
 export function getIsGhostBetweenBounds() {
 	return getWritableContext<boolean>('isGhostBetweenBounds');
+}
+
+export function setIsRemoving(context: boolean) {
+	return setWritableContext<boolean>('isRemoving', context);
+}
+export function getIsRemoving() {
+	return getWritableContext<boolean>('isRemoving');
 }

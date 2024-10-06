@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte';
+	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import type {
 		GhostProps,
@@ -81,6 +81,17 @@
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
 
+	// Svelte currently does not retain focus when elements are moved (even when keyed),
+	// so we need to manually keep focus on the selected <SortableItem> as items are sorted.
+	// https://github.com/sveltejs/svelte/issues/3973
+	let activeElement: HTMLElement;
+	beforeUpdate(() => {
+		activeElement = document?.activeElement as HTMLElement;
+	});
+	afterUpdate(() => {
+		if (activeElement) activeElement.focus();
+	});
+
 	const isPointerDragging = setIsPointerDragging(false);
 	const isPointerDropping = setIsPointerDropping(false);
 	const isKeyboardDragging = setIsKeyboardDragging(false);
@@ -102,26 +113,12 @@
 			$isKeyboardDropping ||
 			$isCancelingKeyboardDragging ||
 			$focusedItem
-		) {
-			event.preventDefault();
+		)
 			return;
-		}
 
 		const target = event.target as HTMLElement;
 		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
 		if (!currItem) return;
-
-		const targetIsOrResidesInInteractiveElement = isOrResidesInInteractiveElement(target, currItem);
-		// Prevent default behavior if the current list item doesn’t contain an interactive element or
-		// the target is a <label> with a `for` attribute assigned to it.
-		// NOTE: for some reason that is still unknown to me, clicking/tapping a <label> element
-		// sets the focus on the current <SortableItem>, so let’s prevent that.
-		if (
-			(target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) ||
-			!targetIsOrResidesInInteractiveElement
-		) {
-			event.preventDefault();
-		}
 
 		if (
 			isLocked ||
@@ -131,6 +128,16 @@
 		)
 			return;
 
+		// Prevent default if the clicked/tapped element is a label with a for attribute.
+		// NOTE 1: for some reason that is still unknown to me, clicking/tapping a <label> element sets
+		// the focus on the current <SortableItem>.
+		// NOTE 2: We need to run this check before isOrResidesInInteractiveElement() because, if the
+		// target is a <label> element, it will stop the execution of this event handler and the
+		// preventDefault() right after will never run, but we can’t preventDefault() for every element
+		// because we need to allow interactive elements to run normally.
+		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for'))
+			event.preventDefault();
+
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
 		const targetIsOrResidesInHandle = target.closest('[data-role="handle"]');
@@ -138,7 +145,9 @@
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
-		if (targetIsOrResidesInInteractiveElement && !targetIsOrResidesInHandle) return;
+		if (isOrResidesInInteractiveElement(target, currItem) && !targetIsOrResidesInHandle) return;
+		// Prevent focus from being set on the current <SortableItem>.
+		event.preventDefault();
 
 		currItem.setPointerCapture(event.pointerId);
 
@@ -260,9 +269,6 @@
 						$targetItem = null;
 						$itemsOrigin = null;
 						$isKeyboardDropping = false;
-
-						await tick();
-						$focusedItem?.focus();
 					}
 
 					function handleTransitionEnd({ propertyName }: TransitionEvent) {

@@ -209,8 +209,8 @@
 		$focusedItem = itemRef;
 	}
 
-	// `focusout` is preferred over `blur` because it detects
-	// the loss of focus on the current element and it’s descendants too.
+	// `focusout` is preferred over `blur` since it detects the loss of focus
+	// on the current element and it’s descendants too.
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
