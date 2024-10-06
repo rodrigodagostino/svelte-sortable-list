@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.6] (2024-10-05)
+
+### Added
+
+- Add `not-allowed` cursor to disabled items.
+
+### Changed
+
+- Improve the use of `pointer-events: none` in `<SortableList>` and `<SortableItem>`.
+- Clean up `<SortableItem>` style reactive declarations.
+
+### Fixed
+
+- Repair dispatch `remove` when item is dropped outside (while `hasRemoveOnDropOut` is active) and `transitionDuration` is set to `0`.
+- Use `transitionDuration` as duration value for the `in` transition of `<SortableItem>`.
+- Allow the `<Remove>` component click event to be triggered normally.
+- Keep the `hover` state appearance consistent for the `<Handle>` component during drag-and-drop through pointer.
+- Prevent item overflow during drop out removal while `hasDropMarker` is active.
+- Handle `<SortableItem>` focus in a more reliable way.
+
 ## [0.10.5] (2024-09-29)
 
 ### Changed
@@ -537,7 +557,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.6...HEAD
+[0.10.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.2...v0.10.3
