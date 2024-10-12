@@ -43,6 +43,7 @@
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
+	export let canClearTargetOnDragOut: SortableListProps['canClearTargetOnDragOut'] = false;
 	export let hasRemoveOnDropOut: SortableListProps['hasRemoveOnDropOut'] = false;
 	export let isLocked: SortableListProps['isLocked'] = false;
 	export let isDisabled: SortableListProps['isDisabled'] = false;
@@ -55,6 +56,7 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
+		canClearTargetOnDragOut,
 		hasRemoveOnDropOut,
 		isLocked,
 		isDisabled,
@@ -67,6 +69,7 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
+		canClearTargetOnDragOut,
 		hasRemoveOnDropOut,
 		isLocked,
 		isDisabled,
@@ -190,6 +193,8 @@
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
+		else if (canClearTargetOnDragOut || (hasRemoveOnDropOut && !$isGhostBetweenBounds))
+			$targetItem = null;
 	}
 
 	function handlePointerUp() {

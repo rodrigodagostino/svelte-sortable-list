@@ -165,7 +165,11 @@
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
-			$isCancelingKeyboardDragging
+			$isCancelingKeyboardDragging ||
+			(!$isGhostBetweenBounds &&
+				!$listProps.canClearTargetOnDragOut &&
+				$listProps.hasRemoveOnDropOut) ||
+			$isRemoving
 		)
 			return 'translate3d(0, 0, 0)';
 
