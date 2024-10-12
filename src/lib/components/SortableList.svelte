@@ -190,7 +190,6 @@
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
-		else $targetItem = null;
 	}
 
 	function handlePointerUp() {
