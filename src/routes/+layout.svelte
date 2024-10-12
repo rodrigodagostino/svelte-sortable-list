@@ -103,6 +103,18 @@
 					</tr>
 					<tr>
 						<td></td>
+						<td><label for="can-clear-target-on-drag-out">canClearTargetOnDragOut</label></td>
+						<td>
+							<input
+								id="can-clear-target-on-drag-out"
+								type="checkbox"
+								bind:checked={$props.canClearTargetOnDragOut}
+							/>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
 						<td><label for="has-remove-on-drop-out">hasRemoveOnDropOut</label></td>
 						<td>
 							<input
@@ -240,6 +252,13 @@
 				aria-current={$page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
 			>
 				Direction horizontal
+			</a>
+			<a
+				class="app-nav__link"
+				href="/clear-target-on-drag-out"
+				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
+			>
+				Clear target on drag out
 			</a>
 			<a
 				class="app-nav__link"
