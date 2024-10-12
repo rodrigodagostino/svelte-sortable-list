@@ -115,12 +115,12 @@
 					</tr>
 					<tr>
 						<td></td>
-						<td><label for="has-remove-on-drop-out">hasRemoveOnDropOut</label></td>
+						<td><label for="can-remove-item-on-drop-out">canRemoveItemOnDropOut</label></td>
 						<td>
 							<input
-								id="has-remove-on-drop-out"
+								id="can-remove-item-on-drop-out"
 								type="checkbox"
-								bind:checked={$props.hasRemoveOnDropOut}
+								bind:checked={$props.canRemoveItemOnDropOut}
 							/>
 						</td>
 						<td></td>
@@ -262,10 +262,10 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/has-remove-on-drop-out"
-				aria-current={$page.url.pathname === '/has-remove-on-drop-out' ? 'page' : undefined}
+				href="/remove-item-on-drop-out"
+				aria-current={$page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
 			>
-				Has remove on drop out
+				Remove item on drop out
 			</a>
 			<hr class="app-nav__separator" />
 			<a

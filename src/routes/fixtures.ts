@@ -9,7 +9,7 @@ export const defaultProps: SortableListProps = {
 	hasLockedAxis: false,
 	hasBoundaries: false,
 	canClearTargetOnDragOut: false,
-	hasRemoveOnDropOut: false,
+	canRemoveItemOnDropOut: false,
 	isLocked: false,
 	isDisabled: false,
 };

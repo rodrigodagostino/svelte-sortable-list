@@ -135,13 +135,13 @@
 }
 
 /**
- * hasRemoveOnDropOut
+ * canRemoveItemOnDropOut
  */
 .ssl-list:has(> .ssl-item.is-removing) + .ssl-ghost .ssl-ghost__inner {
 	opacity: 0;
 }
 
-.ssl-list.has-remove-on-drop-out + .ssl-ghost.is-out-of-bounds .ssl-ghost__inner {
+.ssl-list.can-remove-item-on-drop-out + .ssl-ghost.is-out-of-bounds .ssl-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }

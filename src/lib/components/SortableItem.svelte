@@ -99,7 +99,7 @@
 			? 0
 			: 1;
 	$: styleOverflow =
-		draggedItemId === String(id) && $listProps.hasRemoveOnDropOut ? 'hidden' : undefined;
+		draggedItemId === String(id) && $listProps.canRemoveItemOnDropOut ? 'hidden' : undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
@@ -114,27 +114,35 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
-		if (!$listProps.hasRemoveOnDropOut) return undefined;
+		if (!$listProps.canRemoveItemOnDropOut) return undefined;
 
 		if (
 			draggedItemId === String(id) &&
-			((!$isGhostBetweenBounds && $listProps.hasRemoveOnDropOut) || $isRemoving)
+			((!$isGhostBetweenBounds && $listProps.canRemoveItemOnDropOut) || $isRemoving)
 		)
 			return '0';
-		else if (draggedItemId === String(id) && $isGhostBetweenBounds && $listProps.hasRemoveOnDropOut)
+		else if (
+			draggedItemId === String(id) &&
+			$isGhostBetweenBounds &&
+			$listProps.canRemoveItemOnDropOut
+		)
 			return `${draggedItemRect?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
-		if (!$listProps.hasRemoveOnDropOut) return undefined;
+		if (!$listProps.canRemoveItemOnDropOut) return undefined;
 
 		if (
 			draggedItemId === String(id) &&
-			(($listProps.hasRemoveOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
+			(($listProps.canRemoveItemOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
 		)
 			return '0';
-		else if (draggedItemId === String(id) && $listProps.hasRemoveOnDropOut && $isGhostBetweenBounds)
+		else if (
+			draggedItemId === String(id) &&
+			$listProps.canRemoveItemOnDropOut &&
+			$isGhostBetweenBounds
+		)
 			return `${draggedItemRect?.height}px`;
 	}
 
@@ -142,7 +150,7 @@
 	function getStyleMargin(...args: unknown[]) {
 		if (
 			draggedItemId === String(id) &&
-			(($listProps.hasRemoveOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
+			(($listProps.canRemoveItemOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
 		)
 			return '0';
 		else
@@ -168,7 +176,7 @@
 			$isCancelingKeyboardDragging ||
 			(!$isGhostBetweenBounds &&
 				!$listProps.canClearTargetOnDragOut &&
-				$listProps.hasRemoveOnDropOut) ||
+				$listProps.canRemoveItemOnDropOut) ||
 			$isRemoving
 		)
 			return 'translate3d(0, 0, 0)';

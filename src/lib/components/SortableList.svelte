@@ -44,7 +44,7 @@
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
 	export let canClearTargetOnDragOut: SortableListProps['canClearTargetOnDragOut'] = false;
-	export let hasRemoveOnDropOut: SortableListProps['hasRemoveOnDropOut'] = false;
+	export let canRemoveItemOnDropOut: SortableListProps['canRemoveItemOnDropOut'] = false;
 	export let isLocked: SortableListProps['isLocked'] = false;
 	export let isDisabled: SortableListProps['isDisabled'] = false;
 
@@ -57,7 +57,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		canClearTargetOnDragOut,
-		hasRemoveOnDropOut,
+		canRemoveItemOnDropOut,
 		isLocked,
 		isDisabled,
 	});
@@ -70,7 +70,7 @@
 		hasLockedAxis,
 		hasBoundaries,
 		canClearTargetOnDragOut,
-		hasRemoveOnDropOut,
+		canRemoveItemOnDropOut,
 		isLocked,
 		isDisabled,
 	};
@@ -193,17 +193,18 @@
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
-		else if (canClearTargetOnDragOut || (hasRemoveOnDropOut && !$isGhostBetweenBounds))
+		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds))
 			$targetItem = null;
 	}
 
 	function handlePointerUp() {
 		if (!$isPointerDragging || $isPointerDropping) return;
 
-		if ($draggedItem && !$isGhostBetweenBounds && hasRemoveOnDropOut) dispatchRemove($draggedItem);
+		if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut)
+			dispatchRemove($draggedItem);
 
 		$isPointerDragging = false;
-		ghostStatus = !$isGhostBetweenBounds && hasRemoveOnDropOut ? 'remove' : 'set';
+		ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'set';
 		$isPointerDropping = true;
 		$isGhostBetweenBounds = true;
 
@@ -444,7 +445,7 @@
 	bind:this={listRef}
 	class="ssl-list has-direction-{direction}"
 	class:has-drop-marker={hasDropMarker}
-	class:has-remove-on-drop-out={hasRemoveOnDropOut}
+	class:can-remove-item-on-drop-out={canRemoveItemOnDropOut}
 	class:is-locked={isLocked}
 	class:is-disabled={isDisabled}
 	style:--gap="{gap}px"

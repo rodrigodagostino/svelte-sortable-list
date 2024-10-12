@@ -23,7 +23,7 @@ export interface SortableListProps {
 	hasLockedAxis?: boolean;
 	hasBoundaries?: boolean;
 	canClearTargetOnDragOut?: boolean;
-	hasRemoveOnDropOut?: boolean;
+	canRemoveItemOnDropOut?: boolean;
 	isLocked?: boolean;
 	isDisabled?: boolean;
 }
