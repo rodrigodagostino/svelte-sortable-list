@@ -200,8 +200,11 @@
 	function handlePointerUp() {
 		if (!$isPointerDragging || $isPointerDropping) return;
 
-		if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut)
+		let hasDispatchedRemove = false;
+		if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut) {
 			dispatchRemove($draggedItem);
+			hasDispatchedRemove = true;
+		}
 
 		$isPointerDragging = false;
 		ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'set';
@@ -209,7 +212,8 @@
 		$isGhostBetweenBounds = true;
 
 		function handleGhostDrop() {
-			if ($draggedItem && $targetItem) dispatchSort($draggedItem, $targetItem);
+			if (!hasDispatchedRemove && $draggedItem && $targetItem)
+				dispatchSort($draggedItem, $targetItem);
 
 			ghostStatus = 'unset';
 			$pointer = null;
