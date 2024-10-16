@@ -129,10 +129,10 @@ export const screenReaderText = {
 	dragged: (
 		draggedItem: HTMLLIElement,
 		targetItem: HTMLLIElement,
-		key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight'
+		key: 'ArrowUp' | 'ArrowLeft' | 'ArrowDown' | 'ArrowRight' | 'Home' | 'End'
 	) => {
 		const textContent = draggedItem.textContent ? draggedItem.textContent : 'the item';
-		const direction = key === 'ArrowUp' || key === 'ArrowLeft' ? 'up' : 'down';
+		const direction = key === 'ArrowUp' || key === 'ArrowLeft' || key === 'Home' ? 'up' : 'down';
 		const position = getIndex(targetItem)! + 1;
 		return `Moved ${textContent} ${direction} to position ${position}.`;
 	},

@@ -238,7 +238,7 @@
 				}
 			}
 
-			if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+			if (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'ArrowDown' || key === 'ArrowRight') {
 				event.preventDefault();
 
 				const step = key === 'ArrowUp' || key === 'ArrowLeft' ? -1 : 1;
@@ -255,10 +255,12 @@
 
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = listRef.children;
+					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 					if (
 						(key === 'ArrowUp' && focusedItemIndex === 0) ||
-						(key === 'ArrowDown' && focusedItemIndex === items.length - 1)
+						(key === 'ArrowLeft' && focusedItemIndex === 0) ||
+						(key === 'ArrowDown' && focusedItemIndex === items.length - 1) ||
+						(key === 'ArrowRight' && focusedItemIndex === items.length - 1)
 					)
 						return;
 
@@ -291,7 +293,45 @@
 								: ($targetItem.previousElementSibling as HTMLLIElement);
 					}
 
-					if ($targetItem) liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
+					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
+				}
+			}
+
+			if (key === 'Home' || key === 'End') {
+				event.preventDefault();
+
+				const draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
+				const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
+				const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
+
+				if (!$isKeyboardDragging) {
+					// Prevent focusing the previous item if the current one is the first,
+					// and focusing the next item if the current one is the last.
+					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					if (
+						(key === 'Home' && focusedItemIndex === 0) ||
+						(key === 'End' && focusedItemIndex === items.length - 1)
+					)
+						return;
+
+					if (key === 'Home') items[0]?.focus();
+					else items[items.length - 1]?.focus();
+				} else {
+					if (!$draggedItem || !$itemsOrigin) return;
+					// Prevent moving the selected item if it’s the first or last item,
+					// or is at the top or bottom of the list.
+					if (
+						(key === 'Home' && draggedItemIndex === 0 && !targetItem) ||
+						(key === 'Home' && targetItemIndex === 0) ||
+						(key === 'End' && draggedItemIndex === $itemsOrigin.length - 1 && !targetItem) ||
+						(key === 'End' && targetItemIndex === $itemsOrigin.length - 1)
+					)
+						return;
+
+					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
+
+					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
 				}
 			}
 
