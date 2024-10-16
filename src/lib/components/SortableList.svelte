@@ -128,8 +128,10 @@
 			currItem.classList.contains('is-locked') ||
 			isDisabled ||
 			currItem.getAttribute('aria-disabled') === 'true'
-		)
+		) {
+			event.preventDefault();
 			return;
+		}
 
 		// Prevent default if the clicked/tapped element is a label with a for attribute.
 		// NOTE 1: for some reason that is still unknown to me, clicking/tapping a <label> element sets
