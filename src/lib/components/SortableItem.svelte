@@ -93,13 +93,16 @@
 	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isGhostBetweenBounds);
 	$: styleOpacity =
 		draggedItemId === String(id) &&
-		$draggedItem &&
 		($isPointerDragging || $isPointerDropping) &&
 		!$listProps.hasDropMarker
 			? 0
 			: 1;
 	$: styleOverflow =
-		draggedItemId === String(id) && $listProps.canRemoveItemOnDropOut ? 'hidden' : undefined;
+		draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		$listProps.canRemoveItemOnDropOut
+			? 'hidden'
+			: undefined;
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
