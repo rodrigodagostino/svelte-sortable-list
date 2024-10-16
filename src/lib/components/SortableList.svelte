@@ -198,41 +198,7 @@
 	}
 
 	function handlePointerUp() {
-		if (!$isPointerDragging || $isPointerDropping) return;
-
-		let hasDispatchedRemove = false;
-		if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut) {
-			dispatchRemove($draggedItem);
-			hasDispatchedRemove = true;
-		}
-
-		$isPointerDragging = false;
-		ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'set';
-		$isPointerDropping = true;
-		$isGhostBetweenBounds = true;
-
-		function handleGhostDrop() {
-			if (!hasDispatchedRemove && $draggedItem && $targetItem)
-				dispatchSort($draggedItem, $targetItem);
-
-			ghostStatus = 'unset';
-			$pointer = null;
-			$pointerOrigin = null;
-			$itemsOrigin = null;
-			$draggedItem = null;
-			$targetItem = null;
-			$isPointerDropping = false;
-		}
-
-		function handleTransitionEnd({ propertyName }: TransitionEvent) {
-			if (propertyName === 'top' || propertyName === 'z-index') {
-				handleGhostDrop();
-				ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
-			}
-		}
-
-		if (transitionDuration! > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
-		else handleGhostDrop();
+		handleElementDrop(ghostRef, 'pointer-drop');
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
@@ -266,30 +232,7 @@
 					$itemsOrigin = getItemsData(listRef);
 					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
 				} else {
-					$isKeyboardDragging = false;
-					$isKeyboardDropping = true;
-
-					if ($draggedItem) liveText = screenReaderText.dropped($draggedItem, $targetItem);
-
-					async function handleItemDrop() {
-						if ($draggedItem && $targetItem) dispatchSort($draggedItem, $targetItem);
-
-						$draggedItem = null;
-						$targetItem = null;
-						$itemsOrigin = null;
-						$isKeyboardDropping = false;
-					}
-
-					function handleTransitionEnd({ propertyName }: TransitionEvent) {
-						if (propertyName === 'z-index') {
-							handleItemDrop();
-							$focusedItem?.removeEventListener('transitionend', handleTransitionEnd);
-						}
-					}
-
-					if (transitionDuration! > 0)
-						$focusedItem.addEventListener('transitionend', handleTransitionEnd);
-					else handleItemDrop();
+					handleElementDrop($focusedItem, 'keyboard-drop');
 				}
 			}
 
@@ -351,35 +294,72 @@
 			}
 
 			if (key === 'Escape' && $draggedItem) {
-				cleanUp($draggedItem);
+				handleElementDrop($draggedItem, 'keyboard-cancel');
 			}
 		}
 	}
 
-	function cleanUp(item: HTMLElement) {
-		if (!$draggedItem || !$isKeyboardDragging) return;
+	function handleElementDrop(
+		element: HTMLElement,
+		action: 'pointer-drop' | 'keyboard-drop' | 'keyboard-cancel'
+	) {
+		if (action === 'pointer-drop' && (!$draggedItem || !$isPointerDragging || $isPointerDropping))
+			return;
+		if (
+			(action === 'keyboard-drop' || action === 'keyboard-cancel') &&
+			(!$draggedItem || !$isKeyboardDragging)
+		)
+			return;
 
-		$isKeyboardDragging = false;
-		$isKeyboardDropping = true;
-		$isCancelingKeyboardDragging = true;
-		liveText = screenReaderText.canceled($draggedItem);
+		let hasDispatchedRemove = false;
+		if (action === 'pointer-drop') {
+			if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut) {
+				dispatchRemove($draggedItem);
+				hasDispatchedRemove = true;
+			}
+			$isPointerDragging = false;
+			ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'set';
+			$isPointerDropping = true;
+			$isGhostBetweenBounds = true;
+		} else {
+			$isKeyboardDragging = false;
+			$isKeyboardDropping = true;
+		}
+		if (action === 'keyboard-drop' && $draggedItem)
+			liveText = screenReaderText.dropped($draggedItem, $targetItem);
+		else if (action === 'keyboard-cancel' && $draggedItem) {
+			$isCancelingKeyboardDragging = true;
+			liveText = screenReaderText.canceled($draggedItem);
+		}
 
-		function handleItemDrop() {
+		async function handleItemDrop() {
+			if (
+				((action === 'pointer-drop' && !hasDispatchedRemove) || action === 'keyboard-drop') &&
+				$draggedItem &&
+				$targetItem
+			)
+				dispatchSort($draggedItem, $targetItem);
+			await tick();
 			$draggedItem = null;
 			$targetItem = null;
 			$itemsOrigin = null;
-			$isKeyboardDropping = false;
-			$isCancelingKeyboardDragging = false;
+			if (action === 'pointer-drop') {
+				ghostStatus = 'unset';
+				$pointer = null;
+				$pointerOrigin = null;
+				$isPointerDropping = false;
+			} else $isKeyboardDropping = false;
+			if (action === 'keyboard-cancel') $isCancelingKeyboardDragging = false;
 		}
 
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
 			if (propertyName === 'z-index') {
 				handleItemDrop();
-				item.removeEventListener('transitionend', handleTransitionEnd);
+				element?.removeEventListener('transitionend', handleTransitionEnd);
 			}
 		}
 
-		if (transitionDuration! > 0) item.addEventListener('transitionend', handleTransitionEnd);
+		if (transitionDuration! > 0) element?.addEventListener('transitionend', handleTransitionEnd);
 		else handleItemDrop();
 	}
 
@@ -419,7 +399,7 @@
 			}
 
 			function handleTransitionEnd({ propertyName }: TransitionEvent) {
-				if (propertyName === 'top' || propertyName === 'z-index') {
+				if (propertyName === 'z-index') {
 					handleGhostDrop();
 					ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
 				}
@@ -463,7 +443,7 @@
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
-	on:cleanup={(event) => cleanUp(event.detail.item)}
+	on:cleanup={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
 	on:removestart={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>
