@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.8] (2024-10-17)
+
+### BREAKING
+
+- Rename the `removestart` custom event to `requestremove`.
+
+### Added
+
+- Add `Home` and `End` keys to keyboard support.
+
+### Changed
+
+- Rename the `cleanup` custom event to `itemfocusout`.
+
+### Docs
+
+- Move the repository link to the top of the navigation and add the package version to the demo layout.
+- Reorder the demo layout navigation items.
+- Add remove handling to all the demo pages.
+- Update the README to reflect the latest changes.
+- Avoid controls overlapping with navigation on mobile in demo pages layout.
+
 ## [0.10.7] (2024-10-15)
 
 ### BREAKING
@@ -93,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add **“Disabled list”** demo page.
 - Add **“Locked list”** demo page.
 - Add **“Locked items”** demo page.
-- Add repository link to demo layout.
+- Add the repository link to the demo layout.
 - Update the README to reflect the latest changes.
 
 ## [0.10.2] (2024-09-21)
@@ -583,7 +605,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.7...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.8...HEAD
+[0.10.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.4...v0.10.5
