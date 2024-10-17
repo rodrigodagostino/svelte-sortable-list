@@ -316,6 +316,13 @@
 	.app-nav {
 		display: flex;
 		flex-direction: column;
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-block: auto;
+		}
 	}
 
 	.app-main {
@@ -396,7 +403,6 @@
 		position: relative;
 
 		.container {
-			align-items: center;
 			justify-content: center;
 			gap: 0.75rem;
 		}
@@ -422,13 +428,6 @@
 			border-style: solid;
 			color: var(--gray-400);
 		}
-	}
-
-	.container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		margin-block: auto;
 	}
 
 	@media (min-width: 26em) {
