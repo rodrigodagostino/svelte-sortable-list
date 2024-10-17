@@ -122,14 +122,18 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 The following is a list of steps to navigate and operate the Sortable List:
 
-1. Press `tab` to focus the list.
-2. Press `arrow up`, `arrow left`, `arrow down` or `arrow right` to focus the first item in the list.
-3. Press `arrow up` or `arrow left` to move the focus to the previous item.
-4. Press `arrow down` or `arrow right` to move the focus to the next item.
-5. Press `space` to lift or drop an item.
-6. Press `arrow up` or `arrow left` to move the lifted item to the previous position.
-7. Press `arrow down` or `arrow right` to move the lifted item to the next position.
-8. Press `escape` to cancel the lift and return the item to its initial position.
+1. Press `Tab` to focus the list.
+2. Press `Arrow Up`, `Arrow Left`, `Arrow Down` or `Arrow Right` to focus the first item in the list.
+3. Press `Arrow Up` or `Arrow Left` to move the focus to the previous item.
+4. Press `Arrow Down` or `Arrow Right` to move the focus to the next item.
+5. Press `Home` to move the focus to the first item.
+6. Press `End` to move the focus to the last item.
+7. Press `Space` to drag or drop an item.
+8. Press `Arrow Up` or `Arrow Left` to move the dragged item to the previous position.
+9. Press `Arrow Down` or `Arrow Right` to move the dragged item to the next position.
+10. Press `Home` to move the dragged item to the first position.
+11. Press `End` to move the dragged item to the last position.
+12. Press `Escape` to cancel the drag and return the item to its initial position.
 
 ## Components
 
@@ -153,7 +157,7 @@ You can create your own `<Remove>` component if you require it that way. Do so b
 
 	function handleRemove(event: MouseEvent) {
 		const target = event.target as HTMLElement;
-		if (target) dispatch(target, 'removestart', { item: target.closest('.ssl-item') });
+		if (target) dispatch(target, 'requestremove', { item: target.closest('.ssl-item') });
 	};
 </script>
 
@@ -263,43 +267,55 @@ Example:
 
 ## Types
 
-| Type               | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `SortableItemData` | Provides definitions for your list of items. |
+| Type                | Description                                                                                         |
+| ------------------- | --------------------------------------------------------------------------------------------------- |
+| `RemoveEventDetail` | Provides definitions for the [`<SortableList>` `remove` custom event detail](#sortablelist-events). |
+| `SortEventDetail`   | Provides definitions for the [`<SortableList>` `sort` custom event detail](#sortablelist-events).   |
+| `SortableItemData`  | Provides definitions for your list of items.                                                        |
 
 Example:
 
 ```ts
 <script lang="ts">
-	import type { SortableItemData } from '$lib/types/index.js';
+	import type { RemoveEventDetail, SortEventDetail, SortableItemData } from '$lib/types/index.js';
 
 	let items: SortableItemData[] = [
-	{
-		id: 'list-item-1',
-		text: 'List item 1',
-		isDisabled: false,
-	},
-	{
-		id: 'list-item-2',
-		text: 'List item 2',
-		isDisabled: true,
-	},
-	{
-		id: 'list-item-3',
-		text: 'List item 3',
-		isDisabled: true,
-	},
-	{
-		id: 'list-item-4',
-		text: 'List item 4',
-		isDisabled: false,
-	},
-	{
-		id: 'list-item-5',
-		text: 'List item 5',
-		isDisabled: false,
-	},
-];
+		{
+			id: 'list-item-1',
+			text: 'List item 1',
+			isDisabled: false,
+		},
+		{
+			id: 'list-item-2',
+			text: 'List item 2',
+			isDisabled: true,
+		},
+		{
+			id: 'list-item-3',
+			text: 'List item 3',
+			isDisabled: true,
+		},
+		{
+			id: 'list-item-4',
+			text: 'List item 4',
+			isDisabled: false,
+		},
+		{
+			id: 'list-item-5',
+			text: 'List item 5',
+			isDisabled: false,
+		},
+	];
+
+	function handleSort(event: CustomEvent<SortEventDetail>) {
+		const { prevItemIndex, nextItemIndex } = event.detail;
+		items = sortItems(items, prevItemIndex, nextItemIndex);
+	}
+
+	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
+		const { itemIndex } = event.detail;
+		items = removeItem(items, itemIndex);
+	}
 </script>
 ```
 
@@ -313,7 +329,8 @@ import 'svelte-sortable-list/styles.css';
 
 ### Selectors
 
-To customize the appearance of the list items and not cause any conflicts or interferences with the core styles and transitions, the usage of the `.ssl-item` selector must be avoided, pointing instead to `.ssl-item__inner`, which is the direct child of the aforementioned selector.
+> [!IMPORTANT]
+> To customize the appearance of the list items and not cause any conflicts or interferences with the core styles and transitions, the usage of the `.ssl-item` selector must be avoided, pointing instead to `.ssl-item__inner`, which is the direct child of the aforementioned selector.
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
