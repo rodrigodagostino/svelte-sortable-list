@@ -5,7 +5,9 @@
 		SortableItem,
 		Handle,
 		IconHandle,
+		removeItem,
 		sortItems,
+		type RemoveEventDetail,
 		type SortEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
@@ -22,13 +24,18 @@
 		const { prevItemIndex, nextItemIndex } = event.detail;
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
+
+	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
+		const { itemIndex } = event.detail;
+		items = removeItem(items, itemIndex);
+	}
 </script>
 
 <svelte:head>
 	<title>With handle | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:sort={handleSort}>
+<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 	{#each items as item, index (item.id)}
 		<SortableItem id={item.id} {index}>
 			<Handle>

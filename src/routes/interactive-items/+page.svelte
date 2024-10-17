@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SortableItem, SortableList, sortItems, type SortEventDetail } from '$lib/index.js';
+	import {
+		SortableItem,
+		SortableList,
+		removeItem,
+		sortItems,
+		type RemoveEventDetail,
+		type SortEventDetail,
+	} from '$lib/index.js';
 	import { interactiveItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
@@ -15,13 +22,18 @@
 		const { prevItemIndex, nextItemIndex } = event.detail;
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
+
+	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
+		const { itemIndex } = event.detail;
+		items = removeItem(items, itemIndex);
+	}
 </script>
 
 <svelte:head>
 	<title>Interactive items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:sort={handleSort}>
+<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 	{#each items as item, index (item.id)}
 		<SortableItem id={item.id} {index}>
 			<div class="ssl-item__content">

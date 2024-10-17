@@ -7,8 +7,8 @@
 		IconRemove,
 		removeItem,
 		sortItems,
-		type SortEventDetail,
 		type RemoveEventDetail,
+		type SortEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
