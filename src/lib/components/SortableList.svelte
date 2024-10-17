@@ -485,7 +485,7 @@
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
-	on:cleanup={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
+	on:itemfocusout={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
 	on:requestremove={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>
