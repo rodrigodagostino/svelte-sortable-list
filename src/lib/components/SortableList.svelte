@@ -486,7 +486,7 @@
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
 	on:cleanup={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
-	on:removestart={(event) => dispatchRemove(event.detail.item)}
+	on:requestremove={(event) => dispatchRemove(event.detail.item)}
 >
 	<slot>
 		<p>

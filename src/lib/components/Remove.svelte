@@ -3,7 +3,7 @@
 
 	function handleClick(event: Event) {
 		const target = event.target as HTMLElement;
-		dispatch(target, 'removestart', { item: target.closest('.ssl-item') });
+		dispatch(target, 'requestremove', { item: target.closest('.ssl-item') });
 	}
 </script>
 

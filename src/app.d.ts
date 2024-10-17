@@ -12,7 +12,7 @@ declare global {
 	declare namespace svelteHTML {
 		interface HTMLAttributes {
 			'on:cleanup'?: (event: CustomEvent<{ item: HTMLElement }>) => void;
-			'on:removestart'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
+			'on:requestremove'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 		}
 	}
 }
