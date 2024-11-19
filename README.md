@@ -66,7 +66,12 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ```ts
 <script lang="ts">
-	import { SortableList, sortItems, type SortableListProps } from 'svelte-sortable-list';
+	import {
+		SortableItem,
+		SortableList,
+		type SortableListProps,
+	} from '@rodrigodagostino/svelte-sortable-list';
+
 </script>
 ```
 
@@ -74,9 +79,12 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ```ts
 <script lang="ts">
-	import { SortableItem, SortableList, sortItems } from '$lib/index.js';
-	import type { SortableItemData } from '$lib/types/index.js';
-	import '$lib/styles.css';
+	import {
+		SortableItem,
+		SortableList,
+		type SortableItemData,
+		sortItems
+	} from '@rodrigodagostino/svelte-sortable-list';
 
 	let items: SortableItemData[] = [
 		{
