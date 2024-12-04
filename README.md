@@ -71,7 +71,6 @@ yarn add @rodrigodagostino/svelte-sortable-list
 		SortableList,
 		type SortableListProps,
 	} from '@rodrigodagostino/svelte-sortable-list';
-
 </script>
 ```
 
