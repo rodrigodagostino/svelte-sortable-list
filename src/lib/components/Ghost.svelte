@@ -15,6 +15,7 @@
 	import { getId, getIndex } from '$lib/utils/index.js';
 
 	export let ghostRef: HTMLDivElement;
+	let ghostInnerRef: HTMLDivElement;
 
 	export let status: GhostProps['status'];
 
@@ -30,6 +31,20 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
+
+	$: if ($draggedItem) {
+		const clone = $draggedItem?.children[0].children[0].cloneNode(true);
+
+		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
+		const selects =
+			$draggedItem?.children[0].children[0].querySelectorAll<HTMLSelectElement>('select');
+		if (selects)
+			(clone as HTMLElement)
+				.querySelectorAll<HTMLSelectElement>('select')
+				.forEach((select, index) => (select.value = selects[index].value));
+
+		ghostInnerRef?.replaceChildren(clone);
+	}
 
 	$: styleWidth = getStyleWidth($draggedItem);
 	$: styleHeight = getStyleHeight($draggedItem);
@@ -186,10 +201,7 @@
 	data-id={$draggedItem && getId($draggedItem)}
 	aria-hidden="true"
 >
-	<div class="ssl-ghost__inner">
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html $draggedItem?.children[0].innerHTML.trim() || '<span>GHOST</span>'}
-	</div>
+	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
 </div>
 
 <style lang="scss">
