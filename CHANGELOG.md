@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.11] (2024-12-29)
+
+### Fixed
+
+- Retain interactive element values while dragging an item.
+
 ## [0.10.10] (2024-12-11)
 
 ### Docs
@@ -617,8 +623,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.10...HEAD
-[0.10.9]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.9...v0.10.10
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.11...HEAD
+[0.10.11]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.10...v0.10.11
+[0.10.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.9...v0.10.10
 [0.10.9]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.8...v0.10.9
 [0.10.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.6...v0.10.7
