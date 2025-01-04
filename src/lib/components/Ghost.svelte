@@ -33,17 +33,16 @@
 	const isRemoving = getIsRemoving();
 
 	$: if ($draggedItem) {
-		const clone = $draggedItem?.children[0].children[0].cloneNode(true);
+		const clone = $draggedItem?.children[0].cloneNode(true);
 
 		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
-		const selects =
-			$draggedItem?.children[0].children[0].querySelectorAll<HTMLSelectElement>('select');
+		const selects = $draggedItem?.children[0].querySelectorAll<HTMLSelectElement>('select');
 		if (selects)
 			(clone as HTMLElement)
 				.querySelectorAll<HTMLSelectElement>('select')
 				.forEach((select, index) => (select.value = selects[index].value));
 
-		ghostInnerRef?.replaceChildren(clone);
+		ghostInnerRef?.replaceChildren(...clone.childNodes);
 	}
 
 	$: styleWidth = getStyleWidth($draggedItem);
