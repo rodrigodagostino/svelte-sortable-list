@@ -12,3 +12,9 @@
 >
 	<slot />
 </span>
+
+<style lang="scss">
+	.ssl-handle {
+		touch-action: none;
+	}
+</style>

@@ -254,6 +254,7 @@
 	style:margin={styleMargin}
 	style:opacity={styleOpacity}
 	style:overflow={styleOverflow}
+	style:touch-action={!hasHandle ? 'none' : undefined}
 	style:transform={styleTransform}
 	style:transition={styleTransition}
 	id="ssl-item-{id}"

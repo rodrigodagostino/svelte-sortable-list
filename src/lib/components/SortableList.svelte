@@ -511,7 +511,6 @@
 		padding-inline-start: 0;
 		margin: calc(var(--gap) / 2 * -1);
 		outline-offset: calc(var(--gap) / 2 * -1);
-		touch-action: none;
 
 		&.has-direction-vertical {
 			flex-direction: column;
