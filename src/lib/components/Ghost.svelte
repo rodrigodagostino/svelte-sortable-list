@@ -43,6 +43,8 @@
 				.forEach((select, index) => (select.value = selects[index].value));
 
 		ghostInnerRef?.replaceChildren(...clone.childNodes);
+	} else {
+		ghostInnerRef?.replaceChildren();
 	}
 
 	$: styleWidth = getStyleWidth($draggedItem);
