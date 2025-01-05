@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.13] (2025-01-05)
+
+### Fixed
+
+- Remove `<Ghost>` contents after dropping an item with a pointing device.
+
 ## [0.10.12] (2025-01-04)
 
 ### Fixed
