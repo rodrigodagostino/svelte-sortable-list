@@ -53,6 +53,7 @@ export interface SortableItemData extends Omit<SortableItemProps, 'index'> {
 
 export interface GhostProps {
 	status: 'init' | 'set' | 'remove' | 'unset';
+	listRef: HTMLUListElement | null;
 }
 
 export interface ItemData {

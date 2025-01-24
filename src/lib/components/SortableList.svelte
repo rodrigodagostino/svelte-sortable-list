@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
+	import Portal from '$lib/components/Portal.svelte';
 	import type {
 		GhostProps,
 		RemoveEventDetail,
@@ -495,10 +496,12 @@
 		</p>
 	</slot>
 </ul>
-<Ghost bind:ghostRef status={ghostStatus} />
 <div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
 	{liveText}
 </div>
+<Portal>
+	<Ghost bind:ghostRef status={ghostStatus} {listRef} />
+</Portal>
 
 <style lang="scss">
 	.ssl-list,

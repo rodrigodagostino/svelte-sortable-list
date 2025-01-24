@@ -18,6 +18,7 @@
 	let ghostInnerRef: HTMLDivElement;
 
 	export let status: GhostProps['status'];
+	export let listRef: GhostProps['listRef'];
 
 	const listProps = getListProps();
 
@@ -85,11 +86,18 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(status: GhostProps['status'], ...args: unknown[]) {
-		if (status === 'unset' || !$pointer || !$pointerOrigin || !$draggedItem || !$itemsOrigin)
+		if (
+			status === 'unset' ||
+			!listRef ||
+			!$itemsOrigin ||
+			!$pointer ||
+			!$pointerOrigin ||
+			!$draggedItem
+		)
 			return 'translate3d(0, 0, 0)';
 
-		const listRect = ghostRef.previousElementSibling!.getBoundingClientRect()!;
-		const ghostRect = ghostRef.getBoundingClientRect()!;
+		const ghostRect = ghostRef.getBoundingClientRect();
+		const listRect = listRef.getBoundingClientRect();
 		const draggedItemOrigin = $itemsOrigin[getIndex($draggedItem)!];
 
 		if (status === 'init') {
