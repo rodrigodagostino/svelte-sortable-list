@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.14] (2025-01-24)
+
+### Added
+
+- Create `<Portal>` component.
+
+### Fixed
+
+- Consistently position the `<Ghost>` component relative to the viewport by wrapping it with the `<Portal>` component.
+
 ## [0.10.13] (2025-01-05)
 
 ### Fixed
@@ -636,7 +646,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.12...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...HEAD
+[0.10.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.13...v0.10.14
+[0.10.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.12...v0.10.13
 [0.10.12]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.11...v0.10.12
 [0.10.11]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.10...v0.10.11
 [0.10.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.9...v0.10.10
