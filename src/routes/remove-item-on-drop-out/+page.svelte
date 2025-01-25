@@ -47,3 +47,9 @@
 </SortableList>
 
 <button class="button" on:click={() => (items = varyingItems)}>Reset</button>
+
+<style lang="scss">
+	.button {
+		margin-top: 2rem;
+	}
+</style>

@@ -66,3 +66,9 @@
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>
 </form>
+
+<style lang="scss">
+	.button:has(+ form) {
+		margin-top: 2rem;
+	}
+</style>

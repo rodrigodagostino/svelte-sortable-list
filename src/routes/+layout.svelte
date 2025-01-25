@@ -342,12 +342,6 @@
 	.app-main {
 		padding: 3rem;
 		scrollbar-gutter: stable;
-
-		.container {
-			& > :global(.button) {
-				margin-top: 2rem;
-			}
-		}
 	}
 
 	.app-controls {
