@@ -6,7 +6,8 @@
 	let ref: HTMLElement;
 
 	onMount(() => {
-		document.body.appendChild(ref);
+		const target = ref?.closest('dialog') || document.body;
+		target.appendChild(ref);
 		ref.hidden = false;
 	});
 
