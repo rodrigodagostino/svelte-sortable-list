@@ -207,20 +207,6 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/dynamic-items"
-				aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
-			>
-				Dynamic items
-			</a>
-			<a
-				class="app-nav__link"
-				href="/interactive-items"
-				aria-current={$page.url.pathname === '/interactive-items' ? 'page' : undefined}
-			>
-				Interactive items
-			</a>
-			<a
-				class="app-nav__link"
 				href="/with-handle"
 				aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
 			>
@@ -249,17 +235,17 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/clear-target-on-drag-out"
-				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
+				href="/dynamic-items"
+				aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
 			>
-				Clear target on drag out
+				Dynamic items
 			</a>
 			<a
 				class="app-nav__link"
-				href="/remove-item-on-drop-out"
-				aria-current={$page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
+				href="/interactive-items"
+				aria-current={$page.url.pathname === '/interactive-items' ? 'page' : undefined}
 			>
-				Remove item on drop out
+				Interactive items
 			</a>
 			<a
 				class="app-nav__link"
@@ -288,6 +274,20 @@
 				aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
 			>
 				Disabled items
+			</a>
+			<a
+				class="app-nav__link"
+				href="/clear-target-on-drag-out"
+				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
+			>
+				Clear target on drag out
+			</a>
+			<a
+				class="app-nav__link"
+				href="/remove-item-on-drop-out"
+				aria-current={$page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
+			>
+				Remove item on drop out
 			</a>
 		</div>
 	</nav>
