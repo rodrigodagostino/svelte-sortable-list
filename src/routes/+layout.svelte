@@ -284,6 +284,13 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/inside-custom-dialog"
+				aria-current={$page.url.pathname === '/inside-custom-dialog' ? 'page' : undefined}
+			>
+				Inside custom dialog
+			</a>
+			<a
+				class="app-nav__link"
 				href="/clear-target-on-drag-out"
 				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
 			>
