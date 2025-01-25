@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
 		getIsGhostBetweenBounds,
@@ -211,6 +212,7 @@
 	style:z-index={styleZIndex}
 	data-id={$draggedItem && getId($draggedItem)}
 	aria-hidden="true"
+	use:portal
 >
 	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
 </div>
