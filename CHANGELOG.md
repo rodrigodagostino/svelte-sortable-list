@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.15] (2025-01-25)
+
+### Fixed
+
+- Adjust the `<Portal>` component to support the HTML native `<dialog>` element.
+- Repair `<Ghost>` broken styles.
+
+### Changed
+
+- Replace the `<Portal>` component with the `portal()` action to remove the wrapping element around `<Ghost>`.
+
+### Docs
+
+- Add **“Inside dialog”** demo page.
+- Add **“Inside custom dialog”** demo page.
+- Update the README to reflect the latest changes.
+
 ## [0.10.14] (2025-01-24)
 
 ### Added
@@ -646,7 +663,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...HEAD
+[0.10.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...v0.10.15
 [0.10.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.13...v0.10.14
 [0.10.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.12...v0.10.13
 [0.10.12]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.11...v0.10.12
