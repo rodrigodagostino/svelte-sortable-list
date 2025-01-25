@@ -42,6 +42,7 @@ Live demo:
 - Remove on drop outside.
 - Touch screen support.
 - RTL support.
+- `<dialog>` support.
 - Un-opinionated styling.
 - Typescript definitions.
 - No dependencies.
@@ -341,30 +342,32 @@ import 'svelte-sortable-list/styles.css';
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
-| Selector                                | Points to                                                                                               |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `.ssl-list`                             | The `<SortableList>` main container.                                                                    |
-| `.ssl-list.has-drop-marker`             | The `<SortableList>` main container while `hasDropMarker` is enabled.                                   |
-| `.ssl-list.can-remove-item-on-drop-out` | The `<SortableList>` main container while `canRemoveItemOnDropOut` is enabled.                          |
-| `.ssl-list.is-locked`                   | The `<SortableList>` that is locked.                                                                    |
-| `.ssl-list.is-disabled`                 | The `<SortableList>` that is disabled.                                                                  |
-| `.ssl-item`                             | Each `<SortableItem>` main container.                                                                   |
-| `.ssl-item.is-pointer-dragging`         | The `<SortableItem>` that is being dragged by a pointing device.                                        |
-| `.ssl-item.is-pointer-dropping`         | The `<SortableItem>` that is being dropped by a pointing device.                                        |
-| `.ssl-item.is-keyboard-dragging`        | The `<SortableItem>` that is being dragged by the keyboard.                                             |
-| `.ssl-item.is-keyboard-dropping`        | The `<SortableItem>` that is being dropped by the keyboard.                                             |
-| `.ssl-item.is-locked`                   | Each `<SortableItem>` that is locked.                                                                   |
-| `.ssl-item.is-disabled`                 | Each `<SortableItem>` that is disabled.                                                                 |
-| `.ssl-item[aria-disabled="true"]`       | Each `<SortableItem>` that is disabled.                                                                 |
-| `.ssl-item.is-removing`                 | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
-| `.ssl-item__inner`                      | The content wrapper element inside each `<SortableItem>`.                                               |
-| `.ssl-ghost`                            | The shadow element displayed under the pointer when dragging.                                           |
-| `.ssl-ghost.is-dragging`                | The shadow element while it’s being dragged by a pointing device.                                       |
-| `.ssl-ghost.is-dropping`                | The shadow element while it’s being dropped by a pointing device.                                       |
-| `.ssl-ghost.is-between-bounds`          | The shadow element while it’s inside the list limits.                                                   |
-| `.ssl-ghost.is-out-of-bounds`           | The shadow element while it’s outside the list limits.                                                  |
-| `.ssl-handle`                           | The `<Handle>` main container.                                                                          |
-| `.ssl-remove`                           | The `<Remove>` main container.                                                                          |
+| Selector                                 | Points to                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `.ssl-list`                              | The `<SortableList>` main container.                                                                    |
+| `.ssl-list.has-drop-marker`              | The `<SortableList>` main container while `hasDropMarker` is enabled.                                   |
+| `.ssl-list.can-remove-item-on-drop-out`  | The `<SortableList>` main container while `canRemoveItemOnDropOut` is enabled.                          |
+| `.ssl-list.is-locked`                    | The `<SortableList>` that is locked.                                                                    |
+| `.ssl-list.is-disabled`                  | The `<SortableList>` that is disabled.                                                                  |
+| `.ssl-item`                              | Each `<SortableItem>` main container.                                                                   |
+| `.ssl-item.is-pointer-dragging`          | The `<SortableItem>` that is being dragged by a pointing device.                                        |
+| `.ssl-item.is-pointer-dropping`          | The `<SortableItem>` that is being dropped by a pointing device.                                        |
+| `.ssl-item.is-keyboard-dragging`         | The `<SortableItem>` that is being dragged by the keyboard.                                             |
+| `.ssl-item.is-keyboard-dropping`         | The `<SortableItem>` that is being dropped by the keyboard.                                             |
+| `.ssl-item.is-locked`                    | Each `<SortableItem>` that is locked.                                                                   |
+| `.ssl-item.is-disabled`                  | Each `<SortableItem>` that is disabled.                                                                 |
+| `.ssl-item[aria-disabled="true"]`        | Each `<SortableItem>` that is disabled.                                                                 |
+| `.ssl-item.is-removing`                  | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
+| `.ssl-item__inner`                       | The content wrapper element inside each `<SortableItem>`.                                               |
+| `.ssl-ghost`                             | The shadow element displayed under the pointer when dragging.                                           |
+| `.ssl-ghost.is-dragging`                 | The shadow element while it’s being dragged by a pointing device.                                       |
+| `.ssl-ghost.is-dropping`                 | The shadow element while it’s being dropped by a pointing device.                                       |
+| `.ssl-ghost.is-between-bounds`           | The shadow element while it’s inside the list limits.                                                   |
+| `.ssl-ghost.is-out-of-bounds`            | The shadow element while it’s outside the list limits.                                                  |
+| `.ssl-ghost.is-removing`                 | The shadow element while a `<SortableItem>` is being removed.                                           |
+| `.ssl-ghost.can-remove-item-on-drop-out` | The shadow element while `canRemoveItemOnDropOut` is enabled.                                           |
+| `.ssl-handle`                            | The `<Handle>` main container.                                                                          |
+| `.ssl-remove`                            | The `<Remove>` main container.                                                                          |
 
 ### Custom properties
 
