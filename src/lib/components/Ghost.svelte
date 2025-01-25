@@ -197,6 +197,8 @@
 	class:is-dropping={$isPointerDropping}
 	class:is-between-bounds={$isGhostBetweenBounds}
 	class:is-out-of-bounds={!$isGhostBetweenBounds}
+	class:is-removing={$isRemoving}
+	class:can-remove-item-on-drop-out={$listProps.canRemoveItemOnDropOut}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : !$isRemoving ? 'grab' : 'initial'}
 	style:width={styleWidth}

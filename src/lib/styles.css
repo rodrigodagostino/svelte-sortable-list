@@ -137,11 +137,11 @@
 /**
  * canRemoveItemOnDropOut
  */
-.ssl-list:has(> .ssl-item.is-removing) + .ssl-ghost .ssl-ghost__inner {
+.ssl-ghost.is-removing .ssl-ghost__inner {
 	opacity: 0;
 }
 
-.ssl-list.can-remove-item-on-drop-out + .ssl-ghost.is-out-of-bounds .ssl-ghost__inner {
+.ssl-ghost.can-remove-item-on-drop-out.is-out-of-bounds .ssl-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }
