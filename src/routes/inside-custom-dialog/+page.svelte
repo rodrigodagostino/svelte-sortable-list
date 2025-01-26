@@ -28,22 +28,24 @@
 		const { itemIndex } = event.detail;
 		items = removeItem(items, itemIndex);
 	}
+
+	function handleOpenDialog() {
+		isDialogOpen = true;
+	}
+
+	function handleCloseDialog() {
+		isDialogOpen = false;
+	}
 </script>
 
 <svelte:head>
 	<title>Inside custom dialog | Svelte Sortable List</title>
 </svelte:head>
 
-<button class="button" on:click={() => (isDialogOpen = true)}>Open dialog</button>
-<div class="dialog" role="dialog" aria-modal="true" class:is-open={isDialogOpen}>
+<button class="button" on:click={handleOpenDialog}>Open dialog</button>
+<div class="dialog" class:is-open={isDialogOpen} role="dialog" aria-modal="true">
 	<div class="dialog__window">
-		<button
-			class="dialog__close button"
-			aria-label="Close modal"
-			on:click={() => (isDialogOpen = false)}
-		>
-			Close dialog
-		</button>
+		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
 		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem id={item.id} {index}>
@@ -54,20 +56,28 @@
 			{/each}
 		</SortableList>
 	</div>
-	<button class="dialog__backdrop" on:click={() => (isDialogOpen = false)}>Close dialog</button>
+	<button class="dialog__backdrop" on:click={handleCloseDialog}>Close dialog</button>
 </div>
 
 <style lang="scss">
+	:global(html:has(.dialog.is-open)) {
+		overflow: hidden;
+	}
+
 	.dialog {
 		position: fixed;
 		inset: 0;
 		visibility: hidden;
 		opacity: 0;
+		transition:
+			opacity 320ms,
+			visibility 0s 320ms;
 		z-index: 9999;
 
 		&.is-open {
 			visibility: visible;
 			opacity: 1;
+			transition: opacity 320ms;
 		}
 
 		&__window {
@@ -75,7 +85,9 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			min-width: 40rem;
+			width: 40rem;
+			max-width: 90vw;
+			max-width: 90dvw;
 			padding: 4rem;
 			background-color: var(--gray-100);
 			box-shadow: var(--box-shadow-4);
@@ -96,7 +108,8 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background-color: rgba(0, 0, 0, 0.1);
+			border: none;
+			background-color: rgba(0, 0, 0, 0.32);
 			z-index: 0;
 		}
 	}
