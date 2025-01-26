@@ -340,6 +340,8 @@
 	}
 
 	.app-main {
+		min-height: 50vh;
+		min-height: 50dvh;
 		padding: 3rem;
 		scrollbar-gutter: stable;
 	}
