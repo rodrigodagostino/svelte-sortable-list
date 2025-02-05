@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.16] (2025-02-04)
+
+### Fixed
+
+- Avoid preventing click when `<SortableList>` or `<SortableItem>` are locked and the click target is an interactive element.
+
+### Docs
+
+- Add minimum height to the layout `<main>` section.
+- Polish **“Inside dialog”** and **“Inside custom dialog”** demo pages.
+- Update the README to reflect the latest changes.
+
 ## [0.10.15] (2025-01-25)
 
 ### Fixed
@@ -663,7 +675,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...HEAD
+[0.10.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...v0.10.16
 [0.10.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...v0.10.15
 [0.10.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.13...v0.10.14
 [0.10.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.12...v0.10.13
