@@ -35,7 +35,7 @@
 
 <SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 	{#each items as item, index (item.id)}
-		<SortableItem id={item.id} {index} isLocked={item.isLocked}>
+		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">
 				{item.text}
 			</div>
