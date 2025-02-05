@@ -124,8 +124,9 @@
 		if (!currItem) return;
 
 		if (
-			isLocked ||
-			currItem.classList.contains('is-locked') ||
+			(isLocked && !isOrResidesInInteractiveElement(target, currItem)) ||
+			(currItem.classList.contains('is-locked') &&
+				!isOrResidesInInteractiveElement(target, currItem)) ||
 			isDisabled ||
 			currItem.getAttribute('aria-disabled') === 'true'
 		) {
