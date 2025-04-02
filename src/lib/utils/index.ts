@@ -108,6 +108,50 @@ export function getCollidingItem(
 	return collidingItems[0];
 }
 
+export const getClosestScrollableAncestor = (element: HTMLElement) => {
+	if (!element) return undefined;
+
+	let parent = element.parentElement;
+	while (parent) {
+		const { overflow } = window.getComputedStyle(parent);
+		if (
+			overflow.includes('auto') ||
+			overflow.includes('scroll') ||
+			parent.tagName === 'DIALOG' ||
+			parent.getAttribute('role') === 'dialog' ||
+			parent.getAttribute('aria-modal') === 'true'
+		)
+			return parent;
+		parent = parent.parentElement;
+	}
+
+	return document.documentElement;
+};
+
+export function shouldAutoScroll(element: HTMLElement, scrollingSpeed: number) {
+	return (
+		(element?.scrollTop > 0 && scrollingSpeed < 0) ||
+		(element?.scrollTop + element?.clientHeight < element?.scrollHeight && scrollingSpeed > 0)
+	);
+}
+
+export function getScrollingSpeed(
+	scrollableAncestor: HTMLElement,
+	clientY: PointerEvent['clientY'],
+	offset: number,
+	ratio: number
+) {
+	const ancestorRect = scrollableAncestor.getBoundingClientRect();
+
+	if (clientY - ancestorRect.top < offset) {
+		return Math.round((offset - (clientY - ancestorRect.top)) / -ratio);
+	} else if (ancestorRect.bottom - clientY < offset) {
+		return Math.round((offset - (ancestorRect.bottom - clientY)) / ratio);
+	} else {
+		return 0;
+	}
+}
+
 export function dispatch(target: HTMLElement, name: string, detail: object) {
 	const event = new CustomEvent(name, { bubbles: true, detail });
 	target.dispatchEvent(event);

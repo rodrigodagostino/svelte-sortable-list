@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
+	import { browser } from '$app/environment';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import type {
 		GhostProps,
@@ -9,12 +10,15 @@
 	} from '$lib/types/index.js';
 	import {
 		areColliding,
+		getClosestScrollableAncestor,
 		getCollidingItem,
 		getId,
 		getIndex,
 		getItemsData,
+		getScrollingSpeed,
 		isOrResidesInInteractiveElement,
 		screenReaderText,
+		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 	import {
 		setDraggedItem,
@@ -83,6 +87,36 @@
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
+
+	$: scrollableAncestor = getClosestScrollableAncestor(listRef);
+	const AUTOSCROLL_ACTIVE_OFFSET = 200;
+	const AUTOSCROLL_SPEED_RATIO = 40;
+	let scrollingSpeed = 0;
+	$: if (scrollingSpeed !== 0) scroll();
+
+	function scroll() {
+		if (!scrollableAncestor) return;
+
+		if (browser)
+			requestAnimationFrame(() => {
+				if (!shouldAutoScroll(scrollableAncestor, scrollingSpeed)) return;
+
+				scrollableAncestor?.scrollBy(0, scrollingSpeed);
+
+				if (scrollingSpeed !== 0) scroll();
+			});
+	}
+
+	function autoScroll(clientY: PointerEvent['clientY']) {
+		if (!scrollableAncestor) return;
+
+		scrollingSpeed = getScrollingSpeed(
+			scrollableAncestor,
+			clientY,
+			AUTOSCROLL_ACTIVE_OFFSET,
+			AUTOSCROLL_SPEED_RATIO
+		);
+	}
 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
 	// so we need to manually keep focus on the selected <SortableItem> as items are sorted.
@@ -191,6 +225,9 @@
 				: swapThreshold && swapThreshold > 2
 					? 2
 					: swapThreshold;
+		// Re-set itemsData only during scrolling.
+		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
+		if (scrollingSpeed !== 0) $itemsData = getItemsData(listRef);
 		await tick();
 		const collidingItemData = getCollidingItem(ghostRef, $itemsData, enforcedSwapThreshold);
 		if (collidingItemData)
@@ -199,6 +236,9 @@
 			);
 		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds))
 			$targetItem = null;
+
+		if (scrollableAncestor && scrollableAncestor.scrollHeight > scrollableAncestor.clientHeight)
+			autoScroll(clientY);
 	}
 
 	function handlePointerUp() {
@@ -367,6 +407,7 @@
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
 			$isGhostBetweenBounds = true;
+			scrollingSpeed = 0;
 		} else {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
