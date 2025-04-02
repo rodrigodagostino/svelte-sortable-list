@@ -26,7 +26,7 @@
 		setIsPointerDragging,
 		setIsPointerDropping,
 		setIsRemoving,
-		setItemsOrigin,
+		setItemsData,
 		setListProps,
 		setPointer,
 		setPointerOrigin,
@@ -78,7 +78,7 @@
 	let ghostStatus: GhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
-	const itemsOrigin = setItemsOrigin(null);
+	const itemsData = setItemsData(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
@@ -162,7 +162,7 @@
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
-		$itemsOrigin = getItemsData(listRef);
+		$itemsData = getItemsData(listRef);
 		ghostStatus = 'init';
 
 		currItem.addEventListener('pointermove', handlePointerMove);
@@ -176,8 +176,8 @@
 		);
 	}
 
-	function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!$isPointerDragging || !ghostRef || !$itemsOrigin || !$draggedItem) return;
+	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
+		if (!$isPointerDragging || !ghostRef || !$itemsData || !$draggedItem) return;
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
@@ -191,7 +191,8 @@
 				: swapThreshold && swapThreshold > 2
 					? 2
 					: swapThreshold;
-		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, enforcedSwapThreshold);
+		await tick();
+		const collidingItemData = getCollidingItem(ghostRef, $itemsData, enforcedSwapThreshold);
 		if (collidingItemData)
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
@@ -232,7 +233,7 @@
 
 					await tick();
 					$draggedItem = $focusedItem;
-					$itemsOrigin = getItemsData(listRef);
+					$itemsData = getItemsData(listRef);
 					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
 				} else {
 					handleElementDrop($focusedItem, 'keyboard-drop');
@@ -268,17 +269,17 @@
 					if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
 					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
 				} else {
-					if (!$draggedItem || !$itemsOrigin) return;
+					if (!$draggedItem || !$itemsData) return;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
 						((key === 'ArrowUp' || key === 'ArrowLeft') && draggedItemIndex === 0 && !targetItem) ||
 						((key === 'ArrowUp' || key === 'ArrowLeft') && targetItemIndex === 0) ||
 						((key === 'ArrowDown' || key === 'ArrowRight') &&
-							draggedItemIndex === $itemsOrigin.length - 1 &&
+							draggedItemIndex === $itemsData.length - 1 &&
 							!targetItem) ||
 						((key === 'ArrowDown' || key === 'ArrowRight') &&
-							targetItemIndex === $itemsOrigin.length - 1)
+							targetItemIndex === $itemsData.length - 1)
 					)
 						return;
 
@@ -318,14 +319,14 @@
 					if (key === 'Home') items[0]?.focus();
 					else items[items.length - 1]?.focus();
 				} else {
-					if (!$draggedItem || !$itemsOrigin) return;
+					if (!$draggedItem || !$itemsData) return;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
 						(key === 'Home' && draggedItemIndex === 0 && !targetItem) ||
 						(key === 'Home' && targetItemIndex === 0) ||
-						(key === 'End' && draggedItemIndex === $itemsOrigin.length - 1 && !targetItem) ||
-						(key === 'End' && targetItemIndex === $itemsOrigin.length - 1)
+						(key === 'End' && draggedItemIndex === $itemsData.length - 1 && !targetItem) ||
+						(key === 'End' && targetItemIndex === $itemsData.length - 1)
 					)
 						return;
 
@@ -342,7 +343,7 @@
 		}
 	}
 
-	function handleElementDrop(
+	async function handleElementDrop(
 		element: HTMLElement,
 		action: 'pointer-drop' | 'keyboard-drop' | 'keyboard-cancel'
 	) {
@@ -361,7 +362,9 @@
 				hasDispatchedRemove = true;
 			}
 			$isPointerDragging = false;
-			ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'set';
+			ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'preset';
+			await tick();
+			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
 			$isGhostBetweenBounds = true;
 		} else {
@@ -385,7 +388,7 @@
 			await tick();
 			$draggedItem = null;
 			$targetItem = null;
-			$itemsOrigin = null;
+			$itemsData = null;
 			if (action === 'pointer-drop') {
 				ghostStatus = 'unset';
 				$pointer = null;

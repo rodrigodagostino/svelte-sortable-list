@@ -43,11 +43,11 @@ export function getPointerOrigin() {
 	return getWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin');
 }
 
-export function setItemsOrigin(context: SortableListCoordinates['itemsOrigin']) {
-	return setWritableContext<SortableListCoordinates['itemsOrigin']>('itemsOrigin', context);
+export function setItemsData(context: SortableListCoordinates['itemsData']) {
+	return setWritableContext<SortableListCoordinates['itemsData']>('itemsData', context);
 }
-export function getItemsOrigin() {
-	return getWritableContext<SortableListCoordinates['itemsOrigin']>('itemsOrigin');
+export function getItemsData() {
+	return getWritableContext<SortableListCoordinates['itemsData']>('itemsData');
 }
 
 /**

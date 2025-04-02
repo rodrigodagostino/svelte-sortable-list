@@ -8,13 +8,27 @@ export function getIndex(element: HTMLElement): number {
 	return Number(element.dataset.index);
 }
 
+function getTranslateValues(element: HTMLElement) {
+	const style = window.getComputedStyle(element);
+	const matrix = style.transform.match(/matrix.*\((.+)\)/)![1].split(', ');
+
+	return {
+		x: Number(matrix[12] || matrix[4] || 0),
+		y: Number(matrix[13] || matrix[5] || 0),
+		z: Number(matrix[14] || 0),
+	};
+}
+
 export function getItemData(item: HTMLElement): ItemData {
 	const itemRect = item.getBoundingClientRect();
+	const itemTranslate = getTranslateValues(item);
 	return {
 		id: item.dataset.id!,
 		index: +item.dataset.index!,
-		x: itemRect.x,
-		y: itemRect.y,
+		// Translate values are removed to create a reliable reference to the item’s position in the list
+		// without the risk of catching in-between values while an item is translating.
+		x: itemRect.x - itemTranslate.x,
+		y: itemRect.y - itemTranslate.y,
 		width: itemRect.width,
 		height: itemRect.height,
 	};

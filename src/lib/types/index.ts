@@ -31,7 +31,7 @@ export interface SortableListProps {
 export interface SortableListCoordinates {
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
-	itemsOrigin: ItemData[] | null;
+	itemsData: ItemData[] | null;
 }
 
 export interface SortableListElements {
@@ -52,7 +52,7 @@ export interface SortableItemData extends Omit<SortableItemProps, 'index'> {
 }
 
 export interface GhostProps {
-	status: 'init' | 'set' | 'remove' | 'unset';
+	status: 'init' | 'preset' | 'set' | 'remove' | 'unset';
 	listRef: HTMLUListElement | null;
 }
 

@@ -10,7 +10,7 @@
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getIsRemoving,
-		getItemsOrigin,
+		getItemsData,
 		getListProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
@@ -27,7 +27,7 @@
 
 	const listProps = getListProps();
 
-	const itemsOrigin = getItemsOrigin();
+	const itemsData = getItemsData();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 	const focusedItem = getFocusedItem();
@@ -40,12 +40,14 @@
 	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
 
+	let rectOrigin: DOMRect | null = null;
 	let hasHandle = false;
 	$: {
 		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
 	}
 
 	onMount(() => {
+		rectOrigin = itemRef?.getBoundingClientRect();
 		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 		setInteractiveElementsTabIndex();
 	});
@@ -69,15 +71,15 @@
 			);
 	}
 
-	$: draggedItemId = ($draggedItem && getId($draggedItem)) ?? null;
-	$: draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
-	// $itemsOrigin is used as a reliable reference to the item’s position in the list
-	// without the risk of catching in-between values while the item is translating.
+	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
+	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
+	// $itemsData is used as a reliable reference to the item’s position in the list
+	// without the risk of catching in-between values while an item is translating.
 	$: draggedItemRect =
-		typeof draggedItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[draggedItemIndex] : null;
-	$: targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
+		$itemsData && typeof draggedItemIndex === 'number' ? $itemsData[draggedItemIndex] : null;
+	$: targetItemIndex = $targetItem ? getIndex($targetItem) : null;
 	$: targetItemRect =
-		typeof targetItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[targetItemIndex] : null;
+		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
 	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
 
 	$: styleCursor =
@@ -118,35 +120,16 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-
-		if (
-			draggedItemId === String(id) &&
-			((!$isGhostBetweenBounds && $listProps.canRemoveItemOnDropOut) || $isRemoving)
-		)
-			return '0';
-		else if (
-			draggedItemId === String(id) &&
-			$isGhostBetweenBounds &&
-			$listProps.canRemoveItemOnDropOut
-		)
-			return `${draggedItemRect?.width}px`;
+		if (draggedItemId === String(id) && (!$isGhostBetweenBounds || $isRemoving)) return '0';
+		else if (draggedItemId === String(id) && $isGhostBetweenBounds) return `${rectOrigin?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-
-		if (
-			draggedItemId === String(id) &&
-			(($listProps.canRemoveItemOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
-		)
-			return '0';
-		else if (
-			draggedItemId === String(id) &&
-			$listProps.canRemoveItemOnDropOut &&
-			$isGhostBetweenBounds
-		)
-			return `${draggedItemRect?.height}px`;
+		if (draggedItemId === String(id) && (!$isGhostBetweenBounds || $isRemoving)) return '0';
+		else if (draggedItemId === String(id) && $isGhostBetweenBounds)
+			return `${rectOrigin?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -165,7 +148,7 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (
-			!$itemsOrigin ||
+			!$itemsData ||
 			!$draggedItem ||
 			!$targetItem ||
 			draggedItemIndex === null ||
