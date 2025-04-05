@@ -17,6 +17,7 @@
 		getItemsData,
 		getScrollingSpeed,
 		isOrResidesInInteractiveElement,
+		isScrollable,
 		screenReaderText,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
@@ -99,20 +100,24 @@
 
 		if (browser)
 			requestAnimationFrame(() => {
-				if (!shouldAutoScroll(scrollableAncestor, scrollingSpeed)) return;
+				if (!shouldAutoScroll(scrollableAncestor, direction, scrollingSpeed)) return;
 
-				scrollableAncestor?.scrollBy(0, scrollingSpeed);
+				const x = direction === 'horizontal' ? scrollingSpeed : 0;
+				const y = direction === 'vertical' ? scrollingSpeed : 0;
+				scrollableAncestor?.scrollBy(x, y);
 
 				if (scrollingSpeed !== 0) scroll();
 			});
 	}
 
-	function autoScroll(clientY: PointerEvent['clientY']) {
+	function autoScroll(clientX: PointerEvent['clientX'], clientY: PointerEvent['clientY']) {
 		if (!scrollableAncestor) return;
 
 		scrollingSpeed = getScrollingSpeed(
 			scrollableAncestor,
+			clientX,
 			clientY,
+			direction,
 			AUTOSCROLL_ACTIVE_OFFSET,
 			AUTOSCROLL_SPEED_RATIO
 		);
@@ -237,8 +242,7 @@
 		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds))
 			$targetItem = null;
 
-		if (scrollableAncestor && scrollableAncestor.scrollHeight > scrollableAncestor.clientHeight)
-			autoScroll(clientY);
+		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
 
 	function handlePointerUp() {

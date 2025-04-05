@@ -128,27 +128,60 @@ export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	return document.documentElement;
 };
 
-export function shouldAutoScroll(element: HTMLElement, scrollingSpeed: number) {
+export function isScrollable(
+	element: HTMLElement | undefined,
+	direction: SortableListProps['direction']
+) {
 	return (
-		(element?.scrollTop > 0 && scrollingSpeed < 0) ||
-		(element?.scrollTop + element?.clientHeight < element?.scrollHeight && scrollingSpeed > 0)
+		element &&
+		((direction === 'vertical' && element.scrollHeight > element.clientHeight) ||
+			(direction === 'horizontal' && element.scrollWidth > element.clientWidth))
 	);
 }
 
+export function shouldAutoScroll(
+	element: HTMLElement,
+	direction: SortableListProps['direction'],
+	scrollingSpeed: number
+) {
+	if (direction === 'vertical')
+		return (
+			(element?.scrollTop > 0 && scrollingSpeed < 0) ||
+			(element?.scrollTop + element?.clientHeight < element?.scrollHeight && scrollingSpeed > 0)
+		);
+	else
+		return (
+			(element?.scrollLeft > 0 && scrollingSpeed < 0) ||
+			(element?.scrollLeft + element?.clientWidth < element?.scrollWidth && scrollingSpeed > 0)
+		);
+}
+
 export function getScrollingSpeed(
-	scrollableAncestor: HTMLElement,
+	element: HTMLElement,
+	clientX: PointerEvent['clientX'],
 	clientY: PointerEvent['clientY'],
+	direction: SortableListProps['direction'],
 	offset: number,
 	ratio: number
 ) {
-	const ancestorRect = scrollableAncestor.getBoundingClientRect();
+	const rect = element.getBoundingClientRect();
 
-	if (clientY - ancestorRect.top < offset) {
-		return Math.round((offset - (clientY - ancestorRect.top)) / -ratio);
-	} else if (ancestorRect.bottom - clientY < offset) {
-		return Math.round((offset - (ancestorRect.bottom - clientY)) / ratio);
+	if (direction === 'vertical') {
+		if (clientY - rect.top < offset) {
+			return Math.round((offset - (clientY - rect.top)) / -ratio);
+		} else if (rect.bottom - clientY < offset) {
+			return Math.round((offset - (rect.bottom - clientY)) / ratio);
+		} else {
+			return 0;
+		}
 	} else {
-		return 0;
+		if (clientX - rect.left < offset) {
+			return Math.round((offset - (clientX - rect.left)) / -ratio);
+		} else if (rect.right - clientX < offset) {
+			return Math.round((offset - (rect.right - clientX)) / ratio);
+		} else {
+			return 0;
+		}
 	}
 }
 
