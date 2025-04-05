@@ -131,7 +131,7 @@
 		activeElement = document?.activeElement as HTMLElement;
 	});
 	afterUpdate(() => {
-		if (activeElement) activeElement.focus();
+		if (activeElement) activeElement.focus({ preventScroll: true });
 	});
 
 	const isPointerDragging = setIsPointerDragging(false);
@@ -295,7 +295,7 @@
 				if (!$isKeyboardDragging) {
 					if (!$focusedItem || focusedItemIndex === null) {
 						const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
-						firstItemElement?.focus();
+						firstItemElement?.focus({ preventScroll: true });
 						return;
 					}
 
@@ -310,8 +310,10 @@
 					)
 						return;
 
-					if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
-					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+					if (step === 1)
+						($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+					else
+						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				} else {
 					if (!$draggedItem || !$itemsData) return;
 					// Prevent moving the selected item if it’s the first or last item,
@@ -360,8 +362,8 @@
 					)
 						return;
 
-					if (key === 'Home') items[0]?.focus();
-					else items[items.length - 1]?.focus();
+					if (key === 'Home') items[0]?.focus({ preventScroll: true });
+					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
 					if (!$draggedItem || !$itemsData) return;
 					// Prevent moving the selected item if it’s the first or last item,
@@ -504,8 +506,10 @@
 				if (items.length > 1) {
 					// Focus the next/previous item (if it exists) before removing.
 					const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
-					if (step === 1) ($focusedItem.nextElementSibling as HTMLLIElement)?.focus();
-					else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus();
+					if (step === 1)
+						($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+					else
+						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				} else {
 					// Focus the list (if there are no items left) before removing.
 					listRef.focus();
