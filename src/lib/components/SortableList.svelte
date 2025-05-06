@@ -18,7 +18,9 @@
 		getScrollingSpeed,
 		isOrResidesInInteractiveElement,
 		isScrollable,
+		isFullyVisible,
 		screenReaderText,
+		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 	import {
@@ -295,7 +297,10 @@
 				if (!$isKeyboardDragging) {
 					if (!$focusedItem || focusedItemIndex === null) {
 						const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
-						firstItemElement?.focus({ preventScroll: true });
+						if (!firstItemElement) return;
+						firstItemElement.focus({ preventScroll: true });
+						if (scrollableAncestor && !isFullyVisible(firstItemElement, scrollableAncestor))
+							scrollIntoView(firstItemElement, scrollableAncestor, direction, -1);
 						return;
 					}
 
@@ -341,13 +346,22 @@
 								: ($targetItem.previousElementSibling as HTMLLIElement);
 					}
 
+					await tick();
+					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
+						scrollIntoView($targetItem, scrollableAncestor, direction, step);
 					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
 				}
+
+				await tick();
+				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
+				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
+					scrollIntoView(scrollTarget, scrollableAncestor, direction, step);
 			}
 
 			if (key === 'Home' || key === 'End') {
 				event.preventDefault();
 
+				const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
 				const targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
 				const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
@@ -355,7 +369,6 @@
 				if (!$isKeyboardDragging) {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 					if (
 						(key === 'Home' && focusedItemIndex === 0) ||
 						(key === 'End' && focusedItemIndex === items.length - 1)
@@ -376,11 +389,15 @@
 					)
 						return;
 
-					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
-
 					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
 				}
+
+				await tick();
+				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
+				const step = key === 'Home' ? -1 : 1;
+				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
+					scrollIntoView(scrollTarget, scrollableAncestor, direction, step);
 			}
 
 			if (key === 'Escape' && $draggedItem) {
@@ -422,6 +439,8 @@
 			liveText = screenReaderText.dropped($draggedItem, $targetItem);
 		else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isCancelingKeyboardDragging = true;
+			await tick();
+			if (scrollableAncestor) scrollIntoView($draggedItem, scrollableAncestor, direction, -1);
 			liveText = screenReaderText.canceled($draggedItem);
 		}
 

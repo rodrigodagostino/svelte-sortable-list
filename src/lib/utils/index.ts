@@ -10,6 +10,7 @@ export function getIndex(element: HTMLElement): number {
 
 function getTranslateValues(element: HTMLElement) {
 	const style = window.getComputedStyle(element);
+	if (style.transform === 'none') return;
 	const matrix = style.transform.match(/matrix.*\((.+)\)/)![1].split(', ');
 
 	return {
@@ -24,11 +25,11 @@ export function getItemData(item: HTMLElement): ItemData {
 	const itemTranslate = getTranslateValues(item);
 	return {
 		id: item.dataset.id!,
-		index: +item.dataset.index!,
+		index: Number(item.dataset.index),
 		// Translate values are removed to create a reliable reference to the item’s position in the list
 		// without the risk of catching in-between values while an item is translating.
-		x: itemRect.x - itemTranslate.x,
-		y: itemRect.y - itemTranslate.y,
+		x: itemRect.x - (itemTranslate?.x || 0),
+		y: itemRect.y - (itemTranslate?.y || 0),
 		width: itemRect.width,
 		height: itemRect.height,
 	};
@@ -127,6 +128,93 @@ export const getClosestScrollableAncestor = (element: HTMLElement) => {
 
 	return document.documentElement;
 };
+
+export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
+	const elementRect = element.getBoundingClientRect();
+	const elementStyles = window.getComputedStyle(element);
+	const elementTranslate = getTranslateValues(element);
+	const containerRect = container.getBoundingClientRect();
+	// In those situations where the container is larger than the viewport,
+	// we want to use the window as reference.
+	const limitTop = containerRect.height < window.innerHeight ? containerRect.top : 0;
+	const limitBottom =
+		containerRect.height < window.innerHeight ? containerRect.bottom : window.innerHeight;
+	const limitLeft = containerRect.width < window.innerWidth ? containerRect.left : 0;
+	const limitRight =
+		containerRect.width < window.innerWidth ? containerRect.right : window.innerWidth;
+
+	return (
+		elementRect.top - (elementTranslate?.y || 0) + parseFloat(elementStyles.marginTop) > limitTop &&
+		elementRect.bottom - (elementTranslate?.y || 0) + parseFloat(elementStyles.marginBottom) <
+			limitBottom &&
+		elementRect.left - (elementTranslate?.x || 0) + parseFloat(elementStyles.marginLeft) >
+			limitLeft &&
+		elementRect.right - (elementTranslate?.x || 0) + parseFloat(elementStyles.marginRight) <
+			limitRight
+	);
+}
+
+export function scrollIntoView(
+	element: HTMLElement,
+	container: HTMLElement,
+	direction: SortableListProps['direction'],
+	step: 1 | -1
+) {
+	const elementRect = element.getBoundingClientRect();
+	const elementStyles = window.getComputedStyle(element);
+	const elementTranslate = getTranslateValues(element);
+	const containerRect = container.getBoundingClientRect();
+	const containerStyles = window.getComputedStyle(container);
+	// In those situations where the container is larger than the viewport,
+	// we want to use the window as reference.
+	const smallerWrapperWidth = Math.min(container.clientWidth, window.innerWidth);
+	const smallerWrapperHeight = Math.min(container.clientHeight, window.innerHeight);
+	const SCROLL_MARGIN = 40;
+	const left =
+		direction === 'horizontal'
+			? step === 1
+				? elementRect.right -
+					(elementTranslate?.x || 0) -
+					containerRect.left -
+					parseFloat(containerStyles?.borderRightWidth) -
+					smallerWrapperWidth +
+					container.scrollLeft +
+					parseFloat(elementStyles.marginRight) * 2 +
+					SCROLL_MARGIN
+				: elementRect.left -
+					(elementTranslate?.x || 0) -
+					containerRect.left -
+					parseFloat(containerStyles?.borderLeftWidth) +
+					container.scrollLeft -
+					parseFloat(elementStyles.marginLeft) * 2 -
+					SCROLL_MARGIN
+			: undefined;
+	const top =
+		direction === 'vertical'
+			? step === 1
+				? elementRect.bottom -
+					(elementTranslate?.y || 0) -
+					containerRect.top -
+					parseFloat(containerStyles?.borderBottomWidth) -
+					smallerWrapperHeight +
+					container.scrollTop +
+					parseFloat(elementStyles.marginBottom) * 2 +
+					SCROLL_MARGIN
+				: elementRect.top -
+					(elementTranslate?.y || 0) -
+					containerRect.top -
+					parseFloat(containerStyles?.borderTopWidth) +
+					container.scrollTop -
+					parseFloat(elementStyles.marginTop) * 2 -
+					SCROLL_MARGIN
+			: undefined;
+
+	container.scrollTo({
+		left,
+		top,
+		behavior: 'smooth',
+	});
+}
 
 export function isScrollable(
 	element: HTMLElement | undefined,
