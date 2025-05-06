@@ -249,6 +249,27 @@
 			</a>
 			<a
 				class="app-nav__link"
+				href="/auto-scroll"
+				aria-current={$page.url.pathname === '/auto-scroll' ? 'page' : undefined}
+			>
+				Auto scroll
+			</a>
+			<a
+				class="app-nav__link"
+				href="/auto-scroll-container"
+				aria-current={$page.url.pathname === '/auto-scroll-container' ? 'page' : undefined}
+			>
+				Auto scroll container
+			</a>
+			<a
+				class="app-nav__link"
+				href="/auto-scroll-dialog"
+				aria-current={$page.url.pathname === '/auto-scroll-dialog' ? 'page' : undefined}
+			>
+				Auto scroll dialog
+			</a>
+			<a
+				class="app-nav__link"
 				href="/locked-list"
 				aria-current={$page.url.pathname === '/locked-list' ? 'page' : undefined}
 			>
@@ -328,14 +349,14 @@
 
 	.app-main,
 	.app-nav {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(0, 1fr);
 
 		.container {
 			display: flex;
 			flex-direction: column;
-			align-items: center;
-			margin-block: auto;
+			margin: auto;
 		}
 	}
 
@@ -469,7 +490,7 @@
 		}
 
 		.app-main {
-			overflow-y: auto;
+			overflow: auto;
 		}
 
 		.app-nav {
@@ -477,10 +498,12 @@
 			inset: 0;
 			margin-inline-start: auto;
 			width: 20.25rem;
+			overflow: auto;
 
 			.container {
 				align-items: start;
 				height: 100%;
+				margin-block: auto;
 			}
 		}
 
@@ -490,7 +513,7 @@
 
 			.container {
 				height: 100%;
-				overflow-y: auto;
+				overflow: auto;
 			}
 
 			&__toggle {
