@@ -11,7 +11,7 @@
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 
-	let items = [...defaultItems];
+	let items = $state([...defaultItems]);
 
 	onMount(() => {
 		$props = { ...defaultProps };

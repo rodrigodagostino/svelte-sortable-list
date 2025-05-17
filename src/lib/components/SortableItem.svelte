@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { onMount, tick } from 'svelte';
 	import {
 		getDraggedItem,
@@ -18,12 +20,23 @@
 	import type { SortableItemProps } from '$lib/types/index.js';
 	import { dispatch, getId, getIndex, screenReaderText } from '$lib/utils/index.js';
 
-	let itemRef: HTMLLIElement;
+	let itemRef: HTMLLIElement = $state();
 
-	export let id: SortableItemProps['id'];
-	export let index: SortableItemProps['index'];
-	export let isLocked: SortableItemProps['isLocked'] = false;
-	export let isDisabled: SortableItemProps['isDisabled'] = false;
+	interface Props {
+		id: SortableItemProps['id'];
+		index: SortableItemProps['index'];
+		isLocked?: SortableItemProps['isLocked'];
+		isDisabled?: SortableItemProps['isDisabled'];
+		children?: import('svelte').Snippet;
+	}
+
+	let {
+		id,
+		index,
+		isLocked = false,
+		isDisabled = false,
+		children
+	}: Props = $props();
 
 	const listProps = getListProps();
 
@@ -40,10 +53,7 @@
 	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
 
-	let hasHandle = false;
-	$: {
-		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
-	}
+	let hasHandle = $state(false);
 
 	onMount(() => {
 		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
@@ -69,51 +79,7 @@
 			);
 	}
 
-	$: draggedItemId = ($draggedItem && getId($draggedItem)) ?? null;
-	$: draggedItemIndex = ($draggedItem && getIndex($draggedItem)) ?? null;
-	// $itemsOrigin is used as a reliable reference to the item’s position in the list
-	// without the risk of catching in-between values while the item is translating.
-	$: draggedItemRect =
-		typeof draggedItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[draggedItemIndex] : null;
-	$: targetItemIndex = ($targetItem && getIndex($targetItem)) ?? null;
-	$: targetItemRect =
-		typeof targetItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[targetItemIndex] : null;
-	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
 
-	$: styleCursor =
-		$listProps.isDisabled || isDisabled
-			? 'not-allowed'
-			: $isPointerDragging && draggedItemId === String(id)
-				? 'grabbing'
-				: !hasHandle && !$listProps.isLocked && !isLocked
-					? 'grab'
-					: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds);
-	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds);
-	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isGhostBetweenBounds);
-	$: styleOpacity =
-		draggedItemId === String(id) &&
-		($isPointerDragging || $isPointerDropping) &&
-		!$listProps.hasDropMarker
-			? 0
-			: 1;
-	$: styleOverflow =
-		draggedItemId === String(id) &&
-		($isPointerDragging || $isPointerDropping) &&
-		$listProps.canRemoveItemOnDropOut
-			? 'hidden'
-			: undefined;
-	$: styleTransform = getStyleTransform(
-		$draggedItem,
-		$targetItem,
-		$isCancelingKeyboardDragging,
-		$isGhostBetweenBounds
-	);
-	$: styleTransition = $draggedItem
-		? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
-			`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
-			`z-index ${$listProps.transitionDuration}ms`
-		: `none`;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
@@ -235,6 +201,53 @@
 			$focusedItem = null;
 		}
 	}
+	let focusedItemId = $derived($focusedItem ? getId($focusedItem) : null);
+	run(() => {
+		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
+	});
+	let draggedItemId = $derived(($draggedItem && getId($draggedItem)) ?? null);
+	let draggedItemIndex = $derived(($draggedItem && getIndex($draggedItem)) ?? null);
+	// $itemsOrigin is used as a reliable reference to the item’s position in the list
+	// without the risk of catching in-between values while the item is translating.
+	let draggedItemRect =
+		$derived(typeof draggedItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[draggedItemIndex] : null);
+	let targetItemIndex = $derived(($targetItem && getIndex($targetItem)) ?? null);
+	let targetItemRect =
+		$derived(typeof targetItemIndex === 'number' && $itemsOrigin ? $itemsOrigin[targetItemIndex] : null);
+	let styleCursor =
+		$derived($listProps.isDisabled || isDisabled
+			? 'not-allowed'
+			: $isPointerDragging && draggedItemId === String(id)
+				? 'grabbing'
+				: !hasHandle && !$listProps.isLocked && !isLocked
+					? 'grab'
+					: 'initial');
+	let styleWidth = $derived(getStyleWidth($draggedItem, $isGhostBetweenBounds));
+	let styleHeight = $derived(getStyleHeight($draggedItem, $isGhostBetweenBounds));
+	let styleMargin = $derived(getStyleMargin($listProps.direction, $draggedItem, $isGhostBetweenBounds));
+	let styleOpacity =
+		$derived(draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		!$listProps.hasDropMarker
+			? 0
+			: 1);
+	let styleOverflow =
+		$derived(draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		$listProps.canRemoveItemOnDropOut
+			? 'hidden'
+			: undefined);
+	let styleTransform = $derived(getStyleTransform(
+		$draggedItem,
+		$targetItem,
+		$isCancelingKeyboardDragging,
+		$isGhostBetweenBounds
+	));
+	let styleTransition = $derived($draggedItem
+		? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
+			`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
+			`z-index ${$listProps.transitionDuration}ms`
+		: `none`);
 </script>
 
 <li
@@ -268,13 +281,13 @@
 	)}
 	aria-selected={focusedItemId === String(id)}
 	aria-disabled={$listProps.isDisabled || isDisabled}
-	on:focus={handleFocus}
-	on:focusout={handleFocusOut}
+	onfocus={handleFocus}
+	onfocusout={handleFocusOut}
 	in:scaleFade={{ duration: $listProps.transitionDuration }}
 	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
 >
 	<div class="ssl-item__inner">
-		<slot />
+		{@render children?.()}
 	</div>
 </li>
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
@@ -15,11 +17,15 @@
 	import type { GhostProps } from '$lib/types/index.js';
 	import { getId, getIndex } from '$lib/utils/index.js';
 
-	export let ghostRef: HTMLDivElement;
 	let ghostInnerRef: HTMLDivElement;
 
-	export let status: GhostProps['status'];
-	export let listRef: GhostProps['listRef'];
+	interface Props {
+		ghostRef: HTMLDivElement;
+		status: GhostProps['status'];
+		listRef: GhostProps['listRef'];
+	}
+
+	let { ghostRef = $bindable(), status, listRef }: Props = $props();
 
 	const listProps = getListProps();
 
@@ -33,29 +39,6 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isGhostBetweenBounds = getIsGhostBetweenBounds();
 	const isRemoving = getIsRemoving();
-
-	$: if ($draggedItem) {
-		const clone = $draggedItem?.children[0].cloneNode(true);
-
-		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
-		const selects = $draggedItem?.children[0].querySelectorAll<HTMLSelectElement>('select');
-		if (selects)
-			(clone as HTMLElement)
-				.querySelectorAll<HTMLSelectElement>('select')
-				.forEach((select, index) => (select.value = selects[index].value));
-
-		ghostInnerRef?.replaceChildren(...clone.childNodes);
-	} else {
-		ghostInnerRef?.replaceChildren();
-	}
-
-	$: styleWidth = getStyleWidth($draggedItem);
-	$: styleHeight = getStyleHeight($draggedItem);
-	$: styleLeft = getStyleLeft(status);
-	$: styleTop = getStyleTop(status);
-	$: styleTransform = getStyleTransform(status, $pointer);
-	$: styleTransition = getStyleTransition(status);
-	$: styleZIndex = getStyleZIndex(status);
 
 	function getStyleWidth(draggedItem: HTMLElement | null) {
 		if (!draggedItem || !$itemsOrigin) return '0';
@@ -189,6 +172,29 @@
 		// when the ghost is dragged and dropped without being moved.
 		if (status === 'set' || status === 'remove') return '9999';
 	}
+	run(() => {
+		if ($draggedItem) {
+			const clone = $draggedItem?.children[0].cloneNode(true);
+
+			// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
+			const selects = $draggedItem?.children[0].querySelectorAll<HTMLSelectElement>('select');
+			if (selects)
+				(clone as HTMLElement)
+					.querySelectorAll<HTMLSelectElement>('select')
+					.forEach((select, index) => (select.value = selects[index].value));
+
+			ghostInnerRef?.replaceChildren(...clone.childNodes);
+		} else {
+			ghostInnerRef?.replaceChildren();
+		}
+	});
+	let styleWidth = $derived(getStyleWidth($draggedItem));
+	let styleHeight = $derived(getStyleHeight($draggedItem));
+	let styleLeft = $derived(getStyleLeft(status));
+	let styleTop = $derived(getStyleTop(status));
+	let styleTransform = $derived(getStyleTransform(status, $pointer));
+	let styleTransition = $derived(getStyleTransition(status));
+	let styleZIndex = $derived(getStyleZIndex(status));
 </script>
 
 <div
@@ -214,7 +220,7 @@
 	aria-hidden="true"
 	use:portal
 >
-	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
+	<div bind:this={ghostInnerRef} class="ssl-ghost__inner"></div>
 </div>
 
 <style lang="scss">

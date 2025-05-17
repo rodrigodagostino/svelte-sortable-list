@@ -12,9 +12,9 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let dialogRef: HTMLDialogElement;
+	let dialogRef: HTMLDialogElement = $state();
 
-	let items = [...defaultItems];
+	let items = $state([...defaultItems]);
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -48,12 +48,12 @@
 	<title>Inside dialog | Svelte Sortable List</title>
 </svelte:head>
 
-<button class="button" on:click={handleOpenDialog}>Open dialog</button>
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialogRef} class="dialog" on:click={handleClickDialog}>
+<button class="button" onclick={handleOpenDialog}>Open dialog</button>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<dialog bind:this={dialogRef} class="dialog" onclick={handleClickDialog}>
 	<div class="dialog__inner">
-		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
+		<button class="dialog__close button" onclick={handleCloseDialog}>Close dialog</button>
 		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem {...item} {index}>

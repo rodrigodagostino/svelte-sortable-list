@@ -100,13 +100,13 @@ export function dispatch(target: HTMLElement, name: string, detail: object) {
 }
 
 export function sortItems<T>(items: T[], from: number, to: number) {
-	const clone = structuredClone(items);
+	const clone = [...items];
 	clone.splice(to < 0 ? clone.length + to : to, 0, clone.splice(from, 1)[0]);
 	return clone;
 }
 
 export function removeItem<T>(items: T[], index: SortableItemProps['index']) {
-	const clone = structuredClone(items);
+	const clone = [...items];
 	clone.splice(index, 1);
 	return clone;
 }

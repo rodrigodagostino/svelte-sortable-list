@@ -1,6 +1,8 @@
+<!-- @migration-task Error while migrating Svelte code: migrating this component would require adding a `$props` rune but there's already a variable named props.
+     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
 	import { version } from '$app/environment';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { props } from './stores.js';
 	import './styles.css';
 
@@ -172,14 +174,14 @@
 			<a
 				class="app-nav__link"
 				href="/"
-				aria-current={$page.url.pathname === '/' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/' ? 'page' : undefined}
 			>
 				Basic
 			</a>
 			<a
 				class="app-nav__link"
 				href="/unstyled"
-				aria-current={$page.url.pathname === '/unstyled' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/unstyled' ? 'page' : undefined}
 				data-sveltekit-reload
 			>
 				Unstyled
@@ -187,119 +189,119 @@
 			<a
 				class="app-nav__link"
 				href="/no-animations"
-				aria-current={$page.url.pathname === '/no-animations' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/no-animations' ? 'page' : undefined}
 			>
 				No animations
 			</a>
 			<a
 				class="app-nav__link"
 				href="/direction-horizontal"
-				aria-current={$page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
 			>
 				Direction horizontal
 			</a>
 			<a
 				class="app-nav__link"
 				href="/varying-heights"
-				aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/varying-heights' ? 'page' : undefined}
 			>
 				Varying heights
 			</a>
 			<a
 				class="app-nav__link"
 				href="/with-handle"
-				aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/with-handle' ? 'page' : undefined}
 			>
 				With handle
 			</a>
 			<a
 				class="app-nav__link"
 				href="/with-drop-marker"
-				aria-current={$page.url.pathname === '/with-drop-marker' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/with-drop-marker' ? 'page' : undefined}
 			>
 				With drop marker
 			</a>
 			<a
 				class="app-nav__link"
 				href="/with-boundaries"
-				aria-current={$page.url.pathname === '/with-boundaries' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/with-boundaries' ? 'page' : undefined}
 			>
 				With boundaries
 			</a>
 			<a
 				class="app-nav__link"
 				href="/with-locked-axis"
-				aria-current={$page.url.pathname === '/with-locked-axis' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/with-locked-axis' ? 'page' : undefined}
 			>
 				With locked axis
 			</a>
 			<a
 				class="app-nav__link"
 				href="/dynamic-items"
-				aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/dynamic-items' ? 'page' : undefined}
 			>
 				Dynamic items
 			</a>
 			<a
 				class="app-nav__link"
 				href="/interactive-items"
-				aria-current={$page.url.pathname === '/interactive-items' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/interactive-items' ? 'page' : undefined}
 			>
 				Interactive items
 			</a>
 			<a
 				class="app-nav__link"
 				href="/locked-list"
-				aria-current={$page.url.pathname === '/locked-list' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/locked-list' ? 'page' : undefined}
 			>
 				Locked list
 			</a>
 			<a
 				class="app-nav__link"
 				href="/locked-items"
-				aria-current={$page.url.pathname === '/locked-items' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/locked-items' ? 'page' : undefined}
 			>
 				Locked items
 			</a>
 			<a
 				class="app-nav__link"
 				href="/disabled-list"
-				aria-current={$page.url.pathname === '/disabled-list' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/disabled-list' ? 'page' : undefined}
 			>
 				Disabled list
 			</a>
 			<a
 				class="app-nav__link"
 				href="/disabled-items"
-				aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/disabled-items' ? 'page' : undefined}
 			>
 				Disabled items
 			</a>
 			<a
 				class="app-nav__link"
 				href="/inside-dialog"
-				aria-current={$page.url.pathname === '/inside-dialog' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/inside-dialog' ? 'page' : undefined}
 			>
 				Inside dialog
 			</a>
 			<a
 				class="app-nav__link"
 				href="/inside-custom-dialog"
-				aria-current={$page.url.pathname === '/inside-custom-dialog' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/inside-custom-dialog' ? 'page' : undefined}
 			>
 				Inside custom dialog
 			</a>
 			<a
 				class="app-nav__link"
 				href="/clear-target-on-drag-out"
-				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
 			>
 				Clear target on drag out
 			</a>
 			<a
 				class="app-nav__link"
 				href="/remove-item-on-drop-out"
-				aria-current={$page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
+				aria-current={page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
 			>
 				Remove item on drop out
 			</a>

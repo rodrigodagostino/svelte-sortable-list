@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { onMount } from 'svelte';
 	import {
 		SortableList,
@@ -14,8 +16,8 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...defaultItems];
-	let newItem: string;
+	let items = $state([...defaultItems]);
+	let newItem: string = $state();
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -56,19 +58,19 @@
 	{/each}
 </SortableList>
 
-<button class="button" on:click={() => (items = defaultItems)}>Reset</button>
+<button class="button" onclick={() => (items = defaultItems)}>Reset</button>
 
 <form
 	class="form"
-	on:submit|preventDefault={() =>
-		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }])}
+	onsubmit={preventDefault(() =>
+		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }]))}
 >
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>
 </form>
 
 <style lang="scss">
-	.button:has(+ form) {
+	.button:has(:global(+ form)) {
 		margin-top: 2rem;
 	}
 </style>

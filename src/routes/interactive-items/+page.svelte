@@ -12,7 +12,7 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...interactiveItems];
+	let items = $state([...interactiveItems]);
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -42,7 +42,7 @@
 					<input id={item.id} type="text" />
 				{:else if item.type === 'textarea'}
 					<label for={item.id}>{item.text}</label>
-					<textarea id={item.id} />
+					<textarea id={item.id}></textarea>
 				{:else if item.type === 'select'}
 					<label for={item.id}>{item.text}</label>
 					<select id={item.id} name={item.id}>

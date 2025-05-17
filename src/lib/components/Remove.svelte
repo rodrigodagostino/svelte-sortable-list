@@ -1,5 +1,10 @@
 <script lang="ts">
 	import { dispatch } from '$lib/utils/index.js';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	function handleClick(event: Event) {
 		const target = event.target as HTMLElement;
@@ -7,6 +12,6 @@
 	}
 </script>
 
-<button class="ssl-remove" data-role="remove" on:click={handleClick}>
-	<slot />
+<button class="ssl-remove" data-role="remove" onclick={handleClick}>
+	{@render children?.()}
 </button>

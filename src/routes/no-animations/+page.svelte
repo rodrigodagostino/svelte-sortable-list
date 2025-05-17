@@ -12,7 +12,7 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...defaultItems];
+	let items = $state([...defaultItems]);
 
 	onMount(() => {
 		$props = {

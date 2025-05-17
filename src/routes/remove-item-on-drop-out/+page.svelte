@@ -12,7 +12,7 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...varyingItems];
+	let items = $state([...varyingItems]);
 
 	onMount(() => {
 		$props = {
@@ -46,7 +46,7 @@
 	{/each}
 </SortableList>
 
-<button class="button" on:click={() => (items = varyingItems)}>Reset</button>
+<button class="button" onclick={() => (items = varyingItems)}>Reset</button>
 
 <style lang="scss">
 	.button {

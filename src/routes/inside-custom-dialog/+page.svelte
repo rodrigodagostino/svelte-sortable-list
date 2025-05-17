@@ -12,8 +12,8 @@
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...defaultItems];
-	let isDialogOpen = false;
+	let items = $state([...defaultItems]);
+	let isDialogOpen = $state(false);
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -42,10 +42,10 @@
 	<title>Inside custom dialog | Svelte Sortable List</title>
 </svelte:head>
 
-<button class="button" on:click={handleOpenDialog}>Open dialog</button>
+<button class="button" onclick={handleOpenDialog}>Open dialog</button>
 <div class="dialog" class:is-open={isDialogOpen} role="dialog" aria-modal="true">
 	<div class="dialog__window">
-		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
+		<button class="dialog__close button" onclick={handleCloseDialog}>Close dialog</button>
 		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem {...item} {index}>
@@ -56,7 +56,7 @@
 			{/each}
 		</SortableList>
 	</div>
-	<button class="dialog__backdrop" on:click={handleCloseDialog}>Close dialog</button>
+	<button class="dialog__backdrop" onclick={handleCloseDialog}>Close dialog</button>
 </div>
 
 <style lang="scss">

@@ -1,5 +1,10 @@
 <script lang="ts">
 	import { getIsPointerDragging } from '$lib/stores/index.js';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
+
+	let { children }: Props = $props();
 
 	const isPointerDragging = getIsPointerDragging();
 </script>
@@ -10,7 +15,7 @@
 	data-role="handle"
 	aria-hidden="true"
 >
-	<slot />
+	{@render children?.()}
 </span>
 
 <style lang="scss">
