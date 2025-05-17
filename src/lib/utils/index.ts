@@ -129,19 +129,32 @@ export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	return document.documentElement;
 };
 
+export function isRootElement(element: HTMLElement, direction: SortableListProps['direction']) {
+	const rootElement = document.documentElement;
+	return (
+		element === rootElement ||
+		(direction === 'vertical'
+			? element.clientHeight > rootElement.clientHeight
+			: element.clientWidth > rootElement.clientWidth)
+	);
+}
+
 export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
 	const elementRect = element.getBoundingClientRect();
 	const elementStyles = window.getComputedStyle(element);
 	const elementTranslate = getTranslateValues(element);
 	const containerRect = container.getBoundingClientRect();
 	// In those situations where the container is larger than the viewport,
-	// we want to use the window as reference.
-	const limitTop = containerRect.height < window.innerHeight ? containerRect.top : 0;
+	// we want to use the root as reference.
+	const rootElement = document.documentElement;
+	const limitTop = containerRect.height < rootElement.clientHeight ? containerRect.top : 0;
 	const limitBottom =
-		containerRect.height < window.innerHeight ? containerRect.bottom : window.innerHeight;
-	const limitLeft = containerRect.width < window.innerWidth ? containerRect.left : 0;
+		containerRect.height < rootElement.clientHeight
+			? containerRect.bottom
+			: rootElement.clientHeight;
+	const limitLeft = containerRect.width < rootElement.clientWidth ? containerRect.left : 0;
 	const limitRight =
-		containerRect.width < window.innerWidth ? containerRect.right : window.innerWidth;
+		containerRect.width < rootElement.clientWidth ? containerRect.right : rootElement.clientWidth;
 
 	return (
 		elementRect.top - (elementTranslate?.y || 0) + parseFloat(elementStyles.marginTop) > limitTop &&
@@ -166,46 +179,49 @@ export function scrollIntoView(
 	const containerRect = container.getBoundingClientRect();
 	const containerStyles = window.getComputedStyle(container);
 	// In those situations where the container is larger than the viewport,
-	// we want to use the window as reference.
-	const smallerWrapperWidth = Math.min(container.clientWidth, window.innerWidth);
-	const smallerWrapperHeight = Math.min(container.clientHeight, window.innerHeight);
+	// we want to use the root element as reference.
+	const rootElement = document.documentElement;
+	const isRootEl = isRootElement(container, direction);
+	const containerWidth = Math.min(container.clientWidth, rootElement.clientWidth);
+	const containerHeight = Math.min(container.clientHeight, rootElement.clientHeight);
 	const SCROLL_MARGIN = 40;
+
 	const left =
 		direction === 'horizontal'
 			? step === 1
 				? elementRect.right -
-					(elementTranslate?.x || 0) -
-					containerRect.left -
-					parseFloat(containerStyles?.borderRightWidth) -
-					smallerWrapperWidth +
-					container.scrollLeft +
-					parseFloat(elementStyles.marginRight) * 2 +
+					(isRootEl ? 0 : containerRect.left) -
+					containerWidth +
+					container.scrollLeft -
+					parseFloat(containerStyles.borderRightWidth) +
+					parseFloat(elementStyles.marginRight) * 2 -
+					(elementTranslate?.x || 0) +
 					SCROLL_MARGIN
 				: elementRect.left -
-					(elementTranslate?.x || 0) -
-					containerRect.left -
-					parseFloat(containerStyles?.borderLeftWidth) +
+					(isRootEl ? 0 : containerRect.left) +
 					container.scrollLeft -
+					parseFloat(containerStyles.borderLeftWidth) -
 					parseFloat(elementStyles.marginLeft) * 2 -
+					(elementTranslate?.x || 0) -
 					SCROLL_MARGIN
 			: undefined;
 	const top =
 		direction === 'vertical'
 			? step === 1
 				? elementRect.bottom -
-					(elementTranslate?.y || 0) -
-					containerRect.top -
-					parseFloat(containerStyles?.borderBottomWidth) -
-					smallerWrapperHeight +
-					container.scrollTop +
-					parseFloat(elementStyles.marginBottom) * 2 +
+					(isRootEl ? 0 : containerRect.top) -
+					containerHeight +
+					container.scrollTop -
+					parseFloat(containerStyles.borderBottomWidth) +
+					parseFloat(elementStyles.marginBottom) * 2 -
+					(elementTranslate?.y || 0) +
 					SCROLL_MARGIN
 				: elementRect.top -
-					(elementTranslate?.y || 0) -
-					containerRect.top -
-					parseFloat(containerStyles?.borderTopWidth) +
+					(isRootEl ? 0 : containerRect.top) +
 					container.scrollTop -
+					parseFloat(containerStyles.borderTopWidth) -
 					parseFloat(elementStyles.marginTop) * 2 -
+					(elementTranslate?.y || 0) -
 					SCROLL_MARGIN
 			: undefined;
 
@@ -252,21 +268,29 @@ export function getScrollingSpeed(
 	offset: number,
 	ratio: number
 ) {
+	// In those situations where the container is larger than the viewport,
+	// we want to use the root element as reference.
+	const rootElement = document.documentElement;
+	const isRootEl = isRootElement(element, direction);
 	const rect = element.getBoundingClientRect();
+	const top = isRootEl ? 0 : rect.top;
+	const left = isRootEl ? 0 : rect.left;
+	const right = isRootEl ? rootElement.clientWidth : rect.right;
+	const bottom = isRootEl ? rootElement.clientHeight : rect.bottom;
 
 	if (direction === 'vertical') {
-		if (clientY - rect.top < offset) {
-			return Math.round((offset - (clientY - rect.top)) / -ratio);
-		} else if (rect.bottom - clientY < offset) {
-			return Math.round((offset - (rect.bottom - clientY)) / ratio);
+		if (clientY - top < offset) {
+			return Math.round((offset - (clientY - top)) / -ratio);
+		} else if (bottom - clientY < offset) {
+			return Math.round((offset - (bottom - clientY)) / ratio);
 		} else {
 			return 0;
 		}
 	} else {
-		if (clientX - rect.left < offset) {
-			return Math.round((offset - (clientX - rect.left)) / -ratio);
-		} else if (rect.right - clientX < offset) {
-			return Math.round((offset - (rect.right - clientX)) / ratio);
+		if (clientX - left < offset) {
+			return Math.round((offset - (clientX - left)) / -ratio);
+		} else if (right - clientX < offset) {
+			return Math.round((offset - (right - clientX)) / ratio);
 		} else {
 			return 0;
 		}
