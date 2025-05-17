@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] (2025-05-17)
+
+### Added
+
+- Add the auto scroll feature (including support for horizontal lists and keyboard navigation).
+
+### Changed
+
+- Improve the collision detection logic to support auto scroll.
+
+### Docs
+
+- Add the **“Auto scroll”** demo page.
+- Add the **“Auto scroll inside container”** demo page.
+- Add the **“Auto scroll inside dialog”** demo page.
+- Remove width and height constraints present in the `<main>` element of the demo pages layout.
+- Update the README to reflect the latest changes.
+
 ## [0.10.16] (2025-02-04)
 
 ### Fixed
@@ -15,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Docs
 
-- Add minimum height to the layout `<main>` section.
+- Add a minimum height to the layout `<main>` section.
 - Polish **“Inside dialog”** and **“Inside custom dialog”** demo pages.
 - Update the README to reflect the latest changes.
 
@@ -24,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Adjust the `<Portal>` component to support the HTML native `<dialog>` element.
-- Repair `<Ghost>` broken styles.
+- Repair the `<Ghost>` broken styles.
 
 ### Changed
 
@@ -44,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Consistently position the `<Ghost>` component relative to the viewport by wrapping it with the `<Portal>` component.
+- # Consistently position the `<Ghost>` component relative to the viewport by wrapping it with the `<Portal>` component.
 
 ## [0.10.13] (2025-01-05)
 
@@ -675,7 +693,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...v0.11.0
 [0.10.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...v0.10.16
 [0.10.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...v0.10.15
 [0.10.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.13...v0.10.14
