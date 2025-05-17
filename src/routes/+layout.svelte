@@ -4,149 +4,53 @@
 	import { props } from './stores.js';
 	import './styles.css';
 
-	let isControlsExpanded = true;
+	let isMenuExpanded = false;
+	let isControlsExpanded = false;
 </script>
 
-<div id="app" class="app" class:is-controls-expanded={isControlsExpanded}>
-	<main class="app-main">
-		<div class="container">
-			<slot />
-		</div>
-	</main>
-	<aside id="app-controls" class="app-controls">
-		<button
-			class="app-controls__toggle button"
-			aria-expanded={isControlsExpanded}
-			aria-controls="app-controls"
-			on:click={() => (isControlsExpanded = !isControlsExpanded)}
-		>
-			{isControlsExpanded ? 'Hide controls' : 'Show controls'}
-		</button>
-		<div class="container">
-			<table>
-				<thead>
-					<tr>
-						<th></th>
-						<th>Prop</th>
-						<th>Value</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td></td>
-						<td><label for="gap">gap</label></td>
-						<td><input id="gap" type="number" min="0" bind:value={$props.gap} /></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="direction">direction</label></td>
-						<td>
-							<select id="direction" bind:value={$props.direction}>
-								<option value="vertical">vertical</option>
-								<option value="horizontal">horizontal</option>
-							</select>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="swap-threshold">swapThreshold</label></td>
-						<td>
-							<input
-								id="swap-threshold"
-								type="number"
-								min="0.5"
-								max="2"
-								step="0.1"
-								bind:value={$props.swapThreshold}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="transition-duration">transitionDuration</label></td>
-						<td>
-							<input
-								id="transition-duration"
-								type="number"
-								min="0"
-								bind:value={$props.transitionDuration}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-drop-marker">hasDropMarker</label></td>
-						<td>
-							<input id="has-drop-marker" type="checkbox" bind:checked={$props.hasDropMarker} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-locked-axis">hasLockedAxis</label></td>
-						<td>
-							<input id="has-locked-axis" type="checkbox" bind:checked={$props.hasLockedAxis} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-boundaries">hasBoundaries</label></td>
-						<td>
-							<input id="has-boundaries" type="checkbox" bind:checked={$props.hasBoundaries} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="can-clear-target-on-drag-out">canClearTargetOnDragOut</label></td>
-						<td>
-							<input
-								id="can-clear-target-on-drag-out"
-								type="checkbox"
-								bind:checked={$props.canClearTargetOnDragOut}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="can-remove-item-on-drop-out">canRemoveItemOnDropOut</label></td>
-						<td>
-							<input
-								id="can-remove-item-on-drop-out"
-								type="checkbox"
-								bind:checked={$props.canRemoveItemOnDropOut}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="is-locked">isLocked</label></td>
-						<td>
-							<input id="is-locked" type="checkbox" bind:checked={$props.isLocked} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="is-disabled">isDisabled</label></td>
-						<td>
-							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
-						</td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</aside>
-	<nav class="app-nav">
+<div id="app" class="app">
+	<button
+		class="app-nav-toggle button"
+		aria-controls="app-nav"
+		aria-expanded={isMenuExpanded}
+		on:click={() => (isMenuExpanded = !isMenuExpanded)}
+	>
+		{#if isMenuExpanded}
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M18 6 6 18" />
+				<path d="m6 6 12 12" />
+			</svg>
+			<span class="sr-only">Hide menu</span>
+		{:else}
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M4 12h16" />
+				<path d="M4 18h16" />
+				<path d="M4 6h16" />
+			</svg>
+			<span class="sr-only">Show menu</span>
+		{/if}
+	</button>
+	<nav id="app-nav" class="app-nav" aria-hidden={!isMenuExpanded} inert={!isMenuExpanded}>
 		<div class="container">
 			<a
 				class="app-nav__link app-nav__link--github"
@@ -326,116 +230,233 @@
 			</a>
 		</div>
 	</nav>
+	<button
+		class="app-controls-toggle button"
+		aria-controls="app-controls"
+		aria-expanded={isControlsExpanded}
+		on:click={() => (isControlsExpanded = !isControlsExpanded)}
+	>
+		{#if isControlsExpanded}
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M18 6 6 18" />
+				<path d="m6 6 12 12" />
+			</svg>
+			<span class="sr-only">Hide controls</span>
+		{:else}
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<line x1="21" x2="14" y1="4" y2="4" />
+				<line x1="10" x2="3" y1="4" y2="4" />
+				<line x1="21" x2="12" y1="12" y2="12" />
+				<line x1="8" x2="3" y1="12" y2="12" />
+				<line x1="21" x2="16" y1="20" y2="20" />
+				<line x1="12" x2="3" y1="20" y2="20" />
+				<line x1="14" x2="14" y1="2" y2="6" />
+				<line x1="8" x2="8" y1="10" y2="14" />
+				<line x1="16" x2="16" y1="18" y2="22" />
+			</svg>
+			<span class="sr-only">Show controls</span>
+		{/if}
+	</button>
+	<aside
+		id="app-controls"
+		class="app-controls"
+		aria-hidden={!isControlsExpanded}
+		inert={!isControlsExpanded}
+	>
+		<div class="container">
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th>Prop</th>
+						<th>Value</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td></td>
+						<td><label for="gap">gap</label></td>
+						<td><input id="gap" type="number" min="0" bind:value={$props.gap} /></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="direction">direction</label></td>
+						<td>
+							<select id="direction" bind:value={$props.direction}>
+								<option value="vertical">vertical</option>
+								<option value="horizontal">horizontal</option>
+							</select>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="swap-threshold">swapThreshold</label></td>
+						<td>
+							<input
+								id="swap-threshold"
+								type="number"
+								min="0.5"
+								max="2"
+								step="0.1"
+								bind:value={$props.swapThreshold}
+							/>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="transition-duration">transitionDuration</label></td>
+						<td>
+							<input
+								id="transition-duration"
+								type="number"
+								min="0"
+								bind:value={$props.transitionDuration}
+							/>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="has-drop-marker">hasDropMarker</label></td>
+						<td>
+							<input id="has-drop-marker" type="checkbox" bind:checked={$props.hasDropMarker} />
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="has-locked-axis">hasLockedAxis</label></td>
+						<td>
+							<input id="has-locked-axis" type="checkbox" bind:checked={$props.hasLockedAxis} />
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="has-boundaries">hasBoundaries</label></td>
+						<td>
+							<input id="has-boundaries" type="checkbox" bind:checked={$props.hasBoundaries} />
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="can-clear-target-on-drag-out">canClearTargetOnDragOut</label></td>
+						<td>
+							<input
+								id="can-clear-target-on-drag-out"
+								type="checkbox"
+								bind:checked={$props.canClearTargetOnDragOut}
+							/>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="can-remove-item-on-drop-out">canRemoveItemOnDropOut</label></td>
+						<td>
+							<input
+								id="can-remove-item-on-drop-out"
+								type="checkbox"
+								bind:checked={$props.canRemoveItemOnDropOut}
+							/>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="is-locked">isLocked</label></td>
+						<td>
+							<input id="is-locked" type="checkbox" bind:checked={$props.isLocked} />
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><label for="is-disabled">isDisabled</label></td>
+						<td>
+							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
+						</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</aside>
+	<main class="app-main">
+		<div class="container">
+			<slot />
+		</div>
+	</main>
 </div>
 
 <style lang="scss">
 	.app {
-		display: grid;
-		grid-template-columns: 1fr;
-		grid-template-rows: auto 0fr auto;
 		width: 100%;
 		min-height: 100vh;
 		min-height: 100svh;
-		transition: grid-template-rows 320ms;
-
-		&.is-controls-expanded {
-			grid-template-rows: repeat(3, auto);
-
-			.app-controls {
-				grid-template-rows: 1fr;
-			}
-		}
 	}
 
-	.app-main,
-	.app-nav {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: minmax(0, 1fr);
-
-		.container {
-			display: flex;
-			flex-direction: column;
-			margin: auto;
-		}
+	.container {
+		display: flex;
+		flex-direction: column;
+		max-width: 100%;
+		margin: auto;
 	}
 
-	.app-main {
-		min-height: 50vh;
-		min-height: 50dvh;
-		padding: 3rem;
-		scrollbar-gutter: stable;
-	}
-
-	.app-controls {
-		display: grid;
-		grid-template-rows: 0fr;
-		background-color: var(--white);
-		position: relative;
-		transition: grid-template-rows 320ms;
-		z-index: 1;
-
-		&__toggle {
-			position: absolute;
-			top: 0;
-			right: 0;
-			transform: translateY(-50%);
-			height: 2.25rem;
-			font-size: 0.875rem;
-			transition:
-				background-color 240ms,
-				transform 320ms;
-		}
-
-		.container {
-			overflow: hidden;
-		}
-
-		table {
-			border-collapse: collapse;
-			margin-block: 1.25rem;
-		}
-
-		tr:nth-child(odd) td {
-			background-color: var(--gray-100);
-		}
-
-		th:not(:first-child):not(:last-child),
-		td:not(:first-child):not(:last-child) {
-			padding: 0.625rem 1.25rem;
-		}
-
-		th {
-			border-bottom: 1px solid var(--gray-200);
-			text-align: start;
-
-			&:first-child,
-			&:last-child {
-				width: 0;
-			}
-		}
-
-		td {
-			font-family: monospace;
-		}
-
-		input:not([type='checkbox']),
-		select {
-			width: 7.75rem;
-			max-width: 100%;
-			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
-			border-radius: 0.25rem;
-		}
+	.app-nav-toggle {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		z-index: 21;
 	}
 
 	.app-nav {
+		max-height: calc(100vh - 1.5rem);
+		max-height: calc(100dvh - 1.5rem);
 		padding: 3rem 2rem;
 		background-color: var(--gray-500);
-		position: relative;
+		box-shadow: var(--box-shadow-4);
+		position: fixed;
+		top: 0.75rem;
+		right: 0.75rem;
+		overflow: auto;
+		z-index: 20;
 
 		.container {
-			justify-content: center;
 			gap: 0.75rem;
+		}
+
+		&[aria-hidden='true'] {
+			transform: translate3d(110%, 0, 0);
+		}
+
+		&[aria-hidden='false'] {
+			transform: translate3d(0, 0, 0);
 		}
 
 		&__link {
@@ -461,6 +482,92 @@
 		}
 	}
 
+	.app-controls-toggle {
+		position: fixed;
+		bottom: 1rem;
+		right: 1rem;
+		z-index: 11;
+	}
+
+	.app-controls {
+		display: flex;
+		flex-direction: column;
+		max-width: calc(100% - 1.5rem);
+		max-height: calc(100% - 1.5rem);
+		background-color: var(--white);
+		box-shadow: var(--box-shadow-4);
+		position: fixed;
+		right: 0.75rem;
+		bottom: 0.75rem;
+		z-index: 10;
+
+		&[aria-hidden='true'] {
+			transform: translate3d(0, 110%, 0);
+		}
+
+		&[aria-hidden='false'] {
+			transform: translate3d(0, 0, 0);
+		}
+
+		.container {
+			overflow: auto;
+		}
+
+		table {
+			border-collapse: collapse;
+			max-width: 100%;
+			margin-block: 0.5rem;
+		}
+
+		tr:nth-child(odd) td {
+			background-color: var(--gray-100);
+		}
+
+		th:not(:first-child):not(:last-child),
+		td:not(:first-child):not(:last-child) {
+			padding: 0.625rem 1.25rem;
+		}
+
+		th {
+			border-bottom: 1px solid var(--gray-200);
+			text-align: start;
+
+			&:nth-child(3) {
+				width: 44%;
+			}
+
+			&:first-child,
+			&:last-child {
+				width: 0;
+			}
+		}
+
+		td {
+			font-family: monospace;
+		}
+
+		input:not([type='checkbox']),
+		select {
+			width: 7.75rem;
+			max-width: 100%;
+			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+			border-radius: 0.25rem;
+		}
+	}
+
+	.app-main {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: 1fr;
+		min-height: 100%;
+		padding: 3rem;
+		scrollbar-gutter: stable;
+
+		.container {
+			align-items: center;
+		}
+	}
+
 	@media (min-width: 26em) {
 		.app-controls {
 			table {
@@ -477,49 +584,24 @@
 	}
 
 	@media (min-width: 48em) {
-		.app {
-			grid-template-columns: 1fr 20.25rem;
-			grid-template-rows: 1fr 0;
-			height: 100vh;
-			height: 100svh;
-			overflow: hidden;
-
-			&.is-controls-expanded {
-				grid-template-rows: 1fr 18rem;
-			}
-		}
-
-		.app-main {
-			overflow: auto;
+		.app-nav-toggle {
+			top: 1.5rem;
+			right: 1.5rem;
 		}
 
 		.app-nav {
-			position: fixed;
-			inset: 0;
-			margin-inline-start: auto;
-			width: 20.25rem;
-			overflow: auto;
+			top: 1.25rem;
+			right: 1.25rem;
+		}
 
-			.container {
-				align-items: start;
-				height: 100%;
-				margin-block: auto;
-			}
+		.app-controls-toggle {
+			bottom: 1.5rem;
+			right: 1.5rem;
 		}
 
 		.app-controls {
-			grid-row: span 1;
-			grid-column: 1/2;
-
-			.container {
-				height: 100%;
-				overflow: auto;
-			}
-
-			&__toggle {
-				right: 1.25rem;
-				transform: translate(0, -100%);
-			}
+			bottom: 1.25rem;
+			right: 1.25rem;
 		}
 	}
 </style>

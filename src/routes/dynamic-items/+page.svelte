@@ -63,7 +63,7 @@
 	on:submit|preventDefault={() =>
 		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }])}
 >
-	<input type="text" class="form__input" bind:value={newItem} required />
+	<input type="text" class="form-input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>
 </form>
 

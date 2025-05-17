@@ -43,9 +43,30 @@
 </svelte:head>
 
 <button class="button" on:click={handleOpenDialog}>Open dialog</button>
-<div class="dialog" class:is-open={isDialogOpen} role="dialog" aria-modal="true">
+<div
+	class="dialog direction-{$props.direction}"
+	class:is-open={isDialogOpen}
+	role="dialog"
+	aria-modal="true"
+>
 	<div class="dialog__window">
-		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
+		<button class="dialog__close button" on:click={handleCloseDialog}>
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M18 6 6 18" />
+				<path d="m6 6 12 12" />
+			</svg>
+			<span class="sr-only">Close dialog</span>
+		</button>
 		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem {...item} {index}>
@@ -81,6 +102,9 @@
 		}
 
 		&__window {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 			position: absolute;
 			top: 50%;
 			left: 50%;
@@ -88,9 +112,12 @@
 			width: 40rem;
 			max-width: 90vw;
 			max-width: 90dvw;
-			padding: 4rem;
+			max-height: 80vh;
+			max-height: 80dvh;
+			padding: 5rem 4rem;
 			background-color: var(--gray-100);
 			box-shadow: var(--box-shadow-4);
+			overflow: auto;
 			z-index: 1;
 		}
 
@@ -98,7 +125,6 @@
 			position: absolute;
 			top: 1rem;
 			right: 1rem;
-			height: 2.25rem;
 			font-size: 0.875rem;
 		}
 
@@ -111,6 +137,19 @@
 			border: none;
 			background-color: rgba(0, 0, 0, 0.32);
 			z-index: 0;
+		}
+
+		&.direction-vertical {
+			.dialog__window {
+				flex-direction: column;
+				align-items: center;
+			}
+		}
+
+		&.direction-horizontal {
+			.dialog__window {
+				width: max-content;
+			}
 		}
 	}
 </style>

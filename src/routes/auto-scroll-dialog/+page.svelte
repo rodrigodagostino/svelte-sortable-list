@@ -54,9 +54,29 @@
 <button class="button" on:click={handleOpenDialog}>Open dialog</button>
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialogRef} class="dialog" on:click={handleClickDialog}>
+<dialog
+	bind:this={dialogRef}
+	class="dialog direction-{$props.direction}"
+	on:click={handleClickDialog}
+>
+	<button class="dialog__close button" on:click={handleCloseDialog}>
+		<svg
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			aria-hidden="true"
+		>
+			<path d="M18 6 6 18" />
+			<path d="m6 6 12 12" />
+		</svg>
+		<span class="sr-only">Close dialog</span>
+	</button>
 	<div class="dialog__inner">
-		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
 		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem id={item.id} {index}>
@@ -85,6 +105,7 @@
 		box-shadow: var(--box-shadow-4);
 		border: none;
 		color: inherit;
+		overflow: hidden;
 		z-index: 1;
 
 		&:not([open]) {
@@ -100,21 +121,35 @@
 
 		&__inner {
 			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 4rem;
+			max-width: 100%;
+			max-height: 80vh;
+			max-height: 80dvh;
+			padding: 5rem 4rem;
+			overflow: auto;
 		}
 
 		&__close {
 			position: absolute;
 			top: 1rem;
 			right: 1rem;
-			height: 2.25rem;
 			font-size: 0.875rem;
 		}
 
 		&::backdrop {
 			background-color: rgba(0, 0, 0, 0.32);
+		}
+
+		&.direction-vertical {
+			.dialog__inner {
+				flex-direction: column;
+				align-items: center;
+			}
+		}
+
+		&.direction-horizontal {
+			.dialog__inner {
+				width: max-content;
+			}
 		}
 	}
 

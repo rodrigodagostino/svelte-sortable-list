@@ -50,10 +50,12 @@
 
 <style lang="scss">
 	.wrapper {
+		display: flex;
 		padding: 1.75rem 2rem;
 		background-color: var(--gray-150);
 
 		&.direction-vertical {
+			flex-direction: column;
 			height: 32rem;
 			max-height: 80vh;
 			max-height: 80dvh;

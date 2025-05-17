@@ -173,10 +173,12 @@ code {
 
 .form {
 	display: flex;
+	max-width: 100%;
 	margin-top: 3rem;
 }
 
-.form__input {
+.form-input {
+	flex: 1;
 	border: none;
 	border: 0.0625rem solid var(--gray-200);
 	padding-inline: 0.75rem;
@@ -191,6 +193,8 @@ code {
 	border: none;
 	color: var(--white);
 	line-height: 1;
+	text-transform: uppercase;
+	white-space: nowrap;
 	transition: background-color 240ms;
 }
 
