@@ -13,6 +13,7 @@ Live demo:
 
 ## Table of contents
 
+- [Table of contents](#table-of-contents)
 - [Features](#features)
 - [Get started](#get-started)
   - [Install it](#install-it)
@@ -109,13 +110,12 @@ yarn add @rodrigodagostino/svelte-sortable-list
 		},
 	];
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
+	function handleSort({ prevItemIndex, nextItemIndex }: SortEventDetail) {
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 </script>
 
-<SortableList on:sort={handleSort}>
+<SortableList onSort={handleSort}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">
@@ -190,10 +190,10 @@ You can create your own `<Remove>` component if you require it that way. Do so b
 
 ### `<SortableList>` events
 
-| Name        | Type                             | Trigger                    | Returns                                                                                                                                                                                                                                                             |
-| ----------- | -------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `on:sort`   | `CustomEvent<SortEventDetail>`   | An item switches position. | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;prevItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;nextItemIndex: number<br>&nbsp;&nbsp;}<br>}</pre> |
-| `on:remove` | `CustomEvent<RemoveEventDetail>` | An item is removed.        | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;itemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;itemIndex: number<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                          |
+| Name       | Type                | Trigger                    | Returns                                                                                                                                                            |
+| ---------- | ------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `onSort`   | `SortEventDetail`   | An item switches position. | <pre>{<br>&nbsp;&nbsp;prevItemId: string,<br>&nbsp;&nbsp;prevItemIndex: number,<br>&nbsp;&nbsp;nextItemId: string,<br>&nbsp;&nbsp;nextItemIndex: number<br>}</pre> |
+| `onRemove` | `RemoveEventDetail` | An item is removed.        | <pre>{<br>&nbsp;&nbsp;itemId: string,<br>&nbsp;&nbsp;itemIndex: number<br>}</pre>                                                                                  |
 
 ### `<SortableItem>` props
 
@@ -206,10 +206,10 @@ You can create your own `<Remove>` component if you require it that way. Do so b
 
 ## Utilities
 
-| Function       | Description                                                                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sortItems()`  | Provides an easy mechanism to reorder items (should be used in combination with the [`on:sort` event](#sortablelist-events)).                   |
-| `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`on:remove` event](#sortablelist-events)). |
+| Function       | Description                                                                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sortItems()`  | Provides an easy mechanism to reorder items (should be used in combination with the [`onSort` event](#sortablelist-events)).                   |
+| `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`onRemove` event](#sortablelist-events)). |
 
 Example:
 
@@ -248,18 +248,16 @@ Example:
 		},
 	];
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
+	function handleSort({ prevItemIndex, nextItemIndex }: SortEventDetail) {
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
-		const { itemIndex } = event.detail;
+	function handleRemove({ itemIndex }: RemoveEventDetail) {
 		items = removeItem(items, itemIndex);
 	}
 </script>
 
-<SortableList on:sort={handleSort} on:remove={handleRemove}>
+<SortableList onSort={handleSort} onRemove={handleRemove}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">
