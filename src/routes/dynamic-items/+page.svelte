@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { onMount } from 'svelte';
 	import {
 		SortableList,
@@ -13,23 +11,21 @@
 		type SortEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items = $state([...defaultItems]);
-	let newItem: string = $state();
+	let newItem: string = $state('');
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultProps };
 	});
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
+	function handleSort({ prevItemIndex, nextItemIndex }: SortEventDetail) {
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
-		const { itemIndex } = event.detail;
+	function handleRemove({ itemIndex }: RemoveEventDetail) {
 		items = removeItem(items, itemIndex);
 	}
 
@@ -45,7 +41,7 @@
 	<title>Dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
+<SortableList {...$rootProps} onSort={handleSort} onRemove={handleRemove}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">
@@ -62,8 +58,10 @@
 
 <form
 	class="form"
-	onsubmit={preventDefault(() =>
-		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }]))}
+	onsubmit={(ev) => {
+		items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }];
+		ev.preventDefault();
+	}}
 >
 	<input type="text" class="form__input" bind:value={newItem} required />
 	<button type="submit" class="button">Add item</button>

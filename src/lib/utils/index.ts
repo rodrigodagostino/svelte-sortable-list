@@ -94,11 +94,6 @@ export function getCollidingItem(
 	return collidingItems[0];
 }
 
-export function dispatch(target: HTMLElement, name: string, detail: object) {
-	const event = new CustomEvent(name, { bubbles: true, detail });
-	target.dispatchEvent(event);
-}
-
 export function sortItems<T>(items: T[], from: number, to: number) {
 	const clone = [...items];
 	clone.splice(to < 0 ? clone.length + to : to, 0, clone.splice(from, 1)[0]);

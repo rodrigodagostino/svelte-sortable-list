@@ -1,18 +1,18 @@
-<!-- @migration-task Error while migrating Svelte code: migrating this component would require adding a `$props` rune but there's already a variable named props.
-     Rename the variable and try again or migrate by hand. -->
 <script lang="ts">
 	import { version } from '$app/environment';
 	import { page } from '$app/state';
-	import { props } from './stores.js';
+	import { rootProps } from './stores.js';
 	import './styles.css';
 
-	let isControlsExpanded = true;
+	let { children } = $props();
+
+	let isControlsExpanded = $state(true);
 </script>
 
 <div id="app" class="app" class:is-controls-expanded={isControlsExpanded}>
 	<main class="app-main">
 		<div class="container">
-			<slot />
+			{@render children?.()}
 		</div>
 	</main>
 	<aside id="app-controls" class="app-controls">
@@ -20,7 +20,7 @@
 			class="app-controls__toggle button"
 			aria-expanded={isControlsExpanded}
 			aria-controls="app-controls"
-			on:click={() => (isControlsExpanded = !isControlsExpanded)}
+			onclick={() => (isControlsExpanded = !isControlsExpanded)}
 		>
 			{isControlsExpanded ? 'Hide controls' : 'Show controls'}
 		</button>
@@ -38,14 +38,14 @@
 					<tr>
 						<td></td>
 						<td><label for="gap">gap</label></td>
-						<td><input id="gap" type="number" min="0" bind:value={$props.gap} /></td>
+						<td><input id="gap" type="number" min="0" bind:value={$rootProps.gap} /></td>
 						<td></td>
 					</tr>
 					<tr>
 						<td></td>
 						<td><label for="direction">direction</label></td>
 						<td>
-							<select id="direction" bind:value={$props.direction}>
+							<select id="direction" bind:value={$rootProps.direction}>
 								<option value="vertical">vertical</option>
 								<option value="horizontal">horizontal</option>
 							</select>
@@ -62,7 +62,7 @@
 								min="0.5"
 								max="2"
 								step="0.1"
-								bind:value={$props.swapThreshold}
+								bind:value={$rootProps.swapThreshold}
 							/>
 						</td>
 						<td></td>
@@ -75,7 +75,7 @@
 								id="transition-duration"
 								type="number"
 								min="0"
-								bind:value={$props.transitionDuration}
+								bind:value={$rootProps.transitionDuration}
 							/>
 						</td>
 						<td></td>
@@ -84,7 +84,7 @@
 						<td></td>
 						<td><label for="has-drop-marker">hasDropMarker</label></td>
 						<td>
-							<input id="has-drop-marker" type="checkbox" bind:checked={$props.hasDropMarker} />
+							<input id="has-drop-marker" type="checkbox" bind:checked={$rootProps.hasDropMarker} />
 						</td>
 						<td></td>
 					</tr>
@@ -92,7 +92,7 @@
 						<td></td>
 						<td><label for="has-locked-axis">hasLockedAxis</label></td>
 						<td>
-							<input id="has-locked-axis" type="checkbox" bind:checked={$props.hasLockedAxis} />
+							<input id="has-locked-axis" type="checkbox" bind:checked={$rootProps.hasLockedAxis} />
 						</td>
 						<td></td>
 					</tr>
@@ -100,7 +100,7 @@
 						<td></td>
 						<td><label for="has-boundaries">hasBoundaries</label></td>
 						<td>
-							<input id="has-boundaries" type="checkbox" bind:checked={$props.hasBoundaries} />
+							<input id="has-boundaries" type="checkbox" bind:checked={$rootProps.hasBoundaries} />
 						</td>
 						<td></td>
 					</tr>
@@ -111,7 +111,7 @@
 							<input
 								id="can-clear-target-on-drag-out"
 								type="checkbox"
-								bind:checked={$props.canClearTargetOnDragOut}
+								bind:checked={$rootProps.canClearTargetOnDragOut}
 							/>
 						</td>
 						<td></td>
@@ -123,7 +123,7 @@
 							<input
 								id="can-remove-item-on-drop-out"
 								type="checkbox"
-								bind:checked={$props.canRemoveItemOnDropOut}
+								bind:checked={$rootProps.canRemoveItemOnDropOut}
 							/>
 						</td>
 						<td></td>
@@ -132,7 +132,7 @@
 						<td></td>
 						<td><label for="is-locked">isLocked</label></td>
 						<td>
-							<input id="is-locked" type="checkbox" bind:checked={$props.isLocked} />
+							<input id="is-locked" type="checkbox" bind:checked={$rootProps.isLocked} />
 						</td>
 						<td></td>
 					</tr>
@@ -140,7 +140,7 @@
 						<td></td>
 						<td><label for="is-disabled">isDisabled</label></td>
 						<td>
-							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
+							<input id="is-disabled" type="checkbox" bind:checked={$rootProps.isDisabled} />
 						</td>
 						<td></td>
 					</tr>

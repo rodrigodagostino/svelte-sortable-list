@@ -1,9 +1,7 @@
 <script lang="ts">
-	interface Props {
-		[key: string]: any
-	}
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	let { ...rest }: Props = $props();
+	let props: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
@@ -17,7 +15,7 @@
 	stroke-linejoin="round"
 	stroke-width="3"
 	pointer-events="none"
-	{...rest}
+	{...props}
 >
 	<path d="m20.5 3.5-17 17" />
 	<path d="m3.5 3.5 17 17" />

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
@@ -172,7 +170,8 @@
 		// when the ghost is dragged and dropped without being moved.
 		if (status === 'set' || status === 'remove') return '9999';
 	}
-	run(() => {
+
+	$effect(() => {
 		if ($draggedItem) {
 			const clone = $draggedItem?.children[0].cloneNode(true);
 
@@ -188,6 +187,7 @@
 			ghostInnerRef?.replaceChildren();
 		}
 	});
+
 	let styleWidth = $derived(getStyleWidth($draggedItem));
 	let styleHeight = $derived(getStyleHeight($draggedItem));
 	let styleLeft = $derived(getStyleLeft(status));

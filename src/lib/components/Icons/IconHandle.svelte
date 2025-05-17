@@ -1,9 +1,7 @@
 <script lang="ts">
-	interface Props {
-		[key: string]: any
-	}
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	let { ...rest }: Props = $props();
+	let props: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
@@ -12,7 +10,7 @@
 	height="0.875rem"
 	viewBox="0 0 320 512"
 	pointer-events="none"
-	{...rest}
+	{...props}
 >
 	<circle cx="80" cy="96" r="48" />
 	<circle cx="240" cy="96" r="48" />

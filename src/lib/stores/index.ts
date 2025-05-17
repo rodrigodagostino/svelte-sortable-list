@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte';
-import { writable, type Writable } from 'svelte/store';
+import { readonly, writable, type Writable } from 'svelte/store';
 import type {
 	SortableListCoordinates,
 	SortableListElements,
@@ -14,6 +14,21 @@ export function setWritableContext<T>(key: string, context: T): Writable<T> {
 export function getWritableContext<T>(key: string): Writable<T> {
 	const uniqueKey = Symbol.for(key);
 	return getContext<Writable<T>>(uniqueKey);
+}
+
+type RootListContext = {
+	handlers: {
+		itemFocusOut: (item: HTMLElement) => void;
+		requestRemove: (item: HTMLLIElement) => void;
+	};
+};
+
+export function setRootListContext(context: RootListContext) {
+	return setWritableContext('svelte-sortable-list.root', context);
+}
+
+export function getRootListContext() {
+	return readonly(getWritableContext<RootListContext>('svelte-sortable-list.root'));
 }
 
 /**

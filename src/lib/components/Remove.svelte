@@ -1,14 +1,21 @@
 <script lang="ts">
-	import { dispatch } from '$lib/utils/index.js';
+	import { getRootListContext } from '$lib/stores/index.js';
+
 	interface Props {
 		children?: import('svelte').Snippet;
+		onRequestRemove?: (item: HTMLElement) => void;
 	}
 
-	let { children }: Props = $props();
+	let { children, onRequestRemove }: Props = $props();
 
-	function handleClick(event: Event) {
-		const target = event.target as HTMLElement;
-		dispatch(target, 'requestremove', { item: target.closest('.ssl-item') });
+	const rootContext = getRootListContext();
+
+	function handleClick(event: MouseEvent) {
+		const item = (event.target as HTMLElement)?.closest<HTMLLIElement>('.ssl-item');
+		if (item != null) {
+			onRequestRemove?.(item);
+			$rootContext.handlers.requestRemove(item);
+		}
 	}
 </script>
 

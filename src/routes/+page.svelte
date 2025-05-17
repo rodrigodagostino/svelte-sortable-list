@@ -9,22 +9,21 @@
 		type SortEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from './fixtures.js';
-	import { props } from './stores.js';
+	import { rootProps } from './stores.js';
 	import '$lib/styles.css';
 
 	let items = $state([...defaultItems]);
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultProps };
 	});
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
+	function handleSort({ prevItemIndex, nextItemIndex }: SortEventDetail) {
+		console.log('hi');
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
-		const { itemIndex } = event.detail;
+	function handleRemove({ itemIndex }: RemoveEventDetail) {
 		items = removeItem(items, itemIndex);
 	}
 </script>
@@ -33,7 +32,7 @@
 	<title>Basic | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
+<SortableList {...$rootProps} onSort={handleSort} onRemove={handleRemove}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">

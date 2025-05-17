@@ -1,6 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate and beforeUpdate. Please migrate by hand. -->
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
+	import { tick, type Snippet } from 'svelte';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import type {
 		GhostProps,
@@ -32,24 +32,35 @@
 		setPointer,
 		setPointerOrigin,
 		setTargetItem,
+		setRootListContext,
 	} from '$lib/stores/index.js';
 
-	let listRef: HTMLUListElement;
-	let ghostRef: HTMLDivElement;
+	let listRef = $state<HTMLUListElement>()!;
+	let ghostRef = $state<HTMLDivElement>()!;
 
-	export let gap: SortableListProps['gap'] = 12;
-	export let direction: SortableListProps['direction'] = 'vertical';
-	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
-	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
-	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
-	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
-	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
-	export let canClearTargetOnDragOut: SortableListProps['canClearTargetOnDragOut'] = false;
-	export let canRemoveItemOnDropOut: SortableListProps['canRemoveItemOnDropOut'] = false;
-	export let isLocked: SortableListProps['isLocked'] = false;
-	export let isDisabled: SortableListProps['isDisabled'] = false;
+	interface Props extends SortableListProps {
+		onSort?: (value: SortEventDetail) => void;
+		onRemove?: (value: RemoveEventDetail) => void;
+		children?: Snippet;
+	}
+	let {
+		gap = 12,
+		direction = 'vertical',
+		swapThreshold = 1,
+		transitionDuration = 320,
+		hasDropMarker = false,
+		hasLockedAxis = false,
+		hasBoundaries = false,
+		canClearTargetOnDragOut = false,
+		canRemoveItemOnDropOut = false,
+		isLocked = false,
+		isDisabled = false,
+		onSort,
+		onRemove,
+		children,
+	}: Props = $props();
 
-	const props = setListProps({
+	const rootProps = setListProps({
 		gap,
 		direction,
 		swapThreshold,
@@ -62,37 +73,39 @@
 		isLocked,
 		isDisabled,
 	});
-	$: $props = {
-		gap,
-		direction,
-		swapThreshold,
-		transitionDuration,
-		hasDropMarker,
-		hasLockedAxis,
-		hasBoundaries,
-		canClearTargetOnDragOut,
-		canRemoveItemOnDropOut,
-		isLocked,
-		isDisabled,
-	};
+	$effect(() => {
+		$rootProps = {
+			gap,
+			direction,
+			swapThreshold,
+			transitionDuration,
+			hasDropMarker,
+			hasLockedAxis,
+			hasBoundaries,
+			canClearTargetOnDragOut,
+			canRemoveItemOnDropOut,
+			isLocked,
+			isDisabled,
+		};
+	});
 
-	let ghostStatus: GhostProps['status'] = 'unset';
+	let ghostStatus = $state<GhostProps['status']>('unset');
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemsOrigin = setItemsOrigin(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
-	let liveText: string = '';
+	let liveText = $state('');
 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
 	// so we need to manually keep focus on the selected <SortableItem> as items are sorted.
 	// https://github.com/sveltejs/svelte/issues/3973
 	let activeElement: HTMLElement;
-	beforeUpdate(() => {
+	$effect.pre(() => {
 		activeElement = document?.activeElement as HTMLElement;
 	});
-	afterUpdate(() => {
+	$effect(() => {
 		if (activeElement) activeElement.focus();
 	});
 
@@ -104,10 +117,12 @@
 	const isGhostBetweenBounds = setIsGhostBetweenBounds(true);
 	const isRemoving = setIsRemoving(false);
 
-	const dispatch = createEventDispatcher<{
-		sort: SortEventDetail;
-		remove: RemoveEventDetail;
-	}>();
+	setRootListContext({
+		handlers: {
+			itemFocusOut: (item) => handleElementDrop(item, 'keyboard-cancel'),
+			requestRemove: (item) => dispatchRemove(item),
+		},
+	});
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
@@ -193,12 +208,13 @@
 					? 2
 					: swapThreshold;
 		const collidingItemData = getCollidingItem(ghostRef, $itemsOrigin, enforcedSwapThreshold);
-		if (collidingItemData)
+		if (collidingItemData) {
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-id="${collidingItemData.id}"]`
 			);
-		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds))
+		} else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds)) {
 			$targetItem = null;
+		}
 	}
 
 	function handlePointerUp() {
@@ -381,8 +397,9 @@
 				((action === 'pointer-drop' && !hasDispatchedRemove) || action === 'keyboard-drop') &&
 				$draggedItem &&
 				$targetItem
-			)
+			) {
 				dispatchSort($draggedItem, $targetItem);
+			}
 			await tick();
 			$draggedItem = null;
 			$targetItem = null;
@@ -414,13 +431,14 @@
 		const targetItemIndex = getIndex(targetItem);
 
 		if (
+			onSort != null &&
 			draggedItem !== null &&
 			targetItem !== null &&
 			typeof draggedItemIndex === 'number' &&
 			typeof targetItemIndex === 'number' &&
 			draggedItemIndex !== targetItemIndex
 		) {
-			dispatch('sort', {
+			onSort({
 				prevItemId: draggedItemId,
 				prevItemIndex: draggedItemIndex,
 				nextItemId: targetItemId,
@@ -437,7 +455,7 @@
 			$isRemoving = true;
 
 			async function handleGhostDrop() {
-				dispatch('remove', { itemId, itemIndex });
+				onRemove?.({ itemId, itemIndex });
 				await tick();
 				$isRemoving = false;
 			}
@@ -464,7 +482,7 @@
 					listRef.focus();
 				}
 			}
-			dispatch('remove', { itemId, itemIndex });
+			onRemove?.({ itemId, itemIndex });
 		}
 	}
 </script>
@@ -485,17 +503,17 @@
 	aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
 	aria-disabled={isDisabled}
 	tabindex="0"
-	on:pointerdown={handlePointerDown}
-	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
-	on:requestremove={(event) => dispatchRemove(event.detail.item)}
+	onpointerdown={handlePointerDown}
+	onkeydown={handleKeyDown}
 >
-	<slot>
+	{#if children != null}
+		{@render children()}
+	{:else}
 		<p>
 			To display your list, provide an array of <code>items</code> to
 			<code>{'<SortableList>'}</code>.
 		</p>
-	</slot>
+	{/if}
 </ul>
 <div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
 	{liveText}
