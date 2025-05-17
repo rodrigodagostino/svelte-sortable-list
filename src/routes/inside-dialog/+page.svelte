@@ -9,24 +9,22 @@
 		type SortEventDetail,
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let dialogRef: HTMLDialogElement;
 
-	let items = [...defaultItems];
+	let items = $state([...defaultItems]);
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultProps };
 	});
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
+	function handleSort({ prevItemIndex, nextItemIndex }: SortEventDetail) {
 		items = sortItems(items, prevItemIndex, nextItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
-		const { itemIndex } = event.detail;
+	function handleRemove({ itemIndex }: RemoveEventDetail) {
 		items = removeItem(items, itemIndex);
 	}
 
@@ -48,13 +46,11 @@
 	<title>Inside dialog | Svelte Sortable List</title>
 </svelte:head>
 
-<button class="button" on:click={handleOpenDialog}>Open dialog</button>
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialogRef} class="dialog" on:click={handleClickDialog}>
+<button class="button" onclick={handleOpenDialog}>Open dialog</button>
+<dialog bind:this={dialogRef} class="dialog" onclick={handleClickDialog}>
 	<div class="dialog__inner">
-		<button class="dialog__close button" on:click={handleCloseDialog}>Close dialog</button>
-		<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
+		<button class="dialog__close button" onclick={handleCloseDialog}>Close dialog</button>
+		<SortableList {...$rootProps} onSort={handleSort} onRemove={handleRemove}>
 			{#each items as item, index (item.id)}
 				<SortableItem {...item} {index}>
 					<div class="ssl-item__content">

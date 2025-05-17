@@ -1,3 +1,9 @@
+<script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	let props: HTMLAttributes<SVGElement> = $props();
+</script>
+
 <svg
 	class="ssl-icon-remove"
 	width="0.875rem"
@@ -9,7 +15,7 @@
 	stroke-linejoin="round"
 	stroke-width="3"
 	pointer-events="none"
-	{...$$restProps}
+	{...props}
 >
 	<path d="m20.5 3.5-17 17" />
 	<path d="m3.5 3.5 17 17" />

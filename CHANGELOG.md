@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Migration to Svelte 5
+- `on:sort` changed to `onSort`
+- `on:remove` changed to `onRemove`
+
+### Removed
+
+- Bubbling events: `on:itemfocusout` and `on:requestremove`
+
 ## [0.10.16] (2025-02-04)
 
 ### Fixed
