@@ -1,11 +1,11 @@
 import type { ItemData, SortableItemProps, SortableListProps } from '$lib/types/index.js';
 
 export function getId(element: HTMLElement): string {
-	return String(element.dataset.id);
+	return String(element.dataset.itemId);
 }
 
 export function getIndex(element: HTMLElement): number {
-	return Number(element.dataset.index);
+	return Number(element.dataset.itemIndex);
 }
 
 function getTranslateValues(element: HTMLElement) {
@@ -24,8 +24,8 @@ export function getItemData(item: HTMLElement): ItemData {
 	const itemRect = item.getBoundingClientRect();
 	const itemTranslate = getTranslateValues(item);
 	return {
-		id: item.dataset.id!,
-		index: Number(item.dataset.index),
+		id: item.dataset.itemId!,
+		index: Number(item.dataset.itemIndex),
 		// Translate values are removed to create a reliable reference to the item’s position in the list
 		// without the risk of catching in-between values while an item is translating.
 		x: itemRect.x - (itemTranslate?.x || 0),

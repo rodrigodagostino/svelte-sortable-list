@@ -27,7 +27,7 @@
 	import {
 		setDraggedItem,
 		setFocusedItem,
-		setIsGhostBetweenBounds,
+		setIsBetweenBounds,
 		setIsCancelingKeyboardDragging,
 		setIsKeyboardDragging,
 		setIsKeyboardDropping,
@@ -141,7 +141,7 @@
 	const isKeyboardDragging = setIsKeyboardDragging(false);
 	const isKeyboardDropping = setIsKeyboardDropping(false);
 	const isCancelingKeyboardDragging = setIsCancelingKeyboardDragging(false);
-	const isGhostBetweenBounds = setIsGhostBetweenBounds(true);
+	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRemoving = setIsRemoving(false);
 
 	const dispatch = createEventDispatcher<{
@@ -166,7 +166,7 @@
 
 		if (
 			(isLocked && !isOrResidesInInteractiveElement(target, currItem)) ||
-			(currItem.classList.contains('is-locked') &&
+			(currItem.dataset.isLocked === 'true' &&
 				!isOrResidesInInteractiveElement(target, currItem)) ||
 			isDisabled ||
 			currItem.getAttribute('aria-disabled') === 'true'
@@ -224,7 +224,7 @@
 		const ghostRect = ghostRef.getBoundingClientRect();
 
 		$pointer = { x: clientX, y: clientY };
-		$isGhostBetweenBounds = areColliding(ghostRect, listRect);
+		$isBetweenBounds = areColliding(ghostRect, listRect);
 
 		const enforcedSwapThreshold =
 			swapThreshold && swapThreshold < 0.5
@@ -239,9 +239,9 @@
 		const collidingItemData = getCollidingItem(ghostRef, $itemsData, enforcedSwapThreshold);
 		if (collidingItemData)
 			$targetItem = listRef.querySelector<HTMLLIElement>(
-				`.ssl-item[data-id="${collidingItemData.id}"]`
+				`.ssl-item[data-item-id="${collidingItemData.id}"]`
 			);
-		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isGhostBetweenBounds))
+		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isBetweenBounds))
 			$targetItem = null;
 
 		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
@@ -267,7 +267,7 @@
 				if (
 					!target.classList.contains('ssl-item') ||
 					isLocked ||
-					target.classList.contains('is-locked')
+					target.dataset.isLocked === 'true'
 				)
 					return;
 				else event.preventDefault();
@@ -426,16 +426,16 @@
 
 		let hasDispatchedRemove = false;
 		if (action === 'pointer-drop') {
-			if ($draggedItem && !$isGhostBetweenBounds && canRemoveItemOnDropOut) {
+			if ($draggedItem && !$isBetweenBounds && canRemoveItemOnDropOut) {
 				dispatchRemove($draggedItem);
 				hasDispatchedRemove = true;
 			}
 			$isPointerDragging = false;
-			ghostStatus = !$isGhostBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'preset';
+			ghostStatus = !$isBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'preset';
 			await tick();
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
-			$isGhostBetweenBounds = true;
+			$isBetweenBounds = true;
 			scrollingSpeed = 0;
 		} else {
 			$isKeyboardDragging = false;
@@ -548,19 +548,19 @@
 
 <ul
 	bind:this={listRef}
-	class="ssl-list has-direction-{direction}"
-	class:has-drop-marker={hasDropMarker}
-	class:can-remove-item-on-drop-out={canRemoveItemOnDropOut}
-	class:is-locked={isLocked}
-	class:is-disabled={isDisabled}
+	class="ssl-list"
 	style:--gap="{gap}px"
 	style:--transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
+	data-has-drop-marker={hasDropMarker}
+	data-can-remove-item-on-drop-out={canRemoveItemOnDropOut}
+	data-is-locked={isLocked}
+	data-is-disabled={isDisabled}
 	role="listbox"
-	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	aria-orientation={direction}
-	aria-activedescendant={$focusedItem ? `ssl-item-${$focusedItem.id}` : null}
 	aria-disabled={isDisabled}
+	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
+	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
 	on:keydown={handleKeyDown}
@@ -591,12 +591,12 @@
 		margin: calc(var(--gap) / 2 * -1);
 		outline-offset: calc(var(--gap) / 2 * -1);
 
-		&.has-direction-vertical {
+		&[aria-orientation='vertical'] {
 			flex-direction: column;
 			padding-inline: calc(var(--gap) / 2);
 		}
 
-		&.has-direction-horizontal {
+		&[aria-orientation='horizontal'] {
 			flex-direction: row;
 			padding-block: calc(var(--gap) / 2);
 		}

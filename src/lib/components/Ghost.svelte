@@ -2,7 +2,7 @@
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
-		getIsGhostBetweenBounds,
+		getIsBetweenBounds,
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getIsRemoving,
@@ -13,7 +13,7 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import type { GhostProps } from '$lib/types/index.js';
-	import { getId, getIndex } from '$lib/utils/index.js';
+	import { getIndex } from '$lib/utils/index.js';
 
 	export let ghostRef: HTMLDivElement;
 	let ghostInnerRef: HTMLDivElement;
@@ -31,7 +31,7 @@
 
 	const isPointerDragging = getIsPointerDragging();
 	const isPointerDropping = getIsPointerDropping();
-	const isGhostBetweenBounds = getIsGhostBetweenBounds();
+	const isBetweenBounds = getIsBetweenBounds();
 	const isRemoving = getIsRemoving();
 
 	$: if ($draggedItem) {
@@ -233,12 +233,6 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	class:is-dragging={$isPointerDragging}
-	class:is-dropping={$isPointerDropping}
-	class:is-between-bounds={$isGhostBetweenBounds}
-	class:is-out-of-bounds={!$isGhostBetweenBounds}
-	class:is-removing={$isRemoving}
-	class:can-remove-item-on-drop-out={$listProps.canRemoveItemOnDropOut}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : !$isRemoving ? 'grab' : 'initial'}
 	style:width={styleWidth}
@@ -249,7 +243,11 @@
 	style:transition={styleTransition}
 	style:visibility={$isPointerDragging || $isPointerDropping ? 'visible' : 'hidden'}
 	style:z-index={styleZIndex}
-	data-id={$draggedItem && getId($draggedItem)}
+	data-is-pointer-dragging={$isPointerDragging}
+	data-is-pointer-dropping={$isPointerDropping}
+	data-is-between-bounds={$isBetweenBounds}
+	data-is-removing={$isRemoving}
+	data-can-remove-item-on-drop-out={$listProps.canRemoveItemOnDropOut}
 	aria-hidden="true"
 	use:portal
 >

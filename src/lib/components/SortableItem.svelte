@@ -3,7 +3,7 @@
 	import {
 		getDraggedItem,
 		getFocusedItem,
-		getIsGhostBetweenBounds,
+		getIsBetweenBounds,
 		getIsCancelingKeyboardDragging,
 		getIsKeyboardDragging,
 		getIsKeyboardDropping,
@@ -37,7 +37,7 @@
 	const isKeyboardDragging = getIsKeyboardDragging();
 	const isKeyboardDropping = getIsKeyboardDropping();
 	const isCancelingKeyboardDragging = getIsCancelingKeyboardDragging();
-	const isGhostBetweenBounds = getIsGhostBetweenBounds();
+	const isBetweenBounds = getIsBetweenBounds();
 	const isRemoving = getIsRemoving();
 
 	let rectOrigin: DOMRect | null = null;
@@ -90,9 +90,9 @@
 				: !hasHandle && !$listProps.isLocked && !isLocked
 					? 'grab'
 					: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isGhostBetweenBounds);
-	$: styleHeight = getStyleHeight($draggedItem, $isGhostBetweenBounds);
-	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isGhostBetweenBounds);
+	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
+	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
+	$: styleMargin = getStyleMargin($listProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOpacity =
 		draggedItemId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
@@ -109,7 +109,7 @@
 		$draggedItem,
 		$targetItem,
 		$isCancelingKeyboardDragging,
-		$isGhostBetweenBounds
+		$isBetweenBounds
 	);
 	$: styleTransition = $draggedItem
 		? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
@@ -120,23 +120,22 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && (!$isGhostBetweenBounds || $isRemoving)) return '0';
-		else if (draggedItemId === String(id) && $isGhostBetweenBounds) return `${rectOrigin?.width}px`;
+		if (draggedItemId === String(id) && (!$isBetweenBounds || $isRemoving)) return '0';
+		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && (!$isGhostBetweenBounds || $isRemoving)) return '0';
-		else if (draggedItemId === String(id) && $isGhostBetweenBounds)
-			return `${rectOrigin?.height}px`;
+		if (draggedItemId === String(id) && (!$isBetweenBounds || $isRemoving)) return '0';
+		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
 		if (
 			draggedItemId === String(id) &&
-			(($listProps.canRemoveItemOnDropOut && !$isGhostBetweenBounds) || $isRemoving)
+			(($listProps.canRemoveItemOnDropOut && !$isBetweenBounds) || $isRemoving)
 		)
 			return '0';
 		else
@@ -160,7 +159,7 @@
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
 			$isCancelingKeyboardDragging ||
-			(!$isGhostBetweenBounds &&
+			(!$isBetweenBounds &&
 				!$listProps.canClearTargetOnDragOut &&
 				$listProps.canRemoveItemOnDropOut) ||
 			$isRemoving
@@ -222,14 +221,8 @@
 
 <li
 	bind:this={itemRef}
+	{id}
 	class="ssl-item"
-	class:is-pointer-dragging={$isPointerDragging && draggedItemId === String(id)}
-	class:is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
-	class:is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
-	class:is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
-	class:is-locked={$listProps.isLocked || isLocked}
-	class:is-disabled={$listProps.isDisabled || isDisabled}
-	class:is-removing={$isRemoving && draggedItemId === String(id)}
 	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:width={styleWidth}
@@ -240,17 +233,23 @@
 	style:touch-action={!hasHandle ? 'none' : undefined}
 	style:transform={styleTransform}
 	style:transition={styleTransition}
-	id="ssl-item-{id}"
-	data-id={id}
-	data-index={index}
+	data-item-id={id}
+	data-item-index={index}
+	data-is-pointer-dragging={$isPointerDragging && draggedItemId === String(id)}
+	data-is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
+	data-is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
+	data-is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	data-is-between-bounds={$isBetweenBounds}
+	data-is-locked={$listProps.isLocked || isLocked}
+	data-is-removing={$isRemoving && draggedItemId === String(id)}
 	role="option"
 	tabindex={focusedItemId === String(id) ? 0 : -1}
+	aria-selected={focusedItemId === String(id)}
+	aria-disabled={$listProps.isDisabled || isDisabled}
 	aria-roledescription={screenReaderText.item(
 		index,
 		$listProps.isDisabled || isDisabled || $listProps.isLocked || isLocked
 	)}
-	aria-selected={focusedItemId === String(id)}
-	aria-disabled={$listProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	in:scaleFade={{ duration: $listProps.transitionDuration }}
@@ -275,19 +274,19 @@
 			z-index: 2;
 		}
 
-		&.is-keyboard-dragging {
+		&[data-is-keyboard-dragging='true'] {
 			z-index: 4;
 		}
 
-		&.is-keyboard-dropping {
+		&[data-is-keyboard-dropping='true'] {
 			// The following z-index is different from the one in .is-keyboard-dragging for
 			// the sole purpose of ensuring the «transitionend» event is fired when
 			// the item is dropped using the keyboard.
 			z-index: 3;
 		}
 
-		&.is-pointer-dragging,
-		&.is-pointer-dropping {
+		&[data-is-pointer-dragging='true'],
+		&[data-is-pointer-dropping='true'] {
 			z-index: 0;
 		}
 

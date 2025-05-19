@@ -76,8 +76,8 @@
 	opacity: 0.5;
 }
 
-.ssl-item.is-keyboard-dragging .ssl-item__inner,
-.ssl-ghost.is-dragging .ssl-ghost__inner {
+.ssl-item[data-is-keyboard-dragging="true"] .ssl-item__inner,
+.ssl-ghost[data-is-pointer-dragging="true"] .ssl-ghost__inner {
 	box-shadow: var(--box-shadow-1);
 }
 
@@ -99,7 +99,7 @@
 .ssl-handle:hover,
 .ssl-remove:focus,
 .ssl-remove:hover,
-.ssl-item.is-pointer-dropping .ssl-handle,
+.ssl-item[data-is-pointer-dropping="true"] .ssl-handle,
 .ssl-ghost .ssl-handle {
 	background-color: var(--gray-100);
 	color: var(--gray-600);
@@ -117,31 +117,38 @@
 /**
  * hasDropMarker
  */
-.ssl-list.has-drop-marker .ssl-item__inner {
+.ssl-list[data-has-drop-marker="true"] .ssl-item__inner {
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
 		border-color calc(var(--transition-duration) / 3 * 2),
 		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
-.ssl-list.has-drop-marker .ssl-item.is-pointer-dragging .ssl-item__inner,
-.ssl-list.has-drop-marker .ssl-item.is-pointer-dropping .ssl-item__inner {
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-item__inner,
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-item__inner {
 	opacity: 0.5;
 }
 
-.ssl-list.has-drop-marker .ssl-item.is-pointer-dragging .ssl-item__inner > *,
-.ssl-list.has-drop-marker .ssl-item.is-pointer-dropping .ssl-item__inner > * {
+.ssl-list[data-has-drop-marker="true"]
+	.ssl-item[data-is-pointer-dragging="true"]
+	.ssl-item__inner
+	> *,
+.ssl-list[data-has-drop-marker="true"]
+	.ssl-item[data-is-pointer-dropping="true"]
+	.ssl-item__inner
+	> * {
 	opacity: 0;
 }
 
 /**
  * canRemoveItemOnDropOut
  */
-.ssl-ghost.is-removing .ssl-ghost__inner {
+.ssl-ghost[data-is-removing="true"] .ssl-ghost__inner {
 	opacity: 0;
 }
 
-.ssl-ghost.can-remove-item-on-drop-out.is-out-of-bounds .ssl-ghost__inner {
+.ssl-ghost[data-can-remove-item-on-drop-out="true"][data-is-between-bounds="false"]
+	.ssl-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }
