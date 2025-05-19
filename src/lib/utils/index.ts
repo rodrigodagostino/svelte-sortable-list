@@ -171,34 +171,29 @@ export function scrollIntoView(
 	element: HTMLElement,
 	container: HTMLElement,
 	direction: SortableListProps['direction'],
-	step: 1 | -1
+	step: 1 | -1,
+	isScrollingDocument: boolean
 ) {
 	const elementRect = element.getBoundingClientRect();
 	const elementStyles = window.getComputedStyle(element);
 	const elementTranslate = getTranslateValues(element);
 	const containerRect = container.getBoundingClientRect();
 	const containerStyles = window.getComputedStyle(container);
-	// In those situations where the container is larger than the viewport,
-	// we want to use the root element as reference.
-	const rootElement = document.documentElement;
-	const isRootEl = isRootElement(container, direction);
-	const containerWidth = Math.min(container.clientWidth, rootElement.clientWidth);
-	const containerHeight = Math.min(container.clientHeight, rootElement.clientHeight);
 	const SCROLL_MARGIN = 40;
 
 	const left =
 		direction === 'horizontal'
 			? step === 1
 				? elementRect.right -
-					(isRootEl ? 0 : containerRect.left) -
-					containerWidth +
+					(isScrollingDocument ? 0 : containerRect.left) -
+					container.clientWidth +
 					container.scrollLeft -
 					parseFloat(containerStyles.borderRightWidth) +
 					parseFloat(elementStyles.marginRight) * 2 -
 					(elementTranslate?.x || 0) +
 					SCROLL_MARGIN
 				: elementRect.left -
-					(isRootEl ? 0 : containerRect.left) +
+					(isScrollingDocument ? 0 : containerRect.left) +
 					container.scrollLeft -
 					parseFloat(containerStyles.borderLeftWidth) -
 					parseFloat(elementStyles.marginLeft) * 2 -
@@ -209,15 +204,15 @@ export function scrollIntoView(
 		direction === 'vertical'
 			? step === 1
 				? elementRect.bottom -
-					(isRootEl ? 0 : containerRect.top) -
-					containerHeight +
+					(isScrollingDocument ? 0 : containerRect.top) -
+					container.clientHeight +
 					container.scrollTop -
 					parseFloat(containerStyles.borderBottomWidth) +
 					parseFloat(elementStyles.marginBottom) * 2 -
 					(elementTranslate?.y || 0) +
 					SCROLL_MARGIN
 				: elementRect.top -
-					(isRootEl ? 0 : containerRect.top) +
+					(isScrollingDocument ? 0 : containerRect.top) +
 					container.scrollTop -
 					parseFloat(containerStyles.borderTopWidth) -
 					parseFloat(elementStyles.marginTop) * 2 -
@@ -266,17 +261,17 @@ export function getScrollingSpeed(
 	clientY: PointerEvent['clientY'],
 	direction: SortableListProps['direction'],
 	offset: number,
-	ratio: number
+	ratio: number,
+	isScrollingDocument: boolean
 ) {
 	// In those situations where the container is larger than the viewport,
 	// we want to use the root element as reference.
 	const rootElement = document.documentElement;
-	const isRootEl = isRootElement(element, direction);
 	const rect = element.getBoundingClientRect();
-	const top = isRootEl ? 0 : rect.top;
-	const left = isRootEl ? 0 : rect.left;
-	const right = isRootEl ? rootElement.clientWidth : rect.right;
-	const bottom = isRootEl ? rootElement.clientHeight : rect.bottom;
+	const top = isScrollingDocument ? 0 : rect.top;
+	const left = isScrollingDocument ? 0 : rect.left;
+	const right = isScrollingDocument ? rootElement.clientWidth : rect.right;
+	const bottom = isScrollingDocument ? rootElement.clientHeight : rect.bottom;
 
 	if (direction === 'vertical') {
 		if (clientY - top < offset) {

@@ -17,6 +17,7 @@
 		getItemsData,
 		getScrollingSpeed,
 		isOrResidesInInteractiveElement,
+		isRootElement,
 		isScrollable,
 		isFullyVisible,
 		screenReaderText,
@@ -92,10 +93,12 @@
 	let liveText: string = '';
 
 	$: scrollableAncestor = getClosestScrollableAncestor(listRef);
+	let scrollingSpeed = 0;
+	let isScrollingDocument = true;
+	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
+	$: if (scrollingSpeed !== 0) scroll();
 	const AUTOSCROLL_ACTIVE_OFFSET = 200;
 	const AUTOSCROLL_SPEED_RATIO = 40;
-	let scrollingSpeed = 0;
-	$: if (scrollingSpeed !== 0) scroll();
 
 	function scroll() {
 		if (!scrollableAncestor) return;
@@ -121,7 +124,8 @@
 			clientY,
 			direction,
 			AUTOSCROLL_ACTIVE_OFFSET,
-			AUTOSCROLL_SPEED_RATIO
+			AUTOSCROLL_SPEED_RATIO,
+			isScrollingDocument
 		);
 	}
 
@@ -300,7 +304,13 @@
 						if (!firstItemElement) return;
 						firstItemElement.focus({ preventScroll: true });
 						if (scrollableAncestor && !isFullyVisible(firstItemElement, scrollableAncestor))
-							scrollIntoView(firstItemElement, scrollableAncestor, direction, -1);
+							scrollIntoView(
+								firstItemElement,
+								scrollableAncestor,
+								direction,
+								-1,
+								isScrollingDocument
+							);
 						return;
 					}
 
@@ -348,14 +358,14 @@
 
 					await tick();
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
-						scrollIntoView($targetItem, scrollableAncestor, direction, step);
+						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
 					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
 				}
 
 				await tick();
 				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step);
+					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Home' || key === 'End') {
@@ -397,7 +407,7 @@
 				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
 				const step = key === 'Home' ? -1 : 1;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step);
+					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Escape' && $draggedItem) {
@@ -440,7 +450,8 @@
 		else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isCancelingKeyboardDragging = true;
 			await tick();
-			if (scrollableAncestor) scrollIntoView($draggedItem, scrollableAncestor, direction, -1);
+			if (scrollableAncestor)
+				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
 			liveText = screenReaderText.canceled($draggedItem);
 		}
 
