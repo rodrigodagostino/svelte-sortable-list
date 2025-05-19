@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] (2025-05-19)
+
+### Performance
+
+- Check if the scrolling element is the document only on init.
+
+### Docs
+
+- Rename the auto scroll demo pages.
+
 ## [0.11.0] (2025-05-17)
 
 ### Added
@@ -693,7 +703,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.1...HEAD
+[0.11.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...v0.11.0
 [0.10.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...v0.10.16
 [0.10.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.14...v0.10.15
