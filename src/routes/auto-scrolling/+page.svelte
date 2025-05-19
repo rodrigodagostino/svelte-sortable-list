@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-	<title>Auto scroll | Svelte Sortable List</title>
+	<title>Auto scrolling | Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>

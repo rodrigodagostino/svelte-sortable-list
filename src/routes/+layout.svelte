@@ -153,24 +153,24 @@
 			</a>
 			<a
 				class="app-nav__link"
-				href="/auto-scroll"
-				aria-current={$page.url.pathname === '/auto-scroll' ? 'page' : undefined}
+				href="/auto-scrolling"
+				aria-current={$page.url.pathname === '/auto-scrolling' ? 'page' : undefined}
 			>
-				Auto scroll
+				Auto scrolling
 			</a>
 			<a
 				class="app-nav__link"
-				href="/auto-scroll-container"
-				aria-current={$page.url.pathname === '/auto-scroll-container' ? 'page' : undefined}
+				href="/auto-scrolling-container"
+				aria-current={$page.url.pathname === '/auto-scrolling-container' ? 'page' : undefined}
 			>
-				Auto scroll container
+				Auto scrolling container
 			</a>
 			<a
 				class="app-nav__link"
-				href="/auto-scroll-dialog"
-				aria-current={$page.url.pathname === '/auto-scroll-dialog' ? 'page' : undefined}
+				href="/auto-scrolling-dialog"
+				aria-current={$page.url.pathname === '/auto-scrolling-dialog' ? 'page' : undefined}
 			>
-				Auto scroll dialog
+				Auto scrolling dialog
 			</a>
 			<a
 				class="app-nav__link"

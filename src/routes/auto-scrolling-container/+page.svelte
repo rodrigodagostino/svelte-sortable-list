@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-	<title>Auto scroll inside container | Svelte Sortable List</title>
+	<title>Auto scrolling container | Svelte Sortable List</title>
 </svelte:head>
 
 <div class="wrapper direction-{$props.direction}">

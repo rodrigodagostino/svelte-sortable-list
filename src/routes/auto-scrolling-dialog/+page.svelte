@@ -48,7 +48,7 @@
 </script>
 
 <svelte:head>
-	<title>Auto scroll inside dialog | Svelte Sortable List</title>
+	<title>Auto scrolling dialog | Svelte Sortable List</title>
 </svelte:head>
 
 <button class="button" on:click={handleOpenDialog}>Open dialog</button>
