@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.2] (2025-05-24)
+
+### Changed
+
+- Calculate the scrolling offset based on the scrollable ancestor’s dimensions.
+- Smooth the scrolling speed transition by reducing the scrolling speed ratio from `40` to `24`.
+
 ## [0.11.1] (2025-05-19)
 
 ### Performance
@@ -703,7 +710,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.2...HEAD
+[0.11.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...v0.11.0
 [0.10.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.15...v0.10.16
