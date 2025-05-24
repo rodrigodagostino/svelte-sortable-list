@@ -255,19 +255,23 @@ export function shouldAutoScroll(
 		);
 }
 
+function getScrollingOffset(element: HTMLElement, direction: SortableListProps['direction']) {
+	return direction === 'vertical' ? element.clientHeight * 0.2 : element.clientWidth * 0.2;
+}
+
 export function getScrollingSpeed(
-	element: HTMLElement,
+	container: HTMLElement,
 	clientX: PointerEvent['clientX'],
 	clientY: PointerEvent['clientY'],
 	direction: SortableListProps['direction'],
-	offset: number,
-	ratio: number,
 	isScrollingDocument: boolean
 ) {
+	const offset = getScrollingOffset(container, direction);
+	const SPEED_RATIO = 40;
 	// In those situations where the container is larger than the viewport,
 	// we want to use the root element as reference.
 	const rootElement = document.documentElement;
-	const rect = element.getBoundingClientRect();
+	const rect = container.getBoundingClientRect();
 	const top = isScrollingDocument ? 0 : rect.top;
 	const left = isScrollingDocument ? 0 : rect.left;
 	const right = isScrollingDocument ? rootElement.clientWidth : rect.right;
@@ -275,17 +279,17 @@ export function getScrollingSpeed(
 
 	if (direction === 'vertical') {
 		if (clientY - top < offset) {
-			return Math.round((offset - (clientY - top)) / -ratio);
+			return Math.round((offset - (clientY - top)) / -SPEED_RATIO);
 		} else if (bottom - clientY < offset) {
-			return Math.round((offset - (bottom - clientY)) / ratio);
+			return Math.round((offset - (bottom - clientY)) / SPEED_RATIO);
 		} else {
 			return 0;
 		}
 	} else {
 		if (clientX - left < offset) {
-			return Math.round((offset - (clientX - left)) / -ratio);
+			return Math.round((offset - (clientX - left)) / -SPEED_RATIO);
 		} else if (right - clientX < offset) {
-			return Math.round((offset - (right - clientX)) / ratio);
+			return Math.round((offset - (right - clientX)) / SPEED_RATIO);
 		} else {
 			return 0;
 		}

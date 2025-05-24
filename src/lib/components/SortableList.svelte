@@ -97,8 +97,6 @@
 	let isScrollingDocument = true;
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
 	$: if (scrollingSpeed !== 0) scroll();
-	const AUTOSCROLL_ACTIVE_OFFSET = 200;
-	const AUTOSCROLL_SPEED_RATIO = 40;
 
 	function scroll() {
 		if (!scrollableAncestor) return;
@@ -123,8 +121,6 @@
 			clientX,
 			clientY,
 			direction,
-			AUTOSCROLL_ACTIVE_OFFSET,
-			AUTOSCROLL_SPEED_RATIO,
 			isScrollingDocument
 		);
 	}
