@@ -70,13 +70,8 @@ export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLE
 	return false;
 }
 
-export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData, threshold: number = 1) {
-	return (
-		a.x + a.width * threshold > b.x &&
-		a.x < b.x + b.width * threshold &&
-		a.y + a.height * threshold > b.y &&
-		a.y < b.y + b.height * threshold
-	);
+export function areColliding(a: DOMRect | ItemData, b: DOMRect | ItemData) {
+	return a.x + a.width > b.x && a.x < b.x + b.width && a.y + a.height > b.y && a.y < b.y + b.height;
 }
 
 function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
@@ -88,15 +83,9 @@ function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(
-	ghost: HTMLElement,
-	items: ItemData[],
-	threshold: SortableListProps['swapThreshold']
-) {
+export function getCollidingItem(ghost: HTMLElement, items: ItemData[]) {
 	const ghostRect = ghost.getBoundingClientRect();
-	const collidingItems = items.filter((targetItem) =>
-		areColliding(ghostRect, targetItem, threshold)
-	);
+	const collidingItems = items.filter((targetItem) => areColliding(ghostRect, targetItem));
 	if (collidingItems.length > 1) {
 		collidingItems.sort((a, b) => {
 			const aIntersectionRect = getIntersectionRect(ghostRect, a);

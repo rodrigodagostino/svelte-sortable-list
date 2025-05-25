@@ -49,7 +49,6 @@
 
 	export let gap: SortableListProps['gap'] = 12;
 	export let direction: SortableListProps['direction'] = 'vertical';
-	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
 	export let transitionDuration: SortableListProps['transitionDuration'] = 240;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
@@ -62,7 +61,6 @@
 	const props = setListProps({
 		gap,
 		direction,
-		swapThreshold,
 		transitionDuration,
 		hasDropMarker,
 		hasLockedAxis,
@@ -75,7 +73,6 @@
 	$: $props = {
 		gap,
 		direction,
-		swapThreshold,
 		transitionDuration,
 		hasDropMarker,
 		hasLockedAxis,
@@ -256,17 +253,11 @@
 		$pointer = { x: clientX, y: clientY };
 		$isBetweenBounds = areColliding(ghostRect, listRect);
 
-		const enforcedSwapThreshold =
-			swapThreshold && swapThreshold < 0.5
-				? 0.5
-				: swapThreshold && swapThreshold > 2
-					? 2
-					: swapThreshold;
 		// Re-set itemsData only during scrolling.
 		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
 		if (scrollingSpeed !== 0) $itemsData = getItemsData(listRef);
 		await tick();
-		const collidingItemData = getCollidingItem(ghostRef, $itemsData, enforcedSwapThreshold);
+		const collidingItemData = getCollidingItem(ghostRef, $itemsData);
 		if (collidingItemData)
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemData.id}"]`
