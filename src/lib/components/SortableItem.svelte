@@ -102,7 +102,7 @@
 	$: styleOverflow =
 		draggedItemId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
-		$listProps.canRemoveItemOnDropOut
+		$listProps.canRemoveOnDropOut
 			? 'hidden'
 			: undefined;
 	$: styleTransform = getStyleTransform(
@@ -121,23 +121,23 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
-		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
+		if (!$listProps.canRemoveOnDropOut) return undefined;
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
 		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
-		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
+		if (!$listProps.canRemoveOnDropOut) return undefined;
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
 		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
 		else
 			return $listProps.direction === 'vertical'
@@ -161,9 +161,7 @@
 				!$isKeyboardDropping) ||
 			$isCancelingPointerDragging ||
 			$isCancelingKeyboardDragging ||
-			(!$isBetweenBounds &&
-				!$listProps.canClearTargetOnDragOut &&
-				$listProps.canRemoveItemOnDropOut)
+			(!$isBetweenBounds && !$listProps.canClearOnDragOut && $listProps.canRemoveOnDropOut)
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -255,7 +253,7 @@
 	in:scaleFade={{ duration: $listProps.transitionDuration }}
 	out:scaleFade={{
 		duration:
-			!$isBetweenBounds && $listProps.canRemoveItemOnDropOut ? 0 : $listProps.transitionDuration,
+			!$isBetweenBounds && $listProps.canRemoveOnDropOut ? 0 : $listProps.transitionDuration,
 	}}
 >
 	<div class="ssl-item__inner">

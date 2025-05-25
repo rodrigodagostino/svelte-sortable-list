@@ -54,8 +54,8 @@
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
-	export let canClearTargetOnDragOut: SortableListProps['canClearTargetOnDragOut'] = false;
-	export let canRemoveItemOnDropOut: SortableListProps['canRemoveItemOnDropOut'] = false;
+	export let canClearOnDragOut: SortableListProps['canClearOnDragOut'] = false;
+	export let canRemoveOnDropOut: SortableListProps['canRemoveOnDropOut'] = false;
 	export let isLocked: SortableListProps['isLocked'] = false;
 	export let isDisabled: SortableListProps['isDisabled'] = false;
 
@@ -67,8 +67,8 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
-		canClearTargetOnDragOut,
-		canRemoveItemOnDropOut,
+		canClearOnDragOut,
+		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
 	});
@@ -80,8 +80,8 @@
 		hasDropMarker,
 		hasLockedAxis,
 		hasBoundaries,
-		canClearTargetOnDragOut,
-		canRemoveItemOnDropOut,
+		canClearOnDragOut,
+		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
 	};
@@ -221,7 +221,7 @@
 			draggedItemId: getId(currItem),
 			draggedItemIndex: getIndex(currItem),
 			isBetweenBounds: $isBetweenBounds,
-			canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
 		currItem.addEventListener('pointermove', handlePointerMove);
@@ -247,7 +247,7 @@
 			targetItemId: $targetItem ? getId($targetItem) : null,
 			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 			isBetweenBounds: $isBetweenBounds,
-			canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
 		const listRect = listRef.getBoundingClientRect();
@@ -271,8 +271,7 @@
 			$targetItem = listRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemData.id}"]`
 			);
-		else if (canClearTargetOnDragOut || (canRemoveItemOnDropOut && !$isBetweenBounds))
-			$targetItem = null;
+		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
 
 		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
@@ -320,7 +319,7 @@
 						draggedItemId: getId($focusedItem),
 						draggedItemIndex: getIndex($focusedItem),
 						isBetweenBounds: $isBetweenBounds,
-						canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
 				} else {
@@ -404,7 +403,7 @@
 						targetItemId: $targetItem ? getId($targetItem) : null,
 						targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 						isBetweenBounds: $isBetweenBounds,
-						canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
 						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
@@ -478,7 +477,7 @@
 				targetItemId: $targetItem ? getId($targetItem) : null,
 				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 				isBetweenBounds: $isBetweenBounds,
-				canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
 				isCanceled: action.includes('cancel'),
 			});
 
@@ -520,12 +519,12 @@
 				targetItemId: $targetItem ? getId($targetItem) : null,
 				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 				isBetweenBounds: $isBetweenBounds,
-				canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
 			});
 
 		if (action === 'pointer-drop') {
 			$isPointerDragging = false;
-			ghostStatus = !$isBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'preset';
+			ghostStatus = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
 			await tick();
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
@@ -571,7 +570,7 @@
 	style:--transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
-	data-can-remove-item-on-drop-out={canRemoveItemOnDropOut}
+	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
 	data-is-disabled={isDisabled}
 	role="listbox"

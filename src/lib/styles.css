@@ -141,15 +141,14 @@
 }
 
 /**
- * canRemoveItemOnDropOut
+ * canRemoveOnDropOut
  */
-.ssl-ghost[data-is-pointer-dropping="true"][data-can-remove-item-on-drop-out="true"][data-is-between-bounds="false"]
+.ssl-ghost[data-is-pointer-dropping="true"][data-can-remove-on-drop-out="true"][data-is-between-bounds="false"]
 	.ssl-ghost__inner {
 	opacity: 0;
 }
 
-.ssl-ghost[data-can-remove-item-on-drop-out="true"][data-is-between-bounds="false"]
-	.ssl-ghost__inner {
+.ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-ghost__inner {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }

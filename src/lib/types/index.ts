@@ -22,8 +22,8 @@ export interface SortableListProps {
 	hasDropMarker?: boolean;
 	hasLockedAxis?: boolean;
 	hasBoundaries?: boolean;
-	canClearTargetOnDragOut?: boolean;
-	canRemoveItemOnDropOut?: boolean;
+	canClearOnDragOut?: boolean;
+	canRemoveOnDropOut?: boolean;
 	isLocked?: boolean;
 	isDisabled?: boolean;
 }
@@ -74,7 +74,7 @@ interface EventDetail {
 	targetItemId: string | null;
 	targetItemIndex: number | null;
 	isBetweenBounds?: boolean;
-	canRemoveItemOnDropOut: boolean;
+	canRemoveOnDropOut: boolean;
 }
 
 export type MountedEventDetail = null;

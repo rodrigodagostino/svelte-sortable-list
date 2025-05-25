@@ -210,7 +210,7 @@
 
 	function getStyleTransition(status: GhostProps['status']) {
 		if (status === 'unset' || status === 'init') return undefined;
-		// The next first condition applies to `canClearTargetOnDragOut`.
+		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
 			return (
 				`transform ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
@@ -244,7 +244,7 @@
 	data-is-pointer-dragging={$isPointerDragging}
 	data-is-pointer-dropping={$isPointerDropping}
 	data-is-between-bounds={$isBetweenBounds}
-	data-can-remove-item-on-drop-out={$listProps.canRemoveItemOnDropOut}
+	data-can-remove-on-drop-out={$listProps.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal
 >
