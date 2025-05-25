@@ -1,10 +1,10 @@
 import type { ItemData, SortableItemProps, SortableListProps } from '$lib/types/index.js';
 
-export function getId(element: HTMLElement): string {
+export function getId(element: HTMLLIElement): string {
 	return String(element.dataset.itemId);
 }
 
-export function getIndex(element: HTMLElement): number {
+export function getIndex(element: HTMLLIElement): number {
 	return Number(element.dataset.itemIndex);
 }
 

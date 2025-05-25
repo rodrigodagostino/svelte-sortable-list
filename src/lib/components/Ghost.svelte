@@ -5,7 +5,6 @@
 		getIsBetweenBounds,
 		getIsPointerDragging,
 		getIsPointerDropping,
-		getIsRemoving,
 		getItemsData,
 		getListProps,
 		getPointer,
@@ -32,7 +31,6 @@
 	const isPointerDragging = getIsPointerDragging();
 	const isPointerDropping = getIsPointerDropping();
 	const isBetweenBounds = getIsBetweenBounds();
-	const isRemoving = getIsRemoving();
 
 	$: if ($draggedItem) {
 		const clone = $draggedItem?.children[0].cloneNode(true);
@@ -234,7 +232,7 @@
 	bind:this={ghostRef}
 	class="ssl-ghost"
 	style:--transition-duration="{$listProps.transitionDuration}ms"
-	style:cursor={$isPointerDragging ? 'grabbing' : !$isRemoving ? 'grab' : 'initial'}
+	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:left={styleLeft}
@@ -246,7 +244,6 @@
 	data-is-pointer-dragging={$isPointerDragging}
 	data-is-pointer-dropping={$isPointerDropping}
 	data-is-between-bounds={$isBetweenBounds}
-	data-is-removing={$isRemoving}
 	data-can-remove-item-on-drop-out={$listProps.canRemoveItemOnDropOut}
 	aria-hidden="true"
 	use:portal

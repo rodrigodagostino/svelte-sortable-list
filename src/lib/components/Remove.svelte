@@ -1,12 +1,30 @@
 <script lang="ts">
-	import { dispatch } from '$lib/utils/index.js';
+	import { getFocusedItem } from '$lib/stores/index.js';
+	import { getIndex } from '$lib/utils/index.js';
+
+	const focusedItem = getFocusedItem();
 
 	function handleClick(event: Event) {
 		const target = event.target as HTMLElement;
-		dispatch(target, 'requestremove', { item: target.closest('.ssl-item') });
+		const item = target.closest<HTMLLIElement>('.ssl-item');
+		const list = item?.closest<HTMLUListElement>('.ssl-list');
+
+		if ($focusedItem && list) {
+			const items = list.querySelectorAll<HTMLLIElement>('.ssl-item');
+			if (items.length > 1) {
+				// Focus the next/previous item (if it exists) before removing.
+				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
+				if (step === 1)
+					($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+			} else {
+				// Focus the list (if there are no items left) before removing.
+				list.focus();
+			}
+		}
 	}
 </script>
 
-<button class="ssl-remove" data-role="remove" on:click={handleClick}>
+<button class="ssl-remove" data-role="remove" on:click={handleClick} on:click>
 	<slot />
 </button>

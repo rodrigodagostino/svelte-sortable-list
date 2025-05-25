@@ -5,11 +5,11 @@
 		getFocusedItem,
 		getIsBetweenBounds,
 		getIsCancelingKeyboardDragging,
+		getIsCancelingPointerDragging,
 		getIsKeyboardDragging,
 		getIsKeyboardDropping,
 		getIsPointerDragging,
 		getIsPointerDropping,
-		getIsRemoving,
 		getItemsData,
 		getListProps,
 		getTargetItem,
@@ -36,9 +36,9 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isKeyboardDragging = getIsKeyboardDragging();
 	const isKeyboardDropping = getIsKeyboardDropping();
+	const isCancelingPointerDragging = getIsCancelingPointerDragging();
 	const isCancelingKeyboardDragging = getIsCancelingKeyboardDragging();
 	const isBetweenBounds = getIsBetweenBounds();
-	const isRemoving = getIsRemoving();
 
 	let rectOrigin: DOMRect | null = null;
 	let hasHandle = false;
@@ -108,35 +108,36 @@
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
+		$isCancelingPointerDragging,
 		$isCancelingKeyboardDragging,
 		$isBetweenBounds
 	);
-	$: styleTransition = $draggedItem
-		? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
-			`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
-			`z-index ${$listProps.transitionDuration}ms`
-		: `none`;
+	$: styleTransition =
+		$draggedItem || $isCancelingPointerDragging || $isCancelingKeyboardDragging
+			? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
+				`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
+				`z-index ${$listProps.transitionDuration}ms`
+			: `none`;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && (!$isBetweenBounds || $isRemoving)) return '0';
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
+			return '0';
 		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!$listProps.canRemoveItemOnDropOut) return undefined;
-		if (draggedItemId === String(id) && (!$isBetweenBounds || $isRemoving)) return '0';
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
+			return '0';
 		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (
-			draggedItemId === String(id) &&
-			(($listProps.canRemoveItemOnDropOut && !$isBetweenBounds) || $isRemoving)
-		)
+		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveItemOnDropOut)
 			return '0';
 		else
 			return $listProps.direction === 'vertical'
@@ -158,11 +159,11 @@
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
+			$isCancelingPointerDragging ||
 			$isCancelingKeyboardDragging ||
 			(!$isBetweenBounds &&
 				!$listProps.canClearTargetOnDragOut &&
-				$listProps.canRemoveItemOnDropOut) ||
-			$isRemoving
+				$listProps.canRemoveItemOnDropOut)
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -241,7 +242,6 @@
 	data-is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$listProps.isLocked || isLocked}
-	data-is-removing={$isRemoving && draggedItemId === String(id)}
 	role="option"
 	tabindex={focusedItemId === String(id) ? 0 : -1}
 	aria-selected={focusedItemId === String(id)}
@@ -253,7 +253,10 @@
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	in:scaleFade={{ duration: $listProps.transitionDuration }}
-	out:scaleFade={{ duration: $isRemoving ? 0 : $listProps.transitionDuration }}
+	out:scaleFade={{
+		duration:
+			!$isBetweenBounds && $listProps.canRemoveItemOnDropOut ? 0 : $listProps.transitionDuration,
+	}}
 >
 	<div class="ssl-item__inner">
 		<slot />

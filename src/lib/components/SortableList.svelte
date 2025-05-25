@@ -1,12 +1,15 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, createEventDispatcher, tick } from 'svelte';
+	import { afterUpdate, beforeUpdate, createEventDispatcher, onMount, tick } from 'svelte';
 	import { browser } from '$app/environment';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import type {
+		DragStartEventDetail,
+		DragEventDetail,
+		DragEndEventDetail,
+		DropEventDetail,
 		GhostProps,
-		RemoveEventDetail,
+		MountedEventDetail,
 		SortableListProps,
-		SortEventDetail,
 	} from '$lib/types/index.js';
 	import {
 		areColliding,
@@ -16,10 +19,10 @@
 		getIndex,
 		getItemsData,
 		getScrollingSpeed,
+		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
 		isScrollable,
-		isFullyVisible,
 		screenReaderText,
 		scrollIntoView,
 		shouldAutoScroll,
@@ -29,11 +32,11 @@
 		setFocusedItem,
 		setIsBetweenBounds,
 		setIsCancelingKeyboardDragging,
+		setIsCancelingPointerDragging,
 		setIsKeyboardDragging,
 		setIsKeyboardDropping,
 		setIsPointerDragging,
 		setIsPointerDropping,
-		setIsRemoving,
 		setItemsData,
 		setListProps,
 		setPointer,
@@ -107,7 +110,7 @@
 
 				const x = direction === 'horizontal' ? scrollingSpeed : 0;
 				const y = direction === 'vertical' ? scrollingSpeed : 0;
-				scrollableAncestor?.scrollBy(x, y);
+				scrollableAncestor.scrollBy(x, y);
 
 				if (scrollingSpeed !== 0) scroll();
 			});
@@ -140,14 +143,21 @@
 	const isPointerDropping = setIsPointerDropping(false);
 	const isKeyboardDragging = setIsKeyboardDragging(false);
 	const isKeyboardDropping = setIsKeyboardDropping(false);
+	const isCancelingPointerDragging = setIsCancelingPointerDragging(false);
 	const isCancelingKeyboardDragging = setIsCancelingKeyboardDragging(false);
 	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRemoving = setIsRemoving(false);
 
 	const dispatch = createEventDispatcher<{
-		sort: SortEventDetail;
-		remove: RemoveEventDetail;
+		mounted: MountedEventDetail;
+		dragstart: DragStartEventDetail;
+		drag: DragEventDetail;
+		drop: DropEventDetail;
+		dragend: DragEndEventDetail;
 	}>();
+
+	onMount(() => {
+		dispatch('mounted');
+	});
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
@@ -205,6 +215,14 @@
 		$draggedItem = currItem;
 		$itemsData = getItemsData(listRef);
 		ghostStatus = 'init';
+		dispatch('dragstart', {
+			deviceType: 'pointer',
+			draggedItem: currItem,
+			draggedItemId: getId(currItem),
+			draggedItemIndex: getIndex(currItem),
+			isBetweenBounds: $isBetweenBounds,
+			canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+		});
 
 		currItem.addEventListener('pointermove', handlePointerMove);
 		currItem.addEventListener(
@@ -219,6 +237,18 @@
 
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (!$isPointerDragging || !ghostRef || !$itemsData || !$draggedItem) return;
+
+		dispatch('drag', {
+			deviceType: 'pointer',
+			draggedItem: $draggedItem,
+			draggedItemId: getId($draggedItem),
+			draggedItemIndex: getIndex($draggedItem),
+			targetItem: $targetItem,
+			targetItemId: $targetItem ? getId($targetItem) : null,
+			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+			isBetweenBounds: $isBetweenBounds,
+			canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+		});
 
 		const listRect = listRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
@@ -248,7 +278,11 @@
 	}
 
 	function handlePointerUp() {
-		handleElementDrop(ghostRef, 'pointer-drop');
+		handlePointerAndKeyboardDrop(ghostRef, 'pointer-drop');
+	}
+
+	function handlePointerCancel() {
+		handlePointerAndKeyboardDrop(ghostRef, 'pointer-cancel');
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
@@ -280,9 +314,17 @@
 					await tick();
 					$draggedItem = $focusedItem;
 					$itemsData = getItemsData(listRef);
+					dispatch('dragstart', {
+						deviceType: 'keyboard',
+						draggedItem: $draggedItem,
+						draggedItemId: getId($focusedItem),
+						draggedItemIndex: getIndex($focusedItem),
+						isBetweenBounds: $isBetweenBounds,
+						canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+					});
 					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem);
 				} else {
-					handleElementDrop($focusedItem, 'keyboard-drop');
+					handlePointerAndKeyboardDrop($focusedItem, 'keyboard-drop');
 				}
 			}
 
@@ -353,6 +395,17 @@
 					}
 
 					await tick();
+					dispatch('drag', {
+						deviceType: 'keyboard',
+						draggedItem: $draggedItem,
+						draggedItemId: getId($draggedItem),
+						draggedItemIndex: getIndex($draggedItem),
+						targetItem: $targetItem,
+						targetItemId: $targetItem ? getId($targetItem) : null,
+						targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+						isBetweenBounds: $isBetweenBounds,
+						canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+					});
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
 						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
 					liveText = screenReaderText.dragged($draggedItem, $targetItem, key);
@@ -407,43 +460,91 @@
 			}
 
 			if (key === 'Escape' && $draggedItem) {
-				handleElementDrop($draggedItem, 'keyboard-cancel');
+				handlePointerAndKeyboardDrop($draggedItem, 'keyboard-cancel');
 			}
 		}
 	}
 
-	async function handleElementDrop(
-		element: HTMLElement,
-		action: 'pointer-drop' | 'keyboard-drop' | 'keyboard-cancel'
+	async function handlePointerAndKeyboardDragEnd(
+		action: 'pointer-drop' | 'pointer-cancel' | 'keyboard-drop' | 'keyboard-cancel'
 	) {
-		if (action === 'pointer-drop' && (!$draggedItem || !$isPointerDragging || $isPointerDropping))
-			return;
+		if ($draggedItem)
+			dispatch('dragend', {
+				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
+				draggedItem: $draggedItem,
+				draggedItemId: getId($draggedItem),
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+				isCanceled: action.includes('cancel'),
+			});
+
+		$draggedItem = null;
+		$targetItem = null;
+		$itemsData = null;
+
+		if (action.includes('pointer')) {
+			ghostStatus = 'unset';
+			$pointer = null;
+			$pointerOrigin = null;
+			$isPointerDropping = false;
+			$isBetweenBounds = true;
+		} else $isKeyboardDropping = false;
+
+		if (action === 'pointer-cancel') $isCancelingPointerDragging = false;
+		if (action === 'keyboard-cancel') $isCancelingKeyboardDragging = false;
+	}
+
+	async function handlePointerAndKeyboardDrop(
+		element: HTMLElement,
+		action: 'pointer-drop' | 'pointer-cancel' | 'keyboard-drop' | 'keyboard-cancel'
+	) {
 		if (
-			(action === 'keyboard-drop' || action === 'keyboard-cancel') &&
-			(!$draggedItem || !$isKeyboardDragging)
+			(action.includes('pointer') &&
+				(!$draggedItem || !$isPointerDragging || $isPointerDropping)) ||
+			(action.includes('keyboard') &&
+				(!$draggedItem || !$isKeyboardDragging || $isKeyboardDropping))
 		)
 			return;
 
-		let hasDispatchedRemove = false;
+		if ($draggedItem)
+			dispatch('drop', {
+				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
+				draggedItem: $draggedItem,
+				draggedItemId: getId($draggedItem),
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveItemOnDropOut: canRemoveItemOnDropOut || false,
+			});
+
 		if (action === 'pointer-drop') {
-			if ($draggedItem && !$isBetweenBounds && canRemoveItemOnDropOut) {
-				dispatchRemove($draggedItem);
-				hasDispatchedRemove = true;
-			}
 			$isPointerDragging = false;
 			ghostStatus = !$isBetweenBounds && canRemoveItemOnDropOut ? 'remove' : 'preset';
 			await tick();
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
-			$isBetweenBounds = true;
 			scrollingSpeed = 0;
-		} else {
+		} else if (action === 'pointer-cancel') {
+			$isPointerDragging = false;
+			$isCancelingPointerDragging = true;
+			if (ghostStatus !== 'remove') ghostStatus = 'set';
+			$isPointerDropping = true;
+			scrollingSpeed = 0;
+		}
+
+		if (action === 'keyboard-drop' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-		}
-		if (action === 'keyboard-drop' && $draggedItem)
 			liveText = screenReaderText.dropped($draggedItem, $targetItem);
-		else if (action === 'keyboard-cancel' && $draggedItem) {
+		} else if (action === 'keyboard-cancel' && $draggedItem) {
+			$isKeyboardDragging = false;
+			$isKeyboardDropping = true;
 			$isCancelingKeyboardDragging = true;
 			await tick();
 			if (scrollableAncestor)
@@ -451,98 +552,15 @@
 			liveText = screenReaderText.canceled($draggedItem);
 		}
 
-		async function handleItemDrop() {
-			if (
-				((action === 'pointer-drop' && !hasDispatchedRemove) || action === 'keyboard-drop') &&
-				$draggedItem &&
-				$targetItem
-			)
-				dispatchSort($draggedItem, $targetItem);
-			await tick();
-			$draggedItem = null;
-			$targetItem = null;
-			$itemsData = null;
-			if (action === 'pointer-drop') {
-				ghostStatus = 'unset';
-				$pointer = null;
-				$pointerOrigin = null;
-				$isPointerDropping = false;
-			} else $isKeyboardDropping = false;
-			if (action === 'keyboard-cancel') $isCancelingKeyboardDragging = false;
-		}
-
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
 			if (propertyName === 'z-index') {
-				handleItemDrop();
+				handlePointerAndKeyboardDragEnd(action);
 				element?.removeEventListener('transitionend', handleTransitionEnd);
 			}
 		}
 
 		if (transitionDuration! > 0) element?.addEventListener('transitionend', handleTransitionEnd);
-		else handleItemDrop();
-	}
-
-	function dispatchSort(draggedItem: HTMLLIElement, targetItem: HTMLLIElement) {
-		const draggedItemId = getId(draggedItem);
-		const draggedItemIndex = getIndex(draggedItem);
-		const targetItemId = getId(targetItem);
-		const targetItemIndex = getIndex(targetItem);
-
-		if (
-			draggedItem !== null &&
-			targetItem !== null &&
-			typeof draggedItemIndex === 'number' &&
-			typeof targetItemIndex === 'number' &&
-			draggedItemIndex !== targetItemIndex
-		) {
-			dispatch('sort', {
-				prevItemId: draggedItemId,
-				prevItemIndex: draggedItemIndex,
-				nextItemId: targetItemId,
-				nextItemIndex: targetItemIndex,
-			});
-		}
-	}
-
-	async function dispatchRemove(item: HTMLLIElement) {
-		const itemId = getId(item);
-		const itemIndex = getIndex(item);
-
-		if ($isPointerDragging) {
-			$isRemoving = true;
-
-			async function handleGhostDrop() {
-				dispatch('remove', { itemId, itemIndex });
-				await tick();
-				$isRemoving = false;
-			}
-
-			function handleTransitionEnd({ propertyName }: TransitionEvent) {
-				if (propertyName === 'z-index') {
-					handleGhostDrop();
-					ghostRef?.removeEventListener('transitionend', handleTransitionEnd);
-				}
-			}
-
-			if (transitionDuration! > 0) ghostRef?.addEventListener('transitionend', handleTransitionEnd);
-			else handleGhostDrop();
-		} else {
-			if ($focusedItem) {
-				const items = listRef.children;
-				if (items.length > 1) {
-					// Focus the next/previous item (if it exists) before removing.
-					const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
-					if (step === 1)
-						($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
-					else
-						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
-				} else {
-					// Focus the list (if there are no items left) before removing.
-					listRef.focus();
-				}
-			}
-			dispatch('remove', { itemId, itemIndex });
-		}
+		else handlePointerAndKeyboardDragEnd(action);
 	}
 </script>
 
@@ -563,9 +581,9 @@
 	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	tabindex="0"
 	on:pointerdown={handlePointerDown}
+	on:pointercancel={handlePointerCancel}
 	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handleElementDrop(event.detail.item, 'keyboard-cancel')}
-	on:requestremove={(event) => dispatchRemove(event.detail.item)}
+	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'keyboard-cancel')}
 >
 	<slot>
 		<p>

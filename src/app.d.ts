@@ -12,7 +12,6 @@ declare global {
 	declare namespace svelteHTML {
 		interface HTMLAttributes {
 			'on:itemfocusout'?: (event: CustomEvent<{ item: HTMLElement }>) => void;
-			'on:requestremove'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 		}
 	}
 }
