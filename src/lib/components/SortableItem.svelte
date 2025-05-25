@@ -4,10 +4,10 @@
 		getDraggedItem,
 		getFocusedItem,
 		getIsBetweenBounds,
-		getIsCancelingKeyboardDragging,
-		getIsCancelingPointerDragging,
+		getIsKeyboardCanceling,
 		getIsKeyboardDragging,
 		getIsKeyboardDropping,
+		getIsPointerCanceling,
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getItemsData,
@@ -36,8 +36,8 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isKeyboardDragging = getIsKeyboardDragging();
 	const isKeyboardDropping = getIsKeyboardDropping();
-	const isCancelingPointerDragging = getIsCancelingPointerDragging();
-	const isCancelingKeyboardDragging = getIsCancelingKeyboardDragging();
+	const isPointerCanceling = getIsPointerCanceling();
+	const isKeyboardCanceling = getIsKeyboardCanceling();
 	const isBetweenBounds = getIsBetweenBounds();
 
 	let rectOrigin: DOMRect | null = null;
@@ -108,12 +108,12 @@
 	$: styleTransform = getStyleTransform(
 		$draggedItem,
 		$targetItem,
-		$isCancelingPointerDragging,
-		$isCancelingKeyboardDragging,
+		$isPointerCanceling,
+		$isKeyboardCanceling,
 		$isBetweenBounds
 	);
 	$: styleTransition =
-		$draggedItem || $isCancelingPointerDragging || $isCancelingKeyboardDragging
+		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
 			? `width ${$listProps.transitionDuration}ms, height ${$listProps.transitionDuration}ms,` +
 				`margin ${$listProps.transitionDuration}ms, transform ${$listProps.transitionDuration}ms,` +
 				`z-index ${$listProps.transitionDuration}ms`
@@ -159,8 +159,8 @@
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
-			$isCancelingPointerDragging ||
-			$isCancelingKeyboardDragging ||
+			$isPointerCanceling ||
+			$isKeyboardCanceling ||
 			(!$isBetweenBounds && !$listProps.canClearOnDragOut && $listProps.canRemoveOnDropOut)
 		)
 			return 'translate3d(0, 0, 0)';

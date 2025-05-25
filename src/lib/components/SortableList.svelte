@@ -31,10 +31,10 @@
 		setDraggedItem,
 		setFocusedItem,
 		setIsBetweenBounds,
-		setIsCancelingKeyboardDragging,
-		setIsCancelingPointerDragging,
+		setIsKeyboardCanceling,
 		setIsKeyboardDragging,
 		setIsKeyboardDropping,
+		setIsPointerCanceling,
 		setIsPointerDragging,
 		setIsPointerDropping,
 		setItemsData,
@@ -143,8 +143,8 @@
 	const isPointerDropping = setIsPointerDropping(false);
 	const isKeyboardDragging = setIsKeyboardDragging(false);
 	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isCancelingPointerDragging = setIsCancelingPointerDragging(false);
-	const isCancelingKeyboardDragging = setIsCancelingKeyboardDragging(false);
+	const isPointerCanceling = setIsPointerCanceling(false);
+	const isKeyboardCanceling = setIsKeyboardCanceling(false);
 	const isBetweenBounds = setIsBetweenBounds(true);
 
 	const dispatch = createEventDispatcher<{
@@ -165,7 +165,7 @@
 			$isPointerDropping ||
 			$isKeyboardDragging ||
 			$isKeyboardDropping ||
-			$isCancelingKeyboardDragging ||
+			$isKeyboardCanceling ||
 			$focusedItem
 		)
 			return;
@@ -493,8 +493,8 @@
 			$isBetweenBounds = true;
 		} else $isKeyboardDropping = false;
 
-		if (action === 'pointer-cancel') $isCancelingPointerDragging = false;
-		if (action === 'keyboard-cancel') $isCancelingKeyboardDragging = false;
+		if (action === 'pointer-cancel') $isPointerCanceling = false;
+		if (action === 'keyboard-cancel') $isKeyboardCanceling = false;
 	}
 
 	async function handlePointerAndKeyboardDrop(
@@ -531,7 +531,7 @@
 			scrollingSpeed = 0;
 		} else if (action === 'pointer-cancel') {
 			$isPointerDragging = false;
-			$isCancelingPointerDragging = true;
+			$isPointerCanceling = true;
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
 			$isPointerDropping = true;
 			scrollingSpeed = 0;
@@ -544,7 +544,7 @@
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			$isCancelingKeyboardDragging = true;
+			$isKeyboardCanceling = true;
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
