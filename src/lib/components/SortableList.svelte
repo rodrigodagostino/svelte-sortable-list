@@ -50,7 +50,7 @@
 	export let gap: SortableListProps['gap'] = 12;
 	export let direction: SortableListProps['direction'] = 'vertical';
 	export let swapThreshold: SortableListProps['swapThreshold'] = 1;
-	export let transitionDuration: SortableListProps['transitionDuration'] = 320;
+	export let transitionDuration: SortableListProps['transitionDuration'] = 240;
 	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
 	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
 	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
