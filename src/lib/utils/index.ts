@@ -302,15 +302,12 @@ export function dispatch(target: HTMLElement, name: string, detail: object) {
 }
 
 export function sortItems<T>(items: T[], from: number, to: number) {
-	const clone = structuredClone(items);
-	clone.splice(to < 0 ? clone.length + to : to, 0, clone.splice(from, 1)[0]);
-	return clone;
+	if (from === to) return items;
+	return items.toSpliced(from, 1).toSpliced(to < 0 ? items.length + to : to, 0, items[from]);
 }
 
 export function removeItem<T>(items: T[], index: SortableItemProps['index']) {
-	const clone = structuredClone(items);
-	clone.splice(index, 1);
-	return clone;
+	return items.toSpliced(index, 1);
 }
 
 export const screenReaderText = {
