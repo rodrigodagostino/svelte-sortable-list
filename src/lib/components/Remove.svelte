@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte';
 	import { getFocusedItem } from '$lib/stores/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
@@ -23,8 +24,12 @@
 			}
 		}
 	}
+
+	const classes = ['ssl-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 </script>
 
-<button class="ssl-remove" data-role="remove" on:click={handleClick} on:click>
-	<slot />
+<button data-role="remove" on:click={handleClick} on:click {...$$restProps} class={classes}>
+	<slot>
+		<Icon name="remove" />
+	</slot>
 </button>
