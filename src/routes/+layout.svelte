@@ -8,7 +8,7 @@
 	let isControlsExpanded = false;
 </script>
 
-<div id="app" class="app">
+<div id="app" class="app" data-page-pathname={$page.url.pathname.replace('/', '')}>
 	<button
 		class="app-nav-toggle button"
 		aria-controls="app-nav"
@@ -313,21 +313,6 @@
 					</tr>
 					<tr>
 						<td></td>
-						<td><label for="swap-threshold">swapThreshold</label></td>
-						<td>
-							<input
-								id="swap-threshold"
-								type="number"
-								min="0.5"
-								max="2"
-								step="0.1"
-								bind:value={$props.swapThreshold}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
 						<td><label for="transition-duration">transitionDuration</label></td>
 						<td>
 							<input
@@ -365,24 +350,24 @@
 					</tr>
 					<tr>
 						<td></td>
-						<td><label for="can-clear-target-on-drag-out">canClearTargetOnDragOut</label></td>
+						<td><label for="can-clear-on-drag-out">canClearOnDragOut</label></td>
 						<td>
 							<input
-								id="can-clear-target-on-drag-out"
+								id="can-clear-on-drag-out"
 								type="checkbox"
-								bind:checked={$props.canClearTargetOnDragOut}
+								bind:checked={$props.canClearOnDragOut}
 							/>
 						</td>
 						<td></td>
 					</tr>
 					<tr>
 						<td></td>
-						<td><label for="can-remove-item-on-drop-out">canRemoveItemOnDropOut</label></td>
+						<td><label for="can-remove-on-drop-out">canRemoveOnDropOut</label></td>
 						<td>
 							<input
-								id="can-remove-item-on-drop-out"
+								id="can-remove-on-drop-out"
 								type="checkbox"
-								bind:checked={$props.canRemoveItemOnDropOut}
+								bind:checked={$props.canRemoveOnDropOut}
 							/>
 						</td>
 						<td></td>

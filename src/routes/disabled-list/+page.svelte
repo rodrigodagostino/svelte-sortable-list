@@ -5,14 +5,14 @@
 		SortableItem,
 		removeItem,
 		sortItems,
-		type RemoveEventDetail,
-		type SortEventDetail,
+		type DropEventDetail,
+		type DragEndEventDetail,
 	} from '$lib/index.js';
-	import { defaultItems, defaultProps } from '../fixtures.js';
+	import { defaultProps, disabledItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...defaultItems];
+	let items = [...disabledItems];
 
 	onMount(() => {
 		$props = {
@@ -21,14 +21,15 @@
 		};
 	});
 
-	function handleSort(event: CustomEvent<SortEventDetail>) {
-		const { prevItemIndex, nextItemIndex } = event.detail;
-		items = sortItems(items, prevItemIndex, nextItemIndex);
+	function handleDrop(event: CustomEvent<DropEventDetail>) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
+		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleRemove(event: CustomEvent<RemoveEventDetail>) {
-		const { itemIndex } = event.detail;
-		items = removeItem(items, itemIndex);
+	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
+			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
 </script>
 
@@ -36,7 +37,7 @@
 	<title>Disabled list | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:sort={handleSort} on:remove={handleRemove}>
+<SortableList {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
 			<div class="ssl-item__content">

@@ -3,18 +3,15 @@ import type { SortableItemData, SortableListProps } from '$lib/types/index.js';
 export const defaultProps: SortableListProps = {
 	gap: 12,
 	direction: 'vertical',
-	swapThreshold: 1,
-	transitionDuration: 320,
+	transitionDuration: 240,
 	hasDropMarker: false,
 	hasLockedAxis: false,
 	hasBoundaries: false,
-	canClearTargetOnDragOut: false,
-	canRemoveItemOnDropOut: false,
+	canClearOnDragOut: false,
+	canRemoveOnDropOut: false,
 	isLocked: false,
 	isDisabled: false,
 };
-
-Object.freeze(defaultProps);
 
 export const defaultItems: SortableItemData[] = [
 	{
@@ -39,8 +36,6 @@ export const defaultItems: SortableItemData[] = [
 	},
 ];
 
-Object.freeze(defaultItems);
-
 export const varyingItems: SortableItemData[] = [
 	{
 		id: 'list-item-1',
@@ -64,67 +59,61 @@ export const varyingItems: SortableItemData[] = [
 	},
 ];
 
-Object.freeze(varyingItems);
-
 export const lockedItems: SortableItemData[] = [
 	{
-		id: 'list-item-1',
-		text: 'List item 1',
-		isLocked: false,
-	},
-	{
-		id: 'list-item-2',
-		text: 'List item 2',
+		id: 'locked-item-1',
+		text: 'Locked item 1',
 		isLocked: true,
 	},
 	{
-		id: 'list-item-3',
-		text: 'List item 3',
+		id: 'locked-item-2',
+		text: 'Locked item 2',
 		isLocked: true,
 	},
 	{
-		id: 'list-item-4',
-		text: 'List item 4',
-		isLocked: false,
+		id: 'locked-item-3',
+		text: 'Locked item 3',
+		isLocked: true,
 	},
 	{
-		id: 'list-item-5',
-		text: 'List item 5',
-		isLocked: false,
+		id: 'locked-item-4',
+		text: 'Locked item 4',
+		isLocked: true,
+	},
+	{
+		id: 'locked-item-5',
+		text: 'Locked item 5',
+		isLocked: true,
 	},
 ];
-
-Object.freeze(lockedItems);
 
 export const disabledItems: SortableItemData[] = [
 	{
-		id: 'list-item-1',
-		text: 'List item 1',
-		isDisabled: false,
-	},
-	{
-		id: 'list-item-2',
-		text: 'List item 2',
+		id: 'disabled-item-1',
+		text: 'Disabled item 1',
 		isDisabled: true,
 	},
 	{
-		id: 'list-item-3',
-		text: 'List item 3',
+		id: 'disabled-item-2',
+		text: 'Disabled item 2',
 		isDisabled: true,
 	},
 	{
-		id: 'list-item-4',
-		text: 'List item 4',
-		isDisabled: false,
+		id: 'disabled-item-3',
+		text: 'Disabled item 3',
+		isDisabled: true,
 	},
 	{
-		id: 'list-item-5',
-		text: 'List item 5',
-		isDisabled: false,
+		id: 'disabled-item-4',
+		text: 'Disabled item 4',
+		isDisabled: true,
+	},
+	{
+		id: 'disabled-item-5',
+		text: 'Disabled item 5',
+		isDisabled: true,
 	},
 ];
-
-Object.freeze(disabledItems);
 
 export const interactiveItems: SortableItemData[] = [
 	{
@@ -158,5 +147,3 @@ export const interactiveItems: SortableItemData[] = [
 		type: 'a',
 	},
 ];
-
-Object.freeze(interactiveItems);
