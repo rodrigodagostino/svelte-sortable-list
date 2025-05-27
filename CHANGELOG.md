@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] (2025-06-01)
+
+### BREAKING
+
+- Replace the state CSS classes with data attributes.
+- Replace the current `<SortableList>` events (`sort` and `remove`) with more flexible ones:
+  - `dragstart`
+  - `drag`
+  - `drop`
+  - `dragend`
+- Unify the `<IconHandle>` and `<IconRemove>` components under the new `<Icon>` component.
+- Add icons as fallback content directly inside the `<Handle>` and `<Remove>` components.
+- Simplify `canClearTargetOnDragOut` and `canRemoveItemOnDropOut` props name to `canClearOnDragOut` and `canRemoveOnDropOut` in the `<SortableList>` component.
+- Remove `swapThreshold` prop from the `<SortableList>` component.
+
+### Changed
+
+- Reduce `transitionDuration` default value to `240`.
+- Simplify `isCancelingPointerDragging` and `isCancelingKeyboardDragging` props name to `isPointerCanceling` and `isKeyboardCanceling`.
+- Split stores, types and utils into multiple files.
+
+### Fixed
+
+- Replace `structuredClone()` with `toSpliced()` in `sortItems()` and `removeItem()` to avoid an [error in Svelte 5](https://github.com/rodrigodagostino/svelte-sortable-list/issues/16).
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Avoid code repetition for the links and controls in the demo pages layout.
+- Correct the `max-height` and add mask to the navigation menu in the demo pages layout.
+- Replace SCSS with CSS.
+- Update the README to reflect the latest changes.
+
 ## [0.11.3] (2025-05-24)
 
 ### Changed
@@ -716,7 +749,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.10.16...v0.11.0
