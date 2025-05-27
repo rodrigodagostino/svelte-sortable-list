@@ -2,10 +2,58 @@
 	import { version } from '$app/environment';
 	import { page } from '$app/stores';
 	import { props } from './stores.js';
+	import { toKebabCase } from './utils.js';
 	import './styles.css';
 
 	let isMenuExpanded = false;
 	let isControlsExpanded = false;
+
+	const links = [
+		{ text: 'Basic', path: '/' },
+		{ text: 'Unstyled', path: '/unstyled' },
+		{ text: 'No animations', path: '/no-animations' },
+		{ text: 'Direction horizontal', path: '/direction-horizontal' },
+		{ text: 'Varying heights', path: '/varying-heights' },
+		{ text: 'With handle', path: '/with-handle' },
+		{ text: 'With drop marker', path: '/with-drop-marker' },
+		{ text: 'With boundaries', path: '/with-boundaries' },
+		{ text: 'With locked axis', path: '/with-locked-axis' },
+		{ text: 'Dynamic items', path: '/dynamic-items' },
+		{ text: 'Interactive items', path: '/interactive-items' },
+		{ text: 'Auto scrolling', path: '/auto-scrolling' },
+		{ text: 'Auto scrolling container', path: '/auto-scrolling-container' },
+		{ text: 'Auto scrolling dialog', path: '/auto-scrolling-dialog' },
+		{ text: 'Locked list', path: '/locked-list' },
+		{ text: 'Locked items', path: '/locked-items' },
+		{ text: 'Disabled list', path: '/disabled-list' },
+		{ text: 'Disabled items', path: '/disabled-items' },
+		{ text: 'Inside dialog', path: '/inside-dialog' },
+		{ text: 'Inside custom dialog', path: '/inside-custom-dialog' },
+		{ text: 'Clear target on drag out', path: '/clear-target-on-drag-out' },
+		{ text: 'Remove item on drop out', path: '/remove-item-on-drop-out' },
+	];
+
+	$: controls = Object.keys($props).map((key) => ({
+		label: key,
+		type:
+			key === 'gap' || key === 'transitionDuration'
+				? 'number'
+				: key === 'direction'
+					? 'select'
+					: 'checkbox',
+		id: toKebabCase(key),
+		...(key === 'gap' || key === 'transitionDuration' ? { min: 0 } : {}),
+		...(key === 'direction' ? { options: ['vertical', 'horizontal'] } : {}),
+		value: $props[key as never],
+	}));
+
+	function handleFieldChange(event: Event) {
+		const { type, name, value, checked } = event.target as HTMLInputElement;
+		$props = {
+			...$props,
+			[name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+		};
+	}
 </script>
 
 <div id="app" class="app" data-page-pathname={$page.url.pathname.replace('/', '')}>
@@ -73,161 +121,15 @@
 				<span>v{version}</span>
 			</a>
 			<hr class="app-nav__separator" />
-			<a
-				class="app-nav__link"
-				href="/"
-				aria-current={$page.url.pathname === '/' ? 'page' : undefined}
-			>
-				Basic
-			</a>
-			<a
-				class="app-nav__link"
-				href="/unstyled"
-				aria-current={$page.url.pathname === '/unstyled' ? 'page' : undefined}
-				data-sveltekit-reload
-			>
-				Unstyled
-			</a>
-			<a
-				class="app-nav__link"
-				href="/no-animations"
-				aria-current={$page.url.pathname === '/no-animations' ? 'page' : undefined}
-			>
-				No animations
-			</a>
-			<a
-				class="app-nav__link"
-				href="/direction-horizontal"
-				aria-current={$page.url.pathname === '/direction-horizontal' ? 'page' : undefined}
-			>
-				Direction horizontal
-			</a>
-			<a
-				class="app-nav__link"
-				href="/varying-heights"
-				aria-current={$page.url.pathname === '/varying-heights' ? 'page' : undefined}
-			>
-				Varying heights
-			</a>
-			<a
-				class="app-nav__link"
-				href="/with-handle"
-				aria-current={$page.url.pathname === '/with-handle' ? 'page' : undefined}
-			>
-				With handle
-			</a>
-			<a
-				class="app-nav__link"
-				href="/with-drop-marker"
-				aria-current={$page.url.pathname === '/with-drop-marker' ? 'page' : undefined}
-			>
-				With drop marker
-			</a>
-			<a
-				class="app-nav__link"
-				href="/with-boundaries"
-				aria-current={$page.url.pathname === '/with-boundaries' ? 'page' : undefined}
-			>
-				With boundaries
-			</a>
-			<a
-				class="app-nav__link"
-				href="/with-locked-axis"
-				aria-current={$page.url.pathname === '/with-locked-axis' ? 'page' : undefined}
-			>
-				With locked axis
-			</a>
-			<a
-				class="app-nav__link"
-				href="/dynamic-items"
-				aria-current={$page.url.pathname === '/dynamic-items' ? 'page' : undefined}
-			>
-				Dynamic items
-			</a>
-			<a
-				class="app-nav__link"
-				href="/interactive-items"
-				aria-current={$page.url.pathname === '/interactive-items' ? 'page' : undefined}
-			>
-				Interactive items
-			</a>
-			<a
-				class="app-nav__link"
-				href="/auto-scrolling"
-				aria-current={$page.url.pathname === '/auto-scrolling' ? 'page' : undefined}
-			>
-				Auto scrolling
-			</a>
-			<a
-				class="app-nav__link"
-				href="/auto-scrolling-container"
-				aria-current={$page.url.pathname === '/auto-scrolling-container' ? 'page' : undefined}
-			>
-				Auto scrolling container
-			</a>
-			<a
-				class="app-nav__link"
-				href="/auto-scrolling-dialog"
-				aria-current={$page.url.pathname === '/auto-scrolling-dialog' ? 'page' : undefined}
-			>
-				Auto scrolling dialog
-			</a>
-			<a
-				class="app-nav__link"
-				href="/locked-list"
-				aria-current={$page.url.pathname === '/locked-list' ? 'page' : undefined}
-			>
-				Locked list
-			</a>
-			<a
-				class="app-nav__link"
-				href="/locked-items"
-				aria-current={$page.url.pathname === '/locked-items' ? 'page' : undefined}
-			>
-				Locked items
-			</a>
-			<a
-				class="app-nav__link"
-				href="/disabled-list"
-				aria-current={$page.url.pathname === '/disabled-list' ? 'page' : undefined}
-			>
-				Disabled list
-			</a>
-			<a
-				class="app-nav__link"
-				href="/disabled-items"
-				aria-current={$page.url.pathname === '/disabled-items' ? 'page' : undefined}
-			>
-				Disabled items
-			</a>
-			<a
-				class="app-nav__link"
-				href="/inside-dialog"
-				aria-current={$page.url.pathname === '/inside-dialog' ? 'page' : undefined}
-			>
-				Inside dialog
-			</a>
-			<a
-				class="app-nav__link"
-				href="/inside-custom-dialog"
-				aria-current={$page.url.pathname === '/inside-custom-dialog' ? 'page' : undefined}
-			>
-				Inside custom dialog
-			</a>
-			<a
-				class="app-nav__link"
-				href="/clear-target-on-drag-out"
-				aria-current={$page.url.pathname === '/clear-target-on-drag-out' ? 'page' : undefined}
-			>
-				Clear target on drag out
-			</a>
-			<a
-				class="app-nav__link"
-				href="/remove-item-on-drop-out"
-				aria-current={$page.url.pathname === '/remove-item-on-drop-out' ? 'page' : undefined}
-			>
-				Remove item on drop out
-			</a>
+			{#each links as { text, path }}
+				<a
+					class="app-nav__link"
+					href={path}
+					aria-current={$page.url.pathname === path ? 'page' : undefined}
+				>
+					{text}
+				</a>
+			{/each}
 		</div>
 	</nav>
 	<button
@@ -294,100 +196,35 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td></td>
-						<td><label for="gap">gap</label></td>
-						<td><input id="gap" type="number" min="0" bind:value={$props.gap} /></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="direction">direction</label></td>
-						<td>
-							<select id="direction" bind:value={$props.direction}>
-								<option value="vertical">vertical</option>
-								<option value="horizontal">horizontal</option>
-							</select>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="transition-duration">transitionDuration</label></td>
-						<td>
-							<input
-								id="transition-duration"
-								type="number"
-								min="0"
-								bind:value={$props.transitionDuration}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-drop-marker">hasDropMarker</label></td>
-						<td>
-							<input id="has-drop-marker" type="checkbox" bind:checked={$props.hasDropMarker} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-locked-axis">hasLockedAxis</label></td>
-						<td>
-							<input id="has-locked-axis" type="checkbox" bind:checked={$props.hasLockedAxis} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="has-boundaries">hasBoundaries</label></td>
-						<td>
-							<input id="has-boundaries" type="checkbox" bind:checked={$props.hasBoundaries} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="can-clear-on-drag-out">canClearOnDragOut</label></td>
-						<td>
-							<input
-								id="can-clear-on-drag-out"
-								type="checkbox"
-								bind:checked={$props.canClearOnDragOut}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="can-remove-on-drop-out">canRemoveOnDropOut</label></td>
-						<td>
-							<input
-								id="can-remove-on-drop-out"
-								type="checkbox"
-								bind:checked={$props.canRemoveOnDropOut}
-							/>
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="is-locked">isLocked</label></td>
-						<td>
-							<input id="is-locked" type="checkbox" bind:checked={$props.isLocked} />
-						</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td><label for="is-disabled">isDisabled</label></td>
-						<td>
-							<input id="is-disabled" type="checkbox" bind:checked={$props.isDisabled} />
-						</td>
-						<td></td>
-					</tr>
+					{#each controls as { id, type, label, min, options, value }}
+						<tr>
+							<td></td>
+							<td><label for={id}>{label}</label></td>
+							<td>
+								{#if type === 'number'}
+									<input
+										{id}
+										type="number"
+										name={label}
+										{min}
+										{value}
+										on:input={handleFieldChange}
+									/>
+								{:else if type === 'select'}
+									<select id="direction" name={label} {value} on:change={handleFieldChange}>
+										{#if options}
+											{#each options as option}
+												<option value={option}>{option}</option>
+											{/each}
+										{/if}
+									</select>
+								{:else if type === 'checkbox'}
+									<input {id} type="checkbox" name={label} {value} on:change={handleFieldChange} />
+								{/if}
+							</td>
+							<td></td>
+						</tr>
+					{/each}
 				</tbody>
 			</table>
 		</div>

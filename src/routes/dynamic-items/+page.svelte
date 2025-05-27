@@ -11,6 +11,7 @@
 	} from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
+	import { toKebabCase } from '../utils.js';
 	import '$lib/styles.css';
 
 	let items = [...defaultItems];
@@ -37,13 +38,6 @@
 		const itemIndex = Number(item?.dataset.itemIndex);
 		if (!item || itemIndex < 0) return;
 		items = removeItem(items, itemIndex);
-	}
-
-	function toKebabCase(str: string) {
-		return str
-			.replace(/([a-z])([A-Z])/g, '$1-$2')
-			.replace(/[\s_]+/g, '-')
-			.toLowerCase();
 	}
 </script>
 
