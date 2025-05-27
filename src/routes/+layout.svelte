@@ -258,19 +258,28 @@
 	}
 
 	.app-nav {
+		display: flex;
+		flex-direction: column;
 		max-height: calc(100vh - 1.5rem);
 		max-height: calc(100dvh - 1.5rem);
-		padding: 3rem 2rem;
 		background-color: var(--gray-500);
 		box-shadow: var(--box-shadow-4);
 		position: fixed;
 		top: 0.75rem;
 		right: 0.75rem;
-		overflow: auto;
 		z-index: 20;
 
 		.container {
 			gap: 0.75rem;
+			padding: 3rem 2rem;
+			overflow: auto;
+			mask-image: linear-gradient(
+				to bottom,
+				transparent 0,
+				black 3rem,
+				black calc(100% - 3rem),
+				transparent 100%
+			);
 		}
 
 		&[aria-hidden='true'] {
@@ -412,6 +421,8 @@
 		}
 
 		.app-nav {
+			max-height: calc(100vh - 2.5rem);
+			max-height: calc(100dvh - 2.5rem);
 			top: 1.25rem;
 			right: 1.25rem;
 		}
