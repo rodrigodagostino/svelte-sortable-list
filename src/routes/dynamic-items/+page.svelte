@@ -67,7 +67,7 @@
 	<button type="submit" class="button">Add item</button>
 </form>
 
-<style lang="scss">
+<style>
 	.button:has(+ form) {
 		margin-top: 2rem;
 	}

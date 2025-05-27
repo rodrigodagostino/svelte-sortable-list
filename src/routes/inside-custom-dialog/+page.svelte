@@ -81,7 +81,7 @@
 	<button class="dialog__backdrop" on:click={handleCloseDialog}>Close dialog</button>
 </div>
 
-<style lang="scss">
+<style>
 	:global(html:has(.dialog.is-open)) {
 		overflow: hidden;
 	}
@@ -102,55 +102,55 @@
 			transition: opacity 240ms;
 		}
 
-		&__window {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			width: 40rem;
-			max-width: 90vw;
-			max-width: 90dvw;
-			max-height: 80vh;
-			max-height: 80dvh;
-			padding: 5rem 4rem;
-			background-color: var(--gray-100);
-			box-shadow: var(--box-shadow-4);
-			overflow: auto;
-			z-index: 1;
-		}
-
-		&__close {
-			position: absolute;
-			top: 1rem;
-			right: 1rem;
-			font-size: 0.875rem;
-		}
-
-		&__backdrop {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			border: none;
-			background-color: rgba(0, 0, 0, 0.32);
-			z-index: 0;
-		}
-
 		&.direction-vertical {
-			.dialog__window {
+			& .dialog__window {
 				flex-direction: column;
 				align-items: center;
 			}
 		}
 
 		&.direction-horizontal {
-			.dialog__window {
+			& .dialog__window {
 				width: max-content;
 			}
 		}
+	}
+
+	.dialog__window {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 40rem;
+		max-width: 90vw;
+		max-width: 90dvw;
+		max-height: 80vh;
+		max-height: 80dvh;
+		padding: 5rem 4rem;
+		background-color: var(--gray-100);
+		box-shadow: var(--box-shadow-4);
+		overflow: auto;
+		z-index: 1;
+	}
+
+	.dialog__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		font-size: 0.875rem;
+	}
+
+	.dialog__backdrop {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border: none;
+		background-color: rgba(0, 0, 0, 0.32);
+		z-index: 0;
 	}
 </style>

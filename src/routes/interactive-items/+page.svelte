@@ -78,7 +78,7 @@
 	{/each}
 </SortableList>
 
-<style lang="scss">
+<style>
 	label:not(:has(input[type='checkbox'])) {
 		display: flex;
 		flex-direction: column;

@@ -49,7 +49,7 @@
 
 <button class="button" on:click={() => (items = varyingItems)}>Reset</button>
 
-<style lang="scss">
+<style>
 	.button {
 		margin-top: 2rem;
 	}

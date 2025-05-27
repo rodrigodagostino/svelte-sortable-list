@@ -87,7 +87,7 @@
 	</div>
 </dialog>
 
-<style lang="scss">
+<style>
 	:global(html:has(dialog[open])) {
 		overflow: hidden;
 	}
@@ -117,38 +117,38 @@
 			animation: fade-in 240ms forwards;
 		}
 
-		&__inner {
-			display: flex;
-			max-width: 100%;
-			max-height: 80vh;
-			max-height: 80dvh;
-			padding: 5rem 4rem;
-			overflow: auto;
-		}
-
-		&__close {
-			position: absolute;
-			top: 1rem;
-			right: 1rem;
-			font-size: 0.875rem;
-		}
-
 		&::backdrop {
 			background-color: rgba(0, 0, 0, 0.32);
 		}
 
 		&.direction-vertical {
-			.dialog__inner {
+			& .dialog__inner {
 				flex-direction: column;
 				align-items: center;
 			}
 		}
 
 		&.direction-horizontal {
-			.dialog__inner {
+			& .dialog__inner {
 				width: max-content;
 			}
 		}
+	}
+
+	.dialog__inner {
+		display: flex;
+		max-width: 100%;
+		max-height: 80vh;
+		max-height: 80dvh;
+		padding: 5rem 4rem;
+		overflow: auto;
+	}
+
+	.dialog__close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		font-size: 0.875rem;
 	}
 
 	@keyframes fade-in {

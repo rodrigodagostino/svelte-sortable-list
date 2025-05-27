@@ -101,7 +101,7 @@
 	<nav id="app-nav" class="app-nav" aria-hidden={!isMenuExpanded} inert={!isMenuExpanded}>
 		<div class="container">
 			<a
-				class="app-nav__link app-nav__link--github"
+				class="link link--github"
 				href="https://github.com/rodrigodagostino/svelte-sortable-list"
 				target="_blank"
 			>
@@ -120,13 +120,9 @@
 				</svg>
 				<span>v{version}</span>
 			</a>
-			<hr class="app-nav__separator" />
+			<hr class="separator" />
 			{#each links as { text, path }}
-				<a
-					class="app-nav__link"
-					href={path}
-					aria-current={$page.url.pathname === path ? 'page' : undefined}
-				>
+				<a class="link" href={path} aria-current={$page.url.pathname === path ? 'page' : undefined}>
 					{text}
 				</a>
 			{/each}
@@ -236,7 +232,7 @@
 	</main>
 </div>
 
-<style lang="scss">
+<style>
 	.app {
 		width: 100%;
 		min-height: 100vh;
@@ -255,6 +251,11 @@
 		top: 1rem;
 		right: 1rem;
 		z-index: 21;
+
+		@media (min-width: 48em) {
+			top: 1.5rem;
+			right: 1.5rem;
+		}
 	}
 
 	.app-nav {
@@ -269,7 +270,14 @@
 		right: 0.75rem;
 		z-index: 20;
 
-		.container {
+		@media (min-width: 48em) {
+			max-height: calc(100vh - 2.5rem);
+			max-height: calc(100dvh - 2.5rem);
+			top: 1.25rem;
+			right: 1.25rem;
+		}
+
+		& .container {
 			gap: 0.75rem;
 			padding: 3rem 2rem;
 			overflow: auto;
@@ -289,28 +297,28 @@
 		&[aria-hidden='false'] {
 			transform: translate3d(0, 0, 0);
 		}
+	}
 
-		&__link {
-			color: var(--white);
-			text-decoration: none;
+	.link {
+		color: var(--white);
+		text-decoration: none;
 
-			&[aria-current='page'] {
-				font-weight: 700;
-			}
-
-			&--github {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				font-size: 0.875rem;
-			}
+		&[aria-current='page'] {
+			font-weight: 700;
 		}
+	}
 
-		&__separator {
-			width: 100%;
-			border-style: solid;
-			color: var(--gray-400);
-		}
+	.link--github {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.875rem;
+	}
+
+	.separator {
+		width: 100%;
+		border-style: solid;
+		color: var(--gray-400);
 	}
 
 	.app-controls-toggle {
@@ -318,6 +326,11 @@
 		bottom: 1rem;
 		right: 1rem;
 		z-index: 11;
+
+		@media (min-width: 48em) {
+			bottom: 1.5rem;
+			right: 1.5rem;
+		}
 	}
 
 	.app-controls {
@@ -332,6 +345,11 @@
 		bottom: 0.75rem;
 		z-index: 10;
 
+		@media (min-width: 48em) {
+			bottom: 1.25rem;
+			right: 1.25rem;
+		}
+
 		&[aria-hidden='true'] {
 			transform: translate3d(0, 110%, 0);
 		}
@@ -340,26 +358,30 @@
 			transform: translate3d(0, 0, 0);
 		}
 
-		.container {
+		& .container {
 			overflow: auto;
 		}
 
-		table {
+		& table {
 			border-collapse: collapse;
 			max-width: 100%;
 			margin-block: 0.5rem;
+
+			@media (min-width: 26em) {
+				table-layout: auto;
+			}
 		}
 
-		tr:nth-child(odd) td {
+		& tr:nth-child(odd) td {
 			background-color: var(--gray-100);
 		}
 
-		th:not(:first-child):not(:last-child),
-		td:not(:first-child):not(:last-child) {
+		& th:not(:first-child):not(:last-child),
+		& td:not(:first-child):not(:last-child) {
 			padding: 0.625rem 1.25rem;
 		}
 
-		th {
+		& th {
 			border-bottom: 1px solid var(--gray-200);
 			text-align: start;
 
@@ -370,15 +392,19 @@
 			&:first-child,
 			&:last-child {
 				width: 0;
+
+				@media (min-width: 26em) {
+					width: 50%;
+				}
 			}
 		}
 
-		td {
+		& td {
 			font-family: monospace;
 		}
 
-		input:not([type='checkbox']),
-		select {
+		& input:not([type='checkbox']),
+		& select {
 			width: 7.75rem;
 			max-width: 100%;
 			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
@@ -394,47 +420,8 @@
 		padding: 3rem;
 		scrollbar-gutter: stable;
 
-		.container {
+		& .container {
 			align-items: center;
-		}
-	}
-
-	@media (min-width: 26em) {
-		.app-controls {
-			table {
-				table-layout: auto;
-			}
-
-			th {
-				&:first-child,
-				&:last-child {
-					width: 50%;
-				}
-			}
-		}
-	}
-
-	@media (min-width: 48em) {
-		.app-nav-toggle {
-			top: 1.5rem;
-			right: 1.5rem;
-		}
-
-		.app-nav {
-			max-height: calc(100vh - 2.5rem);
-			max-height: calc(100dvh - 2.5rem);
-			top: 1.25rem;
-			right: 1.25rem;
-		}
-
-		.app-controls-toggle {
-			bottom: 1.5rem;
-			right: 1.5rem;
-		}
-
-		.app-controls {
-			bottom: 1.25rem;
-			right: 1.25rem;
 		}
 	}
 </style>

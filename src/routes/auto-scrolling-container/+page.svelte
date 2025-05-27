@@ -49,7 +49,7 @@
 	</SortableList>
 </div>
 
-<style lang="scss">
+<style>
 	.wrapper {
 		display: flex;
 		padding: 1.75rem 2rem;

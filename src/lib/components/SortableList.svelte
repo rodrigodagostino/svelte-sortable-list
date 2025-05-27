@@ -587,7 +587,7 @@
 </div>
 <Ghost bind:ghostRef status={ghostStatus} {listRef} />
 
-<style lang="scss">
+<style>
 	.ssl-list,
 	.ssl-list :global(*) {
 		box-sizing: border-box;

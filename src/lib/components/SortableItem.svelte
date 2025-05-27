@@ -261,7 +261,7 @@
 	</div>
 </li>
 
-<style lang="scss">
+<style>
 	.ssl-item {
 		position: relative;
 		list-style: none;
@@ -280,9 +280,8 @@
 		}
 
 		&[data-is-keyboard-dropping='true'] {
-			// The following z-index is different from the one in .is-keyboard-dragging for
-			// the sole purpose of ensuring the «transitionend» event is fired when
-			// the item is dropped using the keyboard.
+			/* The following z-index is different from the one in .is-keyboard-dragging just to ensure the
+				 «transitionend» event is fired when the item is dropped using the keyboard. */
 			z-index: 3;
 		}
 

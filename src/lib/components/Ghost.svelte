@@ -251,7 +251,7 @@
 	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
 </div>
 
-<style lang="scss">
+<style>
 	.ssl-ghost {
 		position: fixed;
 		list-style: none;
