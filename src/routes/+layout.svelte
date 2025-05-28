@@ -31,6 +31,7 @@
 		{ text: 'Inside custom dialog', path: '/inside-custom-dialog' },
 		{ text: 'Clear target on drag out', path: '/clear-target-on-drag-out' },
 		{ text: 'Remove item on drop out', path: '/remove-item-on-drop-out' },
+		{ text: 'RTL', path: '/rtl' },
 	];
 
 	$: controls = Object.keys($props).map((key) => ({
