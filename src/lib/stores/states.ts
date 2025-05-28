@@ -48,3 +48,10 @@ export function setIsBetweenBounds(context: boolean) {
 export function getIsBetweenBounds() {
 	return getWritableContext<boolean>('isBetweenBounds');
 }
+
+export function setIsRTL(context: boolean) {
+	return setWritableContext<boolean>('isRTL', context);
+}
+export function getIsRTL() {
+	return getWritableContext<boolean>('isRTL');
+}

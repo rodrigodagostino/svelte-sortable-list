@@ -1,3 +1,4 @@
+export * from './accessibility.js';
 export * from './coordinates.js';
 export * from './data-extraction.js';
 export * from './elements.js';

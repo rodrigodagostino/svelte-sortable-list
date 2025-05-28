@@ -10,6 +10,7 @@
 		getIsPointerCanceling,
 		getIsPointerDragging,
 		getIsPointerDropping,
+		getIsRTL,
 		getItemsData,
 		getListProps,
 		getTargetItem,
@@ -39,6 +40,7 @@
 	const isPointerCanceling = getIsPointerCanceling();
 	const isKeyboardCanceling = getIsKeyboardCanceling();
 	const isBetweenBounds = getIsBetweenBounds();
+	const isRTL = getIsRTL();
 
 	let rectOrigin: DOMRect | null = null;
 	let hasHandle = false;
@@ -170,7 +172,13 @@
 				(index > draggedItemIndex && index <= targetItemIndex) ||
 				(index < draggedItemIndex && index >= targetItemIndex)
 			) {
-				const operator = index > draggedItemIndex && index <= targetItemIndex ? '-' : '';
+				const operator = !$isRTL
+					? index > draggedItemIndex && index <= targetItemIndex
+						? '-'
+						: ''
+					: index > draggedItemIndex && index <= targetItemIndex
+						? ''
+						: '-';
 				const x =
 					$listProps.direction === 'vertical'
 						? '0'

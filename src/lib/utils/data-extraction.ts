@@ -1,4 +1,4 @@
-import type { ItemData } from '$lib/types/data-extraction.js';
+import type { ItemData, TextDirection } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
 export function getId(element: HTMLLIElement): string {
@@ -29,3 +29,15 @@ export function getItemsData(list: HTMLUListElement): ItemData[] {
 		getItemData(item)
 	);
 }
+
+export const getTextDirection = (element: HTMLElement): TextDirection => {
+	if (!element) return 'auto';
+
+	let parent = element.parentElement;
+	while (parent) {
+		if (parent.getAttribute('dir')) return parent.getAttribute('dir') as TextDirection;
+		parent = parent.parentElement;
+	}
+
+	return 'auto';
+};

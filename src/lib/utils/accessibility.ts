@@ -9,20 +9,27 @@ export const screenReaderText = {
 		].join(' ');
 	},
 
-	lifted: (draggedItem: HTMLLIElement) => {
+	lifted: (draggedItem: HTMLLIElement, isRTL: boolean) => {
 		const textContent = draggedItem.textContent ? draggedItem.textContent : 'the item';
 		return `Lifted ${textContent} at position ${
 			getIndex(draggedItem)! + 1
-		}. Press Arrow Down or Arrow Right to move it down, Arrow Up or Arrow Left to move it up, and Space Bar to drop it.`;
+		}. Press Arrow Down or ${!isRTL ? 'Arrow Right' : 'Arrow Left'} to move it down, Arrow Up or ${!isRTL ? 'Arrow Left' : 'Arrow Right'} to move it up, and Space Bar to drop it.`;
 	},
 
 	dragged: (
 		draggedItem: HTMLLIElement,
 		targetItem: HTMLLIElement,
-		key: 'ArrowUp' | 'ArrowLeft' | 'ArrowDown' | 'ArrowRight' | 'Home' | 'End'
+		key: 'ArrowUp' | 'ArrowLeft' | 'ArrowDown' | 'ArrowRight' | 'Home' | 'End',
+		isRTL: boolean
 	) => {
 		const textContent = draggedItem.textContent ? draggedItem.textContent : 'the item';
-		const direction = key === 'ArrowUp' || key === 'ArrowLeft' || key === 'Home' ? 'up' : 'down';
+		const direction =
+			key === 'ArrowUp' ||
+			(key === 'ArrowLeft' && !isRTL) ||
+			(key === 'ArrowRight' && isRTL) ||
+			key === 'Home'
+				? 'up'
+				: 'down';
 		const position = getIndex(targetItem)! + 1;
 		return `Moved ${textContent} ${direction} to position ${position}.`;
 	},
