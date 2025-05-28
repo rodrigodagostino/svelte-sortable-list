@@ -215,7 +215,13 @@
 										{/if}
 									</select>
 								{:else if type === 'checkbox'}
-									<input {id} type="checkbox" name={label} {value} on:change={handleFieldChange} />
+									<input
+										{id}
+										type="checkbox"
+										name={label}
+										checked={value}
+										on:change={handleFieldChange}
+									/>
 								{/if}
 							</td>
 							<td></td>
