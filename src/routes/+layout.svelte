@@ -123,7 +123,12 @@
 			</a>
 			<hr class="separator" />
 			{#each links as { text, path }}
-				<a class="link" href={path} aria-current={$page.url.pathname === path ? 'page' : undefined}>
+				<a
+					class="link"
+					href={path}
+					aria-current={$page.url.pathname === path ? 'page' : undefined}
+					data-sveltekit-reload={path === '/unstyled' ? true : undefined}
+				>
 					{text}
 				</a>
 			{/each}
