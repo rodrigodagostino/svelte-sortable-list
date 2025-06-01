@@ -29,6 +29,7 @@
 		SortableListProps,
 	} from '$lib/types/index.js';
 	import {
+		announce,
 		areColliding,
 		getClosestScrollableAncestor,
 		getCollidingItem,
@@ -41,7 +42,6 @@
 		isOrResidesInInteractiveElement,
 		isRootElement,
 		isScrollable,
-		screenReaderText,
 		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
@@ -316,7 +316,7 @@
 						isBetweenBounds: $isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
-					if ($draggedItem) liveText = screenReaderText.lifted($draggedItem, $isRTL);
+					if ($draggedItem) liveText = announce.lifted($draggedItem);
 				} else {
 					handlePointerAndKeyboardDrop($focusedItem, 'keyboard-drop');
 				}
@@ -400,7 +400,7 @@
 					});
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
 						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
-					liveText = screenReaderText.dragged($draggedItem, $targetItem, key, $isRTL);
+					liveText = announce.dragged($draggedItem, $targetItem);
 				}
 
 				await tick();
@@ -441,7 +441,7 @@
 						return;
 
 					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
-					liveText = screenReaderText.dragged($draggedItem, $targetItem, key, $isRTL);
+					liveText = announce.dragged($draggedItem, $targetItem);
 				}
 
 				await tick();
@@ -533,7 +533,7 @@
 		if (action === 'keyboard-drop' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			liveText = screenReaderText.dropped($draggedItem, $targetItem);
+			liveText = announce.dropped($draggedItem, $targetItem);
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
@@ -541,7 +541,7 @@
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
-			liveText = screenReaderText.canceled($draggedItem);
+			liveText = announce.canceled($draggedItem);
 		}
 
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
@@ -584,10 +584,8 @@
 		</p>
 	</slot>
 </ul>
-<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">
-	{liveText}
-</div>
 <Ghost bind:ghostRef status={ghostStatus} {listRef} />
+<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>
 	.ssl-list,

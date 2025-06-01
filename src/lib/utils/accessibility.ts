@@ -1,58 +1,34 @@
 import { getIndex } from './index.js';
-import type { SortableItemProps } from '$lib/types/index.js';
 
-export const screenReaderText = {
-	item: (index: SortableItemProps['index'], isDisabled: SortableItemProps['isDisabled']) => {
-		return [
-			`Draggable item at position ${index + 1}.`,
-			...(!isDisabled ? ['Press Space Bar to lift it.'] : []),
-		].join(' ');
+export const announce = {
+	lifted: (draggedItem: HTMLElement) => {
+		return `You have lifted an item at position ${getIndex(draggedItem)! + 1}.`;
 	},
 
-	lifted: (draggedItem: HTMLLIElement, isRTL: boolean) => {
-		const textContent = draggedItem.textContent ? draggedItem.textContent : 'the item';
-		return `Lifted ${textContent} at position ${
-			getIndex(draggedItem)! + 1
-		}. Press Arrow Down or ${!isRTL ? 'Arrow Right' : 'Arrow Left'} to move it down, Arrow Up or ${!isRTL ? 'Arrow Left' : 'Arrow Right'} to move it up, and Space Bar to drop it.`;
-	},
-
-	dragged: (
-		draggedItem: HTMLLIElement,
-		targetItem: HTMLLIElement,
-		key: 'ArrowUp' | 'ArrowLeft' | 'ArrowDown' | 'ArrowRight' | 'Home' | 'End',
-		isRTL: boolean
-	) => {
-		const textContent = draggedItem.textContent ? draggedItem.textContent : 'the item';
-		const direction =
-			key === 'ArrowUp' ||
-			(key === 'ArrowLeft' && !isRTL) ||
-			(key === 'ArrowRight' && isRTL) ||
-			key === 'Home'
-				? 'up'
-				: 'down';
-		const position = getIndex(targetItem)! + 1;
-		return `Moved ${textContent} ${direction} to position ${position}.`;
-	},
-
-	dropped: (draggedItem: HTMLLIElement, targetItem: HTMLLIElement | null) => {
-		const draggedItemIndex = getIndex(draggedItem)!;
-		const targetItemIndex = (targetItem && getIndex(targetItem)) ?? null;
-
-		const element = draggedItem.textContent ? draggedItem.textContent : 'the item';
-		const direction =
-			!targetItem || targetItemIndex === null
-				? null
-				: draggedItemIndex > targetItemIndex
-					? 'up'
-					: 'down';
+	dragged: (draggedItem: HTMLElement, targetItem: HTMLElement) => {
+		const startPosition = getIndex(draggedItem) + 1;
+		const endPosition = getIndex(targetItem) + 1;
 		const result =
-			targetItem && targetItemIndex !== null && draggedItemIndex !== targetItemIndex
-				? `moved ${direction} from position ${draggedItemIndex + 1} to ${targetItemIndex + 1}`
-				: `hasn’t changed position`;
-		return `Dropped ${element}, ${result}.`;
+			startPosition !== endPosition
+				? `from position ${startPosition} to position ${endPosition}`
+				: `back to its starting position of ${startPosition}`;
+		return `You have moved the item ${result}.`;
 	},
 
-	canceled: (draggedItem: HTMLLIElement) => {
-		return `Movement has been canceled. The item has returned to its starting position of ${getIndex(draggedItem)! + 1}.`;
+	dropped: (draggedItem: HTMLElement, targetItem: HTMLElement | null) => {
+		const startPosition = getIndex(draggedItem)! + 1;
+		const endPosition = targetItem ? getIndex(targetItem)! + 1 : null;
+		const result =
+			endPosition === null
+				? `It has remained at its starting position of ${startPosition}`
+				: startPosition !== endPosition
+					? `It has moved from position ${startPosition} to position ${endPosition}`
+					: `It has returned to its starting position of ${startPosition}`;
+		return `You have dropped the item. ${result}.`;
+	},
+
+	canceled: (draggedItem: HTMLElement) => {
+		const draggedItemIndex = getIndex(draggedItem)!;
+		return `You have canceled the dragging. The item has returned to its starting position of ${draggedItemIndex + 1}.`;
 	},
 };

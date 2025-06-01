@@ -17,7 +17,7 @@
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
 	import type { SortableItemProps } from '$lib/types/index.js';
-	import { dispatch, getId, getIndex, screenReaderText } from '$lib/utils/index.js';
+	import { dispatch, getId, getIndex } from '$lib/utils/index.js';
 
 	let itemRef: HTMLLIElement;
 
@@ -252,10 +252,7 @@
 	tabindex={focusedItemId === String(id) ? 0 : -1}
 	aria-selected={focusedItemId === String(id)}
 	aria-disabled={$listProps.isDisabled || isDisabled}
-	aria-roledescription={screenReaderText.item(
-		index,
-		$listProps.isDisabled || isDisabled || $listProps.isLocked || isLocked
-	)}
+	aria-roledescription="Draggable item"
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	in:scaleFade={{ duration: $listProps.transitionDuration }}
