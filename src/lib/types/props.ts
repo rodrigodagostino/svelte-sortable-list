@@ -1,3 +1,5 @@
+import type { Announcements } from './accessibility.js';
+
 export interface SortableListProps {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
@@ -9,6 +11,7 @@ export interface SortableListProps {
 	canRemoveOnDropOut?: boolean;
 	isLocked?: boolean;
 	isDisabled?: boolean;
+	announcements?: Announcements;
 }
 
 export interface SortableItemProps {
