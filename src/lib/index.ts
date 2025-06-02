@@ -4,6 +4,8 @@ export { default as Handle } from '$lib/components/Handle.svelte';
 export { default as Remove } from '$lib/components/Remove.svelte';
 export { removeItem, sortItems } from '$lib/utils/index.js';
 export type {
+	SortableListProps,
+	SortableItemProps,
 	SortableItemData,
 	MountedEventDetail,
 	DragStartEventDetail,
