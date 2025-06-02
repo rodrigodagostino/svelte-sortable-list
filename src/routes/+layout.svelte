@@ -18,6 +18,7 @@
 		{ text: 'With drop marker', path: '/with-drop-marker' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
+		{ text: 'With custom announcements', path: '/with-custom-announcements' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
 		{ text: 'Interactive items', path: '/interactive-items' },
 		{ text: 'Auto scrolling', path: '/auto-scrolling' },
