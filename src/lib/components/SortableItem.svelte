@@ -248,11 +248,12 @@
 	data-is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$listProps.isLocked || isLocked}
-	role="option"
 	tabindex={focusedItemId === String(id) ? 0 : -1}
+	role="option"
+	aria-label={$$restProps['aria-label'] || undefined}
+	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedItemId === String(id)}
 	aria-disabled={$listProps.isDisabled || isDisabled}
-	aria-roledescription="Draggable item"
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	in:scaleFade={{ duration: $listProps.transitionDuration }}

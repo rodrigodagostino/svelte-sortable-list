@@ -586,6 +586,7 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y-role-supports-aria-props -->
 <ul
 	bind:this={listRef}
 	class="ssl-list"
@@ -595,13 +596,18 @@
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
-	data-is-disabled={isDisabled}
-	role="listbox"
-	aria-orientation={direction}
-	aria-disabled={isDisabled}
-	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
-	aria-label="Drag and drop list. Use Arrow Up and Arrow Down to move through the list items."
 	tabindex="0"
+	role="listbox"
+	aria-label={$$restProps['aria-label'] || undefined}
+	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
+	aria-description={!$$restProps['aria-describedby']
+		? $$restProps['aria-description'] ||
+			'Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.'
+		: undefined}
+	aria-describedby={$$restProps['aria-describedby'] || undefined}
+	aria-orientation={direction}
+	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
+	aria-disabled={isDisabled}
 	on:pointerdown={handlePointerDown}
 	on:pointercancel={handlePointerCancel}
 	on:keydown={handleKeyDown}
@@ -615,7 +621,7 @@
 	</slot>
 </ul>
 <Ghost bind:ghostRef status={ghostStatus} {listRef} />
-<div class="ssl-live-region" role="log" aria-live="assertive" aria-atomic="true">{liveText}</div>
+<div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>
 	.ssl-list,

@@ -11,7 +11,10 @@ declare global {
 
 	declare namespace svelteHTML {
 		interface HTMLAttributes {
-			'on:itemfocusout'?: (event: CustomEvent<{ item: HTMLElement }>) => void;
+			// `aria-description` is still in W3C Editor's Draft for ARIA 1.3,
+			// but it is already correctly interpreted by screen readers.
+			'aria-description'?: string;
+			'on:itemfocusout'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 		}
 	}
 }
