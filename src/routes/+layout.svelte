@@ -58,6 +58,20 @@
 	}
 </script>
 
+<svelte:window
+	on:keydown={(event) => {
+		const { key } = event;
+		if (key === 'Escape') {
+			isMenuExpanded = false;
+			isControlsExpanded = false;
+		}
+	}}
+	on:resize={() => {
+		isMenuExpanded = false;
+		isControlsExpanded = false;
+	}}
+/>
+
 <div id="app" class="app" data-page-pathname={$page.url.pathname.replace('/', '')}>
 	<button
 		class="app-nav-toggle button"
