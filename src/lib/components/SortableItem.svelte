@@ -251,7 +251,6 @@ Serves as an individual item within `<SortableList>`. Holds the data and content
 	bind:this={itemRef}
 	{id}
 	class="ssl-item"
-	style:--transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={styleCursor}
 	style:width={styleWidth}
 	style:height={styleHeight}
