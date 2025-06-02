@@ -623,6 +623,44 @@
 <Ghost bind:ghostRef status={ghostStatus} {listRef} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
+<!--
+@component
+## SortableList
+Serves as the primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.
+
+### Props
+- `gap`: separation between items (in pixels).
+- `direction`: orientation in which items will be arranged.
+- `transitionDuration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds).
+- `hasDropMarker`: displays a position marker representing where the dragged item will be positioned when drag@propand@propdropping.
+- `hasLockedAxis`: prevents the dragged item from moving away from the main axis.
+- `hasBoundaries`: items will only be draggable inside the list limits.
+- `canClearOnDragOut`: the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
+- `canRemoveOnDropOut`: items will be removed when dragged and dropped outside of the list boundaries.
+- `isLocked`: allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally.
+- `isDisabled`: allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled.
+
+### Events
+- `on:mounted`: the component is mounted.
+- `on:dragstart`: an item starts to be dragged by a pointer device or a keyboard.
+- `on:drag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
+- `on:drop`: a dragged item is released by a pointer device or a keyboard.
+- `on:dragend`: a dragged item reaches its destination after being released.
+
+### Usage
+```svelte
+	<SortableList on:dragend={handleDragEnd}>
+		{#each items as item, index (item.id)}
+			<SortableItem {...item} {index}>
+				<div class="ssl-item__content">
+					{item.text}
+				</div>
+			</SortableItem>
+		{/each}
+	</SortableList>
+```
+-->
+
 <style>
 	.ssl-list,
 	.ssl-list :global(*) {

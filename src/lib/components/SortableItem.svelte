@@ -226,6 +226,27 @@
 	}
 </script>
 
+<!--
+@component
+## SortableItem
+Serves as an individual item within `<SortableList>`. Holds the data and content for each list item, as well as the `<Handle>` and `<Remove>` components when needed.
+
+### Props
+- `id`: unique identifier for each item.
+- `index`: position of the item in the list.
+- `isLocked`: will prevent the item from being dragged.
+- `isDisabled`: will prevent the item from being dragged and change its appearance to dimmed.
+
+### Usage
+```svelte
+	<SortableItem id={item.id} {index}>
+		<div class="ssl-item__content">
+			{item.text}
+		</div>
+	</SortableItem>
+```
+-->
+
 <li
 	bind:this={itemRef}
 	{id}

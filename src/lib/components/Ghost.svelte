@@ -251,6 +251,21 @@
 	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
 </div>
 
+<!--
+@component
+## Ghost
+Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
+
+### Props
+- `status`: state in which the ghost is.
+- `listRef`: reference to the parent list.
+
+### Usage
+```svelte
+	<Ghost bind:ghostRef status={ghostStatus} {listRef} />
+```
+-->
+
 <style>
 	.ssl-ghost {
 		position: fixed;

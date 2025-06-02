@@ -29,3 +29,17 @@
 		<path d="m6 6 12 12" />
 	{/if}
 </svg>
+
+<!--
+@component
+## Icon
+Serves as an icon for the `<Handle>` and `<Remove>` components.
+
+### Props
+- `name`: name of the icon to display.
+
+### Usage
+```svelte
+	<Icon name="handle" />
+```
+-->
