@@ -34,7 +34,7 @@
 
 	function handleRemoveClick(event: MouseEvent) {
 		const target = event.target as HTMLElement;
-		const item: HTMLLIElement | null = target.closest('.ssl-item');
+		const item = target.closest<HTMLLIElement>('.ssl-item');
 		const itemIndex = Number(item?.dataset.itemIndex);
 		if (!item || itemIndex < 0) return;
 		items = removeItem(items, itemIndex);

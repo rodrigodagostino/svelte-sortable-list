@@ -133,9 +133,9 @@
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
 	// so we need to manually keep focus on the selected <SortableItem> as items are sorted.
 	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLElement;
+	let activeElement: HTMLLIElement;
 	beforeUpdate(() => {
-		activeElement = document?.activeElement as HTMLElement;
+		activeElement = document?.activeElement as HTMLLIElement;
 	});
 	afterUpdate(() => {
 		if (activeElement) activeElement.focus({ preventScroll: true });
@@ -175,7 +175,7 @@
 			return;
 
 		const target = event.target as HTMLElement;
-		const currItem: HTMLLIElement | null = target.closest('.ssl-item');
+		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
 
 		if (

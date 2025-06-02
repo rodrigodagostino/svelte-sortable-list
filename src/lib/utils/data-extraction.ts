@@ -9,7 +9,7 @@ export function getIndex(element: HTMLLIElement): number {
 	return Number(element.dataset.itemIndex);
 }
 
-export function getItemData(item: HTMLElement): ItemData {
+export function getItemData(item: HTMLLIElement): ItemData {
 	const itemRect = item.getBoundingClientRect();
 	const itemTranslate = getTranslateValues(item);
 	return {

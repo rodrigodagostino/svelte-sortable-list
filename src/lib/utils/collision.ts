@@ -13,7 +13,7 @@ function getIntersectionRect(r1: DOMRect | ItemData, r2: DOMRect | ItemData) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(ghost: HTMLElement, items: ItemData[]) {
+export function getCollidingItem(ghost: HTMLDivElement, items: ItemData[]) {
 	const ghostRect = ghost.getBoundingClientRect();
 	const collidingItems = items.filter((targetItem) => areColliding(ghostRect, targetItem));
 	if (collidingItems.length > 1) {

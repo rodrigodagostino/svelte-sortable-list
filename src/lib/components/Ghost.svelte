@@ -63,12 +63,12 @@
 	$: styleTransition = getStyleTransition(status);
 	$: styleZIndex = getStyleZIndex(status);
 
-	function getStyleWidth(draggedItem: HTMLElement | null) {
+	function getStyleWidth(draggedItem: HTMLLIElement | null) {
 		if (!draggedItem || !$itemsData) return '0';
 		return `${draggedItemRect?.width || 0}px`;
 	}
 
-	function getStyleHeight(draggedItem: HTMLElement | null) {
+	function getStyleHeight(draggedItem: HTMLLIElement | null) {
 		if (!draggedItem || !$itemsData) return '0';
 		return `${draggedItemRect?.height || 0}px`;
 	}
