@@ -7,11 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.12.0] (2025-06-01)
+## [0.12.1] (2025-06-03)
+
+### Added
+
+- Add screen reader announcements customization.
+- Expose `SortableListProps` and `SortableItemProps` types.
+- Add hover-over comments to all components.
+
+### Changed
+
+- Improve messages in the `screenReaderText()` function and rename it to `announce()`.
+- Improve screen readers support and announcements customization by adjusting ARIA attributes.
+- Remove unnecessary CSS custom property from `<SortableItem>`: `--transition-duration` (this one is already inherited from `<SortableList>`).
+
+### Fixed
+
+- Correct RTL keyboard navigation and screen reader announcements.
+
+### Docs
+
+- Fix checkbox fields initial value in the demo pages layout controls.
+- Add the **“RTL”** demo page.
+- Force a full reload on the **“Unstyled”** demo page link.
+- Add **“With custom announcements”** demo page.
+- Add events handlers to the demo pages layout to close the menu and the controls when the Escape key is pressed and when the window is resized.
+- Update the README to reflect the latest changes.
+
+## [0.12.0] (2025-05-27)
 
 ### BREAKING
 
-- Replace the state CSS classes with data attributes.
+- Replace state CSS classes with data attributes.
 - Replace the current `<SortableList>` events (`sort` and `remove`) with more flexible ones:
   - `dragstart`
   - `drag`
@@ -749,7 +776,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.1...HEAD
+[0.12.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.2...v0.12.0
 [0.11.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.11.0...v0.11.1
