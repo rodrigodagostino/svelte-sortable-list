@@ -37,21 +37,27 @@
 <SortableList {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
-			<div class="ssl-item__content">
+			<div class="ssl-content">
 				{#if item.type === 'input'}
-					<label for={item.id}>{item.text}</label>
-					<input id={item.id} type="text" />
+					<div class="form-field">
+						<label for={item.id}>{item.text}</label>
+						<input id={item.id} type="text" />
+					</div>
 				{:else if item.type === 'textarea'}
-					<label for={item.id}>{item.text}</label>
-					<textarea id={item.id} />
+					<div class="form-field">
+						<label for={item.id}>{item.text}</label>
+						<textarea id={item.id} />
+					</div>
 				{:else if item.type === 'select'}
-					<label for={item.id}>{item.text}</label>
-					<select id={item.id} name={item.id}>
-						<option value="">--Choose an option--</option>
-						<option value="option-1">Option 1</option>
-						<option value="option-2">Option 2</option>
-						<option value="option-3">Option 3</option>
-					</select>
+					<div class="form-field">
+						<label for={item.id}>{item.text}</label>
+						<select id={item.id} name={item.id}>
+							<option value="">--Choose an option--</option>
+							<option value="option-1">Option 1</option>
+							<option value="option-2">Option 2</option>
+							<option value="option-3">Option 3</option>
+						</select>
+					</div>
 				{:else if item.type === 'checkbox'}
 					<fieldset>
 						<legend>{item.text}</legend>
@@ -69,9 +75,14 @@
 						</label>
 					</fieldset>
 				{:else if item.type === 'button'}
-					<button class="button">{item.text}</button>
+					<div class="form-field">
+						<button class="button">{item.text}</button>
+					</div>
 				{:else if item.type === 'a'}
-					<a href="https://github.com/rodrigodagostino/svelte-sortable-list">{item.text}</a>
+					<a
+						class="ssl-content__text"
+						href="https://github.com/rodrigodagostino/svelte-sortable-list">{item.text}</a
+					>
 				{/if}
 			</div>
 		</SortableItem>
@@ -79,6 +90,11 @@
 </SortableList>
 
 <style>
+	.form-field,
+	fieldset {
+		margin-block: 0.625rem;
+	}
+
 	label:not(:has(input[type='checkbox'])) {
 		display: flex;
 		flex-direction: column;

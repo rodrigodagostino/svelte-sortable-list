@@ -48,10 +48,10 @@
 <SortableList {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
-			<div class="ssl-item__content">
-				{item.text}
+			<div class="ssl-content">
+				<span class="ssl-content__text">{item.text}</span>
+				<Remove on:click={handleRemoveClick} />
 			</div>
-			<Remove on:click={handleRemoveClick} />
 		</SortableItem>
 	{/each}
 </SortableList>
