@@ -15,7 +15,6 @@
 	import { getIndex } from '$lib/utils/index.js';
 
 	export let ghostRef: HTMLDivElement;
-	let ghostInnerRef: HTMLDivElement;
 
 	export let status: GhostProps['status'];
 	export let listRef: GhostProps['listRef'];
@@ -33,17 +32,17 @@
 	const isBetweenBounds = getIsBetweenBounds();
 
 	$: if ($draggedItem) {
-		const clone = $draggedItem?.children[0].cloneNode(true);
+		const clone = $draggedItem?.cloneNode(true) as HTMLElement;
 		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
-		const selects = $draggedItem?.children[0].querySelectorAll<HTMLSelectElement>('select');
+		const selects = $draggedItem?.querySelectorAll<HTMLSelectElement>('select');
 		if (selects)
-			(clone as HTMLElement)
+			clone
 				.querySelectorAll<HTMLSelectElement>('select')
 				.forEach((select, index) => (select.value = selects[index].value));
 
-		ghostInnerRef?.replaceChildren(...clone.childNodes);
+		ghostRef?.replaceChildren(...clone.children);
 	} else {
-		ghostInnerRef?.replaceChildren();
+		ghostRef?.replaceChildren();
 	}
 
 	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
@@ -247,9 +246,7 @@
 	data-can-remove-on-drop-out={$listProps.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal
->
-	<div bind:this={ghostInnerRef} class="ssl-ghost__inner" />
-</div>
+></div>
 
 <!--
 @component

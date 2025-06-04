@@ -212,13 +212,13 @@
 
 		currItem.setPointerCapture(event.pointerId);
 
-		$isPointerDragging = true;
-		await tick();
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
 		$itemsData = getItemsData(listRef);
 		ghostStatus = 'init';
+		await tick();
+		$isPointerDragging = true;
 		dispatch('dragstart', {
 			deviceType: 'pointer',
 			draggedItem: currItem,

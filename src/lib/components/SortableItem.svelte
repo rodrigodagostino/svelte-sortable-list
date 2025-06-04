@@ -282,9 +282,7 @@ Serves as an individual item within `<SortableList>`. Holds the data and content
 			!$isBetweenBounds && $listProps.canRemoveOnDropOut ? 0 : $listProps.transitionDuration,
 	}}
 >
-	<div class="ssl-item__inner">
-		<slot />
-	</div>
+	<slot />
 </li>
 
 <style>

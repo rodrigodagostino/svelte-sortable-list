@@ -48,8 +48,7 @@
 	outline: 0.125rem solid var(--gray-800);
 }
 
-.ssl-item__inner,
-.ssl-ghost__inner {
+.ssl-content {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
@@ -68,16 +67,16 @@
 		opacity var(--transition-duration);
 }
 
-.ssl-item__content {
+.ssl-content__text {
 	margin-block: 0.625rem;
 }
 
-.ssl-item[aria-disabled="true"] .ssl-item__inner {
+.ssl-item[aria-disabled="true"] .ssl-content {
 	opacity: 0.5;
 }
 
-.ssl-item[data-is-keyboard-dragging="true"] .ssl-item__inner,
-.ssl-ghost[data-is-pointer-dragging="true"] .ssl-ghost__inner {
+.ssl-item[data-is-keyboard-dragging="true"] .ssl-content,
+.ssl-ghost[data-is-pointer-dragging="true"] .ssl-content {
 	box-shadow: var(--box-shadow-1);
 }
 
@@ -117,26 +116,20 @@
 /**
  * hasDropMarker
  */
-.ssl-list[data-has-drop-marker="true"] .ssl-item__inner {
+.ssl-list[data-has-drop-marker="true"] .ssl-content {
 	transition:
 		background-color calc(var(--transition-duration) / 3 * 2),
 		border-color calc(var(--transition-duration) / 3 * 2),
 		box-shadow calc(var(--transition-duration) / 3 * 2);
 }
 
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-item__inner,
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-item__inner {
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-content,
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-content {
 	opacity: 0.5;
 }
 
-.ssl-list[data-has-drop-marker="true"]
-	.ssl-item[data-is-pointer-dragging="true"]
-	.ssl-item__inner
-	> *,
-.ssl-list[data-has-drop-marker="true"]
-	.ssl-item[data-is-pointer-dropping="true"]
-	.ssl-item__inner
-	> * {
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-content > *,
+.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-content > * {
 	opacity: 0;
 }
 
@@ -144,11 +137,11 @@
  * canRemoveOnDropOut
  */
 .ssl-ghost[data-is-pointer-dropping="true"][data-can-remove-on-drop-out="true"][data-is-between-bounds="false"]
-	.ssl-ghost__inner {
+	.ssl-content {
 	opacity: 0;
 }
 
-.ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-ghost__inner {
+.ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-content {
 	background-color: var(--rose-300);
 	border-color: var(--rose-400);
 }
