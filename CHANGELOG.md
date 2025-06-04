@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.4] (2025-06-04)
+
+### BREAKING
+
+- Avoid having an inner container in the `<SortableItem>` and `<Ghost>` components. These were initially added to correctly display the transitions for the `<Ghost>` component fired on `pointerdown`. The code was adjusted to simply wait until all the necessary parts are ready before making the `<Ghost>`’s content visible.
+
+### Chore
+
+- Set `esm-env` as a peer dependency.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Avoid full page reload on the “Unstyled” demo page.
+- Update the README to reflect the latest changes.
+
 ## [0.12.3] (2025-06-04)
 
 ### Fixed
@@ -792,7 +808,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...HEAD
+[0.12.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.0...v0.12.1
