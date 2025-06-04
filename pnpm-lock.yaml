@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      esm-env:
+        specifier: ^1.0.0
+        version: 1.2.2
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: 6.0.1
@@ -35,9 +39,6 @@ importers:
       eslint-plugin-svelte:
         specifier: 3.9.1
         version: 3.9.1(eslint@9.28.0)(svelte@4.2.20)
-      esm-env:
-        specifier: 1.2.2
-        version: 1.2.2
       globals:
         specifier: 16.2.0
         version: 16.2.0
