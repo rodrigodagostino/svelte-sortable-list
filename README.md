@@ -122,8 +122,8 @@ yarn add @rodrigodagostino/svelte-sortable-list
 <SortableList on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableItem {...item} {index}>
-			<div class="ssl-item__content">
-				{item.text}
+			<div class="ssl-content">
+				<span class="ssl-content__text">{item.text}</span>
 			</div>
 		</SortableItem>
 	{/each}
@@ -336,7 +336,7 @@ If you want to make use of the styles present in the demo pages, import them in 
 ### Selectors
 
 > [!IMPORTANT]
-> To customize the appearance of the list items and not cause any conflicts or interferences with the core styles and transitions, the usage of the `.ssl-item` selector must be avoided, pointing instead to `.ssl-item__inner`, which is the direct child of the aforementioned selector.
+> To customize the appearance of the list items and ghost element (and not cause any conflicts or interferences with the core styles and transitions), the usage of the `.ssl-item` and `.ssl-ghost` selectors must be avoided. You can instead create a wrapping element for the item’s content (like the element with the `.ssl-content` class included in one of the examples), which should be the direct child of the element with the `.ssl-item` class (the ghost element will simply mirror the list item’s content and appearance).
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
@@ -357,7 +357,6 @@ This is a list of the selectors you can use to style the list and the list items
 | `.ssl-item[data-is-locked="true"]`               | Each `<SortableItem>` that is locked.                                                                   |
 | `.ssl-item[aria-disabled="true"]`                | Each `<SortableItem>` that is disabled.                                                                 |
 | `.ssl-item[data-is-removing="true"]`             | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
-| `.ssl-item__inner`                               | The content wrapper element inside each `<SortableItem>`.                                               |
 | `.ssl-ghost`                                     | The shadow element displayed under the pointer when dragging.                                           |
 | `.ssl-ghost[data-is-pointer-dragging="true"]`    | The shadow element while it’s being dragged by a pointing device.                                       |
 | `.ssl-ghost[data-is-pointer-dropping="true"]`    | The shadow element while it’s being dropped by a pointing device.                                       |
@@ -372,7 +371,7 @@ This is a list of the selectors you can use to style the list and the list items
 > For example, the following would target the direct child of the `<Ghost>` component when `canRemoveOnDropOut` is enabled and is being dragged outside of the list limits:
 >
 > ```css
-> .ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-ghost__inner {
+> .ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-content {
 >   ...
 > }
 > ```
