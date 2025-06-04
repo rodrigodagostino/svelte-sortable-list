@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate, createEventDispatcher, onMount, tick } from 'svelte';
-	import { browser } from '$app/environment';
+	import { BROWSER } from 'esm-env';
 	import Ghost from '$lib/components/Ghost.svelte';
 	import {
 		setDraggedItem,
@@ -106,7 +106,7 @@
 	function scroll() {
 		if (!scrollableAncestor) return;
 
-		if (browser)
+		if (BROWSER)
 			requestAnimationFrame(() => {
 				if (!shouldAutoScroll(scrollableAncestor, direction, scrollingSpeed)) return;
 
