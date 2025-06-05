@@ -44,10 +44,6 @@
 		0 32px 16px rgba(54, 57, 90, 0.1);
 }
 
-.ssl-list {
-	align-items: center;
-}
-
 .ssl-list:focus-visible,
 .ssl-list *:focus-visible {
 	outline: 0.125rem solid var(--gray-800);
@@ -55,6 +51,7 @@
 
 .ssl-content {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	gap: 0.75rem;
 	max-width: 18rem;
@@ -73,7 +70,7 @@
 }
 
 .ssl-content__text {
-	margin-block: 0.625rem;
+	margin: 0.625rem auto;
 }
 
 .ssl-item[aria-disabled="true"] .ssl-content {
