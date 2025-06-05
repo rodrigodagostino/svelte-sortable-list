@@ -40,7 +40,7 @@
 				.querySelectorAll<HTMLSelectElement>('select')
 				.forEach((select, index) => (select.value = selects[index].value));
 
-		ghostRef?.replaceChildren(...clone.children);
+		ghostRef?.replaceChildren(...clone.childNodes);
 	} else {
 		ghostRef?.replaceChildren();
 	}
