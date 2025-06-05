@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.5] (2025-06-05)
+
+### BREAKING
+
+- Adjust the base styles to stretch the list items instead of centering them.
+
+### Fixed
+
+- Revert back to cloning nodes in the `<Ghost>` component in order to include text nodes that are not wrapped by an HTML element.
+
+### Docs
+
+- Replace the default favicon.
+
 ## [0.12.4] (2025-06-04)
 
 ### BREAKING
@@ -808,7 +822,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...HEAD
+[0.12.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.1...v0.12.2
