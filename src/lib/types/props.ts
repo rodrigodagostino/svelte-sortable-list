@@ -1,6 +1,6 @@
 import type { Announcements } from './accessibility.js';
 
-export interface SortableListProps {
+export interface SortableListRootProps {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
 	transitionDuration?: number;
@@ -14,14 +14,15 @@ export interface SortableListProps {
 	announcements?: Announcements;
 }
 
-export interface SortableItemProps {
+export interface SortableListItemProps {
 	id: string;
 	index: number;
 	isLocked?: boolean;
 	isDisabled?: boolean;
 }
 
-export interface GhostProps {
+export interface SortableListGhostProps {
+	ghostRef: HTMLDivElement;
 	status: 'init' | 'preset' | 'set' | 'remove' | 'unset';
 	listRef: HTMLUListElement | null;
 }

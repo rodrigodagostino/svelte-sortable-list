@@ -1,9 +1,9 @@
 import { getWritableContext, setWritableContext } from './index.js';
-import type { SortableListProps } from '$lib/types/index.js';
+import type { SortableListRootProps } from '$lib/types/index.js';
 
-export function setListProps(context: SortableListProps) {
-	return setWritableContext<SortableListProps>('props', context);
+export function setListProps(context: SortableListRootProps) {
+	return setWritableContext<SortableListRootProps>('props', context);
 }
 export function getListProps() {
-	return getWritableContext<SortableListProps>('props');
+	return getWritableContext<SortableListRootProps>('props');
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate, createEventDispatcher, onMount, tick } from 'svelte';
 	import { BROWSER } from 'esm-env';
-	import Ghost from '$lib/components/Ghost.svelte';
+	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import {
 		setDraggedItem,
 		setFocusedItem,
@@ -20,13 +20,14 @@
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
-		DragStartEventDetail,
-		DragEventDetail,
 		DragEndEventDetail,
+		DragEventDetail,
+		DragStartEventDetail,
 		DropEventDetail,
-		GhostProps,
 		MountedEventDetail,
-		SortableListProps,
+		SortableListGhostProps,
+		SortableListRootEvents,
+		SortableListRootProps,
 	} from '$lib/types/index.js';
 	import {
 		announce,
@@ -46,20 +47,23 @@
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
+	type $$Props = SortableListRootProps;
+	type $$Events = SortableListRootEvents;
+
 	let listRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
 
-	export let gap: SortableListProps['gap'] = 12;
-	export let direction: SortableListProps['direction'] = 'vertical';
-	export let transitionDuration: SortableListProps['transitionDuration'] = 240;
-	export let hasDropMarker: SortableListProps['hasDropMarker'] = false;
-	export let hasLockedAxis: SortableListProps['hasLockedAxis'] = false;
-	export let hasBoundaries: SortableListProps['hasBoundaries'] = false;
-	export let canClearOnDragOut: SortableListProps['canClearOnDragOut'] = false;
-	export let canRemoveOnDropOut: SortableListProps['canRemoveOnDropOut'] = false;
-	export let isLocked: SortableListProps['isLocked'] = false;
-	export let isDisabled: SortableListProps['isDisabled'] = false;
-	export let announcements: SortableListProps['announcements'] = announce;
+	export let gap: $$Props['gap'] = 12;
+	export let direction: $$Props['direction'] = 'vertical';
+	export let transitionDuration: $$Props['transitionDuration'] = 240;
+	export let hasDropMarker: $$Props['hasDropMarker'] = false;
+	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
+	export let hasBoundaries: $$Props['hasBoundaries'] = false;
+	export let canClearOnDragOut: $$Props['canClearOnDragOut'] = false;
+	export let canRemoveOnDropOut: $$Props['canRemoveOnDropOut'] = false;
+	export let isLocked: $$Props['isLocked'] = false;
+	export let isDisabled: $$Props['isDisabled'] = false;
+	export let announcements: $$Props['announcements'] = announce;
 
 	const props = setListProps({
 		gap,
@@ -88,7 +92,7 @@
 		announcements,
 	};
 
-	let ghostStatus: GhostProps['status'] = 'unset';
+	let ghostStatus: SortableListGhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemsData = setItemsData(null);
@@ -96,6 +100,14 @@
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
+
+	const dispatch = createEventDispatcher<{
+		mounted: MountedEventDetail;
+		dragstart: DragStartEventDetail;
+		drag: DragEventDetail;
+		drop: DropEventDetail;
+		dragend: DragEndEventDetail;
+	}>();
 
 	$: scrollableAncestor = getClosestScrollableAncestor(listRef);
 	let scrollingSpeed = 0;
@@ -131,7 +143,7 @@
 	}
 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
-	// so we need to manually keep focus on the selected <SortableItem> as items are sorted.
+	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
 	// https://github.com/sveltejs/svelte/issues/3973
 	let activeElement: HTMLLIElement;
 	beforeUpdate(() => {
@@ -149,14 +161,6 @@
 	const isKeyboardCanceling = setIsKeyboardCanceling(false);
 	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRTL = setIsRTL(false);
-
-	const dispatch = createEventDispatcher<{
-		mounted: MountedEventDetail;
-		dragstart: DragStartEventDetail;
-		drag: DragEventDetail;
-		drop: DropEventDetail;
-		dragend: DragEndEventDetail;
-	}>();
 
 	onMount(() => {
 		dispatch('mounted');
@@ -191,7 +195,7 @@
 
 		// Prevent default if the clicked/tapped element is a label with a for attribute.
 		// NOTE 1: for some reason that is still unknown to me, clicking/tapping a <label> element sets
-		// the focus on the current <SortableItem>.
+		// the focus on the current <SortableList.Item>.
 		// NOTE 2: We need to run this check before isOrResidesInInteractiveElement() because, if the
 		// target is a <label> element, it will stop the execution of this event handler and the
 		// preventDefault() right after will never run, but we can’t preventDefault() for every element
@@ -207,7 +211,7 @@
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
 		if (isOrResidesInInteractiveElement(target, currItem) && !targetIsOrResidesInHandle) return;
-		// Prevent focus from being set on the current <SortableItem>.
+		// Prevent focus from being set on the current <SortableList.Item>.
 		event.preventDefault();
 
 		currItem.setPointerCapture(event.pointerId);
@@ -616,11 +620,11 @@
 	<slot>
 		<p>
 			To display your list, provide an array of <code>items</code> to
-			<code>{'<SortableList>'}</code>.
+			<code>{'<SortableList.Root>'}</code>.
 		</p>
 	</slot>
 </ul>
-<Ghost bind:ghostRef status={ghostStatus} {listRef} />
+<SortableListGhost bind:ghostRef status={ghostStatus} {listRef} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--
@@ -632,7 +636,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
 - `transitionDuration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds).
-- `hasDropMarker`: displays a position marker representing where the dragged item will be positioned when drag@propand@propdropping.
+- `hasDropMarker`: displays a position marker representing where the dragged item will be positioned when drag-and-dropping.
 - `hasLockedAxis`: prevents the dragged item from moving away from the main axis.
 - `hasBoundaries`: items will only be draggable inside the list limits.
 - `canClearOnDragOut`: the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
@@ -649,15 +653,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 ### Usage
 ```svelte
-	<SortableList on:dragend={handleDragEnd}>
+	<SortableList.Root on:dragend={handleDragEnd}>
 		{#each items as item, index (item.id)}
-			<SortableItem {...item} {index}>
-				<div class="ssl-item__content">
+			<SortableList.Item {...item} {index}>
+				<div class="ssl-item-content">
 					{item.text}
 				</div>
-			</SortableItem>
+			</SortableList.Item>
 		{/each}
-	</SortableList>
+	</SortableList.Root>
 ```
 -->
 

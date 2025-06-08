@@ -4,7 +4,7 @@
 
 	const isPointerDragging = getIsPointerDragging();
 
-	const classes = ['ssl-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	const classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 </script>
 
 <span
@@ -22,21 +22,21 @@
 <!--
 @component
 ## Handle
-Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableItem>` will directly activate the handle functionality for that item.
+Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.
 
 ### Usage
 ```svelte
-	<SortableItem id={item.id} {index}>
-		<Handle />
-		<div class="ssl-item__content">
+	<SortableList.Item id={item.id} {index}>
+		<SortableList.ItemHandle />
+		<div class="ssl-item-content">
 			{item.text}
 		</div>
-	</SortableItem>
+	</SortableList.Item>
 ```
 -->
 
 <style>
-	.ssl-handle {
+	.ssl-item-handle {
 		touch-action: none;
 	}
 </style>

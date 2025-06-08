@@ -11,13 +11,14 @@
 		getPointerOrigin,
 		getTargetItem,
 	} from '$lib/stores/index.js';
-	import type { GhostProps } from '$lib/types/index.js';
+	import type { SortableListGhostProps } from '$lib/types/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
-	export let ghostRef: HTMLDivElement;
+	type $$Props = SortableListGhostProps;
 
-	export let status: GhostProps['status'];
-	export let listRef: GhostProps['listRef'];
+	export let ghostRef: $$Props['ghostRef'];
+	export let status: $$Props['status'];
+	export let listRef: $$Props['listRef'];
 
 	const listProps = getListProps();
 
@@ -72,7 +73,7 @@
 		return `${draggedItemRect?.height || 0}px`;
 	}
 
-	function getStyleLeft(status: GhostProps['status']) {
+	function getStyleLeft(status: $$Props['status']) {
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
@@ -95,7 +96,7 @@
 		return `${left}px`;
 	}
 
-	function getStyleTop(status: GhostProps['status']) {
+	function getStyleTop(status: $$Props['status']) {
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
@@ -119,7 +120,7 @@
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleTransform(status: GhostProps['status'], ...args: unknown[]) {
+	function getStyleTransform(status: $$Props['status'], ...args: unknown[]) {
 		if (
 			status === 'unset' ||
 			!listRef ||
@@ -207,7 +208,7 @@
 		if (status === 'remove') return ghostRef.style.transform;
 	}
 
-	function getStyleTransition(status: GhostProps['status']) {
+	function getStyleTransition(status: $$Props['status']) {
 		if (status === 'unset' || status === 'init') return undefined;
 		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
@@ -218,7 +219,7 @@
 		if (status === 'remove') return `z-index 0s ${$listProps.transitionDuration}ms`;
 	}
 
-	function getStyleZIndex(status: GhostProps['status']) {
+	function getStyleZIndex(status: $$Props['status']) {
 		if (status === 'unset') return undefined;
 		if (status === 'init' || status === 'preset') return '10000';
 		// zIndex is only set and then re-set to force the transitionend event to be fired
@@ -259,7 +260,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 ### Usage
 ```svelte
-	<Ghost bind:ghostRef status={ghostStatus} {listRef} />
+	<SortableListGhost bind:ghostRef status={ghostStatus} {listRef} />
 ```
 -->
 

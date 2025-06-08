@@ -1,5 +1,5 @@
-import type { SortableItemProps } from './props.js';
+import type { SortableListItemProps } from './props.js';
 
-export interface SortableItemData extends Omit<SortableItemProps, 'index'> {
+export interface SortableListItemData extends Omit<SortableListItemProps, 'index'> {
 	[key: string]: unknown;
 }

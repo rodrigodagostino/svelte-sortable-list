@@ -21,6 +21,14 @@ export type DragEventDetail = EventDetail;
 
 export type DropEventDetail = EventDetail;
 
-export interface DragEndEventDetail extends EventDetail {
+export type DragEndEventDetail = EventDetail & {
 	isCanceled: boolean;
+};
+
+export interface SortableListRootEvents {
+	mounted: CustomEvent<MountedEventDetail>;
+	dragstart: CustomEvent<DragStartEventDetail>;
+	drag: CustomEvent<DragEventDetail>;
+	drop: CustomEvent<DropEventDetail>;
+	dragend: CustomEvent<DragEndEventDetail>;
 }

@@ -1,10 +1,10 @@
-import type { SortableItemProps } from '$lib/types/index.js';
+import type { SortableListItemProps } from '$lib/types/index.js';
 
 export function sortItems<T>(items: T[], from: number, to: number) {
 	if (from === to) return items;
 	return items.toSpliced(from, 1).toSpliced(to < 0 ? items.length + to : to, 0, items[from]);
 }
 
-export function removeItem<T>(items: T[], index: SortableItemProps['index']) {
+export function removeItem<T>(items: T[], index: SortableListItemProps['index']) {
 	return items.toSpliced(index, 1);
 }

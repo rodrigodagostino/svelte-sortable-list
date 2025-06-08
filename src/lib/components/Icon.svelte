@@ -33,7 +33,7 @@
 <!--
 @component
 ## Icon
-Serves as an icon for the `<Handle>` and `<Remove>` components.
+Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.
 
 ### Props
 - `name`: name of the icon to display.

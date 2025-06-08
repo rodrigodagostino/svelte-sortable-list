@@ -16,15 +16,17 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
-	import type { SortableItemProps } from '$lib/types/index.js';
+	import type { SortableListItemProps } from '$lib/types/index.js';
 	import { dispatch, getId, getIndex } from '$lib/utils/index.js';
+
+	type $$Props = SortableListItemProps;
 
 	let itemRef: HTMLLIElement;
 
-	export let id: SortableItemProps['id'];
-	export let index: SortableItemProps['index'];
-	export let isLocked: SortableItemProps['isLocked'] = false;
-	export let isDisabled: SortableItemProps['isDisabled'] = false;
+	export let id: $$Props['id'];
+	export let index: $$Props['index'];
+	export let isLocked: $$Props['isLocked'] = false;
+	export let isDisabled: $$Props['isDisabled'] = false;
 
 	const listProps = getListProps();
 
@@ -229,7 +231,7 @@
 <!--
 @component
 ## SortableItem
-Serves as an individual item within `<SortableList>`. Holds the data and content for each list item, as well as the `<Handle>` and `<Remove>` components when needed.
+Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
 
 ### Props
 - `id`: unique identifier for each item.
@@ -239,11 +241,11 @@ Serves as an individual item within `<SortableList>`. Holds the data and content
 
 ### Usage
 ```svelte
-	<SortableItem id={item.id} {index}>
-		<div class="ssl-item__content">
+	<SortableList.Item id={item.id} {index}>
+		<div class="ssl-item-content">
 			{item.text}
 		</div>
-	</SortableItem>
+	</SortableList.Item>
 ```
 -->
 

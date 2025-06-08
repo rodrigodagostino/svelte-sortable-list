@@ -25,22 +25,22 @@
 		}
 	}
 
-	const classes = ['ssl-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	const classes = ['ssl-item-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 </script>
 
 <!--
 @component
 ## Remove
-Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableItem>` will directly allow it to dispatch the `remove` event for that item.
+Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
 
 ### Usage
 ```svelte
-	<SortableItem id={item.id} {index}>
-		<div class="ssl-item__content">
+	<SortableList.Item id={item.id} {index}>
+		<div class="ssl-item-content">
 			{item.text}
 		</div>
-		<Remove on:click={handleRemoveClick} />
-	</SortableItem>
+		<SortableList.ItemRemove on:click={handleRemoveClick} />
+	</SortableList.Item>
 ```
 -->
 
