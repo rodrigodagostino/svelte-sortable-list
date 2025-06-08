@@ -1,6 +1,11 @@
+import type { AriaAttributes } from 'svelte/elements';
 import type { Announcements } from './accessibility.js';
 
-export interface SortableListRootProps {
+export interface SortableListRootProps
+	extends Pick<
+		AriaAttributes,
+		'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
+	> {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
 	transitionDuration?: number;
@@ -14,7 +19,8 @@ export interface SortableListRootProps {
 	announcements?: Announcements;
 }
 
-export interface SortableListItemProps {
+export interface SortableListItemProps
+	extends Pick<AriaAttributes, 'aria-label' | 'aria-labelledby'> {
 	id: string;
 	index: number;
 	isLocked?: boolean;
