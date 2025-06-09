@@ -22,9 +22,9 @@ Live demos:
   - [Keyboard navigation](#keyboard-navigation)
   - [Screen reader announcements customization](#screen-reader-announcements-customization)
 - [Components](#components)
-  - [`<SortableList>` props](#sortablelist-props)
-  - [`<SortableList>` events](#sortablelist-events)
-  - [`<SortableItem>` props](#sortableitem-props)
+  - [`<SortableList.Root>` props](#sortablelistroot-props)
+  - [`<SortableList.Root>` events](#sortablelistroot-events)
+  - [`<SortableList.Item>` props](#sortablelistitem-props)
 - [Utilities](#utilities)
 - [Types](#types)
 - [Styles](#styles)
@@ -70,11 +70,7 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ```svelte
 <script lang="ts">
-	import {
-		SortableItem,
-		SortableList,
-		type SortableListProps,
-	} from '@rodrigodagostino/svelte-sortable-list';
+	import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 </script>
 ```
 
@@ -82,14 +78,9 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ```svelte
 <script lang="ts">
-	import {
-		SortableItem,
-		SortableList,
-		type SortableItemData,
-		sortItems,
-	} from '@rodrigodagostino/svelte-sortable-list';
+	import { SortableList, sortItems } from '@rodrigodagostino/svelte-sortable-list';
 
-	let items: SortableItemData[] = [
+	let items: SortableList.ItemData[] = [
 		{
 			id: 'list-item-1',
 			text: 'List item 1',
@@ -112,22 +103,22 @@ yarn add @rodrigodagostino/svelte-sortable-list
 		},
 	];
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
 </script>
 
-<SortableList on:dragend={handleDragEnd}>
+<SortableList.Root on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
-		<SortableItem {...item} {index}>
-			<div class="ssl-content">
-				<span class="ssl-content__text">{item.text}</span>
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
 			</div>
-		</SortableItem>
+		</SortableList.Item>
 	{/each}
-</SortableList>
+</SortableList.Root>
 ```
 
 ## Accessibility
@@ -158,7 +149,7 @@ There are two main things that need to be considered to customize the screen rea
 - The `aria-description` attribute: the keyboard navigation instructions (default: `Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.`).
 - The `announcements` prop: the announcements to be read out by the screen reader during drag and drop operations.
 
-In addition to those, you can also use the following too (accepted by both the `<SortableList>` and `<SortableItem>` components):
+In addition to those, you can also use the following too (accepted by both the `<SortableList.Root>` and `<SortableList.Item>` components):
 
 - The `aria-label` attribute: the name of the list.
 - The `aria-labelledby` attribute: the ID of the element that provides the name of the list.
@@ -169,7 +160,7 @@ The following example contains most of the code that you can find in the **“Wi
 <script lang="ts">
 	...
 
-	const announcements: SortableListProps['announcements'] = {
+	const announcements: SortableList.RootProps['announcements'] = {
 		lifted: (_, draggedItemIndex) => {
 			return `Ha levantado un item en la posición ${draggedItemIndex! + 1}.`;
 		},
@@ -199,29 +190,29 @@ The following example contains most of the code that you can find in the **“Wi
 	};
 </script>
 
-<SortableList
+<SortableList.Root
 	...
 	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
 	{announcements}
 >
 	...
-</SortableList>
+</SortableList.Root>
 ```
 
 ## Components
 
 The following is a list of the available components inside the package:
 
-| Component        | Description                                                                                                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<SortableList>` | The primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.                                                        |
-| `<SortableItem>` | An individual item within `<SortableList>`. Holds the data and content for each list item, as well as the `<Handle>` and `<Remove>` components when needed.               |
-| `<Handle>`       | An element that limits the draggable area of a list item to itself. Including it inside a `<SortableItem>` will directly activate the handle functionality for that item. |
-| `<Remove>`       | A `<button>` element that (when pressed) removes an item. Including it inside a `<SortableItem>` will directly allow it to dispatch the `remove` event for that item.     |
+| Component                   | Description                                                                                                                                                                                        |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<SortableList.Root>`       | The primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.                                                                                 |
+| `<SortableList.Item>`       | An individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed. |
+| `<SortableList.ItemHandle>` | An element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.                     |
+| `<SortableList.ItemRemove>` | A `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.                         |
 
-It would be possible to avoid the `<Remove>` component and just go with a `<button>` element to trigger the removal of an item, but keep in mind that this component doesn’t just fire a click event, it will also focus the next item in the list if the user is using the keyboard to press the remove button. Otherwise, after the focused element is removed, the focus will fall back to the `<body>`.
+It would be possible to avoid the `<SortableList.ItemRemove>` component and just go with a `<button>` element to trigger the removal of an item, but keep in mind that this component doesn’t just fire a click event, it will also focus the next item in the list if the user is using the keyboard to press the remove button. Otherwise, after the focused element is removed, the focus will fall back to the `<body>`.
 
-### `<SortableList>` props
+### `<SortableList.Root>` props
 
 | Prop                 | Type                   | Default      | Possible values                | Description                                                                                                                                                                                                                                                                                            |
 | -------------------- | ---------------------- | ------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -236,20 +227,20 @@ It would be possible to avoid the `<Remove>` component and just go with a `<butt
 | `isLocked`           | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard). Interactive elements inside will operate normally.                                                                                                           |
 | `isDisabled`         | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to dimmed. Interactive elements inside will be disabled.                                                                            |
 
-### `<SortableList>` events
+### `<SortableList.Root>` events
 
 > [!Note]
 > Events are fired in the order they are displayed below.
 
-| Event          | Type                                | Trigger                                                                                                  | Returns                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| -------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `on:mounted`   | `CustomEvent<MountedEventDetail>`   | The component is mounted.                                                                                | <pre>event: {<br>&nbsp;&nbsp;detail: null<br>}</pre>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `on:dragstart` | `CustomEvent<DragStartEventDetail>` | An item starts to be dragged by a pointer device or a keyboard.                                          | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                                                                                                                                                    |
-| `on:drag`      | `CustomEvent<DragEventDetail>`      | A dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
-| `on:drop`      | `CustomEvent<DropEventDetail>`      | A dragged item is released by a pointer device or a keyboard.                                            | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
-| `on:dragend`   | `CustomEvent<DragEndEventDetail>`   | A dragged item reaches its destination after being released.                                             | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;isCanceled: boolean<br>&nbsp;&nbsp;}<br>}</pre> |
+| Event       | Type                                | Trigger                                                                                                  | Returns                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ----------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mounted`   | `CustomEvent<MountedEventDetail>`   | The component is mounted.                                                                                | <pre>event: {<br>&nbsp;&nbsp;detail: null<br>}</pre>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `dragstart` | `CustomEvent<DragStartEventDetail>` | An item starts to be dragged by a pointer device or a keyboard.                                          | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                                                                                                                                                    |
+| `drag`      | `CustomEvent<DragEventDetail>`      | A dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
+| `drop`      | `CustomEvent<DropEventDetail>`      | A dragged item is released by a pointer device or a keyboard.                                            | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
+| `dragend`   | `CustomEvent<DragEndEventDetail>`   | A dragged item reaches its destination after being released.                                             | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;isCanceled: boolean<br>&nbsp;&nbsp;}<br>}</pre> |
 
-### `<SortableItem>` props
+### `<SortableList.Item>` props
 
 | Prop         | Type                   | Default     | Possible values   | Description                                                                              |
 | ------------ | ---------------------- | ----------- | ----------------- | ---------------------------------------------------------------------------------------- |
@@ -260,10 +251,10 @@ It would be possible to avoid the `<Remove>` component and just go with a `<butt
 
 ## Utilities
 
-| Function       | Description                                                                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sortItems()`  | Provides an easy mechanism to reorder items (it’s recommended to be used in combination with the [`on:dragend` event](#sortablelist-events)). |
-| `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`on:drop` event](#sortablelist-events)). |
+| Function       | Description                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sortItems()`  | Provides an easy mechanism to reorder items (it’s recommended to be used in combination with the [`dragend` event](#sortablelist-events)). |
+| `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`drop` event](#sortablelist-events)). |
 
 Example:
 
@@ -272,7 +263,7 @@ Example:
 	import { ... removeItem, sortItems } from '$lib/index.js';
 	...
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
@@ -287,35 +278,35 @@ Example:
 	}
 </script>
 
-<SortableList on:dragend={handleDragEnd}>...</SortableList>
+<SortableList.Root on:dragend={handleDragEnd}>...</SortableList.Root>
 ```
 
 ## Types
 
-| Type                   | Description                                                                                            |
-| ---------------------- | ------------------------------------------------------------------------------------------------------ |
-| `SortableListProps`    | Provides definitions for the [`<SortableList>` component](#sortablelist-props).                        |
-| `SortableItemProps`    | Provides definitions for the [`<SortableItem>` component](#sortableitem-props).                        |
-| `SortableItemData`     | Provides definitions for your items list data.                                                         |
-| `MountedEventDetail`   | Provides definitions for the [`<SortableList>` `mounted` custom event detail](#sortablelist-events).   |
-| `DragStartEventDetail` | Provides definitions for the [`<SortableList>` `dragstart` custom event detail](#sortablelist-events). |
-| `DragEventDetail`      | Provides definitions for the [`<SortableList>` `drag` custom event detail](#sortablelist-events).      |
-| `DropEventDetail`      | Provides definitions for the [`<SortableList>` `drop` custom event detail](#sortablelist-events).      |
-| `DragEndEventDetail`   | Provides definitions for the [`<SortableList>` `dragend` custom event detail](#sortablelist-events).   |
+| Type                                   | Description                                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `SortableList.RootProps`               | Provides definitions for the [`<SortableList.Root>` component](#sortablelistroot-props).                 |
+| `SortableList.ItemProps`               | Provides definitions for the [`<SortableList.Item>` component](#sortablelistitem-props).                 |
+| `SortableList.ItemData`                | Provides definitions for your items list data.                                                           |
+| `SortableList.RootEvents['mounted']`   | Provides definitions for the [`<SortableList.Root>` `mounted` custom event](#sortablelistroot-events).   |
+| `SortableList.RootEvents['dragstart']` | Provides definitions for the [`<SortableList.Root>` `dragstart` custom event](#sortablelistroot-events). |
+| `SortableList.RootEvents['drag']`      | Provides definitions for the [`<SortableList.Root>` `drag` custom event](#sortablelistroot-events).      |
+| `SortableList.RootEvents['drop']`      | Provides definitions for the [`<SortableList.Root>` `drop` custom event](#sortablelistroot-events).      |
+| `SortableList.RootEvents['dragend']`   | Provides definitions for the [`<SortableList.Root>` `dragend` custom event](#sortablelistroot-events).   |
 
 Example:
 
 ```svelte
 <script lang="ts">
-	import type { ... DragEndEventDetail, DropEventDetail } from '$lib/types/index.js';
+	import type { SortableList } from '$lib/types/index.js';
 	...
 
-	function handleDrop(event: CustomEvent<DropEventDetail>) {
+	function handleDrop(event: SortableList.RootEvents['drop']) {
 		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
@@ -336,42 +327,42 @@ If you want to make use of the styles present in the demo pages, import them in 
 ### Selectors
 
 > [!IMPORTANT]
-> To customize the appearance of the list items and ghost element (and not cause any conflicts or interferences with the core styles and transitions), the usage of the `.ssl-item` and `.ssl-ghost` selectors must be avoided. You can instead create a wrapping element for the item’s content (like the element with the `.ssl-content` class included in one of the examples), which should be the direct child of the element with the `.ssl-item` class (the ghost element will simply mirror the list item’s content and appearance).
+> To customize the appearance of the list items and ghost element (and not cause any conflicts or interferences with the core styles and transitions), the usage of the `.ssl-item` and `.ssl-ghost` selectors must be avoided. You can instead create a wrapping element for the item’s content (like the element with the `.ssl-item-content` class included in one of the examples), which should be the direct child of the element with the `.ssl-item` class (the ghost element will simply mirror the list item’s content and appearance).
 
 This is a list of the selectors you can use to style the list and the list items to your heart’s desire:
 
-| Selector                                         | Points to                                                                                               |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `.ssl-list`                                      | The `<SortableList>` main container.                                                                    |
-| `.ssl-list[aria-orientation="vertical"]`         | The `<SortableList>` main container when `direction` is set to `vertical`.                              |
-| `.ssl-list[aria-orientation="horizontal"]`       | The `<SortableList>` main container when `direction` is set to `horizontal`.                            |
-| `.ssl-list[data-has-drop-marker="true"]`         | The `<SortableList>` main container while `hasDropMarker` is enabled.                                   |
-| `.ssl-list[data-can-remove-on-drop-out="true"]`  | The `<SortableList>` main container while `canRemoveOnDropOut` is enabled.                              |
-| `.ssl-list[data-is-locked="true"]`               | The `<SortableList>` that is locked.                                                                    |
-| `.ssl-list[aria-disabled="true"]`                | The `<SortableList>` that is disabled.                                                                  |
-| `.ssl-item`                                      | Each `<SortableItem>` main container.                                                                   |
-| `.ssl-item[data-is-pointer-dragging="true"]`     | The `<SortableItem>` that is being dragged by a pointing device.                                        |
-| `.ssl-item[data-is-pointer-dropping="true"]`     | The `<SortableItem>` that is being dropped by a pointing device.                                        |
-| `.ssl-item[data-is-keyboard-dragging="true"]`    | The `<SortableItem>` that is being dragged by the keyboard.                                             |
-| `.ssl-item[data-is-keyboard-dropping="true"]`    | The `<SortableItem>` that is being dropped by the keyboard.                                             |
-| `.ssl-item[data-is-locked="true"]`               | Each `<SortableItem>` that is locked.                                                                   |
-| `.ssl-item[aria-disabled="true"]`                | Each `<SortableItem>` that is disabled.                                                                 |
-| `.ssl-item[data-is-removing="true"]`             | The `<SortableItem>` that is being removed by dropping it outside the list limits by a pointing device. |
-| `.ssl-ghost`                                     | The shadow element displayed under the pointer when dragging.                                           |
-| `.ssl-ghost[data-is-pointer-dragging="true"]`    | The shadow element while it’s being dragged by a pointing device.                                       |
-| `.ssl-ghost[data-is-pointer-dropping="true"]`    | The shadow element while it’s being dropped by a pointing device.                                       |
-| `.ssl-ghost[data-is-between-bounds="true"]`      | The shadow element while it’s inside the list limits.                                                   |
-| `.ssl-ghost[data-is-removing="true"]`            | The shadow element while a `<SortableItem>` is being removed.                                           |
-| `.ssl-ghost[data-can-remove-on-drop-out="true"]` | The shadow element while `canRemoveOnDropOut` is enabled.                                               |
-| `.ssl-handle`                                    | The `<Handle>` main container.                                                                          |
-| `.ssl-remove`                                    | The `<Remove>` main container.                                                                          |
+| Selector                                         | Points to                                                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `.ssl-list`                                      | The `<SortableList.Root>` main container.                                                                    |
+| `.ssl-list[aria-orientation="vertical"]`         | The `<SortableList.Root>` main container when `direction` is set to `vertical`.                              |
+| `.ssl-list[aria-orientation="horizontal"]`       | The `<SortableList.Root>` main container when `direction` is set to `horizontal`.                            |
+| `.ssl-list[data-has-drop-marker="true"]`         | The `<SortableList.Root>` main container while `hasDropMarker` is enabled.                                   |
+| `.ssl-list[data-can-remove-on-drop-out="true"]`  | The `<SortableList.Root>` main container while `canRemoveOnDropOut` is enabled.                              |
+| `.ssl-list[data-is-locked="true"]`               | The `<SortableList.Root>` that is locked.                                                                    |
+| `.ssl-list[aria-disabled="true"]`                | The `<SortableList.Root>` that is disabled.                                                                  |
+| `.ssl-item`                                      | Each `<SortableList.Item>` main container.                                                                   |
+| `.ssl-item[data-is-pointer-dragging="true"]`     | The `<SortableList.Item>` that is being dragged by a pointing device.                                        |
+| `.ssl-item[data-is-pointer-dropping="true"]`     | The `<SortableList.Item>` that is being dropped by a pointing device.                                        |
+| `.ssl-item[data-is-keyboard-dragging="true"]`    | The `<SortableList.Item>` that is being dragged by the keyboard.                                             |
+| `.ssl-item[data-is-keyboard-dropping="true"]`    | The `<SortableList.Item>` that is being dropped by the keyboard.                                             |
+| `.ssl-item[data-is-locked="true"]`               | Each `<SortableList.Item>` that is locked.                                                                   |
+| `.ssl-item[aria-disabled="true"]`                | Each `<SortableList.Item>` that is disabled.                                                                 |
+| `.ssl-item[data-is-removing="true"]`             | The `<SortableList.Item>` that is being removed by dropping it outside the list limits by a pointing device. |
+| `.ssl-ghost`                                     | The shadow element displayed under the pointer when dragging.                                                |
+| `.ssl-ghost[data-is-pointer-dragging="true"]`    | The shadow element while it’s being dragged by a pointing device.                                            |
+| `.ssl-ghost[data-is-pointer-dropping="true"]`    | The shadow element while it’s being dropped by a pointing device.                                            |
+| `.ssl-ghost[data-is-between-bounds="true"]`      | The shadow element while it’s inside the list limits.                                                        |
+| `.ssl-ghost[data-is-removing="true"]`            | The shadow element while a `<SortableList.Item>` is being removed.                                           |
+| `.ssl-ghost[data-can-remove-on-drop-out="true"]` | The shadow element while `canRemoveOnDropOut` is enabled.                                                    |
+| `.ssl-item-handle`                               | The `<SortableList.ItemHandle>` main container.                                                              |
+| `.ssl-item-remove`                               | The `<SortableList.ItemRemove>` main container.                                                              |
 
 > [!TIP]
 > Combining the available selectors appropriately should be enough to style the list and the list items to your heart’s content.
 > For example, the following would target the direct child of the `<Ghost>` component when `canRemoveOnDropOut` is enabled and is being dragged outside of the list limits:
 >
 > ```css
-> .ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-content {
+> .ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-item-content {
 >   ...
 > }
 > ```
@@ -380,10 +371,10 @@ This is a list of the selectors you can use to style the list and the list items
 
 ### Custom properties
 
-| Custom property         | Description                                                                                                                  |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `--gap`                 | Separation between items (in pixels).                                                                                        |
-| `--transition-duration` | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). |
+| Custom property             | Description                                                                                                                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `--ssl-gap`                 | Separation between items (in pixels).                                                                                        |
+| `--ssl-transition-duration` | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). |
 
 ## Motivation
 
