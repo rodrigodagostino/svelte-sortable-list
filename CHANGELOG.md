@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.6] (2025-06-09)
+
+### BREAKING
+
+- Adjust the package structure to follow the Compound Pattern.
+- Add `ssl` as suffix for the CSS custom properties.
+
+### Added
+
+- Add the available ARIA attributes in the `<SortableList.Root>` and `<SortableItem.Item>` components to their props autocomplete.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Update the README to reflect the latest changes.
+
 ## [0.12.5] (2025-06-05)
 
 ### BREAKING
@@ -822,7 +838,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...HEAD
+[0.12.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.2...v0.12.3
