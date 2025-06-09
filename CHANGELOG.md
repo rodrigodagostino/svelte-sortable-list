@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.7] (2025-06-09)
+
+### Fixed
+
+- Correct the definition for the `aria-description` property in the `SortableListRootProps` type.
+
 ## [0.12.6] (2025-06-09)
 
 ### BREAKING
@@ -838,7 +844,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...HEAD
+[0.12.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.3...v0.12.4
