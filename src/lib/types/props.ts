@@ -3,7 +3,11 @@ import type { Announcements } from './accessibility.js';
 
 export interface SortableListRootProps
 	extends Pick<
-		AriaAttributes,
+		AriaAttributes & {
+			// `aria-description` is still in W3C Editor's Draft for ARIA 1.3,
+			// but it is already correctly interpreted by screen readers.
+			'aria-description'?: string | undefined | null;
+		},
 		'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
 	> {
 	gap?: number;
