@@ -231,7 +231,7 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:--transition-duration="{$listProps.transitionDuration}ms"
+	style:--ssl-transition-duration="{$listProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}

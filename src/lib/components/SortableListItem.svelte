@@ -145,8 +145,8 @@
 			return '0';
 		else
 			return $listProps.direction === 'vertical'
-				? 'calc(var(--gap) / 2) 0'
-				: '0 calc(var(--gap) / 2)';
+				? 'calc(var(--ssl-gap) / 2) 0'
+				: '0 calc(var(--ssl-gap) / 2)';
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

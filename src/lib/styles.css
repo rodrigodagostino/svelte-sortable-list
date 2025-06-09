@@ -63,10 +63,10 @@
 	box-shadow: none;
 	opacity: 1;
 	transition:
-		background-color calc(var(--transition-duration) / 3 * 2),
-		border-color calc(var(--transition-duration) / 3 * 2),
-		box-shadow calc(var(--transition-duration) / 3 * 2),
-		opacity var(--transition-duration);
+		background-color calc(var(--ssl-transition-duration) / 3 * 2),
+		border-color calc(var(--ssl-transition-duration) / 3 * 2),
+		box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
+		opacity var(--ssl-transition-duration);
 }
 
 .ssl-item-content__text {
@@ -89,7 +89,7 @@
 	padding: 0.5rem;
 	border: none;
 	border-radius: 0.25rem;
-	transition: background-color calc(var(--transition-duration) / 3 * 2);
+	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
 .ssl-item-handle,
@@ -104,7 +104,7 @@
 .ssl-ghost .ssl-item-handle {
 	background-color: var(--gray-100);
 	color: var(--gray-600);
-	transition: background-color calc(var(--transition-duration) / 3 * 2);
+	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
 .ssl-item-handle {
@@ -120,18 +120,26 @@
  */
 .ssl-list[data-has-drop-marker="true"] .ssl-item-content {
 	transition:
-		background-color calc(var(--transition-duration) / 3 * 2),
-		border-color calc(var(--transition-duration) / 3 * 2),
-		box-shadow calc(var(--transition-duration) / 3 * 2);
+		background-color calc(var(--ssl-transition-duration) / 3 * 2),
+		border-color calc(var(--ssl-transition-duration) / 3 * 2),
+		box-shadow calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
 .ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-item-content,
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-item-content {
+.ssl-list[data-has-drop-marker="true"]
+	.ssl-item[data-is-pointer-dropping="true"]
+	.ssl-item-content {
 	opacity: 0.5;
 }
 
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-item-content > *,
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dropping="true"] .ssl-item-content > * {
+.ssl-list[data-has-drop-marker="true"]
+	.ssl-item[data-is-pointer-dragging="true"]
+	.ssl-item-content
+	> *,
+.ssl-list[data-has-drop-marker="true"]
+	.ssl-item[data-is-pointer-dropping="true"]
+	.ssl-item-content
+	> * {
 	opacity: 0;
 }
 

@@ -594,8 +594,8 @@
 <ul
 	bind:this={listRef}
 	class="ssl-list"
-	style:--gap="{gap}px"
-	style:--transition-duration="{transitionDuration}ms"
+	style:--ssl-gap="{gap}px"
+	style:--ssl-transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
@@ -674,17 +674,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	.ssl-list {
 		display: flex;
 		padding-inline-start: 0;
-		margin: calc(var(--gap) / 2 * -1);
-		outline-offset: calc(var(--gap) / 2 * -1);
+		margin: calc(var(--ssl-gap) / 2 * -1);
+		outline-offset: calc(var(--ssl-gap) / 2 * -1);
 
 		&[aria-orientation='vertical'] {
 			flex-direction: column;
-			padding-inline: calc(var(--gap) / 2);
+			padding-inline: calc(var(--ssl-gap) / 2);
 		}
 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
-			padding-block: calc(var(--gap) / 2);
+			padding-block: calc(var(--ssl-gap) / 2);
 		}
 	}
 
