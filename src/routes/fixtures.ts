@@ -1,6 +1,6 @@
-import type { SortableItemData, SortableListProps } from '$lib/types/index.js';
+import type { SortableList } from '$lib/index.js';
 
-export const defaultProps: SortableListProps = {
+export const defaultProps: SortableList.RootProps = {
 	gap: 12,
 	direction: 'vertical',
 	transitionDuration: 240,
@@ -13,7 +13,7 @@ export const defaultProps: SortableListProps = {
 	isDisabled: false,
 };
 
-export const defaultItems: SortableItemData[] = [
+export const defaultItems: SortableList.ItemData[] = [
 	{
 		id: 'list-item-1',
 		text: 'List item 1',
@@ -36,7 +36,7 @@ export const defaultItems: SortableItemData[] = [
 	},
 ];
 
-export const varyingItems: SortableItemData[] = [
+export const varyingItems: SortableList.ItemData[] = [
 	{
 		id: 'list-item-1',
 		text: 'List item 1',
@@ -59,7 +59,7 @@ export const varyingItems: SortableItemData[] = [
 	},
 ];
 
-export const lockedItems: SortableItemData[] = [
+export const lockedItems: SortableList.ItemData[] = [
 	{
 		id: 'locked-item-1',
 		text: 'Locked item 1',
@@ -87,7 +87,7 @@ export const lockedItems: SortableItemData[] = [
 	},
 ];
 
-export const disabledItems: SortableItemData[] = [
+export const disabledItems: SortableList.ItemData[] = [
 	{
 		id: 'disabled-item-1',
 		text: 'Disabled item 1',
@@ -115,7 +115,7 @@ export const disabledItems: SortableItemData[] = [
 	},
 ];
 
-export const interactiveItems: SortableItemData[] = [
+export const interactiveItems: SortableList.ItemData[] = [
 	{
 		id: 'list-item-1',
 		text: 'List item 1',

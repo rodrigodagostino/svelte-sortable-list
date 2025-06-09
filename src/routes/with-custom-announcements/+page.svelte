@@ -1,14 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import {
-		SortableItem,
-		SortableList,
-		removeItem,
-		sortItems,
-		type DropEventDetail,
-		type DragEndEventDetail,
-		type SortableListProps,
-	} from '$lib/index.js';
+	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
@@ -19,7 +11,7 @@
 		$props = { ...defaultProps };
 	});
 
-	const announcements: SortableListProps['announcements'] = {
+	const announcements: SortableList.RootProps['announcements'] = {
 		lifted: (_, draggedItemIndex) => {
 			return `Ha levantado un item en la posición ${draggedItemIndex! + 1}.`;
 		},
@@ -48,12 +40,12 @@
 		},
 	};
 
-	function handleDrop(event: CustomEvent<DropEventDetail>) {
+	function handleDrop(event: SortableList.RootEvents['drop']) {
 		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
@@ -64,7 +56,7 @@
 	<title>With custom announcements | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList
+<SortableList.Root
 	{...$props}
 	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
 	{announcements}
@@ -72,10 +64,10 @@
 	on:dragend={handleDragEnd}
 >
 	{#each items as item, index (item.id)}
-		<SortableItem {...item} {index}>
-			<div class="ssl-content">
-				<span class="ssl-content__text">{item.text}</span>
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
 			</div>
-		</SortableItem>
+		</SortableList.Item>
 	{/each}
-</SortableList>
+</SortableList.Root>

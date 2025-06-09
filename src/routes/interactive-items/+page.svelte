@@ -1,13 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import {
-		SortableItem,
-		SortableList,
-		removeItem,
-		sortItems,
-		type DropEventDetail,
-		type DragEndEventDetail,
-	} from '$lib/index.js';
+	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { interactiveItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
@@ -18,12 +11,12 @@
 		$props = { ...defaultProps };
 	});
 
-	function handleDrop(event: CustomEvent<DropEventDetail>) {
+	function handleDrop(event: SortableList.RootEvents['drop']) {
 		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
@@ -34,10 +27,10 @@
 	<title>Interactive items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
-		<SortableItem {...item} {index}>
-			<div class="ssl-content">
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
 				{#if item.type === 'input'}
 					<div class="form-field">
 						<label for={item.id}>{item.text}</label>
@@ -80,18 +73,19 @@
 					</div>
 				{:else if item.type === 'a'}
 					<a
-						class="ssl-content__text"
+						class="ssl-item-content__text"
 						href="https://github.com/rodrigodagostino/svelte-sortable-list">{item.text}</a
 					>
 				{/if}
 			</div>
-		</SortableItem>
+		</SortableList.Item>
 	{/each}
-</SortableList>
+</SortableList.Root>
 
 <style>
 	.form-field,
 	fieldset {
+		width: 100%;
 		margin-block: 0.625rem;
 	}
 
@@ -123,6 +117,7 @@
 	}
 
 	button {
+		margin-inline: auto;
 		text-transform: inherit;
 	}
 </style>

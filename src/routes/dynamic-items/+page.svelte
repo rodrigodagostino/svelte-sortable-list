@@ -1,14 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import {
-		SortableList,
-		SortableItem,
-		Remove,
-		removeItem,
-		sortItems,
-		type DropEventDetail,
-		type DragEndEventDetail,
-	} from '$lib/index.js';
+	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { defaultItems, defaultProps } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import { toKebabCase } from '../utils.js';
@@ -21,12 +13,12 @@
 		$props = { ...defaultProps };
 	});
 
-	function handleDrop(event: CustomEvent<DropEventDetail>) {
+	function handleDrop(event: SortableList.RootEvents['drop']) {
 		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: CustomEvent<DragEndEventDetail>) {
+	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
@@ -45,16 +37,16 @@
 	<title>Dynamic items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
-		<SortableItem {...item} {index}>
-			<div class="ssl-content">
-				<span class="ssl-content__text">{item.text}</span>
-				<Remove on:click={handleRemoveClick} />
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+				<SortableList.ItemRemove on:click={handleRemoveClick} />
 			</div>
-		</SortableItem>
+		</SortableList.Item>
 	{/each}
-</SortableList>
+</SortableList.Root>
 
 <button class="button" on:click={() => (items = defaultItems)}>Reset</button>
 
