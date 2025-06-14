@@ -44,14 +44,12 @@
 	const isBetweenBounds = getIsBetweenBounds();
 	const isRTL = getIsRTL();
 
-	let rectOrigin: DOMRect | null = null;
 	let hasHandle = false;
 	$: {
 		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
 	}
 
 	onMount(() => {
-		rectOrigin = itemRef?.getBoundingClientRect();
 		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 		setInteractiveElementsTabIndex();
 	});
@@ -75,6 +73,7 @@
 			);
 	}
 
+	$: currentItemRect = $itemsData ? $itemsData[index] : null;
 	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
 	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemsData is used as a reliable reference to the item’s position in the list
@@ -128,7 +127,7 @@
 		if (!$listProps.canRemoveOnDropOut) return undefined;
 		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.width}px`;
+		else if (draggedItemId === String(id) && $isBetweenBounds) return `${currentItemRect?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -136,7 +135,8 @@
 		if (!$listProps.canRemoveOnDropOut) return undefined;
 		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds) return `${rectOrigin?.height}px`;
+		else if (draggedItemId === String(id) && $isBetweenBounds)
+			return `${currentItemRect?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -152,6 +152,7 @@
 			!$itemsData ||
 			!$draggedItem ||
 			!$targetItem ||
+			currentItemRect === null ||
 			draggedItemIndex === null ||
 			draggedItemRect === null ||
 			targetItemIndex === null ||
@@ -162,6 +163,7 @@
 				!$isKeyboardDropping) ||
 			$isPointerCanceling ||
 			$isKeyboardCanceling ||
+			typeof $listProps.gap !== 'number' ||
 			(!$isBetweenBounds && !$listProps.canClearOnDragOut && $listProps.canRemoveOnDropOut)
 		)
 			return 'translate3d(0, 0, 0)';
@@ -181,10 +183,10 @@
 				const x =
 					$listProps.direction === 'vertical'
 						? '0'
-						: `${operator}${draggedItemRect.width + $listProps.gap!}px`;
+						: `${operator}${draggedItemRect.width + $listProps.gap}px`;
 				const y =
 					$listProps.direction === 'vertical'
-						? `${operator}${draggedItemRect.height + $listProps.gap!}px`
+						? `${operator}${draggedItemRect.height + $listProps.gap}px`
 						: '0';
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
