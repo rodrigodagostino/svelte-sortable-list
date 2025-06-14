@@ -143,10 +143,7 @@
 	function getStyleMargin(...args: unknown[]) {
 		if (draggedItemId === String(id) && !$isBetweenBounds && $listProps.canRemoveOnDropOut)
 			return '0';
-		else
-			return $listProps.direction === 'vertical'
-				? 'calc(var(--ssl-gap) / 2) 0'
-				: '0 calc(var(--ssl-gap) / 2)';
+		else return 'calc(var(--ssl-gap) / 2)';
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars

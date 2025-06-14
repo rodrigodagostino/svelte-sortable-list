@@ -679,12 +679,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		&[aria-orientation='vertical'] {
 			flex-direction: column;
-			padding-inline: calc(var(--ssl-gap) / 2);
 		}
 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
-			padding-block: calc(var(--ssl-gap) / 2);
 		}
 	}
 
