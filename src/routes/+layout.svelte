@@ -94,7 +94,6 @@
 				<path d="M18 6 6 18" />
 				<path d="m6 6 12 12" />
 			</svg>
-			<span class="sr-only">Hide menu</span>
 		{:else}
 			<svg
 				width="24"
@@ -111,8 +110,8 @@
 				<path d="M4 18h16" />
 				<path d="M4 6h16" />
 			</svg>
-			<span class="sr-only">Show menu</span>
 		{/if}
+		<span class="sr-only">{isMenuExpanded ? 'Hide menu' : 'Show menu'}</span>
 	</button>
 	<nav id="app-nav" class="app-nav" aria-hidden={!isMenuExpanded} inert={!isMenuExpanded}>
 		<div class="container">
@@ -165,7 +164,6 @@
 				<path d="M18 6 6 18" />
 				<path d="m6 6 12 12" />
 			</svg>
-			<span class="sr-only">Hide controls</span>
 		{:else}
 			<svg
 				width="24"
@@ -188,8 +186,8 @@
 				<line x1="8" x2="8" y1="10" y2="14" />
 				<line x1="16" x2="16" y1="18" y2="22" />
 			</svg>
-			<span class="sr-only">Show controls</span>
 		{/if}
+		<span class="sr-only">{isControlsExpanded ? 'Hide controls' : 'Show controls'}</span>
 	</button>
 	<aside
 		id="app-controls"
@@ -300,6 +298,7 @@
 		}
 
 		& .container {
+			align-items: start;
 			gap: 0.75rem;
 			padding: 3rem 2rem;
 			overflow: auto;
@@ -313,20 +312,32 @@
 		}
 
 		&[aria-hidden='true'] {
-			transform: translate3d(110%, 0, 0);
+			visibility: hidden;
+			opacity: 0;
+			transition:
+				opacity 240ms,
+				visibility 0s 240ms;
 		}
 
 		&[aria-hidden='false'] {
-			transform: translate3d(0, 0, 0);
+			visibility: visible;
+			opacity: 1;
+			transition: opacity 240ms;
 		}
 	}
 
 	.link {
-		color: var(--white);
+		color: var(--gray-100);
 		text-decoration: none;
+
+		&:focus,
+		&:hover {
+			color: var(--white-rich);
+		}
 
 		&[aria-current='page'] {
 			font-weight: 700;
+			color: var(--white-rich);
 		}
 	}
 
@@ -339,6 +350,7 @@
 
 	.separator {
 		width: 100%;
+		margin-block: 0.25rem;
 		border-style: solid;
 		color: var(--gray-400);
 	}
@@ -373,11 +385,17 @@
 		}
 
 		&[aria-hidden='true'] {
-			transform: translate3d(0, 110%, 0);
+			visibility: hidden;
+			opacity: 0;
+			transition:
+				opacity 240ms,
+				visibility 0s 240ms;
 		}
 
 		&[aria-hidden='false'] {
-			transform: translate3d(0, 0, 0);
+			visibility: visible;
+			opacity: 1;
+			transition: opacity 240ms;
 		}
 
 		& .container {
