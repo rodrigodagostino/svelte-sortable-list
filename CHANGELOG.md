@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.8] (2025-06-14)
+
+### Changed
+
+- Replace `<SortableList.Root>` padding with `<SortableList.Item>` margin.
+- Switch to a more reliable method to obtain the current item data in `<SortableList.Item>`.
+
+### Docs
+
+- Add in and out transitions to the navigation menu and controls in the demo pages layout.
+- Remove unused CSS custom color properties.
+
 ## [0.12.7] (2025-06-09)
 
 ### Fixed
@@ -22,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add the available ARIA attributes in the `<SortableList.Root>` and `<SortableItem.Item>` components to their props autocomplete.
+- Add the available ARIA attributes in the `<SortableList.Root>` and `<SortableList.Item>` components to their props autocomplete.
 
 ### Docs
 
@@ -844,7 +856,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...HEAD
+[0.12.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...v0.12.6
 [0.12.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.4...v0.12.5
