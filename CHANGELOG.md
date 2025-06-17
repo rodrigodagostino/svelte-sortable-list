@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] (2025-06-17)
+
+### Added
+
+- Add wrapping support.
+
+### Changed
+
+- Rename `listRef` to `rootRef`, `listProps` to `rootProps`, and `listRect` to `rootRect`.
+- Shrink the `getIntersectionRect()`function parameters names from `r1` and `r2` to `a` and `b` for consistency with the other related functions.
+
+### Fixed
+
+- Correct the syntax of the CSS universal selector (`*`) in `<SortableList.Item>`.
+
+### Docs
+
+- Add the **“With wrapping”** demo page.
+- Generate the demo pages items dynamically.
+- Rename `defaultProps` to `defaultRootProps` and `props` to `rootProps`.
+- Update the README to reflect the latest changes.
+
 ## [0.12.8] (2025-06-14)
 
 ### Changed
@@ -856,7 +878,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...v0.12.7
 [0.12.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.5...v0.12.6
