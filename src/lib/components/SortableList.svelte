@@ -57,6 +57,7 @@
 	export let direction: $$Props['direction'] = 'vertical';
 	export let transitionDuration: $$Props['transitionDuration'] = 240;
 	export let hasDropMarker: $$Props['hasDropMarker'] = false;
+	export let hasWrapping: $$Props['hasWrapping'] = false;
 	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
 	export let hasBoundaries: $$Props['hasBoundaries'] = false;
 	export let canClearOnDragOut: $$Props['canClearOnDragOut'] = false;
@@ -70,6 +71,7 @@
 		direction,
 		transitionDuration,
 		hasDropMarker,
+		hasWrapping,
 		hasLockedAxis,
 		hasBoundaries,
 		canClearOnDragOut,
@@ -83,6 +85,7 @@
 		direction,
 		transitionDuration,
 		hasDropMarker,
+		hasWrapping,
 		hasLockedAxis,
 		hasBoundaries,
 		canClearOnDragOut,
@@ -595,6 +598,7 @@
 	bind:this={listRef}
 	class="ssl-list"
 	style:--ssl-gap="{gap}px"
+	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{transitionDuration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
@@ -673,6 +677,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	.ssl-list {
 		display: flex;
+		flex-wrap: var(--ssl-wrap);
 		padding-inline-start: 0;
 		margin: calc(var(--ssl-gap) / 2 * -1);
 		outline-offset: calc(var(--ssl-gap) / 2 * -1);

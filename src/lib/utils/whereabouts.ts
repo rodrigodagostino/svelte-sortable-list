@@ -1,3 +1,12 @@
+import type { ItemData } from '$lib/types/data-extraction.js';
+
+export function isInSameRow(a: DOMRect | ItemData, b: DOMRect | ItemData) {
+	return (
+		(a.y >= b.y && a.y + a.height <= b.y + b.height) ||
+		(a.y <= b.y && a.y + a.height >= b.y + b.height)
+	);
+}
+
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
 export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLElement) {

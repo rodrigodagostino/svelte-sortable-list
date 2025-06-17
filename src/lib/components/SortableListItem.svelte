@@ -17,7 +17,7 @@
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
 	import type { SortableListItemProps } from '$lib/types/index.js';
-	import { dispatch, getId, getIndex } from '$lib/utils/index.js';
+	import { dispatch, getId, getIndex, isInSameRow } from '$lib/utils/index.js';
 
 	type $$Props = SortableListItemProps;
 
@@ -163,7 +163,6 @@
 				!$isKeyboardDropping) ||
 			$isPointerCanceling ||
 			$isKeyboardCanceling ||
-			typeof $listProps.gap !== 'number' ||
 			(!$isBetweenBounds && !$listProps.canClearOnDragOut && $listProps.canRemoveOnDropOut)
 		)
 			return 'translate3d(0, 0, 0)';
@@ -173,21 +172,21 @@
 				(index > draggedItemIndex && index <= targetItemIndex) ||
 				(index < draggedItemIndex && index >= targetItemIndex)
 			) {
-				const operator = !$isRTL
-					? index > draggedItemIndex && index <= targetItemIndex
-						? '-'
-						: ''
-					: index > draggedItemIndex && index <= targetItemIndex
-						? ''
-						: '-';
+				const step = index > draggedItemIndex ? -1 : 1;
+				const operator = index > draggedItemIndex === !$isRTL ? '-' : '';
 				const x =
 					$listProps.direction === 'vertical'
 						? '0'
-						: `${operator}${draggedItemRect.width + $listProps.gap}px`;
+						: isInSameRow(currentItemRect, $itemsData[index + step])
+							? `${operator}${draggedItemRect.width + $listProps.gap!}px`
+							: `${$itemsData[index + step].x + $itemsData[index + step].width - currentItemRect.x - currentItemRect.width}px`;
 				const y =
 					$listProps.direction === 'vertical'
-						? `${operator}${draggedItemRect.height + $listProps.gap}px`
-						: '0';
+						? `${operator}${draggedItemRect.height + $listProps.gap!}px`
+						: isInSameRow(currentItemRect, $itemsData[index + step])
+							? '0'
+							: `${$itemsData[index + step].y - currentItemRect.y}px`;
+
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
 				return 'translate3d(0, 0, 0)';
@@ -197,14 +196,9 @@
 			const draggedItemHeight = draggedItemIndex < targetItemIndex ? draggedItemRect.height : 0;
 			const targetItemWidth = draggedItemIndex < targetItemIndex ? targetItemRect.width : 0;
 			const targetItemHeight = draggedItemIndex < targetItemIndex ? targetItemRect.height : 0;
-			const x =
-				$listProps.direction === 'vertical'
-					? '0'
-					: `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
-			const y =
-				$listProps.direction === 'vertical'
-					? `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`
-					: '0';
+			const x = `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
+			const y = `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`;
+
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 	}

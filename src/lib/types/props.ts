@@ -14,6 +14,7 @@ export interface SortableListRootProps
 	direction?: 'vertical' | 'horizontal';
 	transitionDuration?: number;
 	hasDropMarker?: boolean;
+	hasWrapping?: boolean;
 	hasLockedAxis?: boolean;
 	hasBoundaries?: boolean;
 	canClearOnDragOut?: boolean;
