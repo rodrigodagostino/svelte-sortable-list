@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, getDefaultItems } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items = getDefaultItems(5);
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultRootProps };
 	});
 
 	const announcements: SortableList.RootProps['announcements'] = {
@@ -57,7 +57,7 @@
 </svelte:head>
 
 <SortableList.Root
-	{...$props}
+	{...$rootProps}
 	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
 	{announcements}
 	on:drop={handleDrop}

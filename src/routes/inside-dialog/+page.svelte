@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, getDefaultItems } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let dialogRef: HTMLDialogElement;
@@ -10,7 +10,7 @@
 	let items = getDefaultItems(5);
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultRootProps };
 	});
 
 	function handleDrop(event: SortableList.RootEvents['drop']) {
@@ -47,7 +47,7 @@
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <dialog
 	bind:this={dialogRef}
-	class="dialog direction-{$props.direction}"
+	class="dialog direction-{$rootProps.direction}"
 	on:click={handleClickDialog}
 >
 	<button class="dialog__close button" on:click={handleCloseDialog}>
@@ -68,7 +68,7 @@
 		<span class="sr-only">Close dialog</span>
 	</button>
 	<div class="dialog__inner">
-		<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+		<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
 			{#each items as item, index (item.id)}
 				<SortableList.Item {...item} {index}>
 					<div class="ssl-item-content">

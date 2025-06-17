@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { version } from '$app/environment';
 	import { page } from '$app/stores';
-	import { props } from './stores.js';
+	import { rootProps } from './stores.js';
 	import { toKebabCase } from './utils.js';
 	import './styles.css';
 
@@ -36,7 +36,7 @@
 		{ text: 'RTL', path: '/rtl' },
 	];
 
-	$: controls = Object.keys($props).map((key) => ({
+	$: controls = Object.keys($rootProps).map((key) => ({
 		label: key,
 		type:
 			key === 'gap' || key === 'transitionDuration'
@@ -47,13 +47,13 @@
 		id: toKebabCase(key),
 		...(key === 'gap' || key === 'transitionDuration' ? { min: 0 } : {}),
 		...(key === 'direction' ? { options: ['vertical', 'horizontal'] } : {}),
-		value: $props[key as never],
+		value: $rootProps[key as never],
 	}));
 
 	function handleFieldChange(event: Event) {
 		const { type, name, value, checked } = event.target as HTMLInputElement;
-		$props = {
-			...$props,
+		$rootProps = {
+			...$rootProps,
 			[name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
 		};
 	}

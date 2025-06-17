@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, sortItems, removeItem } from '$lib/index.js';
-	import { defaultProps, getDefaultItems, getDisabledItems } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { defaultRootProps, getDefaultItems, getDisabledItems } from '../fixtures.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	const defaultItems = getDefaultItems(3);
@@ -16,7 +16,7 @@
 	];
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultRootProps };
 	});
 
 	function handleDrop(event: SortableList.RootEvents['drop']) {
@@ -35,7 +35,7 @@
 	<title>Disabled items | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">

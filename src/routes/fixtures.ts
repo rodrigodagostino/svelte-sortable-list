@@ -1,6 +1,6 @@
 import type { SortableList } from '$lib/index.js';
 
-export const defaultProps: SortableList.RootProps = {
+export const defaultRootProps: SortableList.RootProps = {
 	gap: 12,
 	direction: 'vertical',
 	transitionDuration: 240,

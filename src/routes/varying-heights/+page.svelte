@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, getVaryingItems } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { defaultRootProps, getVaryingItems } from '../fixtures.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items = getVaryingItems(5);
 
 	onMount(() => {
-		$props = { ...defaultProps };
+		$rootProps = { ...defaultRootProps };
 	});
 
 	function handleDrop(event: SortableList.RootEvents['drop']) {
@@ -27,7 +27,7 @@
 	<title>Varying heights | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">

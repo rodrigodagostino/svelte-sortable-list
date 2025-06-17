@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, getDefaultItems } from '../fixtures.js';
-	import { props } from '../stores.js';
+	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
+	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
 	let items = getDefaultItems(5);
 
 	onMount(() => {
-		$props = {
-			...defaultProps,
+		$rootProps = {
+			...defaultRootProps,
 			hasDropMarker: true,
 		};
 	});
@@ -30,7 +30,7 @@
 	<title>Has drop marker | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList.Root {...$props} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">

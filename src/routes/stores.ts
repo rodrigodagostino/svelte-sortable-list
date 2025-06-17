@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
 import type { SortableListRootProps } from '$lib/types/index.js';
-import { defaultProps } from './fixtures.js';
+import { defaultRootProps } from './fixtures.js';
 
-export const props = writable<Omit<SortableListRootProps, 'items'>>(defaultProps);
+export const rootProps = writable<Omit<SortableListRootProps, 'items'>>(defaultRootProps);
