@@ -16,6 +16,7 @@
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With drop marker', path: '/with-drop-marker' },
+		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
 		{ text: 'With custom announcements', path: '/with-custom-announcements' },

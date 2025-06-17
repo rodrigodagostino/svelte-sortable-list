@@ -7,6 +7,7 @@ export const defaultProps: SortableList.RootProps = {
 	hasDropMarker: false,
 	hasLockedAxis: false,
 	hasBoundaries: false,
+	hasWrapping: false,
 	canClearOnDragOut: false,
 	canRemoveOnDropOut: false,
 	isLocked: false,
