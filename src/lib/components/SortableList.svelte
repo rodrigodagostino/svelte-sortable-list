@@ -14,9 +14,9 @@
 		setIsPointerDropping,
 		setIsRTL,
 		setItemsData,
-		setListProps,
 		setPointer,
 		setPointerOrigin,
+		setRootProps,
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
@@ -50,7 +50,7 @@
 	type $$Props = SortableListRootProps;
 	type $$Events = SortableListRootEvents;
 
-	let listRef: HTMLUListElement;
+	let rootRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
 
 	export let gap: $$Props['gap'] = 12;
@@ -66,7 +66,7 @@
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let announcements: $$Props['announcements'] = announce;
 
-	const props = setListProps({
+	const rootProps = setRootProps({
 		gap,
 		direction,
 		transitionDuration,
@@ -80,7 +80,7 @@
 		isDisabled,
 		announcements,
 	});
-	$: $props = {
+	$: $rootProps = {
 		gap,
 		direction,
 		transitionDuration,
@@ -112,7 +112,7 @@
 		dragend: DragEndEventDetail;
 	}>();
 
-	$: scrollableAncestor = getClosestScrollableAncestor(listRef);
+	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
@@ -167,7 +167,7 @@
 
 	onMount(() => {
 		dispatch('mounted');
-		$isRTL = getTextDirection(listRef) === 'rtl';
+		$isRTL = getTextDirection(rootRef) === 'rtl';
 	});
 
 	async function handlePointerDown(event: PointerEvent) {
@@ -222,7 +222,7 @@
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
-		$itemsData = getItemsData(listRef);
+		$itemsData = getItemsData(rootRef);
 		ghostStatus = 'init';
 		await tick();
 		$isPointerDragging = true;
@@ -261,19 +261,19 @@
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		const listRect = listRef.getBoundingClientRect();
+		const rootRect = rootRef.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
 
 		$pointer = { x: clientX, y: clientY };
-		$isBetweenBounds = areColliding(ghostRect, listRect);
+		$isBetweenBounds = areColliding(ghostRect, rootRect);
 
 		// Re-set itemsData only during scrolling.
 		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-		if (scrollingSpeed !== 0) $itemsData = getItemsData(listRef);
+		if (scrollingSpeed !== 0) $itemsData = getItemsData(rootRef);
 		await tick();
 		const collidingItemData = getCollidingItem(ghostRef, $itemsData);
 		if (collidingItemData)
-			$targetItem = listRef.querySelector<HTMLLIElement>(
+			$targetItem = rootRef.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemData.id}"]`
 			);
 		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
@@ -298,7 +298,7 @@
 		const { key } = event;
 		const target = event.target as HTMLElement;
 
-		if (target === listRef || target === $focusedItem) {
+		if (target === rootRef || target === $focusedItem) {
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
@@ -319,7 +319,7 @@
 					$draggedItem = $focusedItem;
 					const draggedItemId = getId($focusedItem);
 					const draggedItemIndex = getIndex($focusedItem);
-					$itemsData = getItemsData(listRef);
+					$itemsData = getItemsData(rootRef);
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
@@ -345,7 +345,7 @@
 
 				if (!$isKeyboardDragging) {
 					if (!$focusedItem || focusedItemIndex === null) {
-						const firstItemElement = listRef.querySelector<HTMLLIElement>('.ssl-item');
+						const firstItemElement = rootRef.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItemElement) return;
 						firstItemElement.focus({ preventScroll: true });
 						if (scrollableAncestor && !isFullyVisible(firstItemElement, scrollableAncestor))
@@ -361,7 +361,7 @@
 
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 					if (
 						(step === -1 && focusedItemIndex === 0) ||
 						(step === 1 && focusedItemIndex === items.length - 1)
@@ -434,7 +434,7 @@
 			if (key === 'Home' || key === 'End') {
 				event.preventDefault();
 
-				const items = listRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
 				if (!$isKeyboardDragging) {
@@ -595,7 +595,7 @@
 
 <!-- svelte-ignore a11y-role-supports-aria-props -->
 <ul
-	bind:this={listRef}
+	bind:this={rootRef}
 	class="ssl-list"
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
@@ -628,7 +628,7 @@
 		</p>
 	</slot>
 </ul>
-<SortableListGhost bind:ghostRef status={ghostStatus} {listRef} />
+<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--

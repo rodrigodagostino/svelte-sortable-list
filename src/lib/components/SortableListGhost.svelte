@@ -6,9 +6,9 @@
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getItemsData,
-		getListProps,
 		getPointer,
 		getPointerOrigin,
+		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import type { SortableListGhostProps } from '$lib/types/index.js';
@@ -18,9 +18,9 @@
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let status: $$Props['status'];
-	export let listRef: $$Props['listRef'];
+	export let rootRef: $$Props['rootRef'];
 
-	const listProps = getListProps();
+	const rootProps = getRootProps();
 
 	const pointer = getPointer();
 	const pointerOrigin = getPointerOrigin();
@@ -123,7 +123,7 @@
 	function getStyleTransform(status: $$Props['status'], ...args: unknown[]) {
 		if (
 			status === 'unset' ||
-			!listRef ||
+			!rootRef ||
 			!$itemsData ||
 			!$pointer ||
 			!$pointerOrigin ||
@@ -132,49 +132,49 @@
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
-		const listRect = listRef.getBoundingClientRect();
+		const rootRect = rootRef.getBoundingClientRect();
 
 		if (status === 'init' && draggedItemRect) {
-			if (!$listProps.hasBoundaries) {
+			if (!$rootProps.hasBoundaries) {
 				const x =
-					$listProps.direction === 'horizontal' ||
-					($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
+					$rootProps.direction === 'horizontal' ||
+					($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
 						? $pointer.x - $pointerOrigin.x
 						: 0;
 				const y =
-					$listProps.direction === 'vertical' ||
-					($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
+					$rootProps.direction === 'vertical' ||
+					($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
 						? $pointer.y - $pointerOrigin.y
 						: 0;
 				return `translate3d(${x}px, ${y}px, 0)`;
 			}
 
 			const x =
-				$listProps.direction === 'horizontal' ||
-				($listProps.direction === 'vertical' && !$listProps.hasLockedAxis)
+				$rootProps.direction === 'horizontal' ||
+				($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedItemRect.x) < listRect.x + $listProps.gap! / 2
-						? listRect.x - draggedItemRect.x + $listProps.gap! / 2
+						$pointer.x - ($pointerOrigin.x - draggedItemRect.x) < rootRect.x + $rootProps.gap! / 2
+						? rootRect.x - draggedItemRect.x + $rootProps.gap! / 2
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
 							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemRect.x) >
-							  listRect.right - $listProps.gap! / 2
-							? listRect.right - draggedItemRect.x - ghostRect.width - $listProps.gap! / 2
+							  rootRect.right - $rootProps.gap! / 2
+							? rootRect.right - draggedItemRect.x - ghostRect.width - $rootProps.gap! / 2
 							: $pointer.x - $pointerOrigin.x
 					: 0;
 			const y =
-				$listProps.direction === 'vertical' ||
-				($listProps.direction === 'horizontal' && !$listProps.hasLockedAxis)
+				$rootProps.direction === 'vertical' ||
+				($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedItemRect.y) < listRect.y + $listProps.gap! / 2
-						? listRect.y - draggedItemRect.y + $listProps.gap! / 2
+						$pointer.y - ($pointerOrigin.y - draggedItemRect.y) < rootRect.y + $rootProps.gap! / 2
+						? rootRect.y - draggedItemRect.y + $rootProps.gap! / 2
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
 							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemRect.y) >
-							  listRect.bottom - $listProps.gap! / 2
-							? listRect.bottom - draggedItemRect.y - ghostRect.height - $listProps.gap! / 2
+							  rootRect.bottom - $rootProps.gap! / 2
+							? rootRect.bottom - draggedItemRect.y - ghostRect.height - $rootProps.gap! / 2
 							: $pointer.y - $pointerOrigin.y
 					: 0;
 			return `translate3d(${x}px, ${y}px, 0)`;
@@ -184,7 +184,7 @@
 			if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
 				return 'translate3d(0, 0, 0)';
 			const x =
-				$listProps.direction === 'horizontal'
+				$rootProps.direction === 'horizontal'
 					? draggedItemIndex < targetItemIndex
 						? ghostRect.x +
 							ghostRect.width / 2 -
@@ -192,7 +192,7 @@
 						: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + draggedItemRect.width / 2)
 					: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width / 2);
 			const y =
-				$listProps.direction === 'vertical'
+				$rootProps.direction === 'vertical'
 					? draggedItemIndex < targetItemIndex
 						? ghostRect.y +
 							ghostRect.height / 2 -
@@ -213,10 +213,10 @@
 		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
 			return (
-				`transform ${$listProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-				`z-index 0s ${$listProps.transitionDuration}ms`
+				`transform ${$rootProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
+				`z-index 0s ${$rootProps.transitionDuration}ms`
 			);
-		if (status === 'remove') return `z-index 0s ${$listProps.transitionDuration}ms`;
+		if (status === 'remove') return `z-index 0s ${$rootProps.transitionDuration}ms`;
 	}
 
 	function getStyleZIndex(status: $$Props['status']) {
@@ -231,7 +231,7 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:--ssl-transition-duration="{$listProps.transitionDuration}ms"
+	style:--ssl-transition-duration="{$rootProps.transitionDuration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
@@ -244,7 +244,7 @@
 	data-is-pointer-dragging={$isPointerDragging}
 	data-is-pointer-dropping={$isPointerDropping}
 	data-is-between-bounds={$isBetweenBounds}
-	data-can-remove-on-drop-out={$listProps.canRemoveOnDropOut}
+	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal
 ></div>
