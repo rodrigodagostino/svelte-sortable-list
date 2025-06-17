@@ -40,6 +40,7 @@ Live demos:
 - Varying heights.
 - Drag handle.
 - Drop marker.
+- Wrapping.
 - Auto scrolling.
 - Lockable axis.
 - Remove on drop outside.
@@ -210,7 +211,8 @@ The following is a list of the available components inside the package:
 | `<SortableList.ItemHandle>` | An element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.                     |
 | `<SortableList.ItemRemove>` | A `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.                         |
 
-It would be possible to avoid the `<SortableList.ItemRemove>` component and just go with a `<button>` element to trigger the removal of an item, but keep in mind that this component doesn’t just fire a click event, it will also focus the next item in the list if the user is using the keyboard to press the remove button. Otherwise, after the focused element is removed, the focus will fall back to the `<body>`.
+> [!WARNING]
+> It is possible to avoid the `<SortableList.ItemRemove>` component and just go with a `<button>` element to trigger the removal of an item, but keep in mind that this component doesn’t just fire a click event, it will also focus the next item in the list if the user is using the keyboard to press the remove button. Otherwise, after the focused element is removed, the focus will fall back to the `<body>`.
 
 ### `<SortableList.Root>` props
 
@@ -220,6 +222,7 @@ It would be possible to avoid the `<SortableList.ItemRemove>` component and just
 | `direction`          | `string \| undefined`  | `'vertical'` | `'vertical'` or `'horizontal'` | Orientation in which items will be arranged.                                                                                                                                                                                                                                                           |
 | `transitionDuration` | `number \| undefined`  | `240`        | Number equal to or above `0`.  | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.                                                                                                                            |
 | `hasDropMarker`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                                                   |
+| `hasWrapping`        | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, items can wrap onto multiple lines.                                                                                                                                                                                                                                                         |
 | `hasLockedAxis`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                                              |
 | `hasBoundaries`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                                        |
 | `canClearOnDragOut`  | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list. This will cause the dragged item to return to its initial position when dropped. Otherwise, it will take the position of the last item it collided with. |
@@ -227,9 +230,12 @@ It would be possible to avoid the `<SortableList.ItemRemove>` component and just
 | `isLocked`           | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard). Interactive elements inside will operate normally.                                                                                                           |
 | `isDisabled`         | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to dimmed. Interactive elements inside will be disabled.                                                                            |
 
+> [!WARNING]
+> For the time being, the support for wrapping is limited to lists that go with the default alignment and items that have the same width and height. Any other variation might not produce the expected results.
+
 ### `<SortableList.Root>` events
 
-> [!Note]
+> [!NOTE]
 > Events are fired in the order they are displayed below.
 
 | Event       | Type                                | Trigger                                                                                                  | Returns                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -375,6 +381,7 @@ This is a list of the selectors you can use to style the list and the list items
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `--ssl-gap`                 | Separation between items (in pixels).                                                                                        |
 | `--ssl-transition-duration` | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). |
+| `--ssl-wrap`                | Whether the list items are forced onto one line (`nowrap`) or can wrap onto multiple lines (`wrap`).                         |
 
 ## Motivation
 
