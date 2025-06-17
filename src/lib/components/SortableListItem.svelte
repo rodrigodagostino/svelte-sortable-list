@@ -309,7 +309,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 0;
 		}
 
-		&[aria-disabled='true'] > * {
+		&[aria-disabled='true'] > :global(*) {
 			pointer-events: none;
 		}
 	}
