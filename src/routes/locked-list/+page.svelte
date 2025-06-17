@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, lockedItems } from '../fixtures.js';
+	import { defaultProps, getLockedItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...lockedItems];
+	let items = getLockedItems(5);
 
 	onMount(() => {
 		$props = {

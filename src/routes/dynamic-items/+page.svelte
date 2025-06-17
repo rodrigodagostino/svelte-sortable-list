@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultItems, defaultProps } from '../fixtures.js';
+	import { defaultProps, getDefaultItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import { toKebabCase } from '../utils.js';
 	import '$lib/styles.css';
 
-	let items = [...defaultItems];
+	let items = getDefaultItems(5);
 	let newItem: string;
 
 	onMount(() => {
@@ -48,7 +48,7 @@
 	{/each}
 </SortableList.Root>
 
-<button class="button" on:click={() => (items = defaultItems)}>Reset</button>
+<button class="button" on:click={() => (items = getDefaultItems(5))}>Reset</button>
 
 <form
 	class="form"

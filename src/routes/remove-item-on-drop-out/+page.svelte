@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultProps, varyingItems } from '../fixtures.js';
+	import { defaultProps, getVaryingItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...varyingItems];
+	let items = getVaryingItems(5);
 
 	onMount(() => {
 		$props = {
@@ -40,7 +40,7 @@
 	{/each}
 </SortableList.Root>
 
-<button class="button" on:click={() => (items = varyingItems)}>Reset</button>
+<button class="button" on:click={() => (items = getVaryingItems(5))}>Reset</button>
 
 <style>
 	.button {

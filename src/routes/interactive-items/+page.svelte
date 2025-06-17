@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { interactiveItems, defaultProps } from '../fixtures.js';
+	import { defaultProps, getInteractiveItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = [...interactiveItems];
+	let items = getInteractiveItems();
 
 	onMount(() => {
 		$props = { ...defaultProps };
@@ -39,7 +39,7 @@
 				{:else if item.type === 'textarea'}
 					<div class="form-field">
 						<label for={item.id}>{item.text}</label>
-						<textarea id={item.id} />
+						<textarea id={item.id}></textarea>
 					</div>
 				{:else if item.type === 'select'}
 					<div class="form-field">

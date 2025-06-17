@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, sortItems, removeItem } from '$lib/index.js';
-	import { disabledItems, defaultProps, defaultItems } from '../fixtures.js';
+	import { defaultProps, getDefaultItems, getDisabledItems } from '../fixtures.js';
 	import { props } from '../stores.js';
 	import '$lib/styles.css';
 
+	const defaultItems = getDefaultItems(3);
+	const disabledItems = getDisabledItems(2);
 	let items = [
 		defaultItems[0],
 		disabledItems[0],
