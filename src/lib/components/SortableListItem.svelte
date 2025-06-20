@@ -85,43 +85,6 @@
 		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
 	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
 
-	$: styleCursor =
-		$rootProps.isDisabled || isDisabled
-			? 'not-allowed'
-			: $isPointerDragging && draggedItemId === String(id)
-				? 'grabbing'
-				: !hasHandle && !$rootProps.isLocked && !isLocked
-					? 'grab'
-					: 'initial';
-	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
-	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
-	$: styleOpacity =
-		draggedItemId === String(id) &&
-		($isPointerDragging || $isPointerDropping) &&
-		!$rootProps.hasDropMarker
-			? 0
-			: 1;
-	$: styleOverflow =
-		draggedItemId === String(id) &&
-		($isPointerDragging || $isPointerDropping) &&
-		$rootProps.canRemoveOnDropOut
-			? 'hidden'
-			: undefined;
-	$: styleTransform = getStyleTransform(
-		$draggedItem,
-		$targetItem,
-		$isPointerCanceling,
-		$isKeyboardCanceling,
-		$isBetweenBounds
-	);
-	$: styleTransition =
-		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
-			? `width ${$rootProps.transitionDuration}ms, height ${$rootProps.transitionDuration}ms,` +
-				`margin ${$rootProps.transitionDuration}ms, transform ${$rootProps.transitionDuration}ms,` +
-				`z-index ${$rootProps.transitionDuration}ms`
-			: `none`;
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (!$rootProps.canRemoveOnDropOut) return undefined;
@@ -210,6 +173,43 @@
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 	}
+
+	$: styleCursor =
+		$rootProps.isDisabled || isDisabled
+			? 'not-allowed'
+			: $isPointerDragging && draggedItemId === String(id)
+				? 'grabbing'
+				: !hasHandle && !$rootProps.isLocked && !isLocked
+					? 'grab'
+					: 'initial';
+	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
+	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
+	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
+	$: styleOpacity =
+		draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		!$rootProps.hasDropMarker
+			? 0
+			: 1;
+	$: styleOverflow =
+		draggedItemId === String(id) &&
+		($isPointerDragging || $isPointerDropping) &&
+		$rootProps.canRemoveOnDropOut
+			? 'hidden'
+			: undefined;
+	$: styleTransform = getStyleTransform(
+		$draggedItem,
+		$targetItem,
+		$isPointerCanceling,
+		$isKeyboardCanceling,
+		$isBetweenBounds
+	);
+	$: styleTransition =
+		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
+			? `width ${$rootProps.transitionDuration}ms, height ${$rootProps.transitionDuration}ms,` +
+				`margin ${$rootProps.transitionDuration}ms, transform ${$rootProps.transitionDuration}ms,` +
+				`z-index ${$rootProps.transitionDuration}ms`
+			: `none`;
 
 	async function handleFocus() {
 		await tick();

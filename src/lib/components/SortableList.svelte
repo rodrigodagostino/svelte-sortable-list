@@ -104,6 +104,15 @@
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
 
+	const isPointerDragging = setIsPointerDragging(false);
+	const isPointerDropping = setIsPointerDropping(false);
+	const isKeyboardDragging = setIsKeyboardDragging(false);
+	const isKeyboardDropping = setIsKeyboardDropping(false);
+	const isPointerCanceling = setIsPointerCanceling(false);
+	const isKeyboardCanceling = setIsKeyboardCanceling(false);
+	const isBetweenBounds = setIsBetweenBounds(true);
+	const isRTL = setIsRTL(false);
+
 	const dispatch = createEventDispatcher<{
 		mounted: MountedEventDetail;
 		dragstart: DragStartEventDetail;
@@ -112,9 +121,25 @@
 		dragend: DragEndEventDetail;
 	}>();
 
-	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
+	onMount(() => {
+		dispatch('mounted');
+		$isRTL = getTextDirection(rootRef) === 'rtl';
+	});
+
+	// Svelte currently does not retain focus when elements are moved (even when keyed),
+	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
+	// https://github.com/sveltejs/svelte/issues/3973
+	let activeElement: HTMLLIElement;
+	beforeUpdate(() => {
+		activeElement = document?.activeElement as HTMLLIElement;
+	});
+	afterUpdate(() => {
+		if (activeElement) activeElement.focus({ preventScroll: true });
+	});
+
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
+	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
 	$: if (scrollingSpeed !== 0) scroll();
 
@@ -144,31 +169,6 @@
 			isScrollingDocument
 		);
 	}
-
-	// Svelte currently does not retain focus when elements are moved (even when keyed),
-	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
-	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLLIElement;
-	beforeUpdate(() => {
-		activeElement = document?.activeElement as HTMLLIElement;
-	});
-	afterUpdate(() => {
-		if (activeElement) activeElement.focus({ preventScroll: true });
-	});
-
-	const isPointerDragging = setIsPointerDragging(false);
-	const isPointerDropping = setIsPointerDropping(false);
-	const isKeyboardDragging = setIsKeyboardDragging(false);
-	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isPointerCanceling = setIsPointerCanceling(false);
-	const isKeyboardCanceling = setIsKeyboardCanceling(false);
-	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRTL = setIsRTL(false);
-
-	onMount(() => {
-		dispatch('mounted');
-		$isRTL = getTextDirection(rootRef) === 'rtl';
-	});
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (

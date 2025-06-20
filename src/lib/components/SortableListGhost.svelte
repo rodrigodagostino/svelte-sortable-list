@@ -55,14 +55,6 @@
 	$: targetItemRect =
 		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
 
-	$: styleWidth = getStyleWidth($draggedItem);
-	$: styleHeight = getStyleHeight($draggedItem);
-	$: styleLeft = getStyleLeft(status);
-	$: styleTop = getStyleTop(status);
-	$: styleTransform = getStyleTransform(status, $pointer);
-	$: styleTransition = getStyleTransition(status);
-	$: styleZIndex = getStyleZIndex(status);
-
 	function getStyleWidth(draggedItem: HTMLLIElement | null) {
 		if (!draggedItem || !$itemsData) return '0';
 		return `${draggedItemRect?.width || 0}px`;
@@ -230,6 +222,14 @@
 		// when the ghost is dragged and dropped without being moved.
 		if (status === 'set' || status === 'remove') return '9999';
 	}
+
+	$: styleWidth = getStyleWidth($draggedItem);
+	$: styleHeight = getStyleHeight($draggedItem);
+	$: styleLeft = getStyleLeft(status);
+	$: styleTop = getStyleTop(status);
+	$: styleTransform = getStyleTransform(status, $pointer);
+	$: styleTransition = getStyleTransition(status);
+	$: styleZIndex = getStyleZIndex(status);
 </script>
 
 <div
