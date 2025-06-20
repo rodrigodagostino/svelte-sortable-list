@@ -231,7 +231,7 @@ The following is a list of the available components inside the package:
 | `isDisabled`         | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to dimmed. Interactive elements inside will be disabled.                                                                            |
 
 > [!WARNING]
-> For the time being, the support for wrapping is limited to lists that go with the default alignment and items that have the same width and height. Any other variation might not produce the expected results.
+> For the time being, the support for wrapping is limited to lists that are horizontal, and have items with the exact same width and height. Any other variation might not produce the expected results.
 
 ### `<SortableList.Root>` events
 
