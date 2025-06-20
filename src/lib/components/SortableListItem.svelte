@@ -196,8 +196,16 @@
 			const draggedItemHeight = draggedItemIndex < targetItemIndex ? draggedItemRect.height : 0;
 			const targetItemWidth = draggedItemIndex < targetItemIndex ? targetItemRect.width : 0;
 			const targetItemHeight = draggedItemIndex < targetItemIndex ? targetItemRect.height : 0;
-			const x = `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
-			const y = `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`;
+			const x =
+				$rootProps.direction === 'vertical'
+					? '0'
+					: `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
+			const y =
+				$rootProps.direction === 'vertical'
+					? `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`
+					: isInSameRow(draggedItemRect, targetItemRect)
+						? '0'
+						: `${targetItemRect.y - draggedItemRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

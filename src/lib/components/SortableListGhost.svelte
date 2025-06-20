@@ -12,7 +12,7 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import type { SortableListGhostProps } from '$lib/types/index.js';
-	import { getIndex } from '$lib/utils/index.js';
+	import { getIndex, isInSameRow } from '$lib/utils/index.js';
 
 	type $$Props = SortableListGhostProps;
 
@@ -85,14 +85,15 @@
 
 		if (status === 'remove') return ghostRef.style.left;
 
-		if (!$targetItem) return `${draggedItemRect.x}px`;
+		if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
+			return `${draggedItemRect.x}px`;
 
 		const left =
-			typeof targetItemIndex === 'number' && targetItemRect
-				? draggedItemIndex < targetItemIndex
+			$rootProps.direction === 'vertical'
+				? draggedItemRect.x
+				: draggedItemIndex < targetItemIndex
 					? targetItemRect.x + targetItemRect.width - draggedItemRect.width
-					: targetItemRect.x
-				: console.error('targetItemIndex or targetItemRect is not defined');
+					: targetItemRect.x;
 		return `${left}px`;
 	}
 
@@ -108,14 +109,17 @@
 
 		if (status === 'remove') return ghostRef.style.top;
 
-		if (!$targetItem) return `${draggedItemRect.y}px`;
+		if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
+			return `${draggedItemRect.y}px`;
 
 		const top =
-			typeof targetItemIndex === 'number' && targetItemRect
+			$rootProps.direction === 'vertical'
 				? draggedItemIndex < targetItemIndex
 					? targetItemRect.y + targetItemRect.height - draggedItemRect.height
 					: targetItemRect.y
-				: console.error('targetItemIndex or targetItemRect is not defined');
+				: isInSameRow(draggedItemRect, targetItemRect)
+					? draggedItemRect.y
+					: targetItemRect.y;
 		return `${top}px`;
 	}
 
