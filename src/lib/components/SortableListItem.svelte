@@ -192,17 +192,17 @@
 				return 'translate3d(0, 0, 0)';
 			}
 		} else {
-			const draggedItemWidth = draggedItemIndex < targetItemIndex ? draggedItemRect.width : 0;
-			const draggedItemHeight = draggedItemIndex < targetItemIndex ? draggedItemRect.height : 0;
-			const targetItemWidth = draggedItemIndex < targetItemIndex ? targetItemRect.width : 0;
-			const targetItemHeight = draggedItemIndex < targetItemIndex ? targetItemRect.height : 0;
 			const x =
 				$rootProps.direction === 'vertical'
 					? '0'
-					: `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
+					: draggedItemIndex < targetItemIndex
+						? `${targetItemRect.x + targetItemRect.width - draggedItemRect.x - draggedItemRect.width}px`
+						: `${targetItemRect.x - draggedItemRect.x}px`;
 			const y =
 				$rootProps.direction === 'vertical'
-					? `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`
+					? draggedItemIndex < targetItemIndex
+						? `${targetItemRect.y + targetItemRect.height - draggedItemRect.y - draggedItemRect.height}px`
+						: `${targetItemRect.y - draggedItemRect.y}px`
 					: isInSameRow(draggedItemRect, targetItemRect)
 						? '0'
 						: `${targetItemRect.y - draggedItemRect.y}px`;
