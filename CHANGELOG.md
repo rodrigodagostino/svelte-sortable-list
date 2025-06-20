@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.1] (2025-06-20)
+
+### Changed
+
+- Adjust the dragged item transform to match the same pattern as other related logic.
+- Place function declarations above their first usage.
+
+### Fixed
+
+- Correct the `<SortableListGhost>` and `<SortableList.Item>` positioning when wrapping is active.
+
+### Docs
+
+- Improve the wrapping showcase in the **“With wrapping”** demo page.
+- Correct the wrapping warning in the README.
+
 ## [0.13.0] (2025-06-17)
 
 ### Added
@@ -878,7 +894,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...v0.12.7
