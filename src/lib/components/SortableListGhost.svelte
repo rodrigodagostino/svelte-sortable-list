@@ -104,6 +104,7 @@
 		if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
 			return `${draggedItemRect.y}px`;
 
+		const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 		const top =
 			$rootProps.direction === 'vertical'
 				? draggedItemIndex < targetItemIndex
@@ -111,7 +112,11 @@
 					: targetItemRect.y
 				: isInSameRow(draggedItemRect, targetItemRect)
 					? draggedItemRect.y
-					: targetItemRect.y;
+					: alignItems === 'center'
+						? targetItemRect.y + (targetItemRect.height - draggedItemRect.height) / 2
+						: alignItems === 'end' || alignItems === 'flex-end'
+							? targetItemRect.y + targetItemRect.height - draggedItemRect.height
+							: targetItemRect.y;
 		return `${top}px`;
 	}
 
@@ -179,6 +184,8 @@
 		if (status === 'preset' && typeof draggedItemIndex === 'number' && draggedItemRect) {
 			if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
 				return 'translate3d(0, 0, 0)';
+
+			const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 			const x =
 				$rootProps.direction === 'horizontal'
 					? draggedItemIndex < targetItemIndex
@@ -190,7 +197,11 @@
 					? draggedItemIndex < targetItemIndex
 						? `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height - draggedItemRect.height / 2)}px`
 						: `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + draggedItemRect.height / 2)}px`
-					: `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height / 2)}px`;
+					: alignItems === 'center'
+						? `${ghostRect.y - targetItemRect.y + (ghostRect.height - targetItemRect.height) / 2}px`
+						: alignItems === 'end' || alignItems === 'flex-end'
+							? `${ghostRect.y + ghostRect.height - targetItemRect.y - targetItemRect.height}px`
+							: `${ghostRect.y - targetItemRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
