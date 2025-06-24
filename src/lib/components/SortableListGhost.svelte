@@ -135,14 +135,14 @@
 				const x =
 					$rootProps.direction === 'horizontal' ||
 					($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
-						? $pointer.x - $pointerOrigin.x
+						? `${$pointer.x - $pointerOrigin.x}px`
 						: 0;
 				const y =
 					$rootProps.direction === 'vertical' ||
 					($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
-						? $pointer.y - $pointerOrigin.y
+						? `${$pointer.y - $pointerOrigin.y}px`
 						: 0;
-				return `translate3d(${x}px, ${y}px, 0)`;
+				return `translate3d(${x}, ${y}, 0)`;
 			}
 
 			const x =
@@ -151,13 +151,13 @@
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
 						$pointer.x - ($pointerOrigin.x - draggedItemRect.x) < rootRect.x + $rootProps.gap! / 2
-						? rootRect.x - draggedItemRect.x + $rootProps.gap! / 2
+						? `${rootRect.x - draggedItemRect.x + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
 							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemRect.x) >
 							  rootRect.right - $rootProps.gap! / 2
-							? rootRect.right - draggedItemRect.x - ghostRect.width - $rootProps.gap! / 2
-							: $pointer.x - $pointerOrigin.x
+							? `${rootRect.right - draggedItemRect.x - ghostRect.width - $rootProps.gap! / 2}px`
+							: `${$pointer.x - $pointerOrigin.x}px`
 					: 0;
 			const y =
 				$rootProps.direction === 'vertical' ||
@@ -165,15 +165,15 @@
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
 						$pointer.y - ($pointerOrigin.y - draggedItemRect.y) < rootRect.y + $rootProps.gap! / 2
-						? rootRect.y - draggedItemRect.y + $rootProps.gap! / 2
+						? `${rootRect.y - draggedItemRect.y + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
 							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemRect.y) >
 							  rootRect.bottom - $rootProps.gap! / 2
-							? rootRect.bottom - draggedItemRect.y - ghostRect.height - $rootProps.gap! / 2
-							: $pointer.y - $pointerOrigin.y
+							? `${rootRect.bottom - draggedItemRect.y - ghostRect.height - $rootProps.gap! / 2}px`
+							: `${$pointer.y - $pointerOrigin.y}px`
 					: 0;
-			return `translate3d(${x}px, ${y}px, 0)`;
+			return `translate3d(${x}, ${y}, 0)`;
 		}
 
 		if (status === 'preset' && typeof draggedItemIndex === 'number' && draggedItemRect) {
@@ -182,21 +182,17 @@
 			const x =
 				$rootProps.direction === 'horizontal'
 					? draggedItemIndex < targetItemIndex
-						? ghostRect.x +
-							ghostRect.width / 2 -
-							(targetItemRect.x + targetItemRect.width - draggedItemRect.width / 2)
-						: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + draggedItemRect.width / 2)
-					: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width / 2);
+						? `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width - draggedItemRect.width / 2)}px`
+						: `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + draggedItemRect.width / 2)}px`
+					: `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width / 2)}px`;
 			const y =
 				$rootProps.direction === 'vertical'
 					? draggedItemIndex < targetItemIndex
-						? ghostRect.y +
-							ghostRect.height / 2 -
-							(targetItemRect.y + targetItemRect.height - draggedItemRect.height / 2)
-						: ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + draggedItemRect.height / 2)
-					: ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height / 2);
+						? `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height - draggedItemRect.height / 2)}px`
+						: `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + draggedItemRect.height / 2)}px`
+					: `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height / 2)}px`;
 
-			return `translate3d(${x}px, ${y}px, 0)`;
+			return `translate3d(${x}, ${y}, 0)`;
 		}
 
 		if (status === 'set') return 'translate3d(0, 0, 0)';
