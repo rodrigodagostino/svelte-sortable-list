@@ -42,16 +42,18 @@
 </SortableList.Root>
 
 <style>
-	:global([data-page-pathname='with-wrapping'] .app-main .container) {
-		max-width: 64.5rem;
-	}
+	:global([data-page-pathname='with-wrapping']) {
+		& .app-main .container {
+			max-width: 64.5rem;
+		}
 
-	:global(.ssl-list) {
-		justify-content: center;
-		align-items: center;
-	}
+		& .ssl-list {
+			justify-content: center;
+			align-items: center;
+		}
 
-	.ssl-item-content {
-		width: 10rem;
+		& .ssl-item-content {
+			width: 10rem;
+		}
 	}
 </style>

@@ -45,13 +45,13 @@
 <style>
 	:global([data-page-pathname='with-boundaries'] .wrapper) {
 		position: relative;
-	}
 
-	:global([data-page-pathname='with-boundaries'] .wrapper::after) {
-		content: '';
-		position: absolute;
-		inset: -0.25rem;
-		border: 0.25rem dashed var(--gray-200);
-		z-index: -1;
+		&::after {
+			content: '';
+			position: absolute;
+			inset: -0.25rem;
+			border: 0.25rem dashed var(--gray-200);
+			z-index: -1;
+		}
 	}
 </style>

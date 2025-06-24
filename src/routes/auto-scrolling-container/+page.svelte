@@ -43,7 +43,7 @@
 </div>
 
 <style>
-	.wrapper {
+	:global([data-page-pathname='auto-scrolling-container'] .wrapper) {
 		display: flex;
 		padding: 1.75rem 2rem;
 		background-color: var(--gray-150);
