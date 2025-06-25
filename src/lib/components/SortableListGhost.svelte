@@ -46,46 +46,43 @@
 		ghostRef?.replaceChildren();
 	}
 
-	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
+	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemsData is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedItemRect =
-		$itemsData && typeof draggedItemIndex === 'number' ? $itemsData[draggedItemIndex] : null;
-	$: targetItemIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetItemRect =
-		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
+	$: draggedRect = $itemsData && typeof draggedIndex === 'number' ? $itemsData[draggedIndex] : null;
+	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
+	$: targetRect = $itemsData && typeof targetIndex === 'number' ? $itemsData[targetIndex] : null;
 
 	function getStyleWidth(draggedItem: HTMLLIElement | null) {
 		if (!draggedItem || !$itemsData) return '0';
-		return `${draggedItemRect?.width || 0}px`;
+		return `${draggedRect?.width || 0}px`;
 	}
 
 	function getStyleHeight(draggedItem: HTMLLIElement | null) {
 		if (!draggedItem || !$itemsData) return '0';
-		return `${draggedItemRect?.height || 0}px`;
+		return `${draggedRect?.height || 0}px`;
 	}
 
 	function getStyleLeft(status: $$Props['status']) {
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
-			typeof draggedItemIndex !== 'number' ||
-			!draggedItemRect ||
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
 			!$itemsData
 		)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.left;
 
-		if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
-			return `${draggedItemRect.x}px`;
+		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
 
 		const left =
 			$rootProps.direction === 'vertical'
-				? draggedItemRect.x
-				: draggedItemIndex < targetItemIndex
-					? targetItemRect.x + targetItemRect.width - draggedItemRect.width
-					: targetItemRect.x;
+				? draggedRect.x
+				: draggedIndex < targetIndex
+					? targetRect.x + targetRect.width - draggedRect.width
+					: targetRect.x;
 		return `${left}px`;
 	}
 
@@ -93,30 +90,29 @@
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
-			typeof draggedItemIndex !== 'number' ||
-			!draggedItemRect ||
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
 			!$itemsData
 		)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.top;
 
-		if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
-			return `${draggedItemRect.y}px`;
+		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
 		const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 		const top =
 			$rootProps.direction === 'vertical'
-				? draggedItemIndex < targetItemIndex
-					? targetItemRect.y + targetItemRect.height - draggedItemRect.height
-					: targetItemRect.y
-				: isInSameRow(draggedItemRect, targetItemRect)
-					? draggedItemRect.y
+				? draggedIndex < targetIndex
+					? targetRect.y + targetRect.height - draggedRect.height
+					: targetRect.y
+				: isInSameRow(draggedRect, targetRect)
+					? draggedRect.y
 					: alignItems === 'center'
-						? targetItemRect.y + (targetItemRect.height - draggedItemRect.height) / 2
+						? targetRect.y + (targetRect.height - draggedRect.height) / 2
 						: alignItems === 'end' || alignItems === 'flex-end'
-							? targetItemRect.y + targetItemRect.height - draggedItemRect.height
-							: targetItemRect.y;
+							? targetRect.y + targetRect.height - draggedRect.height
+							: targetRect.y;
 		return `${top}px`;
 	}
 
@@ -135,7 +131,7 @@
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = rootRef.getBoundingClientRect();
 
-		if (status === 'init' && draggedItemRect) {
+		if (status === 'init' && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
 				const x =
 					$rootProps.direction === 'horizontal' ||
@@ -155,13 +151,13 @@
 				($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedItemRect.x) < rootRect.x + $rootProps.gap! / 2
-						? `${rootRect.x - draggedItemRect.x + $rootProps.gap! / 2}px`
+						$pointer.x - ($pointerOrigin.x - draggedRect.x) < rootRect.x + $rootProps.gap! / 2
+						? `${rootRect.x - draggedRect.x + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
-							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemRect.x) >
+							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedRect.x) >
 							  rootRect.right - $rootProps.gap! / 2
-							? `${rootRect.right - draggedItemRect.x - ghostRect.width - $rootProps.gap! / 2}px`
+							? `${rootRect.right - draggedRect.x - ghostRect.width - $rootProps.gap! / 2}px`
 							: `${$pointer.x - $pointerOrigin.x}px`
 					: 0;
 			const y =
@@ -169,39 +165,39 @@
 				($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedItemRect.y) < rootRect.y + $rootProps.gap! / 2
-						? `${rootRect.y - draggedItemRect.y + $rootProps.gap! / 2}px`
+						$pointer.y - ($pointerOrigin.y - draggedRect.y) < rootRect.y + $rootProps.gap! / 2
+						? `${rootRect.y - draggedRect.y + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
-							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemRect.y) >
+							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedRect.y) >
 							  rootRect.bottom - $rootProps.gap! / 2
-							? `${rootRect.bottom - draggedItemRect.y - ghostRect.height - $rootProps.gap! / 2}px`
+							? `${rootRect.bottom - draggedRect.y - ghostRect.height - $rootProps.gap! / 2}px`
 							: `${$pointer.y - $pointerOrigin.y}px`
 					: 0;
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (status === 'preset' && typeof draggedItemIndex === 'number' && draggedItemRect) {
-			if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
+		if (status === 'preset' && typeof draggedIndex === 'number' && draggedRect) {
+			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
 
 			const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 			const x =
 				$rootProps.direction === 'vertical'
-					? `${ghostRect.x - targetItemRect.x + (ghostRect.width - targetItemRect.width) / 2}px`
-					: draggedItemIndex < targetItemIndex
-						? `${ghostRect.x - targetItemRect.x + ghostRect.width - targetItemRect.width}px`
-						: `${ghostRect.x - targetItemRect.x}px`;
+					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
+					: draggedIndex < targetIndex
+						? `${ghostRect.x - targetRect.x + ghostRect.width - targetRect.width}px`
+						: `${ghostRect.x - targetRect.x}px`;
 			const y =
 				$rootProps.direction === 'vertical'
-					? draggedItemIndex < targetItemIndex
-						? `${ghostRect.y - targetItemRect.y + ghostRect.height - targetItemRect.height}px`
-						: `${ghostRect.y - targetItemRect.y}px`
+					? draggedIndex < targetIndex
+						? `${ghostRect.y - targetRect.y + ghostRect.height - targetRect.height}px`
+						: `${ghostRect.y - targetRect.y}px`
 					: alignItems === 'center'
-						? `${ghostRect.y - targetItemRect.y + (ghostRect.height - targetItemRect.height) / 2}px`
+						? `${ghostRect.y - targetRect.y + (ghostRect.height - targetRect.height) / 2}px`
 						: alignItems === 'end' || alignItems === 'flex-end'
-							? `${ghostRect.y - targetItemRect.y + ghostRect.height - targetItemRect.height}px`
-							: `${ghostRect.y - targetItemRect.y}px`;
+							? `${ghostRect.y - targetRect.y + ghostRect.height - targetRect.height}px`
+							: `${ghostRect.y - targetRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

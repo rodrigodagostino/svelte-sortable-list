@@ -46,7 +46,7 @@
 
 	let hasHandle = false;
 	$: {
-		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
+		setInteractiveElementsTabIndex($isKeyboardDragging, focusedId);
 	}
 
 	onMount(() => {
@@ -65,7 +65,7 @@
 				(el) =>
 					(el.tabIndex =
 						!$isKeyboardDragging &&
-						focusedItemId === String(id) &&
+						focusedId === String(id) &&
 						!$rootProps.isDisabled &&
 						!isDisabled
 							? 0
@@ -73,39 +73,33 @@
 			);
 	}
 
-	$: currentItemRect = $itemsData ? $itemsData[index] : null;
-	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
-	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
+	$: currentRect = $itemsData ? $itemsData[index] : null;
+	$: draggedId = $draggedItem ? getId($draggedItem) : null;
+	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemsData is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedItemRect =
-		$itemsData && typeof draggedItemIndex === 'number' ? $itemsData[draggedItemIndex] : null;
-	$: targetItemIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetItemRect =
-		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
-	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
+	$: draggedRect = $itemsData && typeof draggedIndex === 'number' ? $itemsData[draggedIndex] : null;
+	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
+	$: targetRect = $itemsData && typeof targetIndex === 'number' ? $itemsData[targetIndex] : null;
+	$: focusedId = $focusedItem ? getId($focusedItem) : null;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds) return `${currentItemRect?.width}px`;
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
+		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds)
-			return `${currentItemRect?.height}px`;
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
+		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
 		else return 'calc(var(--ssl-gap) / 2)';
 	}
 
@@ -115,11 +109,11 @@
 			!$itemsData ||
 			!$draggedItem ||
 			!$targetItem ||
-			currentItemRect === null ||
-			draggedItemIndex === null ||
-			draggedItemRect === null ||
-			targetItemIndex === null ||
-			targetItemRect === null ||
+			currentRect === null ||
+			draggedIndex === null ||
+			draggedRect === null ||
+			targetIndex === null ||
+			targetRect === null ||
 			(!$isPointerDragging &&
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
@@ -133,29 +127,29 @@
 		const rootElement = itemRef.closest<HTMLUListElement>('.ssl-list')!;
 		const alignItems = window.getComputedStyle(rootElement).alignItems;
 
-		if (draggedItemId !== String(id)) {
+		if (draggedId !== String(id)) {
 			if (
-				(index > draggedItemIndex && index <= targetItemIndex) ||
-				(index < draggedItemIndex && index >= targetItemIndex)
+				(index > draggedIndex && index <= targetIndex) ||
+				(index < draggedIndex && index >= targetIndex)
 			) {
-				const step = index > draggedItemIndex ? -1 : 1;
-				const operator = index > draggedItemIndex === !$isRTL ? '-' : '';
+				const step = index > draggedIndex ? -1 : 1;
+				const operator = index > draggedIndex === !$isRTL ? '-' : '';
 				const x =
 					$rootProps.direction === 'vertical'
 						? '0'
-						: isInSameRow(currentItemRect, $itemsData[index + step])
-							? `${operator}${draggedItemRect.width + $rootProps.gap!}px`
-							: `${$itemsData[index + step].x - currentItemRect.x + $itemsData[index + step].width - currentItemRect.width}px`;
+						: isInSameRow(currentRect, $itemsData[index + step])
+							? `${operator}${draggedRect.width + $rootProps.gap!}px`
+							: `${$itemsData[index + step].x - currentRect.x + $itemsData[index + step].width - currentRect.width}px`;
 				const y =
 					$rootProps.direction === 'vertical'
-						? `${operator}${draggedItemRect.height + $rootProps.gap!}px`
-						: isInSameRow(currentItemRect, $itemsData[index + step])
+						? `${operator}${draggedRect.height + $rootProps.gap!}px`
+						: isInSameRow(currentRect, $itemsData[index + step])
 							? '0'
 							: alignItems === 'center'
-								? `${$itemsData[index + step].y - currentItemRect.y + ($itemsData[index + step].height - currentItemRect.height) / 2}px`
+								? `${$itemsData[index + step].y - currentRect.y + ($itemsData[index + step].height - currentRect.height) / 2}px`
 								: alignItems === 'end' || alignItems === 'flex-end'
-									? `${$itemsData[index + step].y - currentItemRect.y + $itemsData[index + step].height - currentItemRect.height}px`
-									: `${$itemsData[index + step].y - currentItemRect.y}px`;
+									? `${$itemsData[index + step].y - currentRect.y + $itemsData[index + step].height - currentRect.height}px`
+									: `${$itemsData[index + step].y - currentRect.y}px`;
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -165,21 +159,21 @@
 			const x =
 				$rootProps.direction === 'vertical'
 					? '0'
-					: draggedItemIndex < targetItemIndex
-						? `${targetItemRect.x - draggedItemRect.x + targetItemRect.width - draggedItemRect.width}px`
-						: `${targetItemRect.x - draggedItemRect.x}px`;
+					: draggedIndex < targetIndex
+						? `${targetRect.x - draggedRect.x + targetRect.width - draggedRect.width}px`
+						: `${targetRect.x - draggedRect.x}px`;
 			const y =
 				$rootProps.direction === 'vertical'
-					? draggedItemIndex < targetItemIndex
-						? `${targetItemRect.y - draggedItemRect.y + targetItemRect.height - draggedItemRect.height}px`
-						: `${targetItemRect.y - draggedItemRect.y}px`
-					: isInSameRow(draggedItemRect, targetItemRect)
+					? draggedIndex < targetIndex
+						? `${targetRect.y - draggedRect.y + targetRect.height - draggedRect.height}px`
+						: `${targetRect.y - draggedRect.y}px`
+					: isInSameRow(draggedRect, targetRect)
 						? '0'
 						: alignItems === 'center'
-							? `${targetItemRect.y - draggedItemRect.y + (targetItemRect.height - draggedItemRect.height) / 2}px`
+							? `${targetRect.y - draggedRect.y + (targetRect.height - draggedRect.height) / 2}px`
 							: alignItems === 'end' || alignItems === 'flex-end'
-								? `${targetItemRect.y - draggedItemRect.y + targetItemRect.height - draggedItemRect.height}px`
-								: `${targetItemRect.y - draggedItemRect.y}px`;
+								? `${targetRect.y - draggedRect.y + targetRect.height - draggedRect.height}px`
+								: `${targetRect.y - draggedRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
@@ -188,7 +182,7 @@
 	$: styleCursor =
 		$rootProps.isDisabled || isDisabled
 			? 'not-allowed'
-			: $isPointerDragging && draggedItemId === String(id)
+			: $isPointerDragging && draggedId === String(id)
 				? 'grabbing'
 				: !hasHandle && !$rootProps.isLocked && !isLocked
 					? 'grab'
@@ -197,13 +191,13 @@
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOpacity =
-		draggedItemId === String(id) &&
+		draggedId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
 		!$rootProps.hasDropMarker
 			? 0
 			: 1;
 	$: styleOverflow =
-		draggedItemId === String(id) &&
+		draggedId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
 		$rootProps.canRemoveOnDropOut
 			? 'hidden'
@@ -276,17 +270,17 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
-	data-is-pointer-dragging={$isPointerDragging && draggedItemId === String(id)}
-	data-is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
-	data-is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
-	data-is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	data-is-pointer-dragging={$isPointerDragging && draggedId === String(id)}
+	data-is-pointer-dropping={$isPointerDropping && draggedId === String(id)}
+	data-is-keyboard-dragging={$isKeyboardDragging && draggedId === String(id)}
+	data-is-keyboard-dropping={$isKeyboardDropping && draggedId === String(id)}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$rootProps.isLocked || isLocked}
-	tabindex={focusedItemId === String(id) ? 0 : -1}
+	tabindex={focusedId === String(id) ? 0 : -1}
 	role="option"
 	aria-label={$$restProps['aria-label'] || undefined}
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
-	aria-selected={focusedItemId === String(id)}
+	aria-selected={focusedId === String(id)}
 	aria-disabled={$rootProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
