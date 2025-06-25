@@ -130,8 +130,8 @@
 		)
 			return 'translate3d(0, 0, 0)';
 
-		const listElement = itemRef.closest<HTMLUListElement>('.ssl-list')!;
-		const alignItems = window.getComputedStyle(listElement).alignItems;
+		const rootElement = itemRef.closest<HTMLUListElement>('.ssl-list')!;
+		const alignItems = window.getComputedStyle(rootElement).alignItems;
 
 		if (draggedItemId !== String(id)) {
 			if (
@@ -145,7 +145,7 @@
 						? '0'
 						: isInSameRow(currentItemRect, $itemsData[index + step])
 							? `${operator}${draggedItemRect.width + $rootProps.gap!}px`
-							: `${$itemsData[index + step].x + $itemsData[index + step].width - currentItemRect.x - currentItemRect.width}px`;
+							: `${$itemsData[index + step].x - currentItemRect.x + $itemsData[index + step].width - currentItemRect.width}px`;
 				const y =
 					$rootProps.direction === 'vertical'
 						? `${operator}${draggedItemRect.height + $rootProps.gap!}px`
@@ -154,7 +154,7 @@
 							: alignItems === 'center'
 								? `${$itemsData[index + step].y - currentItemRect.y + ($itemsData[index + step].height - currentItemRect.height) / 2}px`
 								: alignItems === 'end' || alignItems === 'flex-end'
-									? `${$itemsData[index + step].y + $itemsData[index + step].height - currentItemRect.y - currentItemRect.height}px`
+									? `${$itemsData[index + step].y - currentItemRect.y + $itemsData[index + step].height - currentItemRect.height}px`
 									: `${$itemsData[index + step].y - currentItemRect.y}px`;
 
 				return `translate3d(${x}, ${y}, 0)`;
@@ -166,19 +166,19 @@
 				$rootProps.direction === 'vertical'
 					? '0'
 					: draggedItemIndex < targetItemIndex
-						? `${targetItemRect.x + targetItemRect.width - draggedItemRect.x - draggedItemRect.width}px`
+						? `${targetItemRect.x - draggedItemRect.x + targetItemRect.width - draggedItemRect.width}px`
 						: `${targetItemRect.x - draggedItemRect.x}px`;
 			const y =
 				$rootProps.direction === 'vertical'
 					? draggedItemIndex < targetItemIndex
-						? `${targetItemRect.y + targetItemRect.height - draggedItemRect.y - draggedItemRect.height}px`
+						? `${targetItemRect.y - draggedItemRect.y + targetItemRect.height - draggedItemRect.height}px`
 						: `${targetItemRect.y - draggedItemRect.y}px`
 					: isInSameRow(draggedItemRect, targetItemRect)
 						? '0'
 						: alignItems === 'center'
 							? `${targetItemRect.y - draggedItemRect.y + (targetItemRect.height - draggedItemRect.height) / 2}px`
 							: alignItems === 'end' || alignItems === 'flex-end'
-								? `${targetItemRect.y + targetItemRect.height - draggedItemRect.y - draggedItemRect.height}px`
+								? `${targetItemRect.y - draggedItemRect.y + targetItemRect.height - draggedItemRect.height}px`
 								: `${targetItemRect.y - draggedItemRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;

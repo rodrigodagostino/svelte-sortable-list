@@ -187,20 +187,20 @@
 
 			const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 			const x =
-				$rootProps.direction === 'horizontal'
-					? draggedItemIndex < targetItemIndex
-						? `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width - draggedItemRect.width / 2)}px`
-						: `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + draggedItemRect.width / 2)}px`
-					: `${ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width / 2)}px`;
+				$rootProps.direction === 'vertical'
+					? `${ghostRect.x - targetItemRect.x + (ghostRect.width - targetItemRect.width) / 2}px`
+					: draggedItemIndex < targetItemIndex
+						? `${ghostRect.x - targetItemRect.x + ghostRect.width - targetItemRect.width}px`
+						: `${ghostRect.x - targetItemRect.x}px`;
 			const y =
 				$rootProps.direction === 'vertical'
 					? draggedItemIndex < targetItemIndex
-						? `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height - draggedItemRect.height / 2)}px`
-						: `${ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + draggedItemRect.height / 2)}px`
+						? `${ghostRect.y - targetItemRect.y + ghostRect.height - targetItemRect.height}px`
+						: `${ghostRect.y - targetItemRect.y}px`
 					: alignItems === 'center'
 						? `${ghostRect.y - targetItemRect.y + (ghostRect.height - targetItemRect.height) / 2}px`
 						: alignItems === 'end' || alignItems === 'flex-end'
-							? `${ghostRect.y + ghostRect.height - targetItemRect.y - targetItemRect.height}px`
+							? `${ghostRect.y - targetItemRect.y + ghostRect.height - targetItemRect.height}px`
 							: `${ghostRect.y - targetItemRect.y}px`;
 
 			return `translate3d(${x}, ${y}, 0)`;
