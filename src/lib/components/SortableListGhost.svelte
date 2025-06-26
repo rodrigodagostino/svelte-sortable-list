@@ -259,11 +259,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 ### Props
 - `status`: state in which the ghost is.
-- `listRef`: reference to the parent list.
+- `rootRef`: reference to the parent list.
 
 ### Usage
 ```svelte
-	<SortableListGhost bind:ghostRef status={ghostStatus} {listRef} />
+	<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
 ```
 -->
 
