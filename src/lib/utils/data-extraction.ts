@@ -1,4 +1,4 @@
-import type { ItemData, TextDirection } from '$lib/types/index.js';
+import type { ItemRect, TextDirection } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
 export function getId(element: HTMLLIElement): string {
@@ -9,7 +9,7 @@ export function getIndex(element: HTMLLIElement): number {
 	return Number(element.dataset.itemIndex);
 }
 
-export function getItemData(item: HTMLLIElement): ItemData {
+export function getItemData(item: HTMLLIElement): ItemRect {
 	const itemRect = item.getBoundingClientRect();
 	const itemTranslate = getTranslateValues(item);
 	return {
@@ -24,7 +24,7 @@ export function getItemData(item: HTMLLIElement): ItemData {
 	};
 }
 
-export function getItemsData(list: HTMLUListElement): ItemData[] {
+export function getItemsData(list: HTMLUListElement): ItemRect[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemData(item)
 	);

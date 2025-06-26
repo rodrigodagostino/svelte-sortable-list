@@ -1,4 +1,4 @@
-export interface ItemData {
+export interface ItemRect {
 	id: string;
 	index: number;
 	x: number;

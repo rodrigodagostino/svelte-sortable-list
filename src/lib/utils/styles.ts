@@ -1,4 +1,4 @@
-import type { ItemData } from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/index.js';
 
 export function getTranslateValues(element: HTMLElement) {
 	const style = window.getComputedStyle(element);
@@ -14,8 +14,8 @@ export function getTranslateValues(element: HTMLElement) {
 
 export function calculateTranslate(
 	axis: 'x' | 'y',
-	a: DOMRect | ItemData,
-	b: DOMRect | ItemData,
+	a: DOMRect | ItemRect,
+	b: DOMRect | ItemRect,
 	aIndex: number,
 	bIndex: number
 ) {
@@ -27,8 +27,8 @@ export function calculateTranslate(
 
 export function calculateTranslateWithAlignment(
 	root: HTMLElement,
-	a: DOMRect | ItemData,
-	b: DOMRect | ItemData
+	a: DOMRect | ItemRect,
+	b: DOMRect | ItemRect
 ) {
 	const alignItems = window.getComputedStyle(root).alignItems;
 	return alignItems === 'center'

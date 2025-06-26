@@ -1,6 +1,6 @@
-import type { ItemData } from '$lib/types/data-extraction.js';
+import type { ItemRect } from '$lib/types/data-extraction.js';
 
-export function isInSameRow(a: DOMRect | ItemData, b: DOMRect | ItemData) {
+export function isInSameRow(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return (
 		(a.y >= b.y && a.y + a.height <= b.y + b.height) ||
 		(a.y <= b.y && a.y + a.height >= b.y + b.height)
