@@ -33,18 +33,18 @@
 			<div class="ssl-item-content">
 				{#if item.type === 'input'}
 					<div class="form-field">
-						<label for={item.id}>{item.text}</label>
-						<input id={item.id} type="text" />
+						<label for="form-field-{item.id}">{item.text}</label>
+						<input id="form-field-{item.id}" type="text" />
 					</div>
 				{:else if item.type === 'textarea'}
 					<div class="form-field">
-						<label for={item.id}>{item.text}</label>
-						<textarea id={item.id}></textarea>
+						<label for="form-field-{item.id}">{item.text}</label>
+						<textarea id="form-field-{item.id}"></textarea>
 					</div>
 				{:else if item.type === 'select'}
 					<div class="form-field">
-						<label for={item.id}>{item.text}</label>
-						<select id={item.id} name={item.id}>
+						<label for="form-field-{item.id}">{item.text}</label>
+						<select id="form-field-{item.id}" name="form-field-{item.id}">
 							<option value="">--Choose an option--</option>
 							<option value="option-1">Option 1</option>
 							<option value="option-2">Option 2</option>
