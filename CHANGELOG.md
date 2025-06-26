@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.2] (2025-06-26)
+
+### Added
+
+- Add support for vertical alignment in horizontal wrapping lists.
+
+### Changed
+
+- Adjust the `<SortableListGhost>` transform logic to match the same pattern as in `<SortableList.Item>`.
+- Simplify the `<SortableListGhost>` and `<SortableList.Item>` transform calculations.
+- Unify the `<SortableListGhost>` and `<SortableList.Item>` transform calculations under a couple of common functions: `calculateTranslate()` and `calculateTranslateWithAlignment()`.
+
+### Docs
+
+- Correct the scope of some demo pages styles.
+- Correct the fields ids in the **“Interactive items”** demo page.
+
 ## [0.13.1] (2025-06-20)
 
 ### Changed
@@ -894,7 +911,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...HEAD
+[0.13.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...v0.12.8
