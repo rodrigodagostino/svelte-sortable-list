@@ -12,7 +12,12 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import type { SortableListGhostProps } from '$lib/types/index.js';
-	import { getIndex, isInSameRow } from '$lib/utils/index.js';
+	import {
+		calculateTranslate,
+		calculateTranslateWithAlignment,
+		getIndex,
+		isInSameRow,
+	} from '$lib/utils/index.js';
 
 	type $$Props = SortableListGhostProps;
 
@@ -181,23 +186,14 @@
 			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
 
-			const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
 			const x =
 				$rootProps.direction === 'vertical'
 					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
-					: draggedIndex < targetIndex
-						? `${ghostRect.x - targetRect.x + ghostRect.width - targetRect.width}px`
-						: `${ghostRect.x - targetRect.x}px`;
+					: calculateTranslate('x', ghostRect, targetRect, draggedIndex, targetIndex);
 			const y =
 				$rootProps.direction === 'vertical'
-					? draggedIndex < targetIndex
-						? `${ghostRect.y - targetRect.y + ghostRect.height - targetRect.height}px`
-						: `${ghostRect.y - targetRect.y}px`
-					: alignItems === 'center'
-						? `${ghostRect.y - targetRect.y + (ghostRect.height - targetRect.height) / 2}px`
-						: alignItems === 'end' || alignItems === 'flex-end'
-							? `${ghostRect.y - targetRect.y + ghostRect.height - targetRect.height}px`
-							: `${ghostRect.y - targetRect.y}px`;
+					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
+					: calculateTranslateWithAlignment(rootRef, ghostRect, targetRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

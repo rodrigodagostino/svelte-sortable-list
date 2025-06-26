@@ -17,7 +17,14 @@
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
 	import type { SortableListItemProps } from '$lib/types/index.js';
-	import { dispatch, getId, getIndex, isInSameRow } from '$lib/utils/index.js';
+	import {
+		calculateTranslate,
+		calculateTranslateWithAlignment,
+		dispatch,
+		getId,
+		getIndex,
+		isInSameRow,
+	} from '$lib/utils/index.js';
 
 	type $$Props = SortableListItemProps;
 
@@ -125,7 +132,6 @@
 			return 'translate3d(0, 0, 0)';
 
 		const rootElement = itemRef.closest<HTMLUListElement>('.ssl-list')!;
-		const alignItems = window.getComputedStyle(rootElement).alignItems;
 
 		if (draggedId !== String(id)) {
 			if (
@@ -145,11 +151,7 @@
 						? `${operator}${draggedRect.height + $rootProps.gap!}px`
 						: isInSameRow(currentRect, $itemsData[index + step])
 							? '0'
-							: alignItems === 'center'
-								? `${$itemsData[index + step].y - currentRect.y + ($itemsData[index + step].height - currentRect.height) / 2}px`
-								: alignItems === 'end' || alignItems === 'flex-end'
-									? `${$itemsData[index + step].y - currentRect.y + $itemsData[index + step].height - currentRect.height}px`
-									: `${$itemsData[index + step].y - currentRect.y}px`;
+							: calculateTranslateWithAlignment(rootElement, $itemsData[index + step], currentRect);
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -159,21 +161,13 @@
 			const x =
 				$rootProps.direction === 'vertical'
 					? '0'
-					: draggedIndex < targetIndex
-						? `${targetRect.x - draggedRect.x + targetRect.width - draggedRect.width}px`
-						: `${targetRect.x - draggedRect.x}px`;
+					: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
 			const y =
 				$rootProps.direction === 'vertical'
-					? draggedIndex < targetIndex
-						? `${targetRect.y - draggedRect.y + targetRect.height - draggedRect.height}px`
-						: `${targetRect.y - draggedRect.y}px`
+					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 					: isInSameRow(draggedRect, targetRect)
 						? '0'
-						: alignItems === 'center'
-							? `${targetRect.y - draggedRect.y + (targetRect.height - draggedRect.height) / 2}px`
-							: alignItems === 'end' || alignItems === 'flex-end'
-								? `${targetRect.y - draggedRect.y + targetRect.height - draggedRect.height}px`
-								: `${targetRect.y - draggedRect.y}px`;
+						: calculateTranslateWithAlignment(rootElement, targetRect, draggedRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

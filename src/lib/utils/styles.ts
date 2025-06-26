@@ -1,3 +1,5 @@
+import type { ItemData } from '$lib/types/index.js';
+
 export function getTranslateValues(element: HTMLElement) {
 	const style = window.getComputedStyle(element);
 	if (style.transform === 'none') return;
@@ -8,4 +10,30 @@ export function getTranslateValues(element: HTMLElement) {
 		y: Number(matrix[13] || matrix[5] || 0),
 		z: Number(matrix[14] || 0),
 	};
+}
+
+export function calculateTranslate(
+	axis: 'x' | 'y',
+	a: DOMRect | ItemData,
+	b: DOMRect | ItemData,
+	aIndex: number,
+	bIndex: number
+) {
+	const dimension = axis === 'x' ? 'width' : 'height';
+	return aIndex < bIndex
+		? `${a[axis] - b[axis] + a[dimension] - b[dimension]}px`
+		: `${a[axis] - b[axis]}px`;
+}
+
+export function calculateTranslateWithAlignment(
+	root: HTMLElement,
+	a: DOMRect | ItemData,
+	b: DOMRect | ItemData
+) {
+	const alignItems = window.getComputedStyle(root).alignItems;
+	return alignItems === 'center'
+		? `${a.y - b.y + (a.height - b.height) / 2}px`
+		: alignItems === 'end' || alignItems === 'flex-end'
+			? `${a.y - b.y + a.height - b.height}px`
+			: `${a.y - b.y}px`;
 }
