@@ -113,6 +113,10 @@
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (
+			(!$isPointerDragging &&
+				!$isPointerDropping &&
+				!$isKeyboardDragging &&
+				!$isKeyboardDropping) ||
 			!$itemsData ||
 			!$draggedItem ||
 			!$targetItem ||
@@ -121,10 +125,6 @@
 			draggedRect === null ||
 			targetIndex === null ||
 			targetRect === null ||
-			(!$isPointerDragging &&
-				!$isPointerDropping &&
-				!$isKeyboardDragging &&
-				!$isKeyboardDropping) ||
 			$isPointerCanceling ||
 			$isKeyboardCanceling ||
 			(!$isBetweenBounds && !$rootProps.canClearOnDragOut && $rootProps.canRemoveOnDropOut)
@@ -185,14 +185,14 @@
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOpacity =
-		draggedId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
+		draggedId === String(id) &&
 		!$rootProps.hasDropMarker
 			? 0
 			: 1;
 	$: styleOverflow =
-		draggedId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
+		draggedId === String(id) &&
 		$rootProps.canRemoveOnDropOut
 			? 'hidden'
 			: undefined;
