@@ -16,6 +16,7 @@
 		setItemsData,
 		setPointer,
 		setPointerOrigin,
+		setRoot,
 		setRootProps,
 		setTargetItem,
 	} from '$lib/stores/index.js';
@@ -95,6 +96,7 @@
 		announcements,
 	};
 
+	const root = setRoot(null);
 	let ghostStatus: SortableListGhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
@@ -123,6 +125,7 @@
 
 	onMount(() => {
 		dispatch('mounted');
+		$root = rootRef;
 		$isRTL = getTextDirection(rootRef) === 'rtl';
 	});
 
@@ -615,7 +618,7 @@
 		</p>
 	</slot>
 </ul>
-<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
+<SortableListGhost bind:ghostRef status={ghostStatus} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--

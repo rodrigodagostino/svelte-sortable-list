@@ -8,6 +8,7 @@
 		getItemsData,
 		getPointer,
 		getPointerOrigin,
+		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
@@ -24,10 +25,10 @@
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let status: $$Props['status'];
-	export let rootRef: $$Props['rootRef'];
 
 	const rootProps = getRootProps();
 
+	const root = getRoot();
 	const pointer = getPointer();
 	const pointerOrigin = getPointerOrigin();
 	const itemsData = getItemsData();
@@ -110,7 +111,7 @@
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
-		const alignItems = rootRef && window.getComputedStyle(rootRef).alignItems;
+		const alignItems = $root && window.getComputedStyle($root).alignItems;
 		const top =
 			$rootProps.direction === 'vertical'
 				? draggedIndex < targetIndex
@@ -130,7 +131,7 @@
 	function getStyleTransform(status: $$Props['status'], ...args: unknown[]) {
 		if (
 			status === 'unset' ||
-			!rootRef ||
+			!$root ||
 			!$itemsData ||
 			!$pointer ||
 			!$pointerOrigin ||
@@ -139,7 +140,7 @@
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
-		const rootRect = rootRef.getBoundingClientRect();
+		const rootRect = $root.getBoundingClientRect();
 
 		if (status === 'init' && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
@@ -198,7 +199,7 @@
 			const y =
 				$rootProps.direction === 'vertical'
 					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment(rootRef, ghostRect, targetRect);
+					: calculateTranslateWithAlignment($root, ghostRect, targetRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

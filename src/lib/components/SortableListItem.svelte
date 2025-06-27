@@ -12,6 +12,7 @@
 		getIsPointerDropping,
 		getIsRTL,
 		getItemsData,
+		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
@@ -37,6 +38,7 @@
 
 	const rootProps = getRootProps();
 
+	const root = getRoot();
 	const itemsData = getItemsData();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
@@ -131,8 +133,6 @@
 		)
 			return 'translate3d(0, 0, 0)';
 
-		const rootElement = itemRef.closest<HTMLUListElement>('.ssl-list')!;
-
 		if (draggedId !== String(id)) {
 			if (
 				(index > draggedIndex && index <= targetIndex) ||
@@ -151,7 +151,7 @@
 						? `${operator}${draggedRect.height + $rootProps.gap!}px`
 						: isInSameRow(currentRect, $itemsData[index + step])
 							? '0'
-							: calculateTranslateWithAlignment(rootElement, $itemsData[index + step], currentRect);
+							: calculateTranslateWithAlignment($root!, $itemsData[index + step], currentRect);
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -167,7 +167,7 @@
 					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 					: isInSameRow(draggedRect, targetRect)
 						? '0'
-						: calculateTranslateWithAlignment(rootElement, targetRect, draggedRect);
+						: calculateTranslateWithAlignment($root!, targetRect, draggedRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
