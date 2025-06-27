@@ -9,7 +9,7 @@ export function getIndex(element: HTMLLIElement): number {
 	return Number(element.dataset.itemIndex);
 }
 
-export function getItemData(item: HTMLLIElement): ItemRect {
+export function getItemRect(item: HTMLLIElement): ItemRect {
 	const itemRect = item.getBoundingClientRect();
 	const itemTranslate = getTranslateValues(item);
 	return {
@@ -24,9 +24,9 @@ export function getItemData(item: HTMLLIElement): ItemRect {
 	};
 }
 
-export function getItemsData(list: HTMLUListElement): ItemRect[] {
+export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
-		getItemData(item)
+		getItemRect(item)
 	);
 }
 

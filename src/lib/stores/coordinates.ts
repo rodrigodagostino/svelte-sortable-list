@@ -15,9 +15,9 @@ export function getPointerOrigin() {
 	return getWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin');
 }
 
-export function setItemsData(context: SortableListCoordinates['itemsData']) {
-	return setWritableContext<SortableListCoordinates['itemsData']>('itemsData', context);
+export function setItemRects(context: SortableListCoordinates['itemRects']) {
+	return setWritableContext<SortableListCoordinates['itemRects']>('itemRects', context);
 }
-export function getItemsData() {
-	return getWritableContext<SortableListCoordinates['itemsData']>('itemsData');
+export function getItemRects() {
+	return getWritableContext<SortableListCoordinates['itemRects']>('itemRects');
 }

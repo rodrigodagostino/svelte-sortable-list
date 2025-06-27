@@ -13,7 +13,7 @@
 		setIsPointerDragging,
 		setIsPointerDropping,
 		setIsRTL,
-		setItemsData,
+		setItemRects,
 		setPointer,
 		setPointerOrigin,
 		setRoot,
@@ -37,7 +37,7 @@
 		getCollidingItem,
 		getId,
 		getIndex,
-		getItemsData,
+		getItemRects,
 		getScrollingSpeed,
 		getTextDirection,
 		isFullyVisible,
@@ -100,7 +100,7 @@
 	let ghostStatus: SortableListGhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
-	const itemsData = setItemsData(null);
+	const itemRects = setItemRects(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
@@ -225,7 +225,7 @@
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
-		$itemsData = getItemsData(rootRef);
+		$itemRects = getItemRects(rootRef);
 		ghostStatus = 'init';
 		await tick();
 		$isPointerDragging = true;
@@ -254,7 +254,7 @@
 		if (rafId || !$isPointerDragging) return;
 
 		rafId = requestAnimationFrame(async () => {
-			if (!$draggedItem || !$itemsData || !ghostRef) return;
+			if (!$draggedItem || !$itemRects || !ghostRef) return;
 
 			dispatch('drag', {
 				deviceType: 'pointer',
@@ -273,14 +273,14 @@
 			$pointer = { x: clientX, y: clientY };
 			$isBetweenBounds = areColliding(ghostRect, rootRect);
 
-			// Re-set itemsData only during scrolling.
+			// Re-set itemRects only during scrolling.
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-			if (scrollingSpeed !== 0) $itemsData = getItemsData(rootRef);
+			if (scrollingSpeed !== 0) $itemRects = getItemRects(rootRef);
 			await tick();
-			const collidingItemData = getCollidingItem(ghostRef, $itemsData);
-			if (collidingItemData)
+			const collidingItemRect = getCollidingItem(ghostRef, $itemRects);
+			if (collidingItemRect)
 				$targetItem = rootRef.querySelector<HTMLLIElement>(
-					`.ssl-item[data-item-id="${collidingItemData.id}"]`
+					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 				);
 			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
 
@@ -327,7 +327,7 @@
 					await tick();
 					$draggedItem = $focusedItem;
 					const draggedIndex = getIndex($focusedItem);
-					$itemsData = getItemsData(rootRef);
+					$itemRects = getItemRects(rootRef);
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
@@ -375,7 +375,7 @@
 					else
 						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemsData) return;
+					if (!$draggedItem || !$itemRects) return;
 
 					const draggedId = getId($draggedItem);
 					const draggedIndex = getIndex($draggedItem);
@@ -386,8 +386,8 @@
 					if (
 						(step === -1 && draggedIndex === 0 && !targetItem) ||
 						(step === -1 && targetIndex === 0) ||
-						(step === 1 && draggedIndex === $itemsData.length - 1 && !targetItem) ||
-						(step === 1 && targetIndex === $itemsData.length - 1)
+						(step === 1 && draggedIndex === $itemRects.length - 1 && !targetItem) ||
+						(step === 1 && targetIndex === $itemRects.length - 1)
 					)
 						return;
 
@@ -446,7 +446,7 @@
 					if (key === 'Home') items[0]?.focus({ preventScroll: true });
 					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemsData) return;
+					if (!$draggedItem || !$itemRects) return;
 
 					const draggedIndex = getIndex($draggedItem);
 					const targetIndex = $targetItem ? getIndex($targetItem) : null;
@@ -455,8 +455,8 @@
 					if (
 						(key === 'Home' && draggedIndex === 0 && !targetItem) ||
 						(key === 'Home' && targetIndex === 0) ||
-						(key === 'End' && draggedIndex === $itemsData.length - 1 && !targetItem) ||
-						(key === 'End' && targetIndex === $itemsData.length - 1)
+						(key === 'End' && draggedIndex === $itemRects.length - 1 && !targetItem) ||
+						(key === 'End' && targetIndex === $itemRects.length - 1)
 					)
 						return;
 
@@ -501,7 +501,7 @@
 
 		$draggedItem = null;
 		$targetItem = null;
-		$itemsData = null;
+		$itemRects = null;
 
 		if (action.includes('pointer')) {
 			ghostStatus = 'unset';

@@ -5,7 +5,7 @@
 		getIsBetweenBounds,
 		getIsPointerDragging,
 		getIsPointerDropping,
-		getItemsData,
+		getItemRects,
 		getPointer,
 		getPointerOrigin,
 		getRoot,
@@ -31,7 +31,7 @@
 	const root = getRoot();
 	const pointer = getPointer();
 	const pointerOrigin = getPointerOrigin();
-	const itemsData = getItemsData();
+	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 
@@ -58,19 +58,19 @@
 	}
 
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
-	// $itemsData is used as a reliable reference to the item’s position in the list
+	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedRect = $itemsData && typeof draggedIndex === 'number' ? $itemsData[draggedIndex] : null;
+	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetRect = $itemsData && typeof targetIndex === 'number' ? $itemsData[targetIndex] : null;
+	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
 	function getStyleWidth(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemsData) return '0';
+		if (!draggedItem || !$itemRects) return '0';
 		return `${draggedRect?.width || 0}px`;
 	}
 
 	function getStyleHeight(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemsData) return '0';
+		if (!draggedItem || !$itemRects) return '0';
 		return `${draggedRect?.height || 0}px`;
 	}
 
@@ -80,7 +80,7 @@
 			!$draggedItem ||
 			typeof draggedIndex !== 'number' ||
 			!draggedRect ||
-			!$itemsData
+			!$itemRects
 		)
 			return '0';
 
@@ -103,7 +103,7 @@
 			!$draggedItem ||
 			typeof draggedIndex !== 'number' ||
 			!draggedRect ||
-			!$itemsData
+			!$itemRects
 		)
 			return '0';
 
@@ -132,7 +132,7 @@
 		if (
 			status === 'unset' ||
 			!$root ||
-			!$itemsData ||
+			!$itemRects ||
 			!$pointer ||
 			!$pointerOrigin ||
 			!$draggedItem

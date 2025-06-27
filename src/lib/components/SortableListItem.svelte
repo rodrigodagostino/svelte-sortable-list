@@ -11,7 +11,7 @@
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getIsRTL,
-		getItemsData,
+		getItemRects,
 		getRoot,
 		getRootProps,
 		getTargetItem,
@@ -39,7 +39,7 @@
 	const rootProps = getRootProps();
 
 	const root = getRoot();
-	const itemsData = getItemsData();
+	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 	const focusedItem = getFocusedItem();
@@ -82,14 +82,14 @@
 			);
 	}
 
-	$: currentRect = $itemsData ? $itemsData[index] : null;
+	$: currentRect = $itemRects ? $itemRects[index] : null;
 	$: draggedId = $draggedItem ? getId($draggedItem) : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
-	// $itemsData is used as a reliable reference to the item’s position in the list
+	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedRect = $itemsData && typeof draggedIndex === 'number' ? $itemsData[draggedIndex] : null;
+	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetRect = $itemsData && typeof targetIndex === 'number' ? $itemsData[targetIndex] : null;
+	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 	$: focusedId = $focusedItem ? getId($focusedItem) : null;
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -119,7 +119,7 @@
 				!$isPointerDropping &&
 				!$isKeyboardDragging &&
 				!$isKeyboardDropping) ||
-			!$itemsData ||
+			!$itemRects ||
 			!$draggedItem ||
 			!$targetItem ||
 			currentRect === null ||
@@ -143,15 +143,15 @@
 				const x =
 					$rootProps.direction === 'vertical'
 						? '0'
-						: isInSameRow(currentRect, $itemsData[index + step])
+						: isInSameRow(currentRect, $itemRects[index + step])
 							? `${operator}${draggedRect.width + $rootProps.gap!}px`
-							: `${$itemsData[index + step].x - currentRect.x + $itemsData[index + step].width - currentRect.width}px`;
+							: `${$itemRects[index + step].x - currentRect.x + $itemRects[index + step].width - currentRect.width}px`;
 				const y =
 					$rootProps.direction === 'vertical'
 						? `${operator}${draggedRect.height + $rootProps.gap!}px`
-						: isInSameRow(currentRect, $itemsData[index + step])
+						: isInSameRow(currentRect, $itemRects[index + step])
 							? '0'
-							: calculateTranslateWithAlignment($root!, $itemsData[index + step], currentRect);
+							: calculateTranslateWithAlignment($root!, $itemRects[index + step], currentRect);
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
