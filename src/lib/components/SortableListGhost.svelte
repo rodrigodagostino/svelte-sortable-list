@@ -15,6 +15,7 @@
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
+		getId,
 		getIndex,
 		isInSameRow,
 	} from '$lib/utils/index.js';
@@ -37,18 +38,22 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isBetweenBounds = getIsBetweenBounds();
 
-	$: if ($draggedItem) {
-		const clone = $draggedItem?.cloneNode(true) as HTMLElement;
+	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
+	let lastCloneId: string | null = null;
+	let lastCloneContainsSelect = false;
+
+	$: if ($draggedItem && (draggedItemId !== lastCloneId || lastCloneContainsSelect)) {
+		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
 		const selects = $draggedItem?.querySelectorAll<HTMLSelectElement>('select');
-		if (selects)
+		if (selects.length)
 			clone
 				.querySelectorAll<HTMLSelectElement>('select')
 				.forEach((select, index) => (select.value = selects[index].value));
 
+		lastCloneId = draggedItemId;
+		lastCloneContainsSelect = !!selects.length;
 		ghostRef?.replaceChildren(...clone.childNodes);
-	} else {
-		ghostRef?.replaceChildren();
 	}
 
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
