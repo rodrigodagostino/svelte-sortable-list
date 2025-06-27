@@ -1,9 +1,11 @@
 import type { ItemRect } from '$lib/types/index.js';
 
+const MATRIX_REGEX = /matrix.*\((.+)\)/;
+
 export function getTranslateValues(element: HTMLElement) {
 	const style = window.getComputedStyle(element);
 	if (style.transform === 'none') return;
-	const matrix = style.transform.match(/matrix.*\((.+)\)/)![1].split(', ');
+	const matrix = style.transform.match(MATRIX_REGEX)![1].split(', ');
 
 	return {
 		x: Number(matrix[12] || matrix[4] || 0),
