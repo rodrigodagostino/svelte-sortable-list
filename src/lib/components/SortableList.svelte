@@ -246,39 +246,45 @@
 		);
 	}
 
+	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!$isPointerDragging || !ghostRef || !$itemsData || !$draggedItem) return;
+		if (rafId || !$isPointerDragging) return;
 
-		dispatch('drag', {
-			deviceType: 'pointer',
-			draggedItem: $draggedItem,
-			draggedItemId: getId($draggedItem),
-			draggedItemIndex: getIndex($draggedItem),
-			targetItem: $targetItem,
-			targetItemId: $targetItem ? getId($targetItem) : null,
-			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-			isBetweenBounds: $isBetweenBounds,
-			canRemoveOnDropOut: canRemoveOnDropOut || false,
+		rafId = requestAnimationFrame(async () => {
+			if (!$draggedItem || !$itemsData || !ghostRef) return;
+
+			dispatch('drag', {
+				deviceType: 'pointer',
+				draggedItem: $draggedItem,
+				draggedItemId: getId($draggedItem),
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
+			});
+
+			const rootRect = rootRef.getBoundingClientRect();
+			const ghostRect = ghostRef.getBoundingClientRect();
+			$pointer = { x: clientX, y: clientY };
+			$isBetweenBounds = areColliding(ghostRect, rootRect);
+
+			// Re-set itemsData only during scrolling.
+			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
+			if (scrollingSpeed !== 0) $itemsData = getItemsData(rootRef);
+			await tick();
+			const collidingItemData = getCollidingItem(ghostRef, $itemsData);
+			if (collidingItemData)
+				$targetItem = rootRef.querySelector<HTMLLIElement>(
+					`.ssl-item[data-item-id="${collidingItemData.id}"]`
+				);
+			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+
+			if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
+
+			rafId = null;
 		});
-
-		const rootRect = rootRef.getBoundingClientRect();
-		const ghostRect = ghostRef.getBoundingClientRect();
-
-		$pointer = { x: clientX, y: clientY };
-		$isBetweenBounds = areColliding(ghostRect, rootRect);
-
-		// Re-set itemsData only during scrolling.
-		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-		if (scrollingSpeed !== 0) $itemsData = getItemsData(rootRef);
-		await tick();
-		const collidingItemData = getCollidingItem(ghostRef, $itemsData);
-		if (collidingItemData)
-			$targetItem = rootRef.querySelector<HTMLLIElement>(
-				`.ssl-item[data-item-id="${collidingItemData.id}"]`
-			);
-		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
-
-		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
 
 	function handlePointerUp() {
