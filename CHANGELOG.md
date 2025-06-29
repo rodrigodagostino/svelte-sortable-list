@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] (2025-06-28)
+
+### Performance
+
+- Debounce the `pointermove` handler to reduce the frequency in which it is called in `<SortableList.Root>`.
+- Avoid unnecessary re-cloning in `<SortableListGhost>`.
+- Move the most common exit conditions to the top in `<SortableList.Item>`.
+- Replace queried root with stored reference.
+- Add a few small improvements to utils.
+
+### Changed
+
+- Rename `itemsData` variables, stores, functions and types to `itemRects`.
+
+### Fixed
+
+- Correct reference to `rootRef` in `<SortableListGhost>` hover-over comments.
+
 ## [0.13.2] (2025-06-26)
 
 ### Added
@@ -911,7 +929,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...v0.13.0
