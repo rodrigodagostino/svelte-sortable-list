@@ -10,17 +10,21 @@ export function getIndex(element: HTMLLIElement): number {
 }
 
 export function getItemRect(item: HTMLLIElement): ItemRect {
-	const itemRect = item.getBoundingClientRect();
+	const { x, y, width, height, top, right, bottom, left } = item.getBoundingClientRect();
 	const itemTranslate = getTranslateValues(item);
 	return {
-		id: item.dataset.itemId!,
-		index: Number(item.dataset.itemIndex),
 		// Translate values are removed to create a reliable reference to the item’s position in the list
 		// without the risk of catching in-between values while an item is translating.
-		x: itemRect.x - (itemTranslate?.x || 0),
-		y: itemRect.y - (itemTranslate?.y || 0),
-		width: itemRect.width,
-		height: itemRect.height,
+		x: x - (itemTranslate?.x || 0),
+		y: y - (itemTranslate?.y || 0),
+		width,
+		height,
+		top: top - (itemTranslate?.y || 0),
+		right: right - (itemTranslate?.x || 0),
+		bottom: bottom - (itemTranslate?.y || 0),
+		left: left - (itemTranslate?.x || 0),
+		id: item.dataset.itemId!,
+		index: Number(item.dataset.itemIndex),
 	};
 }
 
