@@ -145,7 +145,7 @@
 						? '0'
 						: isInSameRow(currentRect, $itemRects[index + step])
 							? `${operator}${draggedRect.width + $rootProps.gap!}px`
-							: `${$itemRects[index + step].x - currentRect.x + $itemRects[index + step].width - currentRect.width}px`;
+							: `${$itemRects[index + step].right - currentRect.right}px`;
 				const y =
 					$rootProps.direction === 'vertical'
 						? `${operator}${draggedRect.height + $rootProps.gap!}px`

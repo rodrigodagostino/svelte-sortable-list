@@ -1,10 +1,7 @@
 import type { ItemRect } from '$lib/types/data-extraction.js';
 
 export function isInSameRow(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
-	return (
-		(a.y >= b.y && a.y + a.height <= b.y + b.height) ||
-		(a.y <= b.y && a.y + a.height >= b.y + b.height)
-	);
+	return (a.y >= b.y && a.bottom <= b.bottom) || (a.y <= b.y && a.bottom >= b.bottom);
 }
 
 const INTERACTIVE_ELEMENTS = new Set([

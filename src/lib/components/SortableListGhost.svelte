@@ -92,7 +92,7 @@
 			$rootProps.direction === 'vertical'
 				? draggedRect.x
 				: draggedIndex < targetIndex
-					? targetRect.x + targetRect.width - draggedRect.width
+					? targetRect.right - draggedRect.width
 					: targetRect.x;
 		return `${left}px`;
 	}
@@ -115,14 +115,14 @@
 		const top =
 			$rootProps.direction === 'vertical'
 				? draggedIndex < targetIndex
-					? targetRect.y + targetRect.height - draggedRect.height
+					? targetRect.bottom - draggedRect.height
 					: targetRect.y
 				: isInSameRow(draggedRect, targetRect)
 					? draggedRect.y
 					: alignItems === 'center'
 						? targetRect.y + (targetRect.height - draggedRect.height) / 2
 						: alignItems === 'end' || alignItems === 'flex-end'
-							? targetRect.y + targetRect.height - draggedRect.height
+							? targetRect.bottom - draggedRect.height
 							: targetRect.y;
 		return `${top}px`;
 	}

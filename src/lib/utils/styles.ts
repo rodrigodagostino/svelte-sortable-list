@@ -36,6 +36,6 @@ export function calculateTranslateWithAlignment(
 	return alignItems === 'center'
 		? `${a.y - b.y + (a.height - b.height) / 2}px`
 		: alignItems === 'end' || alignItems === 'flex-end'
-			? `${a.y - b.y + a.height - b.height}px`
+			? `${a.bottom - b.bottom}px`
 			: `${a.y - b.y}px`;
 }
