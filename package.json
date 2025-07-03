@@ -34,7 +34,7 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^4.0.0",
+		"svelte": "^4.0.0 || ^5.0.0",
 		"esm-env": "^1.0.0"
 	},
 	"devDependencies": {
