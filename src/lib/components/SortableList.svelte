@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, createEventDispatcher, onMount, tick } from 'svelte';
+	import {
+		afterUpdate,
+		beforeUpdate,
+		createEventDispatcher,
+		onDestroy,
+		onMount,
+		tick,
+	} from 'svelte';
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import {
@@ -21,6 +28,7 @@
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
+		DestroyedEventDetail,
 		DragEndEventDetail,
 		DragEventDetail,
 		DragStartEventDetail,
@@ -121,12 +129,17 @@
 		drag: DragEventDetail;
 		drop: DropEventDetail;
 		dragend: DragEndEventDetail;
+		destroyed: DestroyedEventDetail;
 	}>();
 
 	onMount(() => {
 		dispatch('mounted');
 		$root = rootRef;
 		$isRTL = getTextDirection(rootRef) === 'rtl';
+	});
+
+	onDestroy(() => {
+		dispatch('destroyed');
 	});
 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),

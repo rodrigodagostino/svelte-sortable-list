@@ -25,10 +25,13 @@ export type DragEndEventDetail = EventDetail & {
 	isCanceled: boolean;
 };
 
+export type DestroyedEventDetail = null;
+
 export interface SortableListRootEvents {
 	mounted: CustomEvent<MountedEventDetail>;
 	dragstart: CustomEvent<DragStartEventDetail>;
 	drag: CustomEvent<DragEventDetail>;
 	drop: CustomEvent<DropEventDetail>;
 	dragend: CustomEvent<DragEndEventDetail>;
+	destroyed: CustomEvent<DestroyedEventDetail>;
 }
