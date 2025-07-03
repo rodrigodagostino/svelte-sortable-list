@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.1] (2025-07-03)
+
+### Added
+
+- Add the `destroyed` event.
+- Allow for Svelte 5 as a peer dependency.
+
+### Performance
+
+- Align the `ItemRect` shape with the `DOMRect` shape to stay in line with monomorphism.
+- Avoid unnecessary coordinates calculations.
+
+### Changed
+
+- Provide clearer type references in the exposed types and utils.
+
+### Docs
+
+- Update the README to reflect the latest changes.
+
 ## [0.14.0] (2025-06-28)
 
 ### Performance
@@ -929,7 +949,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.1...HEAD
+[0.14.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...v0.13.2
 [0.13.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...v0.13.1
