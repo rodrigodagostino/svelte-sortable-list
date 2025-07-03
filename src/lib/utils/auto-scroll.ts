@@ -1,5 +1,5 @@
 import { getTranslateValues } from './index.js';
-import type { SortableListRootProps } from '$lib/types/index.js';
+import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 
 export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	if (!element) return undefined;
@@ -21,7 +21,7 @@ export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	return document.documentElement;
 };
 
-export function isRootElement(element: HTMLElement, direction: SortableListRootProps['direction']) {
+export function isRootElement(element: HTMLElement, direction: RootProps['direction']) {
 	const docElement = document.documentElement;
 	return (
 		element === docElement ||
@@ -31,10 +31,7 @@ export function isRootElement(element: HTMLElement, direction: SortableListRootP
 	);
 }
 
-export function isScrollable(
-	element: HTMLElement | undefined,
-	direction: SortableListRootProps['direction']
-) {
+export function isScrollable(element: HTMLElement | undefined, direction: RootProps['direction']) {
 	return (
 		element &&
 		((direction === 'vertical' && element.scrollHeight > element.clientHeight) ||
@@ -44,7 +41,7 @@ export function isScrollable(
 
 export function shouldAutoScroll(
 	element: HTMLElement,
-	direction: SortableListRootProps['direction'],
+	direction: RootProps['direction'],
 	scrollingSpeed: number
 ) {
 	if (direction === 'vertical')
@@ -62,7 +59,7 @@ export function shouldAutoScroll(
 export function scrollIntoView(
 	element: HTMLElement,
 	container: HTMLElement,
-	direction: SortableListRootProps['direction'],
+	direction: RootProps['direction'],
 	step: 1 | -1,
 	isScrollingDocument: boolean
 ) {
@@ -119,7 +116,7 @@ export function scrollIntoView(
 	});
 }
 
-function getScrollingOffset(element: HTMLElement, direction: SortableListRootProps['direction']) {
+function getScrollingOffset(element: HTMLElement, direction: RootProps['direction']) {
 	return direction === 'vertical' ? element.clientHeight * 0.2 : element.clientWidth * 0.2;
 }
 
@@ -127,7 +124,7 @@ export function getScrollingSpeed(
 	container: HTMLElement,
 	clientX: PointerEvent['clientX'],
 	clientY: PointerEvent['clientY'],
-	direction: SortableListRootProps['direction'],
+	direction: RootProps['direction'],
 	isScrollingDocument: boolean
 ) {
 	const offset = getScrollingOffset(container, direction);

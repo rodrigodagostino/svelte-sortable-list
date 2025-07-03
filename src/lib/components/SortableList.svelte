@@ -34,9 +34,9 @@
 		DragStartEventDetail,
 		DropEventDetail,
 		MountedEventDetail,
-		SortableListGhostProps,
-		SortableListRootEvents,
-		SortableListRootProps,
+		SortableListGhostProps as GhostProps,
+		SortableListRootEvents as RootEvents,
+		SortableListRootProps as RootProps,
 	} from '$lib/types/index.js';
 	import {
 		announce,
@@ -56,8 +56,8 @@
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListRootProps;
-	type $$Events = SortableListRootEvents;
+	type $$Props = RootProps;
+	type $$Events = RootEvents;
 
 	let rootRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
@@ -105,7 +105,7 @@
 	};
 
 	const root = setRoot(null);
-	let ghostStatus: SortableListGhostProps['status'] = 'unset';
+	let ghostStatus: GhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemRects = setItemRects(null);

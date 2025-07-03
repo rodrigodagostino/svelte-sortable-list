@@ -12,7 +12,7 @@
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
-	import type { SortableListGhostProps } from '$lib/types/index.js';
+	import type { SortableListGhostProps as GhostProps } from '$lib/types/index.js';
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
@@ -21,7 +21,7 @@
 		isInSameRow,
 	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListGhostProps;
+	type $$Props = GhostProps;
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let status: $$Props['status'];

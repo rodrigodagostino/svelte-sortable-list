@@ -17,7 +17,7 @@
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
-	import type { SortableListItemProps } from '$lib/types/index.js';
+	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
@@ -27,7 +27,7 @@
 		isInSameRow,
 	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListItemProps;
+	type $$Props = ItemProps;
 
 	let itemRef: HTMLLIElement;
 
