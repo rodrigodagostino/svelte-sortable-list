@@ -73,7 +73,9 @@
 	export let canRemoveOnDropOut: $$Props['canRemoveOnDropOut'] = false;
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
-	export let announcements: $$Props['announcements'] = announce;
+	export let announcements: $$Props['announcements'] = undefined;
+
+	$: _announcements = announcements || announce;
 
 	const rootProps = setRootProps({
 		gap,
@@ -87,7 +89,7 @@
 		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
-		announcements,
+		announcements: _announcements,
 	});
 	$: $rootProps = {
 		gap,
@@ -101,7 +103,7 @@
 		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
-		announcements,
+		announcements: _announcements,
 	};
 
 	const root = setRoot(null);
@@ -349,7 +351,7 @@
 						isBetweenBounds: $isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
-					liveText = announcements!.lifted($draggedItem, draggedIndex);
+					liveText = _announcements.lifted($draggedItem, draggedIndex);
 				} else {
 					handlePointerAndKeyboardDrop($focusedItem, 'keyboard-drop');
 				}
@@ -432,7 +434,7 @@
 					});
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
 						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
-					liveText = announcements!.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
+					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
 				}
 
 				await tick();
@@ -474,7 +476,7 @@
 						return;
 
 					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
-					liveText = announcements!.dragged(
+					liveText = _announcements.dragged(
 						$draggedItem,
 						draggedIndex,
 						$targetItem,
@@ -573,7 +575,7 @@
 		if (action === 'keyboard-drop' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			liveText = announcements!.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
+			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
@@ -581,7 +583,7 @@
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
-			liveText = announcements!.canceled($draggedItem, draggedIndex);
+			liveText = _announcements.canceled($draggedItem, draggedIndex);
 		}
 
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
