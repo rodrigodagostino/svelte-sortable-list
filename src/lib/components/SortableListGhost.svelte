@@ -214,10 +214,10 @@
 		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
 			return (
-				`transform ${$rootProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-				`z-index 0s ${$rootProps.transitionDuration}ms`
+				`transform ${$rootProps.transition!.duration}ms ${$rootProps.transition!.easing},` +
+				`z-index 0s ${$rootProps.transition!.duration}ms`
 			);
-		if (status === 'remove') return `z-index 0s ${$rootProps.transitionDuration}ms`;
+		if (status === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
 	}
 
 	function getStyleZIndex(status: $$Props['status']) {
@@ -240,7 +240,7 @@
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:--ssl-transition-duration="{$rootProps.transitionDuration}ms"
+	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}

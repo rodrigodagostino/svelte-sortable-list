@@ -205,9 +205,9 @@
 	);
 	$: styleTransition =
 		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
-			? `width ${$rootProps.transitionDuration}ms, height ${$rootProps.transitionDuration}ms,` +
-				`margin ${$rootProps.transitionDuration}ms, transform ${$rootProps.transitionDuration}ms,` +
-				`z-index ${$rootProps.transitionDuration}ms`
+			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
+				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
+				`z-index ${$rootProps.transition!.duration}ms`
 			: `none`;
 
 	async function handleFocus() {
@@ -278,10 +278,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-disabled={$rootProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	in:scaleFade={{ duration: $rootProps.transitionDuration }}
+	in:scaleFade={{ duration: $rootProps.transition?.duration }}
 	out:scaleFade={{
 		duration:
-			!$isBetweenBounds && $rootProps.canRemoveOnDropOut ? 0 : $rootProps.transitionDuration,
+			!$isBetweenBounds && $rootProps.canRemoveOnDropOut ? 0 : $rootProps.transition?.duration,
 	}}
 >
 	<slot />

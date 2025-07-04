@@ -64,7 +64,7 @@
 
 	export let gap: $$Props['gap'] = 12;
 	export let direction: $$Props['direction'] = 'vertical';
-	export let transitionDuration: $$Props['transitionDuration'] = 240;
+	export let transition: $$Props['transition'] = undefined;
 	export let hasDropMarker: $$Props['hasDropMarker'] = false;
 	export let hasWrapping: $$Props['hasWrapping'] = false;
 	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
@@ -75,12 +75,13 @@
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let announcements: $$Props['announcements'] = undefined;
 
+	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
 	const rootProps = setRootProps({
 		gap,
 		direction,
-		transitionDuration,
+		transition: _transition,
 		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
@@ -94,7 +95,7 @@
 	$: $rootProps = {
 		gap,
 		direction,
-		transitionDuration,
+		transition: _transition,
 		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
@@ -593,7 +594,7 @@
 			}
 		}
 
-		if (transitionDuration! > 0) element?.addEventListener('transitionend', handleTransitionEnd);
+		if (_transition.duration > 0) element?.addEventListener('transitionend', handleTransitionEnd);
 		else handlePointerAndKeyboardDragEnd(action);
 	}
 </script>
@@ -604,7 +605,7 @@
 	class="ssl-list"
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
-	style:--ssl-transition-duration="{transitionDuration}ms"
+	style:--ssl-transition-duration="{_transition.duration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}

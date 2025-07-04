@@ -12,7 +12,18 @@ export interface SortableListRootProps
 	> {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
-	transitionDuration?: number;
+	transition?: {
+		duration?: number;
+		easing?:
+			| 'ease'
+			| 'ease-in'
+			| 'ease-out'
+			| 'ease-in-out'
+			| 'linear'
+			| 'step-start'
+			| 'step-end'
+			| string;
+	};
 	hasDropMarker?: boolean;
 	hasWrapping?: boolean;
 	hasLockedAxis?: boolean;
