@@ -35,6 +35,11 @@
 	export let index: $$Props['index'];
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
+	export let transitionIn: $$Props['transitionIn'] = undefined;
+	export let transitionOut: $$Props['transitionOut'] = undefined;
+
+	$: _transitionIn = transitionIn || scaleFade;
+	$: _transitionOut = transitionOut || scaleFade;
 
 	const rootProps = getRootProps();
 
@@ -278,11 +283,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-disabled={$rootProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	in:scaleFade={{ duration: $rootProps.transition?.duration }}
-	out:scaleFade={{
-		duration:
-			!$isBetweenBounds && $rootProps.canRemoveOnDropOut ? 0 : $rootProps.transition?.duration,
-	}}
+	in:_transitionIn
+	out:_transitionOut
 >
 	<slot />
 </li>

@@ -1,4 +1,5 @@
 import type { AriaAttributes } from 'svelte/elements';
+import type { TransitionConfig } from 'svelte/transition';
 import type { Announcements } from './accessibility.js';
 
 export interface SortableListRootProps
@@ -41,6 +42,8 @@ export interface SortableListItemProps
 	index: number;
 	isLocked?: boolean;
 	isDisabled?: boolean;
+	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
+	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
 }
 
 export interface SortableListGhostProps {
