@@ -2,43 +2,43 @@
  * Custom properties.
  */
 :root {
-	--font-main:
+	--ssl-font-main:
 		ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
 		"Noto Color Emoji";
 
-	--white-rich: #fff;
-	--white: #f3f3f5;
-	--gray-050: #ededf0;
-	--gray-100: #e1e1e6;
-	--gray-150: #d2d2da;
-	--gray-200: #c3c3ce;
-	--gray-300: #a4a6b5;
-	--gray-400: #86889d;
-	--gray-500: #686a84;
-	--gray-600: #585a70;
-	--gray-650: #515266;
-	--gray-700: #494a5c;
-	--gray-750: #414253;
-	--gray-800: #393a49;
-	--gray-850: #31323f;
-	--gray-900: #2a2a35;
-	--gray-950: #22222b;
-	--black: #15151a;
-	--black-rich: #000;
+	--ssl-white-rich: #fff;
+	--ssl-white: #f3f3f5;
+	--ssl-gray-050: #ededf0;
+	--ssl-gray-100: #e1e1e6;
+	--ssl-gray-150: #d2d2da;
+	--ssl-gray-200: #c3c3ce;
+	--ssl-gray-300: #a4a6b5;
+	--ssl-gray-400: #86889d;
+	--ssl-gray-500: #686a84;
+	--ssl-gray-600: #585a70;
+	--ssl-gray-650: #515266;
+	--ssl-gray-700: #494a5c;
+	--ssl-gray-750: #414253;
+	--ssl-gray-800: #393a49;
+	--ssl-gray-850: #31323f;
+	--ssl-gray-900: #2a2a35;
+	--ssl-gray-950: #22222b;
+	--ssl-black: #15151a;
+	--ssl-black-rich: #000;
 
-	--box-shadow-1:
+	--ssl-box-shadow-1:
 		0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
 		0 4px 4px rgba(54, 57, 90, 0.1), 0 6px 8px rgba(54, 57, 90, 0.1),
 		0 8px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-2:
+	--ssl-box-shadow-2:
 		0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
 		0 4px 4px rgba(54, 57, 90, 0.1), 0 8px 8px rgba(54, 57, 90, 0.1),
 		0 16px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-3:
+	--ssl-box-shadow-3:
 		0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
 		0 8px 4px rgba(54, 57, 90, 0.1), 0 12px 8px rgba(54, 57, 90, 0.1),
 		0 24px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-4:
+	--ssl-box-shadow-4:
 		0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
 		0 8px 4px rgba(54, 57, 90, 0.1), 0 16px 8px rgba(54, 57, 90, 0.1),
 		0 32px 16px rgba(54, 57, 90, 0.1);
@@ -78,12 +78,12 @@ hr {
 }
 
 ::selection {
-	color: var(--white);
-	background: var(--gray-600);
+	color: var(--ssl-white);
+	background: var(--ssl-gray-600);
 }
 
 a {
-	color: var(--indigo-500);
+	color: var(--ssl-indigo-500);
 	transition: outline 240ms;
 	outline: 1px dotted transparent;
 	text-underline-offset: 0.125rem;
@@ -99,7 +99,7 @@ textarea,
 select,
 button {
 	min-width: 0;
-	border: 1px solid var(--gray-400);
+	border: 1px solid var(--ssl-gray-400);
 	color: inherit;
 	font: inherit;
 	letter-spacing: inherit;
@@ -109,7 +109,7 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 button:focus-visible {
-	outline: 0.125rem solid var(--gray-800);
+	outline: 0.125rem solid var(--ssl-gray-800);
 }
 
 button {
@@ -137,10 +137,10 @@ table {
  * Base styles.
  */
 body {
-	font-family: var(--font-main);
+	font-family: var(--ssl-font-main);
 	font-size: 1rem;
-	color: var(--gray-800);
-	background-color: var(--gray-100);
+	color: var(--ssl-gray-800);
+	background-color: var(--ssl-gray-100);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	display: flex;
@@ -148,7 +148,7 @@ body {
 }
 
 code {
-	background-color: var(--gray-200);
+	background-color: var(--ssl-gray-200);
 	border-radius: 0.25rem;
 }
 
@@ -173,7 +173,7 @@ code {
 .form-input {
 	flex: 1;
 	border: none;
-	border: 0.0625rem solid var(--gray-200);
+	border: 0.0625rem solid var(--ssl-gray-200);
 	padding-inline: 0.75rem;
 }
 
@@ -182,9 +182,9 @@ code {
 	align-items: center;
 	height: 3rem;
 	padding: 0.75em 1em;
-	background-color: var(--gray-800);
+	background-color: var(--ssl-gray-800);
 	border: none;
-	color: var(--white);
+	color: var(--ssl-white);
 	line-height: 1;
 	text-transform: uppercase;
 	white-space: nowrap;
@@ -193,9 +193,9 @@ code {
 
 .button:focus-visible,
 .button:hover {
-	background-color: var(--gray-600);
+	background-color: var(--ssl-gray-600);
 }
 
 .button:active {
-	background-color: var(--gray-950);
+	background-color: var(--ssl-gray-950);
 }

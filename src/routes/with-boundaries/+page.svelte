@@ -50,7 +50,7 @@
 			content: '';
 			position: absolute;
 			inset: -0.25rem;
-			border: 0.25rem dashed var(--gray-200);
+			border: 0.25rem dashed var(--ssl-gray-200);
 			z-index: -1;
 		}
 	}

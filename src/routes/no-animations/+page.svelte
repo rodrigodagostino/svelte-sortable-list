@@ -10,7 +10,9 @@
 	onMount(() => {
 		$rootProps = {
 			...defaultRootProps,
-			transitionDuration: 0,
+			transition: {
+				duration: 0,
+			},
 		};
 	});
 

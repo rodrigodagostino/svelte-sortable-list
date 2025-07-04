@@ -46,23 +46,23 @@
 	:global([data-page-pathname='auto-scrolling-container'] .wrapper) {
 		display: flex;
 		padding: 1.75rem 2rem;
-		background-color: var(--gray-150);
+		background-color: var(--ssl-gray-150);
 
 		&.direction-vertical {
 			flex-direction: column;
 			height: 32rem;
 			max-height: 80vh;
 			max-height: 80dvh;
-			border-top: 0.375rem solid var(--gray-300);
-			border-bottom: 0.375rem solid var(--gray-300);
+			border-top: 0.375rem solid var(--ssl-gray-300);
+			border-bottom: 0.375rem solid var(--ssl-gray-300);
 			overflow: hidden auto;
 		}
 
 		&.direction-horizontal {
 			width: 32rem;
 			max-width: 100%;
-			border-left: 0.375rem solid var(--gray-300);
-			border-right: 0.375rem solid var(--gray-300);
+			border-left: 0.375rem solid var(--ssl-gray-300);
+			border-right: 0.375rem solid var(--ssl-gray-300);
 			overflow: auto hidden;
 		}
 	}

@@ -59,8 +59,8 @@
 			right: calc(50% - 0.125rem);
 			background-image: linear-gradient(
 				to bottom,
-				var(--gray-200),
-				var(--gray-200) 60%,
+				var(--ssl-gray-200),
+				var(--ssl-gray-200) 60%,
 				transparent 60%,
 				transparent 100%
 			);
@@ -81,8 +81,8 @@
 			right: -8rem;
 			background-image: linear-gradient(
 				to right,
-				var(--gray-200),
-				var(--gray-200) 60%,
+				var(--ssl-gray-200),
+				var(--ssl-gray-200) 60%,
 				transparent 60%,
 				transparent 100%
 			);
