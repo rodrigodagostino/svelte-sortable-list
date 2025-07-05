@@ -1,44 +1,44 @@
 :root {
-	--font-main:
+	--ssl-font-main:
 		ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
 		"Noto Color Emoji";
 
-	--white-rich: #fff;
-	--white: #f3f3f5;
-	--gray-050: #ededf0;
-	--gray-100: #e1e1e6;
-	--gray-150: #d2d2da;
-	--gray-200: #c3c3ce;
-	--gray-300: #a4a6b5;
-	--gray-400: #86889d;
-	--gray-500: #686a84;
-	--gray-600: #585a70;
-	--gray-650: #515266;
-	--gray-700: #494a5c;
-	--gray-750: #414253;
-	--gray-800: #393a49;
-	--gray-850: #31323f;
-	--gray-900: #2a2a35;
-	--gray-950: #22222b;
-	--black: #15151a;
-	--black-rich: #000;
+	--ssl-white-rich: #fff;
+	--ssl-white: #f3f3f5;
+	--ssl-gray-050: #ededf0;
+	--ssl-gray-100: #e1e1e6;
+	--ssl-gray-150: #d2d2da;
+	--ssl-gray-200: #c3c3ce;
+	--ssl-gray-300: #a4a6b5;
+	--ssl-gray-400: #86889d;
+	--ssl-gray-500: #686a84;
+	--ssl-gray-600: #585a70;
+	--ssl-gray-650: #515266;
+	--ssl-gray-700: #494a5c;
+	--ssl-gray-750: #414253;
+	--ssl-gray-800: #393a49;
+	--ssl-gray-850: #31323f;
+	--ssl-gray-900: #2a2a35;
+	--ssl-gray-950: #22222b;
+	--ssl-black: #15151a;
+	--ssl-black-rich: #000;
 
-	--rose-300: #fda4af;
-	--rose-400: #fb7185;
+	--ssl-rose-300: #fda4af;
+	--ssl-rose-400: #fb7185;
 
-	--box-shadow-1:
+	--ssl-box-shadow-1:
 		0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
 		0 4px 4px rgba(54, 57, 90, 0.1), 0 6px 8px rgba(54, 57, 90, 0.1),
 		0 8px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-2:
+	--ssl-box-shadow-2:
 		0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
 		0 4px 4px rgba(54, 57, 90, 0.1), 0 8px 8px rgba(54, 57, 90, 0.1),
 		0 16px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-3:
+	--ssl-box-shadow-3:
 		0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
 		0 8px 4px rgba(54, 57, 90, 0.1), 0 12px 8px rgba(54, 57, 90, 0.1),
 		0 24px 16px rgba(54, 57, 90, 0.1);
-	--box-shadow-4:
+	--ssl-box-shadow-4:
 		0 2px 1px rgba(54, 57, 90, 0.1), 0 4px 2px rgba(54, 57, 90, 0.1),
 		0 8px 4px rgba(54, 57, 90, 0.1), 0 16px 8px rgba(54, 57, 90, 0.1),
 		0 32px 16px rgba(54, 57, 90, 0.1);
@@ -46,7 +46,7 @@
 
 .ssl-list:focus-visible,
 .ssl-list *:focus-visible {
-	outline: 0.125rem solid var(--gray-800);
+	outline: 0.125rem solid var(--ssl-gray-800);
 }
 
 .ssl-item-content {
@@ -56,8 +56,8 @@
 	gap: 0.75rem;
 	max-width: 18rem;
 	padding: 0.5rem 1.75rem;
-	background-color: var(--white);
-	border: 0.0625rem solid var(--gray-200);
+	background-color: var(--ssl-white);
+	border: 0.0625rem solid var(--ssl-gray-200);
 	line-height: 1.25;
 	text-transform: uppercase;
 	box-shadow: none;
@@ -79,7 +79,7 @@
 
 .ssl-item[data-is-keyboard-dragging="true"] .ssl-item-content,
 .ssl-ghost[data-is-pointer-dragging="true"] .ssl-item-content {
-	box-shadow: var(--box-shadow-1);
+	box-shadow: var(--ssl-box-shadow-1);
 }
 
 .ssl-item-handle,
@@ -94,7 +94,7 @@
 
 .ssl-item-handle,
 .ssl-item-remove {
-	color: var(--gray-400);
+	color: var(--ssl-gray-400);
 }
 
 .ssl-item-handle:hover,
@@ -102,8 +102,8 @@
 .ssl-item-remove:hover,
 .ssl-item[data-is-pointer-dropping="true"] .ssl-item-handle,
 .ssl-ghost .ssl-item-handle {
-	background-color: var(--gray-100);
-	color: var(--gray-600);
+	background-color: var(--ssl-gray-100);
+	color: var(--ssl-gray-600);
 	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
@@ -152,6 +152,6 @@
 }
 
 .ssl-ghost[data-can-remove-on-drop-out="true"][data-is-between-bounds="false"] .ssl-item-content {
-	background-color: var(--rose-300);
-	border-color: var(--rose-400);
+	background-color: var(--ssl-rose-300);
+	border-color: var(--ssl-rose-400);
 }
