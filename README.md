@@ -26,6 +26,7 @@ Live demos:
   - [`<SortableList.Root>` events](#sortablelistroot-events)
   - [`<SortableList.Item>` props](#sortablelistitem-props)
 - [Utilities](#utilities)
+- [Transitions](#transitions)
 - [Types](#types)
 - [Styles](#styles)
   - [Selectors](#selectors)
@@ -42,6 +43,7 @@ Live demos:
 - Drop marker.
 - Wrapping.
 - Auto scrolling.
+- Customizable transitions.
 - Lockable axis.
 - Remove on drop outside.
 - Nested interactive elements support.
@@ -163,7 +165,7 @@ The following example contains most of the code that you can find in the **“Wi
 
 	const announcements: SortableList.RootProps['announcements'] = {
 		lifted: (_, draggedItemIndex) => {
-			return `Ha levantado un item en la posición ${draggedItemIndex! + 1}.`;
+			return `Ha levantado un item en la posición ${draggedItemIndex + 1}.`;
 		},
 		dragged: (_, draggedItemIndex, __, targetItemIndex) => {
 			const startPosition = draggedItemIndex + 1;
@@ -216,19 +218,19 @@ The following is a list of the available components inside the package:
 
 ### `<SortableList.Root>` props
 
-| Prop                 | Type                   | Default      | Possible values                | Description                                                                                                                                                                                                                                                                                            |
-| -------------------- | ---------------------- | ------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `gap`                | `number \| undefined`  | `12`         | Number equal to or above `0`.  | Separation between items (in pixels).                                                                                                                                                                                                                                                                  |
-| `direction`          | `string \| undefined`  | `'vertical'` | `'vertical'` or `'horizontal'` | Orientation in which items will be arranged.                                                                                                                                                                                                                                                           |
-| `transitionDuration` | `number \| undefined`  | `240`        | Number equal to or above `0`.  | Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.                                                                                                                            |
-| `hasDropMarker`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                                                   |
-| `hasWrapping`        | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, items can wrap onto multiple lines.                                                                                                                                                                                                                                                         |
-| `hasLockedAxis`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                                              |
-| `hasBoundaries`      | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                                        |
-| `canClearOnDragOut`  | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list. This will cause the dragged item to return to its initial position when dropped. Otherwise, it will take the position of the last item it collided with. |
-| `canRemoveOnDropOut` | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, items will be removed when dragged and dropped outside of the list boundaries. This needs to be coupled with the `on:remove` event handler for it to complete the removal process.                                                                                                          |
-| `isLocked`           | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard). Interactive elements inside will operate normally.                                                                                                           |
-| `isDisabled`         | `boolean \| undefined` | `false`      | `true` or `false`              | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to dimmed. Interactive elements inside will be disabled.                                                                            |
+| Prop                 | Type                   | Default                                                     | Possible values                                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------------------- | ---------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gap`                | `number \| undefined`  | `12`                                                        | Number equal to or above `0`.                                           | Separation between items (in pixels).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `direction`          | `string \| undefined`  | `'vertical'`                                                | `'vertical'` or `'horizontal'`                                          | Orientation in which items will be arranged.                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `transition`         | `object \| undefined`  | `{ duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number equal to or above `0`.<br>`easing`: easing function. | `duration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.<br>`easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS (`transition-timing-function`)[https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function] property. Currently it only affects the ghost drop transition. |
+| `hasDropMarker`      | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, displays a position marker representing where the dragged item will be positioned when drag-and-dropping.                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `hasWrapping`        | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, items can wrap onto multiple lines.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `hasLockedAxis`      | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, prevents the dragged item from moving away from the main axis.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `hasBoundaries`      | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, items will only be draggable inside the list limits.                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `canClearOnDragOut`  | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list. This will cause the dragged item to return to its initial position when dropped. Otherwise, it will take the position of the last item it collided with.                                                                                                                                                                                                                    |
+| `canRemoveOnDropOut` | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, items will be removed when dragged and dropped outside of the list boundaries. This needs to be coupled with the `on:remove` event handler for it to complete the removal process.                                                                                                                                                                                                                                                                                                                             |
+| `isLocked`           | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard). Interactive elements inside will operate normally.                                                                                                                                                                                                                                                                                                                              |
+| `isDisabled`         | `boolean \| undefined` | `false`                                                     | `true` or `false`                                                       | If `true`, will allow every item in the list to be focused, but will prevent them from being dragged (both through pointer and keyboard) and change its appearance to dimmed. Interactive elements inside will be disabled.                                                                                                                                                                                                                                                                                               |
 
 > [!WARNING]
 > For the time being, the support for wrapping is limited to lists that are horizontal, and have items with the exact same width and height. Any other variation might not produce the expected results.
@@ -260,14 +262,14 @@ The following is a list of the available components inside the package:
 
 | Function       | Description                                                                                                                                |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `sortItems()`  | Provides an easy mechanism to reorder items (it’s recommended to be used in combination with the [`dragend` event](#sortablelist-events)). |
+| `sortItems()`  | Provides an easy mechanism to reorder items (should be used in combination with the [`dragend` event](#sortablelist-events)).              |
 | `removeItem()` | Provides an easy mechanism to remove an item from your list (should be used in combination with the [`drop` event](#sortablelist-events)). |
 
 Example:
 
 ```svelte
 <script lang="ts">
-	import { ... removeItem, sortItems } from '$lib/index.js';
+	import { ... removeItem, sortItems } from '@rodrigodagostino/svelte-sortable-list';
 	...
 
 	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
@@ -288,6 +290,35 @@ Example:
 <SortableList.Root on:dragend={handleDragEnd}>...</SortableList.Root>
 ```
 
+## Transitions
+
+| Function      | Description                                   | Parameters                                                                                                                                                                                      |
+| ------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scaleFade()` | The animated element scales and fades in/out. | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;opacity: number<br>}</pre>                                                   |
+| `scaleFly()`  | The animated element scales and flies in/out. | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;x: number<br>&nbsp;&nbsp;y: number<br>&nbsp;&nbsp;opacity: number<br>}</pre> |
+
+Example:
+
+```svelte
+<script lang="ts">
+	import { ... scaleFly } from '@rodrigodagostino/svelte-sortable-list';
+	...
+</script>
+
+<SortableList.Root>
+	{#each items as item, index (item.id)}
+		<SortableList.Item
+			{...item}
+			{index}
+			transitionIn={(node) => scaleFly(node, { duration: 320, x: -200 })}
+			transitionOut={(node) => scaleFly(node, { duration: 320, x: 200 })}
+		>
+			...
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>
+```
+
 ## Types
 
 | Type                                   | Description                                                                                              |
@@ -300,12 +331,13 @@ Example:
 | `SortableList.RootEvents['drag']`      | Provides definitions for the [`<SortableList.Root>` `drag` custom event](#sortablelistroot-events).      |
 | `SortableList.RootEvents['drop']`      | Provides definitions for the [`<SortableList.Root>` `drop` custom event](#sortablelistroot-events).      |
 | `SortableList.RootEvents['dragend']`   | Provides definitions for the [`<SortableList.Root>` `dragend` custom event](#sortablelistroot-events).   |
+| `SortableList.RootEvents['destroyed']` | Provides definitions for the [`<SortableList.Root>` `destroyed` custom event](#sortablelistroot-events). |
 
 Example:
 
 ```svelte
 <script lang="ts">
-	import type { SortableList } from '$lib/types/index.js';
+	import type { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 	...
 
 	function handleDrop(event: SortableList.RootEvents['drop']) {
