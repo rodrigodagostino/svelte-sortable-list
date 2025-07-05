@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] (2025-07-04)
+
+### BREAKING
+
+- Add transition customization to `<SortableList.Root>`.
+- Add prefix to the CSS custom properties in the base stylesheet.
+
+### Added
+
+- Add transitions customization to `<SortableList.Item>`.
+- Expose the `scaleFade()` and `scaleFly()` transition functions.
+
+### Changed
+
+- Assign a proper default value to announcements.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Add **“With custom transitions”** demo page.
+- Update the README to reflect the latest changes.
+
 ## [0.14.1] (2025-07-03)
 
 ### Added
@@ -22,10 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Provide clearer type references in the exposed types and utils.
-
-### Docs
-
-- Update the README to reflect the latest changes.
 
 ## [0.14.0] (2025-06-28)
 
@@ -949,7 +967,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.1...v0.15.0
 [0.14.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...v0.14.1
 [0.14.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...v0.14.0
 [0.13.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...v0.13.2

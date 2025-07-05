@@ -1,6 +1,6 @@
 {
 	"name": "@rodrigodagostino/svelte-sortable-list",
-	"version": "0.14.1",
+	"version": "0.15.0",
 	"author": "Rodrigo D’Agostino <rodrigo.dagostino@proton.me>",
 	"license": "MIT",
 	"type": "module",
