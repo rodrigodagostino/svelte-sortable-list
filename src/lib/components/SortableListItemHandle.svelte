@@ -1,8 +1,13 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getIsPointerDragging } from '$lib/stores/index.js';
+	import type { SortableListItemHandleProps as ItemHandleProps } from '$lib/types/props.js';
 
-	const isPointerDragging = getIsPointerDragging();
+	type $$Props = ItemHandleProps;
+
+	export let group: $$Props['group'] = undefined;
+
+	const isPointerDragging = getIsPointerDragging(group);
 
 	const classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 </script>
@@ -10,6 +15,7 @@
 <span
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	data-role="handle"
+	data-group={group}
 	aria-hidden="true"
 	{...$$restProps}
 	class={classes}

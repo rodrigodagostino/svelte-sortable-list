@@ -1,23 +1,27 @@
-import { getWritableContext, setWritableContext } from './index.js';
+import { getWritableContext, setWritableContext, type Group } from './index.js';
 import type { SortableListCoordinates } from '$lib/types/index.js';
 
-export function setPointer(context: SortableListCoordinates['pointer']) {
-	return setWritableContext<SortableListCoordinates['pointer']>('pointer', context);
+export function setPointer(group: Group, context: SortableListCoordinates['pointer']) {
+	return setWritableContext<SortableListCoordinates['pointer']>('pointer', group, context);
 }
-export function getPointer() {
-	return getWritableContext<SortableListCoordinates['pointer']>('pointer');
-}
-
-export function setPointerOrigin(context: SortableListCoordinates['pointerOrigin']) {
-	return setWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin', context);
-}
-export function getPointerOrigin() {
-	return getWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin');
+export function getPointer(group: Group) {
+	return getWritableContext<SortableListCoordinates['pointer']>('pointer', group);
 }
 
-export function setItemRects(context: SortableListCoordinates['itemRects']) {
-	return setWritableContext<SortableListCoordinates['itemRects']>('itemRects', context);
+export function setPointerOrigin(group: Group, context: SortableListCoordinates['pointerOrigin']) {
+	return setWritableContext<SortableListCoordinates['pointerOrigin']>(
+		'pointerOrigin',
+		group,
+		context
+	);
 }
-export function getItemRects() {
-	return getWritableContext<SortableListCoordinates['itemRects']>('itemRects');
+export function getPointerOrigin(group: Group) {
+	return getWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin', group);
+}
+
+export function setItemRects(group: Group, context: SortableListCoordinates['itemRects']) {
+	return setWritableContext<SortableListCoordinates['itemRects']>('itemRects', group, context);
+}
+export function getItemRects(group: Group) {
+	return getWritableContext<SortableListCoordinates['itemRects']>('itemRects', group);
 }

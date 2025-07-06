@@ -13,6 +13,7 @@
 		{ text: 'Unstyled', path: '/unstyled' },
 		{ text: 'No animations', path: '/no-animations' },
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
+		{ text: 'Nested', path: '/nested' },
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With drop marker', path: '/with-drop-marker' },
