@@ -27,7 +27,7 @@
 		isInSameRow,
 	} from '$lib/utils/index.js';
 
-	type $$Props = ItemProps;
+	type $$Props = ItemProps & { class?: string };
 
 	let itemRef: HTMLLIElement;
 
@@ -40,6 +40,8 @@
 
 	$: _transitionIn = transitionIn || scaleFly;
 	$: _transitionOut = transitionOut || scaleFly;
+
+	$: classes = ['ssl-item', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 
 	const rootProps = getRootProps();
 
@@ -257,7 +259,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 <li
 	bind:this={itemRef}
 	{id}
-	class="ssl-item"
+	class={classes}
 	style:cursor={styleCursor}
 	style:width={styleWidth}
 	style:height={styleHeight}

@@ -56,7 +56,7 @@
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
-	type $$Props = RootProps;
+	type $$Props = RootProps & { class?: string };
 	type $$Events = RootEvents;
 
 	let rootRef: HTMLUListElement;
@@ -77,6 +77,8 @@
 
 	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
+
+	$: classes = ['ssl-list', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 
 	const rootProps = setRootProps({
 		gap,
@@ -602,11 +604,11 @@
 <!-- svelte-ignore a11y-role-supports-aria-props -->
 <ul
 	bind:this={rootRef}
-	class="ssl-list"
+	class={classes}
+	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
-	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
