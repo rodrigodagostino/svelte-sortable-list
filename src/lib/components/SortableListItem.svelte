@@ -11,15 +11,23 @@
 		getIsPointerDragging,
 		getIsPointerDropping,
 		getIsRTL,
-		getItemsData,
+		getItemRects,
+		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import { scaleFade } from '$lib/transitions/index.js';
-	import type { SortableListItemProps } from '$lib/types/index.js';
-	import { dispatch, getId, getIndex, isInSameRow } from '$lib/utils/index.js';
+	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
+	import {
+		calculateTranslate,
+		calculateTranslateWithAlignment,
+		dispatch,
+		getId,
+		getIndex,
+		isInSameRow,
+	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListItemProps;
+	type $$Props = ItemProps;
 
 	let itemRef: HTMLLIElement;
 
@@ -27,10 +35,16 @@
 	export let index: $$Props['index'];
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
+	export let transitionIn: $$Props['transitionIn'] = undefined;
+	export let transitionOut: $$Props['transitionOut'] = undefined;
+
+	$: _transitionIn = transitionIn || scaleFade;
+	$: _transitionOut = transitionOut || scaleFade;
 
 	const rootProps = getRootProps();
 
-	const itemsData = getItemsData();
+	const root = getRoot();
+	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 	const focusedItem = getFocusedItem();
@@ -46,7 +60,7 @@
 
 	let hasHandle = false;
 	$: {
-		setInteractiveElementsTabIndex($isKeyboardDragging, focusedItemId);
+		setInteractiveElementsTabIndex($isKeyboardDragging, focusedId);
 	}
 
 	onMount(() => {
@@ -65,7 +79,7 @@
 				(el) =>
 					(el.tabIndex =
 						!$isKeyboardDragging &&
-						focusedItemId === String(id) &&
+						focusedId === String(id) &&
 						!$rootProps.isDisabled &&
 						!isDisabled
 							? 0
@@ -73,22 +87,101 @@
 			);
 	}
 
-	$: currentItemRect = $itemsData ? $itemsData[index] : null;
-	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
-	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
-	// $itemsData is used as a reliable reference to the item’s position in the list
+	$: currentRect = $itemRects ? $itemRects[index] : null;
+	$: draggedId = $draggedItem ? getId($draggedItem) : null;
+	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
+	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedItemRect =
-		$itemsData && typeof draggedItemIndex === 'number' ? $itemsData[draggedItemIndex] : null;
-	$: targetItemIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetItemRect =
-		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
-	$: focusedItemId = $focusedItem ? getId($focusedItem) : null;
+	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
+	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
+	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
+	$: focusedId = $focusedItem ? getId($focusedItem) : null;
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleWidth(...args: unknown[]) {
+		if (!$rootProps.canRemoveOnDropOut) return undefined;
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
+		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.width}px`;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleHeight(...args: unknown[]) {
+		if (!$rootProps.canRemoveOnDropOut) return undefined;
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
+		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.height}px`;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleMargin(...args: unknown[]) {
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
+		else return 'calc(var(--ssl-gap) / 2)';
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function getStyleTransform(...args: unknown[]) {
+		if (
+			(!$isPointerDragging &&
+				!$isPointerDropping &&
+				!$isKeyboardDragging &&
+				!$isKeyboardDropping) ||
+			!$itemRects ||
+			!$draggedItem ||
+			!$targetItem ||
+			currentRect === null ||
+			draggedIndex === null ||
+			draggedRect === null ||
+			targetIndex === null ||
+			targetRect === null ||
+			$isPointerCanceling ||
+			$isKeyboardCanceling ||
+			(!$isBetweenBounds && !$rootProps.canClearOnDragOut && $rootProps.canRemoveOnDropOut)
+		)
+			return 'translate3d(0, 0, 0)';
+
+		if (draggedId !== String(id)) {
+			if (
+				(index > draggedIndex && index <= targetIndex) ||
+				(index < draggedIndex && index >= targetIndex)
+			) {
+				const step = index > draggedIndex ? -1 : 1;
+				const operator = index > draggedIndex === !$isRTL ? '-' : '';
+				const x =
+					$rootProps.direction === 'vertical'
+						? '0'
+						: isInSameRow(currentRect, $itemRects[index + step])
+							? `${operator}${draggedRect.width + $rootProps.gap!}px`
+							: `${$itemRects[index + step].right - currentRect.right}px`;
+				const y =
+					$rootProps.direction === 'vertical'
+						? `${operator}${draggedRect.height + $rootProps.gap!}px`
+						: isInSameRow(currentRect, $itemRects[index + step])
+							? '0'
+							: calculateTranslateWithAlignment($root!, $itemRects[index + step], currentRect);
+
+				return `translate3d(${x}, ${y}, 0)`;
+			} else {
+				return 'translate3d(0, 0, 0)';
+			}
+		} else {
+			const x =
+				$rootProps.direction === 'vertical'
+					? '0'
+					: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
+			const y =
+				$rootProps.direction === 'vertical'
+					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
+					: isInSameRow(draggedRect, targetRect)
+						? '0'
+						: calculateTranslateWithAlignment($root!, targetRect, draggedRect);
+
+			return `translate3d(${x}, ${y}, 0)`;
+		}
+	}
 
 	$: styleCursor =
 		$rootProps.isDisabled || isDisabled
 			? 'not-allowed'
-			: $isPointerDragging && draggedItemId === String(id)
+			: $isPointerDragging && draggedId === String(id)
 				? 'grabbing'
 				: !hasHandle && !$rootProps.isLocked && !isLocked
 					? 'grab'
@@ -97,14 +190,14 @@
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOpacity =
-		draggedItemId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
+		draggedId === String(id) &&
 		!$rootProps.hasDropMarker
 			? 0
 			: 1;
 	$: styleOverflow =
-		draggedItemId === String(id) &&
 		($isPointerDragging || $isPointerDropping) &&
+		draggedId === String(id) &&
 		$rootProps.canRemoveOnDropOut
 			? 'hidden'
 			: undefined;
@@ -117,91 +210,10 @@
 	);
 	$: styleTransition =
 		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
-			? `width ${$rootProps.transitionDuration}ms, height ${$rootProps.transitionDuration}ms,` +
-				`margin ${$rootProps.transitionDuration}ms, transform ${$rootProps.transitionDuration}ms,` +
-				`z-index ${$rootProps.transitionDuration}ms`
+			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
+				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
+				`z-index ${$rootProps.transition!.duration}ms`
 			: `none`;
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleWidth(...args: unknown[]) {
-		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds) return `${currentItemRect?.width}px`;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleHeight(...args: unknown[]) {
-		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
-		else if (draggedItemId === String(id) && $isBetweenBounds)
-			return `${currentItemRect?.height}px`;
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleMargin(...args: unknown[]) {
-		if (draggedItemId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut)
-			return '0';
-		else return 'calc(var(--ssl-gap) / 2)';
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleTransform(...args: unknown[]) {
-		if (
-			!$itemsData ||
-			!$draggedItem ||
-			!$targetItem ||
-			currentItemRect === null ||
-			draggedItemIndex === null ||
-			draggedItemRect === null ||
-			targetItemIndex === null ||
-			targetItemRect === null ||
-			(!$isPointerDragging &&
-				!$isPointerDropping &&
-				!$isKeyboardDragging &&
-				!$isKeyboardDropping) ||
-			$isPointerCanceling ||
-			$isKeyboardCanceling ||
-			(!$isBetweenBounds && !$rootProps.canClearOnDragOut && $rootProps.canRemoveOnDropOut)
-		)
-			return 'translate3d(0, 0, 0)';
-
-		if (draggedItemId !== String(id)) {
-			if (
-				(index > draggedItemIndex && index <= targetItemIndex) ||
-				(index < draggedItemIndex && index >= targetItemIndex)
-			) {
-				const step = index > draggedItemIndex ? -1 : 1;
-				const operator = index > draggedItemIndex === !$isRTL ? '-' : '';
-				const x =
-					$rootProps.direction === 'vertical'
-						? '0'
-						: isInSameRow(currentItemRect, $itemsData[index + step])
-							? `${operator}${draggedItemRect.width + $rootProps.gap!}px`
-							: `${$itemsData[index + step].x + $itemsData[index + step].width - currentItemRect.x - currentItemRect.width}px`;
-				const y =
-					$rootProps.direction === 'vertical'
-						? `${operator}${draggedItemRect.height + $rootProps.gap!}px`
-						: isInSameRow(currentItemRect, $itemsData[index + step])
-							? '0'
-							: `${$itemsData[index + step].y - currentItemRect.y}px`;
-
-				return `translate3d(${x}, ${y}, 0)`;
-			} else {
-				return 'translate3d(0, 0, 0)';
-			}
-		} else {
-			const draggedItemWidth = draggedItemIndex < targetItemIndex ? draggedItemRect.width : 0;
-			const draggedItemHeight = draggedItemIndex < targetItemIndex ? draggedItemRect.height : 0;
-			const targetItemWidth = draggedItemIndex < targetItemIndex ? targetItemRect.width : 0;
-			const targetItemHeight = draggedItemIndex < targetItemIndex ? targetItemRect.height : 0;
-			const x = `${targetItemRect.x + targetItemWidth - draggedItemRect.x - draggedItemWidth}px`;
-			const y = `${targetItemRect.y + targetItemHeight - draggedItemRect.y - draggedItemHeight}px`;
-
-			return `translate3d(${x}, ${y}, 0)`;
-		}
-	}
 
 	async function handleFocus() {
 		await tick();
@@ -257,25 +269,22 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
-	data-is-pointer-dragging={$isPointerDragging && draggedItemId === String(id)}
-	data-is-pointer-dropping={$isPointerDropping && draggedItemId === String(id)}
-	data-is-keyboard-dragging={$isKeyboardDragging && draggedItemId === String(id)}
-	data-is-keyboard-dropping={$isKeyboardDropping && draggedItemId === String(id)}
+	data-is-pointer-dragging={$isPointerDragging && draggedId === String(id)}
+	data-is-pointer-dropping={$isPointerDropping && draggedId === String(id)}
+	data-is-keyboard-dragging={$isKeyboardDragging && draggedId === String(id)}
+	data-is-keyboard-dropping={$isKeyboardDropping && draggedId === String(id)}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$rootProps.isLocked || isLocked}
-	tabindex={focusedItemId === String(id) ? 0 : -1}
+	tabindex={focusedId === String(id) ? 0 : -1}
 	role="option"
 	aria-label={$$restProps['aria-label'] || undefined}
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
-	aria-selected={focusedItemId === String(id)}
+	aria-selected={focusedId === String(id)}
 	aria-disabled={$rootProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
-	in:scaleFade={{ duration: $rootProps.transitionDuration }}
-	out:scaleFade={{
-		duration:
-			!$isBetweenBounds && $rootProps.canRemoveOnDropOut ? 0 : $rootProps.transitionDuration,
-	}}
+	in:_transitionIn
+	out:_transitionOut
 >
 	<slot />
 </li>

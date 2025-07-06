@@ -16,6 +16,7 @@
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With drop marker', path: '/with-drop-marker' },
+		{ text: 'With custom transitions', path: '/with-custom-transitions' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
@@ -39,11 +40,13 @@
 	$: controls = Object.keys($rootProps).map((key) => ({
 		label: key,
 		type:
-			key === 'gap' || key === 'transitionDuration'
+			key === 'gap'
 				? 'number'
-				: key === 'direction'
-					? 'select'
-					: 'checkbox',
+				: key === 'transition'
+					? 'textarea'
+					: key === 'direction'
+						? 'select'
+						: 'checkbox',
 		id: toKebabCase(key),
 		...(key === 'gap' || key === 'transitionDuration' ? { min: 0 } : {}),
 		...(key === 'direction' ? { options: ['vertical', 'horizontal'] } : {}),
@@ -51,10 +54,18 @@
 	}));
 
 	function handleFieldChange(event: Event) {
-		const { type, name, value, checked } = event.target as HTMLInputElement;
+		const target = event.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+		const { type, name, value } = target;
 		$rootProps = {
 			...$rootProps,
-			[name]: type === 'checkbox' ? checked : type === 'number' ? Number(value) : value,
+			[name]:
+				type === 'checkbox'
+					? (target as HTMLInputElement).checked
+					: type === 'number'
+						? Number(value)
+						: type === 'textarea'
+							? JSON.parse(value)
+							: value,
 		};
 	}
 </script>
@@ -221,8 +232,17 @@
 										{value}
 										on:input={handleFieldChange}
 									/>
+								{:else if type === 'textarea'}
+									<textarea
+										{id}
+										name={label}
+										rows="4"
+										style="white-space: nowrap"
+										value={JSON.stringify(value, null, 2)}
+										on:input={handleFieldChange}
+									></textarea>
 								{:else if type === 'select'}
-									<select id="direction" name={label} {value} on:change={handleFieldChange}>
+									<select {id} name={label} {value} on:change={handleFieldChange}>
 										{#if options}
 											{#each options as option}
 												<option value={option}>{option}</option>
@@ -284,8 +304,8 @@
 		flex-direction: column;
 		max-height: calc(100vh - 1.5rem);
 		max-height: calc(100dvh - 1.5rem);
-		background-color: var(--gray-500);
-		box-shadow: var(--box-shadow-4);
+		background-color: var(--ssl-gray-500);
+		box-shadow: var(--ssl-box-shadow-4);
 		position: fixed;
 		top: 0.75rem;
 		right: 0.75rem;
@@ -328,17 +348,17 @@
 	}
 
 	.link {
-		color: var(--gray-100);
+		color: var(--ssl-gray-100);
 		text-decoration: none;
 
 		&:focus,
 		&:hover {
-			color: var(--white-rich);
+			color: var(--ssl-white-rich);
 		}
 
 		&[aria-current='page'] {
 			font-weight: 700;
-			color: var(--white-rich);
+			color: var(--ssl-white-rich);
 		}
 	}
 
@@ -353,7 +373,7 @@
 		width: 100%;
 		margin-block: 0.25rem;
 		border-style: solid;
-		color: var(--gray-400);
+		color: var(--ssl-gray-400);
 	}
 
 	.app-controls-toggle {
@@ -373,8 +393,8 @@
 		flex-direction: column;
 		max-width: calc(100% - 1.5rem);
 		max-height: calc(100% - 1.5rem);
-		background-color: var(--white);
-		box-shadow: var(--box-shadow-4);
+		background-color: var(--ssl-white);
+		box-shadow: var(--ssl-box-shadow-4);
 		position: fixed;
 		right: 0.75rem;
 		bottom: 0.75rem;
@@ -414,7 +434,7 @@
 		}
 
 		& tr:nth-child(odd) td {
-			background-color: var(--gray-100);
+			background-color: var(--ssl-gray-100);
 		}
 
 		& th:not(:first-child):not(:last-child),
@@ -423,7 +443,7 @@
 		}
 
 		& th {
-			border-bottom: 1px solid var(--gray-200);
+			border-bottom: 1px solid var(--ssl-gray-200);
 			text-align: start;
 
 			&:nth-child(3) {

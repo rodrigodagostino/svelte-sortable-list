@@ -5,26 +5,33 @@
 		getIsBetweenBounds,
 		getIsPointerDragging,
 		getIsPointerDropping,
-		getItemsData,
+		getItemRects,
 		getPointer,
 		getPointerOrigin,
+		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
-	import type { SortableListGhostProps } from '$lib/types/index.js';
-	import { getIndex } from '$lib/utils/index.js';
+	import type { SortableListGhostProps as GhostProps } from '$lib/types/index.js';
+	import {
+		calculateTranslate,
+		calculateTranslateWithAlignment,
+		getId,
+		getIndex,
+		isInSameRow,
+	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListGhostProps;
+	type $$Props = GhostProps;
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let status: $$Props['status'];
-	export let rootRef: $$Props['rootRef'];
 
 	const rootProps = getRootProps();
 
+	const root = getRoot();
 	const pointer = getPointer();
 	const pointerOrigin = getPointerOrigin();
-	const itemsData = getItemsData();
+	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 
@@ -32,67 +39,61 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isBetweenBounds = getIsBetweenBounds();
 
-	$: if ($draggedItem) {
-		const clone = $draggedItem?.cloneNode(true) as HTMLElement;
+	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
+	let lastCloneId: string | null = null;
+	let lastCloneContainsSelect = false;
+
+	$: if ($draggedItem && (draggedItemId !== lastCloneId || lastCloneContainsSelect)) {
+		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
 		const selects = $draggedItem?.querySelectorAll<HTMLSelectElement>('select');
-		if (selects)
+		if (selects.length)
 			clone
 				.querySelectorAll<HTMLSelectElement>('select')
 				.forEach((select, index) => (select.value = selects[index].value));
 
+		lastCloneId = draggedItemId;
+		lastCloneContainsSelect = !!selects.length;
 		ghostRef?.replaceChildren(...clone.childNodes);
-	} else {
-		ghostRef?.replaceChildren();
 	}
 
-	$: draggedItemIndex = $draggedItem ? getIndex($draggedItem) : null;
-	// $itemsData is used as a reliable reference to the item’s position in the list
+	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
+	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedItemRect =
-		$itemsData && typeof draggedItemIndex === 'number' ? $itemsData[draggedItemIndex] : null;
-	$: targetItemIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetItemRect =
-		$itemsData && typeof targetItemIndex === 'number' ? $itemsData[targetItemIndex] : null;
-
-	$: styleWidth = getStyleWidth($draggedItem);
-	$: styleHeight = getStyleHeight($draggedItem);
-	$: styleLeft = getStyleLeft(status);
-	$: styleTop = getStyleTop(status);
-	$: styleTransform = getStyleTransform(status, $pointer);
-	$: styleTransition = getStyleTransition(status);
-	$: styleZIndex = getStyleZIndex(status);
+	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
+	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
+	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
 	function getStyleWidth(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemsData) return '0';
-		return `${draggedItemRect?.width || 0}px`;
+		if (!draggedItem || !$itemRects) return '0';
+		return `${draggedRect?.width || 0}px`;
 	}
 
 	function getStyleHeight(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemsData) return '0';
-		return `${draggedItemRect?.height || 0}px`;
+		if (!draggedItem || !$itemRects) return '0';
+		return `${draggedRect?.height || 0}px`;
 	}
 
 	function getStyleLeft(status: $$Props['status']) {
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
-			typeof draggedItemIndex !== 'number' ||
-			!draggedItemRect ||
-			!$itemsData
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
+			!$itemRects
 		)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.left;
 
-		if (!$targetItem) return `${draggedItemRect.x}px`;
+		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
 
 		const left =
-			typeof targetItemIndex === 'number' && targetItemRect
-				? draggedItemIndex < targetItemIndex
-					? targetItemRect.x + targetItemRect.width - draggedItemRect.width
-					: targetItemRect.x
-				: console.error('targetItemIndex or targetItemRect is not defined');
+			$rootProps.direction === 'vertical'
+				? draggedRect.x
+				: draggedIndex < targetIndex
+					? targetRect.right - draggedRect.width
+					: targetRect.x;
 		return `${left}px`;
 	}
 
@@ -100,22 +101,29 @@
 		if (
 			status === 'unset' ||
 			!$draggedItem ||
-			typeof draggedItemIndex !== 'number' ||
-			!draggedItemRect ||
-			!$itemsData
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
+			!$itemRects
 		)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.top;
 
-		if (!$targetItem) return `${draggedItemRect.y}px`;
+		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
+		const alignItems = $root && window.getComputedStyle($root).alignItems;
 		const top =
-			typeof targetItemIndex === 'number' && targetItemRect
-				? draggedItemIndex < targetItemIndex
-					? targetItemRect.y + targetItemRect.height - draggedItemRect.height
-					: targetItemRect.y
-				: console.error('targetItemIndex or targetItemRect is not defined');
+			$rootProps.direction === 'vertical'
+				? draggedIndex < targetIndex
+					? targetRect.bottom - draggedRect.height
+					: targetRect.y
+				: isInSameRow(draggedRect, targetRect)
+					? draggedRect.y
+					: alignItems === 'center'
+						? targetRect.y + (targetRect.height - draggedRect.height) / 2
+						: alignItems === 'end' || alignItems === 'flex-end'
+							? targetRect.bottom - draggedRect.height
+							: targetRect.y;
 		return `${top}px`;
 	}
 
@@ -123,8 +131,8 @@
 	function getStyleTransform(status: $$Props['status'], ...args: unknown[]) {
 		if (
 			status === 'unset' ||
-			!rootRef ||
-			!$itemsData ||
+			!$root ||
+			!$itemRects ||
 			!$pointer ||
 			!$pointerOrigin ||
 			!$draggedItem
@@ -132,21 +140,21 @@
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
-		const rootRect = rootRef.getBoundingClientRect();
+		const rootRect = $root.getBoundingClientRect();
 
-		if (status === 'init' && draggedItemRect) {
+		if (status === 'init' && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
 				const x =
 					$rootProps.direction === 'horizontal' ||
 					($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
-						? $pointer.x - $pointerOrigin.x
+						? `${$pointer.x - $pointerOrigin.x}px`
 						: 0;
 				const y =
 					$rootProps.direction === 'vertical' ||
 					($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
-						? $pointer.y - $pointerOrigin.y
+						? `${$pointer.y - $pointerOrigin.y}px`
 						: 0;
-				return `translate3d(${x}px, ${y}px, 0)`;
+				return `translate3d(${x}, ${y}, 0)`;
 			}
 
 			const x =
@@ -154,53 +162,46 @@
 				($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedItemRect.x) < rootRect.x + $rootProps.gap! / 2
-						? rootRect.x - draggedItemRect.x + $rootProps.gap! / 2
+						$pointer.x - ($pointerOrigin.x - draggedRect.x) < rootRect.x + $rootProps.gap! / 2
+						? `${rootRect.x - draggedRect.x + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
-							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedItemRect.x) >
+							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedRect.x) >
 							  rootRect.right - $rootProps.gap! / 2
-							? rootRect.right - draggedItemRect.x - ghostRect.width - $rootProps.gap! / 2
-							: $pointer.x - $pointerOrigin.x
+							? `${rootRect.right - draggedRect.x - ghostRect.width - $rootProps.gap! / 2}px`
+							: `${$pointer.x - $pointerOrigin.x}px`
 					: 0;
 			const y =
 				$rootProps.direction === 'vertical' ||
 				($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedItemRect.y) < rootRect.y + $rootProps.gap! / 2
-						? rootRect.y - draggedItemRect.y + $rootProps.gap! / 2
+						$pointer.y - ($pointerOrigin.y - draggedRect.y) < rootRect.y + $rootProps.gap! / 2
+						? `${rootRect.y - draggedRect.y + $rootProps.gap! / 2}px`
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
-							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedItemRect.y) >
+							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedRect.y) >
 							  rootRect.bottom - $rootProps.gap! / 2
-							? rootRect.bottom - draggedItemRect.y - ghostRect.height - $rootProps.gap! / 2
-							: $pointer.y - $pointerOrigin.y
+							? `${rootRect.bottom - draggedRect.y - ghostRect.height - $rootProps.gap! / 2}px`
+							: `${$pointer.y - $pointerOrigin.y}px`
 					: 0;
-			return `translate3d(${x}px, ${y}px, 0)`;
+			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (status === 'preset' && typeof draggedItemIndex === 'number' && draggedItemRect) {
-			if (!$targetItem || typeof targetItemIndex !== 'number' || !targetItemRect)
+		if (status === 'preset' && typeof draggedIndex === 'number' && draggedRect) {
+			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
+
 			const x =
-				$rootProps.direction === 'horizontal'
-					? draggedItemIndex < targetItemIndex
-						? ghostRect.x +
-							ghostRect.width / 2 -
-							(targetItemRect.x + targetItemRect.width - draggedItemRect.width / 2)
-						: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + draggedItemRect.width / 2)
-					: ghostRect.x + ghostRect.width / 2 - (targetItemRect.x + targetItemRect.width / 2);
+				$rootProps.direction === 'vertical'
+					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
+					: calculateTranslate('x', ghostRect, targetRect, draggedIndex, targetIndex);
 			const y =
 				$rootProps.direction === 'vertical'
-					? draggedItemIndex < targetItemIndex
-						? ghostRect.y +
-							ghostRect.height / 2 -
-							(targetItemRect.y + targetItemRect.height - draggedItemRect.height / 2)
-						: ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + draggedItemRect.height / 2)
-					: ghostRect.y + ghostRect.height / 2 - (targetItemRect.y + targetItemRect.height / 2);
+					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
+					: calculateTranslateWithAlignment($root, ghostRect, targetRect);
 
-			return `translate3d(${x}px, ${y}px, 0)`;
+			return `translate3d(${x}, ${y}, 0)`;
 		}
 
 		if (status === 'set') return 'translate3d(0, 0, 0)';
@@ -213,10 +214,10 @@
 		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
 			return (
-				`transform ${$rootProps.transitionDuration}ms cubic-bezier(0.2, 1, 0.1, 1),` +
-				`z-index 0s ${$rootProps.transitionDuration}ms`
+				`transform ${$rootProps.transition!.duration}ms ${$rootProps.transition!.easing},` +
+				`z-index 0s ${$rootProps.transition!.duration}ms`
 			);
-		if (status === 'remove') return `z-index 0s ${$rootProps.transitionDuration}ms`;
+		if (status === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
 	}
 
 	function getStyleZIndex(status: $$Props['status']) {
@@ -226,12 +227,20 @@
 		// when the ghost is dragged and dropped without being moved.
 		if (status === 'set' || status === 'remove') return '9999';
 	}
+
+	$: styleWidth = getStyleWidth($draggedItem);
+	$: styleHeight = getStyleHeight($draggedItem);
+	$: styleLeft = getStyleLeft(status);
+	$: styleTop = getStyleTop(status);
+	$: styleTransform = getStyleTransform(status, $pointer);
+	$: styleTransition = getStyleTransition(status);
+	$: styleZIndex = getStyleZIndex(status);
 </script>
 
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:--ssl-transition-duration="{$rootProps.transitionDuration}ms"
+	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
@@ -256,11 +265,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 ### Props
 - `status`: state in which the ghost is.
-- `listRef`: reference to the parent list.
+- `rootRef`: reference to the parent list.
 
 ### Usage
 ```svelte
-	<SortableListGhost bind:ghostRef status={ghostStatus} {listRef} />
+	<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
 ```
 -->
 

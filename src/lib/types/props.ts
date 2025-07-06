@@ -1,4 +1,5 @@
 import type { AriaAttributes } from 'svelte/elements';
+import type { TransitionConfig } from 'svelte/transition';
 import type { Announcements } from './accessibility.js';
 
 export interface SortableListRootProps
@@ -12,7 +13,18 @@ export interface SortableListRootProps
 	> {
 	gap?: number;
 	direction?: 'vertical' | 'horizontal';
-	transitionDuration?: number;
+	transition?: {
+		duration?: number;
+		easing?:
+			| 'ease'
+			| 'ease-in'
+			| 'ease-out'
+			| 'ease-in-out'
+			| 'linear'
+			| 'step-start'
+			| 'step-end'
+			| string;
+	};
 	hasDropMarker?: boolean;
 	hasWrapping?: boolean;
 	hasLockedAxis?: boolean;
@@ -30,10 +42,11 @@ export interface SortableListItemProps
 	index: number;
 	isLocked?: boolean;
 	isDisabled?: boolean;
+	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
+	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
 }
 
 export interface SortableListGhostProps {
 	ghostRef: HTMLDivElement;
 	status: 'init' | 'preset' | 'set' | 'remove' | 'unset';
-	rootRef: HTMLUListElement | null;
 }

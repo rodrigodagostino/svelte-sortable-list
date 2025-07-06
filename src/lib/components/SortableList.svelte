@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, createEventDispatcher, onMount, tick } from 'svelte';
+	import {
+		afterUpdate,
+		beforeUpdate,
+		createEventDispatcher,
+		onDestroy,
+		onMount,
+		tick,
+	} from 'svelte';
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import {
@@ -13,21 +20,23 @@
 		setIsPointerDragging,
 		setIsPointerDropping,
 		setIsRTL,
-		setItemsData,
+		setItemRects,
 		setPointer,
 		setPointerOrigin,
+		setRoot,
 		setRootProps,
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
+		DestroyedEventDetail,
 		DragEndEventDetail,
 		DragEventDetail,
 		DragStartEventDetail,
 		DropEventDetail,
 		MountedEventDetail,
-		SortableListGhostProps,
-		SortableListRootEvents,
-		SortableListRootProps,
+		SortableListGhostProps as GhostProps,
+		SortableListRootEvents as RootEvents,
+		SortableListRootProps as RootProps,
 	} from '$lib/types/index.js';
 	import {
 		announce,
@@ -36,7 +45,7 @@
 		getCollidingItem,
 		getId,
 		getIndex,
-		getItemsData,
+		getItemRects,
 		getScrollingSpeed,
 		getTextDirection,
 		isFullyVisible,
@@ -47,15 +56,15 @@
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
-	type $$Props = SortableListRootProps;
-	type $$Events = SortableListRootEvents;
+	type $$Props = RootProps;
+	type $$Events = RootEvents;
 
 	let rootRef: HTMLUListElement;
 	let ghostRef: HTMLDivElement;
 
 	export let gap: $$Props['gap'] = 12;
 	export let direction: $$Props['direction'] = 'vertical';
-	export let transitionDuration: $$Props['transitionDuration'] = 240;
+	export let transition: $$Props['transition'] = undefined;
 	export let hasDropMarker: $$Props['hasDropMarker'] = false;
 	export let hasWrapping: $$Props['hasWrapping'] = false;
 	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
@@ -64,12 +73,15 @@
 	export let canRemoveOnDropOut: $$Props['canRemoveOnDropOut'] = false;
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
-	export let announcements: $$Props['announcements'] = announce;
+	export let announcements: $$Props['announcements'] = undefined;
+
+	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
+	$: _announcements = announcements || announce;
 
 	const rootProps = setRootProps({
 		gap,
 		direction,
-		transitionDuration,
+		transition: _transition,
 		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
@@ -78,12 +90,12 @@
 		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
-		announcements,
+		announcements: _announcements,
 	});
 	$: $rootProps = {
 		gap,
 		direction,
-		transitionDuration,
+		transition: _transition,
 		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
@@ -92,17 +104,27 @@
 		canRemoveOnDropOut,
 		isLocked,
 		isDisabled,
-		announcements,
+		announcements: _announcements,
 	};
 
-	let ghostStatus: SortableListGhostProps['status'] = 'unset';
+	const root = setRoot(null);
+	let ghostStatus: GhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
-	const itemsData = setItemsData(null);
+	const itemRects = setItemRects(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
+
+	const isPointerDragging = setIsPointerDragging(false);
+	const isPointerDropping = setIsPointerDropping(false);
+	const isKeyboardDragging = setIsKeyboardDragging(false);
+	const isKeyboardDropping = setIsKeyboardDropping(false);
+	const isPointerCanceling = setIsPointerCanceling(false);
+	const isKeyboardCanceling = setIsKeyboardCanceling(false);
+	const isBetweenBounds = setIsBetweenBounds(true);
+	const isRTL = setIsRTL(false);
 
 	const dispatch = createEventDispatcher<{
 		mounted: MountedEventDetail;
@@ -110,11 +132,33 @@
 		drag: DragEventDetail;
 		drop: DropEventDetail;
 		dragend: DragEndEventDetail;
+		destroyed: DestroyedEventDetail;
 	}>();
 
-	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
+	onMount(() => {
+		dispatch('mounted');
+		$root = rootRef;
+		$isRTL = getTextDirection(rootRef) === 'rtl';
+	});
+
+	onDestroy(() => {
+		dispatch('destroyed');
+	});
+
+	// Svelte currently does not retain focus when elements are moved (even when keyed),
+	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
+	// https://github.com/sveltejs/svelte/issues/3973
+	let activeElement: HTMLLIElement;
+	beforeUpdate(() => {
+		activeElement = document?.activeElement as HTMLLIElement;
+	});
+	afterUpdate(() => {
+		if (activeElement) activeElement.focus({ preventScroll: true });
+	});
+
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
+	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
 	$: if (scrollingSpeed !== 0) scroll();
 
@@ -144,31 +188,6 @@
 			isScrollingDocument
 		);
 	}
-
-	// Svelte currently does not retain focus when elements are moved (even when keyed),
-	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
-	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLLIElement;
-	beforeUpdate(() => {
-		activeElement = document?.activeElement as HTMLLIElement;
-	});
-	afterUpdate(() => {
-		if (activeElement) activeElement.focus({ preventScroll: true });
-	});
-
-	const isPointerDragging = setIsPointerDragging(false);
-	const isPointerDropping = setIsPointerDropping(false);
-	const isKeyboardDragging = setIsKeyboardDragging(false);
-	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isPointerCanceling = setIsPointerCanceling(false);
-	const isKeyboardCanceling = setIsKeyboardCanceling(false);
-	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRTL = setIsRTL(false);
-
-	onMount(() => {
-		dispatch('mounted');
-		$isRTL = getTextDirection(rootRef) === 'rtl';
-	});
 
 	async function handlePointerDown(event: PointerEvent) {
 		if (
@@ -222,7 +241,7 @@
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
-		$itemsData = getItemsData(rootRef);
+		$itemRects = getItemRects(rootRef);
 		ghostStatus = 'init';
 		await tick();
 		$isPointerDragging = true;
@@ -246,39 +265,45 @@
 		);
 	}
 
+	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (!$isPointerDragging || !ghostRef || !$itemsData || !$draggedItem) return;
+		if (rafId || !$isPointerDragging) return;
 
-		dispatch('drag', {
-			deviceType: 'pointer',
-			draggedItem: $draggedItem,
-			draggedItemId: getId($draggedItem),
-			draggedItemIndex: getIndex($draggedItem),
-			targetItem: $targetItem,
-			targetItemId: $targetItem ? getId($targetItem) : null,
-			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-			isBetweenBounds: $isBetweenBounds,
-			canRemoveOnDropOut: canRemoveOnDropOut || false,
+		rafId = requestAnimationFrame(async () => {
+			if (!$draggedItem || !$itemRects || !ghostRef) return;
+
+			dispatch('drag', {
+				deviceType: 'pointer',
+				draggedItem: $draggedItem,
+				draggedItemId: getId($draggedItem),
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
+			});
+
+			const rootRect = rootRef.getBoundingClientRect();
+			const ghostRect = ghostRef.getBoundingClientRect();
+			$pointer = { x: clientX, y: clientY };
+			$isBetweenBounds = areColliding(ghostRect, rootRect);
+
+			// Re-set itemRects only during scrolling.
+			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
+			if (scrollingSpeed !== 0) $itemRects = getItemRects(rootRef);
+			await tick();
+			const collidingItemRect = getCollidingItem(ghostRef, $itemRects);
+			if (collidingItemRect)
+				$targetItem = rootRef.querySelector<HTMLLIElement>(
+					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+				);
+			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+
+			if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
+
+			rafId = null;
 		});
-
-		const rootRect = rootRef.getBoundingClientRect();
-		const ghostRect = ghostRef.getBoundingClientRect();
-
-		$pointer = { x: clientX, y: clientY };
-		$isBetweenBounds = areColliding(ghostRect, rootRect);
-
-		// Re-set itemsData only during scrolling.
-		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-		if (scrollingSpeed !== 0) $itemsData = getItemsData(rootRef);
-		await tick();
-		const collidingItemData = getCollidingItem(ghostRef, $itemsData);
-		if (collidingItemData)
-			$targetItem = rootRef.querySelector<HTMLLIElement>(
-				`.ssl-item[data-item-id="${collidingItemData.id}"]`
-			);
-		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
-
-		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
 
 	function handlePointerUp() {
@@ -317,18 +342,17 @@
 
 					await tick();
 					$draggedItem = $focusedItem;
-					const draggedItemId = getId($focusedItem);
-					const draggedItemIndex = getIndex($focusedItem);
-					$itemsData = getItemsData(rootRef);
+					const draggedIndex = getIndex($focusedItem);
+					$itemRects = getItemRects(rootRef);
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
-						draggedItemId,
-						draggedItemIndex,
+						draggedItemId: getId($focusedItem),
+						draggedItemIndex: draggedIndex,
 						isBetweenBounds: $isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
-					liveText = announcements!.lifted($draggedItem, draggedItemIndex);
+					liveText = _announcements.lifted($draggedItem, draggedIndex);
 				} else {
 					handlePointerAndKeyboardDrop($focusedItem, 'keyboard-drop');
 				}
@@ -341,21 +365,15 @@
 					key === 'ArrowUp' || (key === 'ArrowLeft' && !$isRTL) || (key === 'ArrowRight' && $isRTL)
 						? -1
 						: 1;
-				const focusedItemIndex = $focusedItem ? getIndex($focusedItem) : null;
+				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
 
 				if (!$isKeyboardDragging) {
-					if (!$focusedItem || focusedItemIndex === null) {
-						const firstItemElement = rootRef.querySelector<HTMLLIElement>('.ssl-item');
-						if (!firstItemElement) return;
-						firstItemElement.focus({ preventScroll: true });
-						if (scrollableAncestor && !isFullyVisible(firstItemElement, scrollableAncestor))
-							scrollIntoView(
-								firstItemElement,
-								scrollableAncestor,
-								direction,
-								-1,
-								isScrollingDocument
-							);
+					if (!$focusedItem || focusedIndex === null) {
+						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
+						if (!firstItem) return;
+						firstItem.focus({ preventScroll: true });
+						if (scrollableAncestor && !isFullyVisible(firstItem, scrollableAncestor))
+							scrollIntoView(firstItem, scrollableAncestor, direction, -1, isScrollingDocument);
 						return;
 					}
 
@@ -363,8 +381,8 @@
 					// and focusing the next item if the current one is the last.
 					const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 					if (
-						(step === -1 && focusedItemIndex === 0) ||
-						(step === 1 && focusedItemIndex === items.length - 1)
+						(step === -1 && focusedIndex === 0) ||
+						(step === 1 && focusedIndex === items.length - 1)
 					)
 						return;
 
@@ -373,19 +391,19 @@
 					else
 						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemsData) return;
+					if (!$draggedItem || !$itemRects) return;
 
-					const draggedItemId = getId($draggedItem);
-					const draggedItemIndex = getIndex($draggedItem);
-					let targetItemId = $targetItem ? getId($targetItem) : null;
-					let targetItemIndex = $targetItem ? getIndex($targetItem) : null;
+					const draggedId = getId($draggedItem);
+					const draggedIndex = getIndex($draggedItem);
+					let targetId = $targetItem ? getId($targetItem) : null;
+					let targetIndex = $targetItem ? getIndex($targetItem) : null;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
-						(step === -1 && draggedItemIndex === 0 && !targetItem) ||
-						(step === -1 && targetItemIndex === 0) ||
-						(step === 1 && draggedItemIndex === $itemsData.length - 1 && !targetItem) ||
-						(step === 1 && targetItemIndex === $itemsData.length - 1)
+						(step === -1 && draggedIndex === 0 && !targetItem) ||
+						(step === -1 && targetIndex === 0) ||
+						(step === 1 && draggedIndex === $itemRects.length - 1 && !targetItem) ||
+						(step === 1 && targetIndex === $itemRects.length - 1)
 					)
 						return;
 
@@ -402,27 +420,22 @@
 					}
 
 					await tick();
-					targetItemId = getId($targetItem);
-					targetItemIndex = getIndex($targetItem);
+					targetId = getId($targetItem);
+					targetIndex = getIndex($targetItem);
 					dispatch('drag', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
-						draggedItemId,
-						draggedItemIndex,
+						draggedItemId: draggedId,
+						draggedItemIndex: draggedIndex,
 						targetItem: $targetItem,
-						targetItemId,
-						targetItemIndex,
+						targetItemId: targetId,
+						targetItemIndex: targetIndex,
 						isBetweenBounds: $isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
 						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
-					liveText = announcements!.dragged(
-						$draggedItem,
-						draggedItemIndex,
-						$targetItem,
-						targetItemIndex
-					);
+					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
 				}
 
 				await tick();
@@ -435,38 +448,38 @@
 				event.preventDefault();
 
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
-				const focusedItemIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
+				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
 				if (!$isKeyboardDragging) {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
-						(key === 'Home' && focusedItemIndex === 0) ||
-						(key === 'End' && focusedItemIndex === items.length - 1)
+						(key === 'Home' && focusedIndex === 0) ||
+						(key === 'End' && focusedIndex === items.length - 1)
 					)
 						return;
 
 					if (key === 'Home') items[0]?.focus({ preventScroll: true });
 					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemsData) return;
+					if (!$draggedItem || !$itemRects) return;
 
-					const draggedItemIndex = getIndex($draggedItem);
-					const targetItemIndex = $targetItem ? getIndex($targetItem) : null;
+					const draggedIndex = getIndex($draggedItem);
+					const targetIndex = $targetItem ? getIndex($targetItem) : null;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
-						(key === 'Home' && draggedItemIndex === 0 && !targetItem) ||
-						(key === 'Home' && targetItemIndex === 0) ||
-						(key === 'End' && draggedItemIndex === $itemsData.length - 1 && !targetItem) ||
-						(key === 'End' && targetItemIndex === $itemsData.length - 1)
+						(key === 'Home' && draggedIndex === 0 && !targetItem) ||
+						(key === 'Home' && targetIndex === 0) ||
+						(key === 'End' && draggedIndex === $itemRects.length - 1 && !targetItem) ||
+						(key === 'End' && targetIndex === $itemRects.length - 1)
 					)
 						return;
 
 					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
-					liveText = announcements!.dragged(
+					liveText = _announcements.dragged(
 						$draggedItem,
-						draggedItemIndex,
+						draggedIndex,
 						$targetItem,
 						getIndex($targetItem)
 					);
@@ -504,7 +517,7 @@
 
 		$draggedItem = null;
 		$targetItem = null;
-		$itemsData = null;
+		$itemRects = null;
 
 		if (action.includes('pointer')) {
 			ghostStatus = 'unset';
@@ -529,20 +542,18 @@
 		)
 			return;
 
-		const draggedItemId = getId($draggedItem);
-		const draggedItemIndex = getIndex($draggedItem);
-		const targetItemId = $targetItem ? getId($targetItem) : null;
-		const targetItemIndex = $targetItem ? getIndex($targetItem) : null;
+		const draggedIndex = getIndex($draggedItem);
+		const targetIndex = $targetItem ? getIndex($targetItem) : null;
 
 		if ($draggedItem)
 			dispatch('drop', {
 				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
 				draggedItem: $draggedItem,
-				draggedItemId,
-				draggedItemIndex,
+				draggedItemId: getId($draggedItem),
+				draggedItemIndex: draggedIndex,
 				targetItem: $targetItem,
-				targetItemId,
-				targetItemIndex,
+				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemIndex: targetIndex,
 				isBetweenBounds: $isBetweenBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
 			});
@@ -565,12 +576,7 @@
 		if (action === 'keyboard-drop' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
-			liveText = announcements!.dropped(
-				$draggedItem,
-				draggedItemIndex,
-				$targetItem,
-				targetItemIndex
-			);
+			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
 			$isKeyboardDragging = false;
 			$isKeyboardDropping = true;
@@ -578,7 +584,7 @@
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
-			liveText = announcements!.canceled($draggedItem, draggedItemIndex);
+			liveText = _announcements.canceled($draggedItem, draggedIndex);
 		}
 
 		function handleTransitionEnd({ propertyName }: TransitionEvent) {
@@ -588,7 +594,7 @@
 			}
 		}
 
-		if (transitionDuration! > 0) element?.addEventListener('transitionend', handleTransitionEnd);
+		if (_transition.duration > 0) element?.addEventListener('transitionend', handleTransitionEnd);
 		else handlePointerAndKeyboardDragEnd(action);
 	}
 </script>
@@ -599,7 +605,7 @@
 	class="ssl-list {$$props.class ?? ''}"
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
-	style:--ssl-transition-duration="{transitionDuration}ms"
+	style:--ssl-transition-duration="{_transition.duration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
@@ -628,7 +634,7 @@
 		</p>
 	</slot>
 </ul>
-<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
+<SortableListGhost bind:ghostRef status={ghostStatus} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--

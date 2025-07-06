@@ -6,24 +6,25 @@ export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
 	const elementTranslate = getTranslateValues(element);
 	const containerRect = container.getBoundingClientRect();
 	// In those situations where the container is larger than the viewport,
-	// we want to use the root as reference.
-	const rootElement = document.documentElement;
-	const limitTop = containerRect.height < rootElement.clientHeight ? containerRect.top : 0;
+	// we want to use the document element as reference.
+	const docElement = document.documentElement;
+	const limitTop = containerRect.height < docElement.clientHeight ? containerRect.top : 0;
 	const limitBottom =
-		containerRect.height < rootElement.clientHeight
-			? containerRect.bottom
-			: rootElement.clientHeight;
-	const limitLeft = containerRect.width < rootElement.clientWidth ? containerRect.left : 0;
+		containerRect.height < docElement.clientHeight ? containerRect.bottom : docElement.clientHeight;
+	const limitLeft = containerRect.width < docElement.clientWidth ? containerRect.left : 0;
 	const limitRight =
-		containerRect.width < rootElement.clientWidth ? containerRect.right : rootElement.clientWidth;
+		containerRect.width < docElement.clientWidth ? containerRect.right : docElement.clientWidth;
+	const translateX = elementTranslate?.x || 0;
+	const translateY = elementTranslate?.y || 0;
+	const marginTop = parseFloat(elementStyles.marginTop);
+	const marginBottom = parseFloat(elementStyles.marginBottom);
+	const marginLeft = parseFloat(elementStyles.marginLeft);
+	const marginRight = parseFloat(elementStyles.marginRight);
 
 	return (
-		elementRect.top - (elementTranslate?.y || 0) + parseFloat(elementStyles.marginTop) > limitTop &&
-		elementRect.bottom - (elementTranslate?.y || 0) + parseFloat(elementStyles.marginBottom) <
-			limitBottom &&
-		elementRect.left - (elementTranslate?.x || 0) + parseFloat(elementStyles.marginLeft) >
-			limitLeft &&
-		elementRect.right - (elementTranslate?.x || 0) + parseFloat(elementStyles.marginRight) <
-			limitRight
+		elementRect.top - translateY + marginTop > limitTop &&
+		elementRect.bottom - translateY + marginBottom < limitBottom &&
+		elementRect.left - translateX + marginLeft > limitLeft &&
+		elementRect.right - translateX + marginRight < limitRight
 	);
 }

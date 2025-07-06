@@ -1,17 +1,14 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getFocusedItem } from '$lib/stores/index.js';
+	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
+	const root = getRoot();
 	const focusedItem = getFocusedItem();
 
-	function handleClick(event: Event) {
-		const target = event.target as HTMLElement;
-		const item = target.closest<HTMLLIElement>('.ssl-item');
-		const list = item?.closest<HTMLUListElement>('.ssl-list');
-
-		if ($focusedItem && list) {
-			const items = list.querySelectorAll<HTMLLIElement>('.ssl-item');
+	function handleClick() {
+		if ($focusedItem && $root) {
+			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
@@ -19,8 +16,8 @@
 					($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 			} else {
-				// Focus the list (if there are no items left) before removing.
-				list.focus();
+				// Focus the root element (if there are no items left) before removing.
+				$root.focus();
 			}
 		}
 	}

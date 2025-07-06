@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] (2025-07-04)
+
+### BREAKING
+
+- Add transition customization to `<SortableList.Root>`.
+- Add prefix to the CSS custom properties in the base stylesheet.
+
+### Added
+
+- Add transitions customization to `<SortableList.Item>`.
+- Expose the `scaleFade()` and `scaleFly()` transition functions.
+
+### Changed
+
+- Assign a proper default value to announcements.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Add **“With custom transitions”** demo page.
+- Update the README to reflect the latest changes.
+
+## [0.14.1] (2025-07-03)
+
+### Added
+
+- Add the `destroyed` event.
+- Allow for Svelte 5 as a peer dependency.
+
+### Performance
+
+- Align the `ItemRect` shape with the `DOMRect` shape to stay in line with monomorphism.
+- Avoid unnecessary coordinates calculations.
+
+### Changed
+
+- Provide clearer type references in the exposed types and utils.
+
+## [0.14.0] (2025-06-28)
+
+### Performance
+
+- Debounce the `pointermove` handler to reduce the frequency in which it is called in `<SortableList.Root>`.
+- Avoid unnecessary re-cloning in `<SortableListGhost>`.
+- Move the most common exit conditions to the top in `<SortableList.Item>`.
+- Replace queried root with stored reference.
+- Add a few small improvements to utils.
+
+### Changed
+
+- Rename `itemsData` variables, stores, functions and types to `itemRects`.
+
+### Fixed
+
+- Correct reference to `rootRef` in `<SortableListGhost>` hover-over comments.
+
+## [0.13.2] (2025-06-26)
+
+### Added
+
+- Add support for vertical alignment in horizontal wrapping lists.
+
+### Changed
+
+- Adjust the `<SortableListGhost>` transform logic to match the same pattern as in `<SortableList.Item>`.
+- Simplify the `<SortableListGhost>` and `<SortableList.Item>` transform calculations.
+- Unify the `<SortableListGhost>` and `<SortableList.Item>` transform calculations under a couple of common functions: `calculateTranslate()` and `calculateTranslateWithAlignment()`.
+
+### Docs
+
+- Correct the scope of some demo pages styles.
+- Correct the fields ids in the **“Interactive items”** demo page.
+
+## [0.13.1] (2025-06-20)
+
+### Changed
+
+- Adjust the dragged item transform to match the same pattern as other related logic.
+- Place function declarations above their first usage.
+
+### Fixed
+
+- Correct the `<SortableListGhost>` and `<SortableList.Item>` positioning when wrapping is active.
+
+### Docs
+
+- Improve the wrapping showcase in the **“With wrapping”** demo page.
+- Correct the wrapping warning in the README.
+
 ## [0.13.0] (2025-06-17)
 
 ### Added
@@ -878,7 +967,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.1...v0.15.0
+[0.14.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...v0.14.1
+[0.14.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.2...v0.14.0
+[0.13.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.1...v0.13.2
+[0.13.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.8...v0.13.0
 [0.12.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.7...v0.12.8
 [0.12.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.12.6...v0.12.7

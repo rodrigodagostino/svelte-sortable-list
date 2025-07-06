@@ -15,7 +15,7 @@ interface ScaleFadeParams {
 
 export function scaleFade(
 	node: HTMLElement,
-	{ delay = 0, duration = 400, easing = sineInOut, opacity = 0 }: ScaleFadeParams = {}
+	{ delay = 0, duration = 240, easing = sineInOut, opacity = 0 }: ScaleFadeParams = {}
 ): TransitionConfig {
 	const style = getComputedStyle(node);
 	const target_opacity = +style.opacity;
@@ -39,7 +39,6 @@ export function scaleFade(
 		duration,
 		easing,
 		css: (t, u) =>
-			/* prettier-ignore */
 			`opacity: ${t <= 0.5 ? `${target_opacity - od * u * 2};` : `${target_opacity}px;`}` +
 			`height: ${t <= 0.5 ? `${t * 2 * height}px;` : `${height}px;`}` +
 			`padding-top: ${t <= 0.5 ? `${t * 2 * padding_top}px;` : `${target_padding_top}px;`}` +
@@ -62,7 +61,7 @@ interface ScaleFlyParams {
 
 export function scaleFly(
 	node: HTMLElement,
-	{ delay = 0, duration = 400, easing = sineInOut, x = 0, y = 0, opacity = 0 }: ScaleFlyParams = {}
+	{ delay = 0, duration = 240, easing = sineInOut, x = 0, y = 0, opacity = 0 }: ScaleFlyParams = {}
 ): TransitionConfig {
 	const style = getComputedStyle(node);
 	const transform = style.transform === 'none' ? '' : style.transform;
@@ -89,7 +88,6 @@ export function scaleFly(
 		duration,
 		easing,
 		css: (t, u) =>
-			/* prettier-ignore */
 			`transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * xValue}${xUnit}` : x}, ${t <= 0.5 ? `${(1 - t) * yValue}${yUnit}` : y}, 0);` +
 			`opacity: ${t <= 0.5 ? `${target_opacity - od * u * 2};` : `${target_opacity}px;`}` +
 			`height: ${t <= 0.5 ? `${t * 2 * height}px;` : `${height}px;`}` +
