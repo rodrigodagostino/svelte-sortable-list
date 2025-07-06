@@ -18,15 +18,20 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	import Icon from '$lib/components/Icon.svelte';
 	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
 	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
+	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/props.js';
 
 	$: classes = joinCSSClasses('ssl-item-remove', $$restProps.class);
 
-	const root = getRoot();
-	const focusedItem = getFocusedItem();
+	type $$Props = ItemRemoveProps;
+
+	export let group: $$Props['group'] = undefined;
+
+	const root = getRoot(group);
+	const focusedItem = getFocusedItem(group);
 
 	function handleClick() {
 		if ($focusedItem && $root) {
-			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item');
+			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item' + getGroupSelector(group));
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
@@ -41,7 +46,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button class={classes} data-role="remove" on:click={handleClick} on:click>
+<button class={classes} data-group={group} data-role="remove" on:click={handleClick} on:click>
 	<slot>
 		<Icon name="remove" />
 	</slot>

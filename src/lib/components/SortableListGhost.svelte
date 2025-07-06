@@ -38,15 +38,16 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let state: $$Props['state'];
+	export let group: $$Props['group'] = undefined;
 
-	const rootProps = getRootProps();
+	const rootProps = getRootProps(group);
 
-	const root = getRoot();
-	const pointer = getPointer();
-	const pointerOrigin = getPointerOrigin();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
+	const root = getRoot(group);
+	const pointer = getPointer(group);
+	const pointerOrigin = getPointerOrigin(group);
+	const itemRects = getItemRects(group);
+	const draggedItem = getDraggedItem(group);
+	const targetItem = getTargetItem(group);
 
 	$: draggedId = $draggedItem ? $draggedItem.id : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
@@ -197,6 +198,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:--ssl-transition-easing={$rootProps.transition?.easing}
+	data-group={group}
 	data-ghost-state={state}
 	data-can-clear-on-drag-out={$rootProps.canClearOnDragOut}
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}

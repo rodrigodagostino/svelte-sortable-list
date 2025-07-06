@@ -15,6 +15,7 @@
 		{ text: 'No transitions', path: '/no-transitions' },
 		{ text: 'Custom transitions', path: '/custom-transitions' },
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
+		{ text: 'Nested', path: '/nested' },
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With wrapping', path: '/with-wrapping' },

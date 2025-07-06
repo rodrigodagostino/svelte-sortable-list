@@ -1,3 +1,4 @@
+import type { Group } from '$lib/stores/index.js';
 import type { ItemRect, TextDirection } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
@@ -28,10 +29,17 @@ export function getItemRect(item: HTMLLIElement): ItemRect {
 	};
 }
 
-export function getItemRects(list: HTMLUListElement): ItemRect[] {
-	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
-		getItemRect(item)
-	);
+export function getGroupSelector(group: Group): string {
+	if (group === undefined) {
+		return ':not([data-group])';
+	}
+	return `[data-group=${group}]`;
+}
+
+export function getItemRects(group: Group, list: HTMLUListElement): ItemRect[] {
+	return Array.from(
+		list.querySelectorAll<HTMLLIElement>('.ssl-item' + getGroupSelector(group))
+	).map((item) => getItemRect(item));
 }
 
 export const getTextDirection = (element: HTMLElement): TextDirection => {
