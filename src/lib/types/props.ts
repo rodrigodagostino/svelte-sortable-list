@@ -25,7 +25,6 @@ export interface SortableListRootProps
 			| 'step-end'
 			| string;
 	};
-	hasDropMarker?: boolean;
 	hasWrapping?: boolean;
 	hasLockedAxis?: boolean;
 	hasBoundaries?: boolean;

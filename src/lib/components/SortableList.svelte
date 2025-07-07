@@ -65,7 +65,6 @@
 	export let gap: $$Props['gap'] = 12;
 	export let direction: $$Props['direction'] = 'vertical';
 	export let transition: $$Props['transition'] = undefined;
-	export let hasDropMarker: $$Props['hasDropMarker'] = false;
 	export let hasWrapping: $$Props['hasWrapping'] = false;
 	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
 	export let hasBoundaries: $$Props['hasBoundaries'] = false;
@@ -84,7 +83,6 @@
 		gap,
 		direction,
 		transition: _transition,
-		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
 		hasBoundaries,
@@ -98,7 +96,6 @@
 		gap,
 		direction,
 		transition: _transition,
-		hasDropMarker,
 		hasWrapping,
 		hasLockedAxis,
 		hasBoundaries,
@@ -609,7 +606,6 @@
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
-	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
 	tabindex="0"
@@ -648,7 +644,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
 - `transitionDuration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds).
-- `hasDropMarker`: displays a position marker representing where the dragged item will be positioned when drag-and-dropping.
 - `hasLockedAxis`: prevents the dragged item from moving away from the main axis.
 - `hasBoundaries`: items will only be draggable inside the list limits.
 - `canClearOnDragOut`: the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.

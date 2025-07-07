@@ -66,11 +66,7 @@
 	text-transform: uppercase;
 	box-shadow: none;
 	opacity: 1;
-	transition:
-		background-color calc(var(--ssl-transition-duration) / 3 * 2),
-		border-color calc(var(--ssl-transition-duration) / 3 * 2),
-		box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
-		opacity var(--ssl-transition-duration);
+	transition: box-shadow calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
 .ssl-item-content__text {
@@ -120,36 +116,16 @@
 }
 
 /**
- * hasDropMarker
+ * canRemoveOnDropOut
  */
-.ssl-list[data-has-drop-marker="true"] .ssl-item-content {
+.ssl-ghost[data-can-remove-on-drop-out="true"] .ssl-item-content {
 	transition:
 		background-color calc(var(--ssl-transition-duration) / 3 * 2),
 		border-color calc(var(--ssl-transition-duration) / 3 * 2),
-		box-shadow calc(var(--ssl-transition-duration) / 3 * 2);
+		box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
+		opacity var(--ssl-transition-duration);
 }
 
-.ssl-list[data-has-drop-marker="true"] .ssl-item[data-is-pointer-dragging="true"] .ssl-item-content,
-.ssl-list[data-has-drop-marker="true"]
-	.ssl-item[data-is-pointer-dropping="true"]
-	.ssl-item-content {
-	opacity: 0.5;
-}
-
-.ssl-list[data-has-drop-marker="true"]
-	.ssl-item[data-is-pointer-dragging="true"]
-	.ssl-item-content
-	> *,
-.ssl-list[data-has-drop-marker="true"]
-	.ssl-item[data-is-pointer-dropping="true"]
-	.ssl-item-content
-	> * {
-	opacity: 0;
-}
-
-/**
- * canRemoveOnDropOut
- */
 .ssl-ghost[data-is-pointer-dropping="true"][data-can-remove-on-drop-out="true"][data-is-between-bounds="false"]
 	.ssl-item-content {
 	opacity: 0;

@@ -191,12 +191,6 @@
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
-	$: styleOpacity =
-		($isPointerDragging || $isPointerDropping) &&
-		draggedId === String(id) &&
-		!$rootProps.hasDropMarker
-			? 0
-			: 1;
 	$: styleOverflow =
 		($isPointerDragging || $isPointerDropping) &&
 		draggedId === String(id) &&
@@ -264,7 +258,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:margin={styleMargin}
-	style:opacity={styleOpacity}
 	style:overflow={styleOverflow}
 	style:touch-action={!hasHandle ? 'none' : undefined}
 	style:transform={styleTransform}
