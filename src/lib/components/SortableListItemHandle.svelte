@@ -2,17 +2,16 @@
 	import Icon from '$lib/components/Icon.svelte';
 	import { getIsPointerDragging } from '$lib/stores/index.js';
 
-	const isPointerDragging = getIsPointerDragging();
+	$: classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 
-	const classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	const isPointerDragging = getIsPointerDragging();
 </script>
 
 <span
+	class={classes}
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	data-role="handle"
 	aria-hidden="true"
-	{...$$restProps}
-	class={classes}
 >
 	<slot>
 		<Icon name="handle" />

@@ -3,6 +3,8 @@
 	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
+	$: classes = ['ssl-item-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+
 	const root = getRoot();
 	const focusedItem = getFocusedItem();
 
@@ -21,8 +23,6 @@
 			}
 		}
 	}
-
-	const classes = ['ssl-item-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 </script>
 
 <!--
@@ -41,7 +41,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 ```
 -->
 
-<button data-role="remove" on:click={handleClick} on:click {...$$restProps} class={classes}>
+<button class={classes} data-role="remove" on:click={handleClick} on:click>
 	<slot>
 		<Icon name="remove" />
 	</slot>
