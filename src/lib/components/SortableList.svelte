@@ -241,8 +241,8 @@
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
-		ghostStatus = 'init';
 		await tick();
+		ghostStatus = 'init';
 		$isPointerDragging = true;
 		dispatch('dragstart', {
 			deviceType: 'pointer',
@@ -632,7 +632,11 @@
 		</p>
 	</slot>
 </ul>
-<SortableListGhost bind:ghostRef status={ghostStatus} />
+<!-- The following if clause will prevent the <SortableListItem> -->
+<!-- inside <SortableListGhost> from transitioning out on page navigation. -->
+{#if $root}
+	<SortableListGhost bind:ghostRef status={ghostStatus} />
+{/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--

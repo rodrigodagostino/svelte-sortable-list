@@ -60,16 +60,16 @@
 	const isBetweenBounds = getIsBetweenBounds();
 	const isRTL = getIsRTL();
 
-	let hasHandle = false;
+	$: hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
+	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
 		setInteractiveElementsTabIndex($isKeyboardDragging, focusedId);
 	}
 
 	onMount(() => {
-		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 		setInteractiveElementsTabIndex();
 	});
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
 		await tick();
 		itemRef
@@ -99,28 +99,44 @@
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 	$: focusedId = $focusedItem ? getId($focusedItem) : null;
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
-		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
-		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.width}px`;
+		if (!isGhost && !$rootProps.canRemoveOnDropOut) return undefined;
+		if (
+			!isGhost &&
+			draggedId === String(id) &&
+			!$isBetweenBounds &&
+			$rootProps.canRemoveOnDropOut &&
+			$rootProps.direction === 'horizontal'
+		)
+			return '0';
+		return `${currentRect?.width}px`;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (!$rootProps.canRemoveOnDropOut) return undefined;
-		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
-		else if (draggedId === String(id) && $isBetweenBounds) return `${currentRect?.height}px`;
+		if (
+			!isGhost &&
+			draggedId === String(id) &&
+			!$isBetweenBounds &&
+			$rootProps.canRemoveOnDropOut &&
+			$rootProps.direction === 'vertical'
+		)
+			return '0';
+		return `${currentRect?.height}px`;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleMargin(...args: unknown[]) {
-		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) return '0';
-		else return 'calc(var(--ssl-gap) / 2)';
+		if (isGhost) return undefined;
+		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) {
+			return $rootProps.direction === 'vertical'
+				? '0 calc(var(--ssl-gap) / 2)'
+				: 'calc(var(--ssl-gap) / 2) 0';
+		}
+		return 'calc(var(--ssl-gap) / 2)';
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
+		if (isGhost) return 'none';
 		if (
 			(!$isPointerDragging &&
 				!$isPointerDropping &&
@@ -192,6 +208,7 @@
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOverflow =
+		!isGhost &&
 		($isPointerDragging || $isPointerDropping) &&
 		draggedId === String(id) &&
 		$rootProps.canRemoveOnDropOut
@@ -205,7 +222,7 @@
 		$isBetweenBounds
 	);
 	$: styleTransition =
-		$draggedItem || $isPointerCanceling || $isKeyboardCanceling
+		!isGhost && ($draggedItem || $isPointerCanceling || $isKeyboardCanceling)
 			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
 				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
 				`z-index ${$rootProps.transition!.duration}ms`
@@ -268,6 +285,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-is-pointer-dropping={$isPointerDropping && draggedId === String(id)}
 	data-is-keyboard-dragging={$isKeyboardDragging && draggedId === String(id)}
 	data-is-keyboard-dropping={$isKeyboardDropping && draggedId === String(id)}
+	data-is-ghost={isGhost}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$rootProps.isLocked || isLocked}
 	tabindex={focusedId === String(id) ? 0 : -1}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SortableListItem from './SortableListItem.svelte';
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
@@ -19,6 +20,7 @@
 		getId,
 		getIndex,
 		isInSameRow,
+		preserveFormFieldValues,
 	} from '$lib/utils/index.js';
 
 	type $$Props = GhostProps;
@@ -39,24 +41,7 @@
 	const isPointerDropping = getIsPointerDropping();
 	const isBetweenBounds = getIsBetweenBounds();
 
-	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
-	let lastCloneId: string | null = null;
-	let lastCloneContainsSelect = false;
-
-	$: if ($draggedItem && (draggedItemId !== lastCloneId || lastCloneContainsSelect)) {
-		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
-		// Since `cloneNode()` doesn’t clone `<select>` values, we have to do it manually.
-		const selects = $draggedItem?.querySelectorAll<HTMLSelectElement>('select');
-		if (selects.length)
-			clone
-				.querySelectorAll<HTMLSelectElement>('select')
-				.forEach((select, index) => (select.value = selects[index].value));
-
-		lastCloneId = draggedItemId;
-		lastCloneContainsSelect = !!selects.length;
-		ghostRef?.replaceChildren(...clone.childNodes);
-	}
-
+	$: draggedId = $draggedItem ? getId($draggedItem) : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
@@ -64,24 +49,27 @@
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
-	function getStyleWidth(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemRects) return '0';
+	function cloneDraggedItemContent(...args: unknown[]) {
+		if (!$draggedItem) return '';
+
+		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
+		preserveFormFieldValues($draggedItem, clone);
+		return clone.innerHTML;
+	}
+	$: draggedContent = cloneDraggedItemContent($draggedItem);
+
+	function getStyleWidth(...args: unknown[]) {
+		if (!draggedRect) return '0';
 		return `${draggedRect?.width || 0}px`;
 	}
 
-	function getStyleHeight(draggedItem: HTMLLIElement | null) {
-		if (!draggedItem || !$itemRects) return '0';
+	function getStyleHeight(...args: unknown[]) {
+		if (!draggedRect) return '0';
 		return `${draggedRect?.height || 0}px`;
 	}
 
-	function getStyleLeft(status: $$Props['status']) {
-		if (
-			status === 'unset' ||
-			!$draggedItem ||
-			typeof draggedIndex !== 'number' ||
-			!draggedRect ||
-			!$itemRects
-		)
+	function getStyleLeft(...args: unknown[]) {
+		if (status === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.left;
@@ -97,14 +85,8 @@
 		return `${left}px`;
 	}
 
-	function getStyleTop(status: $$Props['status']) {
-		if (
-			status === 'unset' ||
-			!$draggedItem ||
-			typeof draggedIndex !== 'number' ||
-			!draggedRect ||
-			!$itemRects
-		)
+	function getStyleTop(...args: unknown[]) {
+		if (status === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
 		if (status === 'remove') return ghostRef.style.top;
@@ -127,17 +109,8 @@
 		return `${top}px`;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleTransform(status: $$Props['status'], ...args: unknown[]) {
-		if (
-			status === 'unset' ||
-			!$root ||
-			!$itemRects ||
-			!$pointer ||
-			!$pointerOrigin ||
-			!$draggedItem
-		)
-			return 'translate3d(0, 0, 0)';
+	function getStyleTransform(...args: unknown[]) {
+		if (status === 'unset' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
@@ -209,7 +182,7 @@
 		if (status === 'remove') return ghostRef.style.transform;
 	}
 
-	function getStyleTransition(status: $$Props['status']) {
+	function getStyleTransition(...args: unknown[]) {
 		if (status === 'unset' || status === 'init') return undefined;
 		// The next first condition applies to `canClearOnDragOut`.
 		if ((status === 'preset' && !$targetItem) || status === 'set')
@@ -220,7 +193,12 @@
 		if (status === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
 	}
 
-	function getStyleZIndex(status: $$Props['status']) {
+	function getStyleVisibility(...args: unknown[]) {
+		if (status === 'unset') return 'hidden';
+		return 'visible';
+	}
+
+	function getStyleZIndex(...args: unknown[]) {
 		if (status === 'unset') return undefined;
 		if (status === 'init' || status === 'preset') return '10000';
 		// zIndex is only set and then re-set to force the transitionend event to be fired
@@ -234,12 +212,15 @@
 	$: styleTop = getStyleTop(status);
 	$: styleTransform = getStyleTransform(status, $pointer);
 	$: styleTransition = getStyleTransition(status);
+	$: styleVisibility = getStyleVisibility(status);
 	$: styleZIndex = getStyleZIndex(status);
 </script>
 
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
+	style:--ssl-gap="{$rootProps.gap}px"
+	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
@@ -248,7 +229,7 @@
 	style:top={styleTop}
 	style:transform={styleTransform}
 	style:transition={styleTransition}
-	style:visibility={$isPointerDragging || $isPointerDropping ? 'visible' : 'hidden'}
+	style:visibility={styleVisibility}
 	style:z-index={styleZIndex}
 	data-is-pointer-dragging={$isPointerDragging}
 	data-is-pointer-dropping={$isPointerDropping}
@@ -256,7 +237,15 @@
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal
-></div>
+>
+	<SortableListItem
+		id={draggedId || 'ghost-item'}
+		index={draggedIndex ?? -1}
+		class={$draggedItem?.className || 'ghost-item'}
+	>
+		{@html draggedContent}
+	</SortableListItem>
+</div>
 
 <!--
 @component
