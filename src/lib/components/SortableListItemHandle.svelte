@@ -1,15 +1,15 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getIsPointerDragging } from '$lib/stores/index.js';
+	import { getDragState } from '$lib/stores/index.js';
 
 	$: classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 
-	const isPointerDragging = getIsPointerDragging();
+	const dragState = getDragState();
 </script>
 
 <span
 	class={classes}
-	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
+	style:cursor={$dragState === 'pointer-dragging' ? 'grabbing' : 'grab'}
 	data-role="handle"
 	aria-hidden="true"
 >

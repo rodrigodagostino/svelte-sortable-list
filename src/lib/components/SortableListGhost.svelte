@@ -3,9 +3,8 @@
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
+		getDragState,
 		getIsBetweenBounds,
-		getIsPointerDragging,
-		getIsPointerDropping,
 		getItemRects,
 		getPointer,
 		getPointerOrigin,
@@ -37,8 +36,7 @@
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 
-	const isPointerDragging = getIsPointerDragging();
-	const isPointerDropping = getIsPointerDropping();
+	const dragState = getDragState();
 	const isBetweenBounds = getIsBetweenBounds();
 
 	$: draggedId = $draggedItem ? getId($draggedItem) : null;
@@ -222,7 +220,7 @@
 	style:--ssl-gap="{$rootProps.gap}px"
 	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
-	style:cursor={$isPointerDragging ? 'grabbing' : 'grab'}
+	style:cursor={$dragState === 'pointer-dragging' ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:left={styleLeft}
@@ -231,8 +229,7 @@
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
 	style:z-index={styleZIndex}
-	data-is-pointer-dragging={$isPointerDragging}
-	data-is-pointer-dropping={$isPointerDropping}
+	data-drag-state={$dragState.includes('pointer') ? $dragState : 'idle'}
 	data-is-between-bounds={$isBetweenBounds}
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"

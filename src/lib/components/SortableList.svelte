@@ -10,15 +10,10 @@
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import {
+		setDragState,
 		setDraggedItem,
 		setFocusedItem,
 		setIsBetweenBounds,
-		setIsKeyboardCanceling,
-		setIsKeyboardDragging,
-		setIsKeyboardDropping,
-		setIsPointerCanceling,
-		setIsPointerDragging,
-		setIsPointerDropping,
 		setIsRTL,
 		setItemRects,
 		setPointer,
@@ -116,12 +111,7 @@
 	const focusedItem = setFocusedItem(null);
 	let liveText: string = '';
 
-	const isPointerDragging = setIsPointerDragging(false);
-	const isPointerDropping = setIsPointerDropping(false);
-	const isKeyboardDragging = setIsKeyboardDragging(false);
-	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isPointerCanceling = setIsPointerCanceling(false);
-	const isKeyboardCanceling = setIsKeyboardCanceling(false);
+	const dragState = setDragState('idle');
 	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRTL = setIsRTL(false);
 
@@ -189,15 +179,7 @@
 	}
 
 	async function handlePointerDown(event: PointerEvent) {
-		if (
-			$isPointerDragging ||
-			$isPointerDropping ||
-			$isKeyboardDragging ||
-			$isKeyboardDropping ||
-			$isKeyboardCanceling ||
-			$focusedItem
-		)
-			return;
+		if ($dragState !== 'idle' || $focusedItem) return;
 
 		const target = event.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
@@ -243,7 +225,7 @@
 		$itemRects = getItemRects(rootRef);
 		await tick();
 		ghostStatus = 'init';
-		$isPointerDragging = true;
+		$dragState = 'pointer-dragging';
 		dispatch('dragstart', {
 			deviceType: 'pointer',
 			draggedItem: currItem,
@@ -266,7 +248,7 @@
 
 	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (rafId || !$isPointerDragging) return;
+		if (rafId || $dragState !== 'pointer-dragging') return;
 
 		rafId = requestAnimationFrame(async () => {
 			if (!$draggedItem || !$itemRects || !ghostRef) return;
@@ -314,7 +296,7 @@
 	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
-		if ($isKeyboardDropping) {
+		if ($dragState === 'keyboard-dropping') {
 			event.preventDefault();
 			return;
 		}
@@ -336,8 +318,8 @@
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-				if (!$isKeyboardDragging) {
-					$isKeyboardDragging = true;
+				if ($dragState !== 'keyboard-dragging') {
+					$dragState = 'keyboard-dragging';
 
 					await tick();
 					$draggedItem = $focusedItem;
@@ -366,7 +348,7 @@
 						: 1;
 				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
 
-				if (!$isKeyboardDragging) {
+				if ($dragState !== 'keyboard-dragging') {
 					if (!$focusedItem || focusedIndex === null) {
 						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItem) return;
@@ -438,7 +420,7 @@
 				}
 
 				await tick();
-				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
+				const scrollTarget = $dragState !== 'keyboard-dragging' ? $focusedItem : $targetItem;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
@@ -449,7 +431,7 @@
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
-				if (!$isKeyboardDragging) {
+				if ($dragState !== 'keyboard-dragging') {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -485,7 +467,7 @@
 				}
 
 				await tick();
-				const scrollTarget = !$isKeyboardDragging ? $focusedItem : $targetItem;
+				const scrollTarget = $dragState !== 'keyboard-dragging' ? $focusedItem : $targetItem;
 				const step = key === 'Home' ? -1 : 1;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
@@ -514,20 +496,14 @@
 				isCanceled: action.includes('cancel'),
 			});
 
+		$pointer = null;
+		$pointerOrigin = null;
 		$draggedItem = null;
 		$targetItem = null;
 		$itemRects = null;
-
-		if (action.includes('pointer')) {
-			ghostStatus = 'unset';
-			$pointer = null;
-			$pointerOrigin = null;
-			$isPointerDropping = false;
-			$isBetweenBounds = true;
-		} else $isKeyboardDropping = false;
-
-		if (action === 'pointer-cancel') $isPointerCanceling = false;
-		if (action === 'keyboard-cancel') $isKeyboardCanceling = false;
+		ghostStatus = 'unset';
+		$dragState = 'idle';
+		$isBetweenBounds = true;
 	}
 
 	async function handlePointerAndKeyboardDrop(
@@ -536,8 +512,8 @@
 	) {
 		if (
 			!$draggedItem ||
-			(action.includes('pointer') && (!$isPointerDragging || $isPointerDropping)) ||
-			(action.includes('keyboard') && (!$isKeyboardDragging || $isKeyboardDropping))
+			(action.includes('pointer') && $dragState === 'pointer-dropping') ||
+			(action.includes('keyboard') && $dragState === 'keyboard-dropping')
 		)
 			return;
 
@@ -558,28 +534,22 @@
 			});
 
 		if (action === 'pointer-drop') {
-			$isPointerDragging = false;
 			ghostStatus = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
 			await tick();
+			$dragState = 'pointer-dropping';
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
-			$isPointerDropping = true;
 			scrollingSpeed = 0;
 		} else if (action === 'pointer-cancel') {
-			$isPointerDragging = false;
-			$isPointerCanceling = true;
+			$dragState = 'pointer-canceling';
 			if (ghostStatus !== 'remove') ghostStatus = 'set';
-			$isPointerDropping = true;
 			scrollingSpeed = 0;
 		}
 
 		if (action === 'keyboard-drop' && $draggedItem) {
-			$isKeyboardDragging = false;
-			$isKeyboardDropping = true;
+			$dragState = 'keyboard-dropping';
 			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
-			$isKeyboardDragging = false;
-			$isKeyboardDropping = true;
-			$isKeyboardCanceling = true;
+			$dragState = 'keyboard-canceling';
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);

@@ -53,8 +53,8 @@
 	outline: 0.125rem solid var(--ssl-gray-800);
 }
 
-.ssl-item[data-is-ghost="false"][data-is-pointer-dragging="true"] .ssl-item-content,
-.ssl-item[data-is-ghost="false"][data-is-pointer-dropping="true"] .ssl-item-content {
+.ssl-item[data-is-ghost="false"][data-drag-state="pointer-dragging"] .ssl-item-content,
+.ssl-item[data-is-ghost="false"][data-drag-state="pointer-dropping"] .ssl-item-content {
 	opacity: 0.5;
 
 	& > * {
@@ -86,8 +86,8 @@
 	opacity: 0.5;
 }
 
-.ssl-item[data-is-keyboard-dragging="true"] .ssl-item-content,
-.ssl-ghost[data-is-pointer-dragging="true"] .ssl-item-content {
+.ssl-item[data-drag-state="keyboard-dragging"] .ssl-item-content,
+.ssl-ghost[data-drag-state="pointer-dragging"] .ssl-item-content {
 	box-shadow: var(--ssl-box-shadow-1);
 }
 
@@ -109,7 +109,7 @@
 .ssl-item-handle:hover,
 .ssl-item-remove:focus,
 .ssl-item-remove:hover,
-.ssl-item[data-is-pointer-dropping="true"] .ssl-item-handle,
+.ssl-item[data-drag-state="pointer-dropping"] .ssl-item-handle,
 .ssl-ghost .ssl-item-handle {
 	background-color: var(--ssl-gray-100);
 	color: var(--ssl-gray-600);
@@ -135,7 +135,7 @@
 		opacity var(--ssl-transition-duration);
 }
 
-.ssl-ghost[data-is-pointer-dropping="true"][data-can-remove-on-drop-out="true"][data-is-between-bounds="false"]
+.ssl-ghost[data-drag-state="pointer-dropping"][data-can-remove-on-drop-out="true"][data-is-between-bounds="false"]
 	.ssl-item-content {
 	opacity: 0;
 }

@@ -1,15 +1,10 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import {
+		getDragState,
 		getDraggedItem,
 		getFocusedItem,
 		getIsBetweenBounds,
-		getIsKeyboardCanceling,
-		getIsKeyboardDragging,
-		getIsKeyboardDropping,
-		getIsPointerCanceling,
-		getIsPointerDragging,
-		getIsPointerDropping,
 		getIsRTL,
 		getItemRects,
 		getRoot,
@@ -51,19 +46,14 @@
 	const targetItem = getTargetItem();
 	const focusedItem = getFocusedItem();
 
-	const isPointerDragging = getIsPointerDragging();
-	const isPointerDropping = getIsPointerDropping();
-	const isKeyboardDragging = getIsKeyboardDragging();
-	const isKeyboardDropping = getIsKeyboardDropping();
-	const isPointerCanceling = getIsPointerCanceling();
-	const isKeyboardCanceling = getIsKeyboardCanceling();
+	const dragState = getDragState();
 	const isBetweenBounds = getIsBetweenBounds();
 	const isRTL = getIsRTL();
 
 	$: hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
-		setInteractiveElementsTabIndex($isKeyboardDragging, focusedId);
+		setInteractiveElementsTabIndex($dragState === 'keyboard-dragging', focusedId);
 	}
 
 	onMount(() => {
@@ -80,7 +70,7 @@
 			.forEach(
 				(el) =>
 					(el.tabIndex =
-						!$isKeyboardDragging &&
+						$dragState !== 'keyboard-dragging' &&
 						focusedId === String(id) &&
 						!$rootProps.isDisabled &&
 						!isDisabled
@@ -138,10 +128,7 @@
 	function getStyleTransform(...args: unknown[]) {
 		if (isGhost) return 'none';
 		if (
-			(!$isPointerDragging &&
-				!$isPointerDropping &&
-				!$isKeyboardDragging &&
-				!$isKeyboardDropping) ||
+			$dragState === 'idle' ||
 			!$itemRects ||
 			!$draggedItem ||
 			!$targetItem ||
@@ -149,10 +136,7 @@
 			draggedIndex === null ||
 			draggedRect === null ||
 			targetIndex === null ||
-			targetRect === null ||
-			$isPointerCanceling ||
-			$isKeyboardCanceling ||
-			(!$isBetweenBounds && !$rootProps.canClearOnDragOut && $rootProps.canRemoveOnDropOut)
+			targetRect === null
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -199,7 +183,7 @@
 	$: styleCursor =
 		$rootProps.isDisabled || isDisabled
 			? 'not-allowed'
-			: $isPointerDragging && draggedId === String(id)
+			: $dragState === 'pointer-dragging' && draggedId === String(id)
 				? 'grabbing'
 				: !hasHandle && !$rootProps.isLocked && !isLocked
 					? 'grab'
@@ -209,20 +193,15 @@
 	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
 	$: styleOverflow =
 		!isGhost &&
-		($isPointerDragging || $isPointerDropping) &&
+		($dragState === 'pointer-dragging' || $dragState === 'pointer-dropping') &&
 		draggedId === String(id) &&
 		$rootProps.canRemoveOnDropOut
 			? 'hidden'
 			: undefined;
-	$: styleTransform = getStyleTransform(
-		$draggedItem,
-		$targetItem,
-		$isPointerCanceling,
-		$isKeyboardCanceling,
-		$isBetweenBounds
-	);
+	$: styleTransform = getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds);
 	$: styleTransition =
-		!isGhost && ($draggedItem || $isPointerCanceling || $isKeyboardCanceling)
+		!isGhost &&
+		($draggedItem || $dragState === 'pointer-canceling' || $dragState === 'keyboard-canceling')
 			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
 				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
 				`z-index ${$rootProps.transition!.duration}ms`
@@ -281,10 +260,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
-	data-is-pointer-dragging={$isPointerDragging && draggedId === String(id)}
-	data-is-pointer-dropping={$isPointerDropping && draggedId === String(id)}
-	data-is-keyboard-dragging={$isKeyboardDragging && draggedId === String(id)}
-	data-is-keyboard-dropping={$isKeyboardDropping && draggedId === String(id)}
+	data-drag-state={draggedId === String(id) ? $dragState : 'idle'}
 	data-is-ghost={isGhost}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$rootProps.isLocked || isLocked}
@@ -316,18 +292,18 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 2;
 		}
 
-		&[data-is-keyboard-dragging='true'] {
+		&[data-drag-state='keyboard-dragging'] {
 			z-index: 4;
 		}
 
-		&[data-is-keyboard-dropping='true'] {
+		&[data-drag-state='keyboard-dropping'] {
 			/* The following z-index is different from the one in .is-keyboard-dragging just to ensure the
 				 «transitionend» event is fired when the item is dropped using the keyboard. */
 			z-index: 3;
 		}
 
-		&[data-is-pointer-dragging='true'],
-		&[data-is-pointer-dropping='true'] {
+		&[data-drag-state='pointer-dragging'],
+		&[data-drag-state='pointer-dropping'] {
 			z-index: 0;
 		}
 
