@@ -19,7 +19,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	import {
 		getDraggedItem,
 		getDragState,
-		getIsBetweenBounds,
 		getItemRects,
 		getPointer,
 		getPointerOrigin,
@@ -52,7 +51,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const targetItem = getTargetItem();
 
 	const dragState = getDragState();
-	const isBetweenBounds = getIsBetweenBounds();
 
 	$: draggedId = $draggedItem ? getId($draggedItem) : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
@@ -232,9 +230,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:--ssl-gap="{$rootProps.gap}px"
-	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
-	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:cursor={$dragState === 'pointer-dragging' ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
@@ -244,8 +239,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	style:transition={styleTransition}
 	style:visibility={styleVisibility}
 	style:z-index={styleZIndex}
-	data-drag-state={$dragState.includes('pointer') ? $dragState : 'idle'}
-	data-is-between-bounds={$isBetweenBounds}
+	style:--ssl-gap="{$rootProps.gap}px"
+	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
+	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
+	data-can-clear-on-drag-out={$rootProps.canClearOnDragOut}
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal

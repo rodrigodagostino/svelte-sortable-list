@@ -618,10 +618,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
+	data-has-locked-axis={hasLockedAxis}
+	data-has-boundaries={hasBoundaries}
+	data-can-clear-on-drag-out={canClearOnDragOut}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
+	data-is-disabled={isDisabled}
 	tabindex="0"
 	role="listbox"
+	aria-orientation={direction}
+	aria-disabled={isDisabled}
 	aria-label={$$restProps['aria-label'] || undefined}
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
 	aria-description={!$$restProps['aria-describedby']
@@ -629,9 +635,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.'
 		: undefined}
 	aria-describedby={$$restProps['aria-describedby'] || undefined}
-	aria-orientation={direction}
 	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
-	aria-disabled={isDisabled}
 	on:pointerdown={handlePointerDown}
 	on:pointercancel={handlePointerCancel}
 	on:keydown={handleKeyDown}

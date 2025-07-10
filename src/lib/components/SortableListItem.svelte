@@ -266,12 +266,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-is-ghost={isGhost}
 	data-is-between-bounds={$isBetweenBounds}
 	data-is-locked={$rootProps.isLocked || isLocked}
+	data-is-disabled={$rootProps.isDisabled || isDisabled}
 	tabindex={focusedId === String(id) ? 0 : -1}
 	role="option"
+	aria-disabled={$rootProps.isDisabled || isDisabled}
 	aria-label={$$restProps['aria-label'] || undefined}
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}
-	aria-disabled={$rootProps.isDisabled || isDisabled}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
 	in:_transitionIn
