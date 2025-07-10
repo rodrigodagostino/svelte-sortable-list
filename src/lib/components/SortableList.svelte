@@ -102,7 +102,6 @@
 	};
 
 	const root = setRoot(null);
-	let ghostStatus: GhostProps['status'] = 'unset';
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemRects = setItemRects(null);
@@ -112,6 +111,7 @@
 	let liveText: string = '';
 
 	const dragState = setDragState('idle');
+	let ghostState: GhostProps['state'] = 'unset';
 	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRTL = setIsRTL(false);
 
@@ -224,7 +224,7 @@
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
 		await tick();
-		ghostStatus = 'init';
+		ghostState = 'init';
 		$dragState = 'pointer-dragging';
 		dispatch('dragstart', {
 			deviceType: 'pointer',
@@ -501,7 +501,7 @@
 		$draggedItem = null;
 		$targetItem = null;
 		$itemRects = null;
-		ghostStatus = 'unset';
+		ghostState = 'unset';
 		$dragState = 'idle';
 		$isBetweenBounds = true;
 	}
@@ -534,14 +534,14 @@
 			});
 
 		if (action === 'pointer-drop') {
-			ghostStatus = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
+			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
 			await tick();
 			$dragState = 'pointer-dropping';
-			if (ghostStatus !== 'remove') ghostStatus = 'set';
+			if (ghostState !== 'remove') ghostState = 'set';
 			scrollingSpeed = 0;
 		} else if (action === 'pointer-cancel') {
 			$dragState = 'pointer-canceling';
-			if (ghostStatus !== 'remove') ghostStatus = 'set';
+			if (ghostState !== 'remove') ghostState = 'set';
 			scrollingSpeed = 0;
 		}
 
@@ -605,7 +605,7 @@
 <!-- The following if clause will prevent the <SortableListItem> -->
 <!-- inside <SortableListGhost> from transitioning out on page navigation. -->
 {#if $root}
-	<SortableListGhost bind:ghostRef status={ghostStatus} />
+	<SortableListGhost bind:ghostRef state={ghostState} />
 {/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 

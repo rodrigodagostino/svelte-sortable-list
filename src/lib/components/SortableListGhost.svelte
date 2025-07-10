@@ -25,7 +25,7 @@
 	type $$Props = GhostProps;
 
 	export let ghostRef: $$Props['ghostRef'];
-	export let status: $$Props['status'];
+	export let state: $$Props['state'];
 
 	const rootProps = getRootProps();
 
@@ -67,10 +67,10 @@
 	}
 
 	function getStyleLeft(...args: unknown[]) {
-		if (status === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
-		if (status === 'remove') return ghostRef.style.left;
+		if (state === 'remove') return ghostRef.style.left;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
 
@@ -84,10 +84,10 @@
 	}
 
 	function getStyleTop(...args: unknown[]) {
-		if (status === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
-		if (status === 'remove') return ghostRef.style.top;
+		if (state === 'remove') return ghostRef.style.top;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
@@ -108,12 +108,12 @@
 	}
 
 	function getStyleTransform(...args: unknown[]) {
-		if (status === 'unset' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
+		if (state === 'unset' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
 
-		if (status === 'init' && draggedRect) {
+		if (state === 'init' && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
 				const x =
 					$rootProps.direction === 'horizontal' ||
@@ -159,7 +159,7 @@
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (status === 'preset' && typeof draggedIndex === 'number' && draggedRect) {
+		if (state === 'preset' && typeof draggedIndex === 'number' && draggedRect) {
 			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
 
@@ -175,43 +175,43 @@
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (status === 'set') return 'translate3d(0, 0, 0)';
+		if (state === 'set') return 'translate3d(0, 0, 0)';
 
-		if (status === 'remove') return ghostRef.style.transform;
+		if (state === 'remove') return ghostRef.style.transform;
 	}
 
 	function getStyleTransition(...args: unknown[]) {
-		if (status === 'unset' || status === 'init') return undefined;
+		if (state === 'unset' || state === 'init') return undefined;
 		// The next first condition applies to `canClearOnDragOut`.
-		if ((status === 'preset' && !$targetItem) || status === 'set')
+		if ((state === 'preset' && !$targetItem) || state === 'set')
 			return (
 				`transform ${$rootProps.transition!.duration}ms ${$rootProps.transition!.easing},` +
 				`z-index 0s ${$rootProps.transition!.duration}ms`
 			);
-		if (status === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
+		if (state === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
 	}
 
 	function getStyleVisibility(...args: unknown[]) {
-		if (status === 'unset') return 'hidden';
+		if (state === 'unset') return 'hidden';
 		return 'visible';
 	}
 
 	function getStyleZIndex(...args: unknown[]) {
-		if (status === 'unset') return undefined;
-		if (status === 'init' || status === 'preset') return '10000';
+		if (state === 'unset') return undefined;
+		if (state === 'init' || state === 'preset') return '10000';
 		// zIndex is only set and then re-set to force the transitionend event to be fired
 		// when the ghost is dragged and dropped without being moved.
-		if (status === 'set' || status === 'remove') return '9999';
+		if (state === 'set' || state === 'remove') return '9999';
 	}
 
 	$: styleWidth = getStyleWidth($draggedItem);
 	$: styleHeight = getStyleHeight($draggedItem);
-	$: styleLeft = getStyleLeft(status);
-	$: styleTop = getStyleTop(status);
-	$: styleTransform = getStyleTransform(status, $pointer);
-	$: styleTransition = getStyleTransition(status);
-	$: styleVisibility = getStyleVisibility(status);
-	$: styleZIndex = getStyleZIndex(status);
+	$: styleLeft = getStyleLeft(state);
+	$: styleTop = getStyleTop(state);
+	$: styleTransform = getStyleTransform(state, $pointer);
+	$: styleTransition = getStyleTransition(state);
+	$: styleVisibility = getStyleVisibility(state);
+	$: styleZIndex = getStyleZIndex(state);
 </script>
 
 <div

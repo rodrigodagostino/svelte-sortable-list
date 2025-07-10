@@ -47,5 +47,5 @@ export interface SortableListItemProps
 
 export interface SortableListGhostProps {
 	ghostRef: HTMLDivElement;
-	status: 'init' | 'preset' | 'set' | 'remove' | 'unset';
+	state: 'init' | 'preset' | 'set' | 'remove' | 'unset';
 }
