@@ -7,14 +7,33 @@ function split_css_unit(value: number | string): [number, string] {
 }
 
 interface ScaleFlyParams {
+	/** Delay (in milliseconds). */
 	delay?: number;
+	/** Duration (in milliseconds). */
 	duration?: number;
+	/** Easing function. */
 	easing?: EasingFunction;
+	/** X position. */
 	x?: number;
+	/** Y position. */
 	y?: number;
+	/** Opacity. */
 	opacity?: number;
 }
 
+/**
+ * Animates the opacity, scale and the x and y positions of an element. `in` transitions animate from an element's current (default) values to the provided values, passed as parameters. `out` transitions animate from the provided values to an element's default values.
+ *
+ * @param node Element to animate.
+ * @param params Animation parameters.
+ * @param params.delay Delay (in milliseconds).
+ * @param params.duration Duration (in milliseconds).
+ * @param params.easing Easing function.
+ * @param params.x X position.
+ * @param params.y Y position.
+ * @param params.opacity Opacity.
+ * @returns Transition configuration.
+ */
 export function scaleFly(
 	node: HTMLElement,
 	{ delay = 0, duration = 240, easing = sineInOut, x = 0, y = 0, opacity = 0 }: ScaleFlyParams = {}
