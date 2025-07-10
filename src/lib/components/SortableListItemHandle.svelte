@@ -1,3 +1,19 @@
+<!--
+@component
+## <SortableList.ItemHandle>
+Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.
+
+### Usage
+```svelte
+	<SortableList.Item id={item.id} {index}>
+		<SortableList.ItemHandle />
+		<div class="ssl-item-content">
+			{item.text}
+		</div>
+	</SortableList.Item>
+```
+-->
+
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getDragState } from '$lib/stores/index.js';
@@ -17,22 +33,6 @@
 		<Icon name="handle" />
 	</slot>
 </span>
-
-<!--
-@component
-## Handle
-Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.
-
-### Usage
-```svelte
-	<SortableList.Item id={item.id} {index}>
-		<SortableList.ItemHandle />
-		<div class="ssl-item-content">
-			{item.text}
-		</div>
-	</SortableList.Item>
-```
--->
 
 <style>
 	.ssl-item-handle {

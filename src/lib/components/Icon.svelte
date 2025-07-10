@@ -1,3 +1,17 @@
+<!--
+@component
+## Icon
+Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.
+
+### Props
+- `name`: name of the icon to display.
+
+### Usage
+```svelte
+	<Icon name="handle" />
+```
+-->
+
 <script lang="ts">
 	export let name: 'handle' | 'remove';
 
@@ -29,17 +43,3 @@
 		<path d="m6 6 12 12" />
 	{/if}
 </svg>
-
-<!--
-@component
-## Icon
-Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.
-
-### Props
-- `name`: name of the icon to display.
-
-### Usage
-```svelte
-	<Icon name="handle" />
-```
--->

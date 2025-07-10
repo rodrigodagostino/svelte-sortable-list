@@ -1,3 +1,19 @@
+<!--
+@component
+## <SortableList.ItemRemove>
+Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
+
+### Usage
+```svelte
+	<SortableList.Item id={item.id} {index}>
+		<div class="ssl-item-content">
+			{item.text}
+		</div>
+		<SortableList.ItemRemove on:click={handleRemoveClick} />
+	</SortableList.Item>
+```
+-->
+
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
@@ -24,22 +40,6 @@
 		}
 	}
 </script>
-
-<!--
-@component
-## Remove
-Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
-
-### Usage
-```svelte
-	<SortableList.Item id={item.id} {index}>
-		<div class="ssl-item-content">
-			{item.text}
-		</div>
-		<SortableList.ItemRemove on:click={handleRemoveClick} />
-	</SortableList.Item>
-```
--->
 
 <button class={classes} data-role="remove" on:click={handleClick} on:click>
 	<slot>

@@ -1,3 +1,45 @@
+<!--
+@component
+## <SortableList.Root>
+Serves as the primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.
+
+### Props
+- `gap`: separation between items (in pixels).
+- `direction`: orientation in which items will be arranged.
+- `transition`:
+		- `duration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.
+		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the ghost drop transition.
+- `hasWrapping`: if `true`, items can wrap onto multiple lines.
+- `hasLockedAxis`: if `true`, prevents the dragged item from moving away from the main axis.
+- `hasBoundaries`: if `true`, items will only be draggable inside the list limits.
+- `canClearOnDragOut`: if `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
+- `canRemoveOnDropOut`: if `true`, items will be removed when dragged and dropped outside of the list boundaries.
+- `isLocked`: if `true`, allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally.
+- `isDisabled`: if `true`, allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled.
+- `announcements`: announcements to be read out by the screen reader during drag and drop operations.
+
+### Events
+- `mounted`: the component is mounted.
+- `dragstart`: an item starts to be dragged by a pointer device or a keyboard.
+- `drag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
+- `drop`: a dragged item is released by a pointer device or a keyboard.
+- `dragend`: a dragged item reaches its destination after being released.
+- `destroyed`: the component is destroyed.
+
+### Usage
+```svelte
+	<SortableList.Root on:drop={handleDrop} on:dragend={handleDragEnd}>
+		{#each items as item, index (item.id)}
+			<SortableList.Item {...item} {index}>
+				<div class="ssl-item-content">
+					<span class="ssl-item-content__text">{item.text}</span>
+				</div>
+			</SortableList.Item>
+		{/each}
+	</SortableList.Root>
+```
+-->
+
 <script lang="ts">
 	import {
 		afterUpdate,
@@ -608,43 +650,6 @@
 	<SortableListGhost bind:ghostRef state={ghostState} />
 {/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
-
-<!--
-@component
-## SortableList
-Serves as the primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.
-
-### Props
-- `gap`: separation between items (in pixels).
-- `direction`: orientation in which items will be arranged.
-- `transitionDuration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds).
-- `hasLockedAxis`: prevents the dragged item from moving away from the main axis.
-- `hasBoundaries`: items will only be draggable inside the list limits.
-- `canClearOnDragOut`: the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
-- `canRemoveOnDropOut`: items will be removed when dragged and dropped outside of the list boundaries.
-- `isLocked`: allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally.
-- `isDisabled`: allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled.
-
-### Events
-- `on:mounted`: the component is mounted.
-- `on:dragstart`: an item starts to be dragged by a pointer device or a keyboard.
-- `on:drag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
-- `on:drop`: a dragged item is released by a pointer device or a keyboard.
-- `on:dragend`: a dragged item reaches its destination after being released.
-
-### Usage
-```svelte
-	<SortableList.Root on:dragend={handleDragEnd}>
-		{#each items as item, index (item.id)}
-			<SortableList.Item {...item} {index}>
-				<div class="ssl-item-content">
-					{item.text}
-				</div>
-			</SortableList.Item>
-		{/each}
-	</SortableList.Root>
-```
--->
 
 <style>
 	.ssl-list,

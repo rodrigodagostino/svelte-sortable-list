@@ -1,3 +1,26 @@
+<!--
+@component
+## <SortableList.Item>
+Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
+
+### Props
+- `id`: unique identifier for each item.
+- `index`: position of the item in the list.
+- `isLocked`: if `true`, will prevent the item from being dragged.
+- `isDisabled`: if `true`, will prevent the item from being dragged and change its appearance to dimmed.
+- `transitionIn`: animation played when the item is added to the list.
+- `transitionOut`: animation played when the item is removed from the list.
+
+### Usage
+```svelte
+	<SortableList.Item id={item.id} {index}>
+		<div class="ssl-item-content">
+			{item.text}
+		</div>
+	</SortableList.Item>
+```
+-->
+
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import {
@@ -224,27 +247,6 @@
 		}
 	}
 </script>
-
-<!--
-@component
-## SortableItem
-Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
-
-### Props
-- `id`: unique identifier for each item.
-- `index`: position of the item in the list.
-- `isLocked`: will prevent the item from being dragged.
-- `isDisabled`: will prevent the item from being dragged and change its appearance to dimmed.
-
-### Usage
-```svelte
-	<SortableList.Item id={item.id} {index}>
-		<div class="ssl-item-content">
-			{item.text}
-		</div>
-	</SortableList.Item>
-```
--->
 
 <li
 	bind:this={itemRef}

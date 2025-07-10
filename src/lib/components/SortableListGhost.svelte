@@ -1,3 +1,18 @@
+<!--
+@component
+## <SortableListGhost>
+Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
+
+### Props
+- `ghostRef`: reference to the Ghost used in its parent component.
+- `state`: state in which the Ghost is in.
+
+### Usage
+```svelte
+	<SortableListGhost bind:ghostRef state={ghostState} />
+```
+-->
+
 <script lang="ts">
 	import SortableListItem from './SortableListItem.svelte';
 	import { portal } from '$lib/actions/index.js';
@@ -243,21 +258,6 @@
 		{@html draggedContent}
 	</SortableListItem>
 </div>
-
-<!--
-@component
-## Ghost
-Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
-
-### Props
-- `status`: state in which the ghost is.
-- `rootRef`: reference to the parent list.
-
-### Usage
-```svelte
-	<SortableListGhost bind:ghostRef status={ghostStatus} {rootRef} />
-```
--->
 
 <style>
 	.ssl-ghost {
