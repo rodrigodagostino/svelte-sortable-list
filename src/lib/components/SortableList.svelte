@@ -686,7 +686,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		flex-wrap: var(--ssl-wrap);
 		padding-inline-start: 0;
 		margin: calc(var(--ssl-gap) / 2 * -1);
-		outline-offset: calc(var(--ssl-gap) / 2 * -1);
 
 		&[aria-orientation='vertical'] {
 			flex-direction: column;
