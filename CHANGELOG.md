@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] (2025-07-11)
+
+### BREAKING
+
+- Make the `<SortableListGhost>` content reactive to state changes.
+- Combine the 6 drag states into a single one.
+- Adjust the components data attributes based on each component’s styling needs.
+- Remove the `hasDropMarker` prop from `<SortableList.Root>`.
+
+### Added
+
+- Allow `class` and `style` to be passed as props to `<SortableList.Root>` and `<SortableList.Item>`.
+- Allow `style` to be passed as prop and make `classes` reactive in `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>`.
+- Add in-editor hints to props, events, and exposed functions.
+
+### Changed
+
+- Make the `<SortableListGhost>` content reactive to state changes by replacing the cloned draggedItem with the `<SortableList.Item>` component.
+- Update and move the components documentation to the top of each file.
+
+### Docs
+
+- Add **“Styled with Tailwind CSS”** demo page.
+- Update the demo pages to reflect the latest changes.
+- Update the README to reflect the latest changes.
+
 ## [0.15.1] (2025-07-11)
 
 ### BREAKING
@@ -981,7 +1007,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.0...v0.15.1
 [0.15.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.1...v0.15.0
 [0.14.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.14.0...v0.14.1
