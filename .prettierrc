@@ -4,7 +4,7 @@
 	"singleQuote": true,
 	"trailingComma": "es5",
 	"useTabs": true,
-	"plugins": ["prettier-plugin-svelte"],
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
 	"overrides": [
 		{ "files": ["*.json", "*.scss", "*.css"], "options": { "singleQuote": false } },
 		{ "files": "*.svelte", "options": { "parser": "svelte" } }

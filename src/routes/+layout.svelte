@@ -11,6 +11,7 @@
 	const links = [
 		{ text: 'Basic', path: '/' },
 		{ text: 'Unstyled', path: '/unstyled' },
+		{ text: 'Styled with Tailwind CSS', path: '/styled-with-tailwind-css' },
 		{ text: 'No animations', path: '/no-animations' },
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
 		{ text: 'Varying heights', path: '/varying-heights' },
