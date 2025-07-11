@@ -1,6 +1,7 @@
 import type { AriaAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
 import type { Announcements } from './accessibility.js';
+import type { Group } from '$lib/stores/index.js';
 
 export interface SortableListRootProps
 	extends Pick<
@@ -34,6 +35,7 @@ export interface SortableListRootProps
 	isLocked?: boolean;
 	isDisabled?: boolean;
 	announcements?: Announcements;
+	group?: Group;
 }
 
 export interface SortableListItemProps
@@ -44,9 +46,19 @@ export interface SortableListItemProps
 	isDisabled?: boolean;
 	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
 	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
+	group?: Group;
 }
 
 export interface SortableListGhostProps {
 	ghostRef: HTMLDivElement;
 	status: 'init' | 'preset' | 'set' | 'remove' | 'unset';
+	group?: Group;
+}
+
+export interface SortableListItemHandleProps {
+	group?: Group;
+}
+
+export interface SortableListItemRemoveProps {
+	group?: Group;
 }

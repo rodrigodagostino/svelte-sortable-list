@@ -1,9 +1,9 @@
-import { getWritableContext, setWritableContext } from './index.js';
+import { getWritableContext, setWritableContext, type Group } from './index.js';
 import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 
-export function setRootProps(context: RootProps) {
-	return setWritableContext<RootProps>('rootProps', context);
+export function setRootProps(group: Group, context: RootProps) {
+	return setWritableContext<RootProps>('rootProps', group, context);
 }
-export function getRootProps() {
-	return getWritableContext<RootProps>('rootProps');
+export function getRootProps(group: Group) {
+	return getWritableContext<RootProps>('rootProps', group);
 }

@@ -9,6 +9,7 @@
 		"url": "git+https://github.com/rodrigodagostino/svelte-sortable-list.git"
 	},
 	"scripts": {
+		"prepare": "npm run build",
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
 		"preview": "vite preview",

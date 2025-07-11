@@ -22,6 +22,7 @@
 		calculateTranslate,
 		calculateTranslateWithAlignment,
 		dispatch,
+		getGroupSelector,
 		getId,
 		getIndex,
 		isInSameRow,
@@ -37,26 +38,27 @@
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let transitionIn: $$Props['transitionIn'] = undefined;
 	export let transitionOut: $$Props['transitionOut'] = undefined;
+	export let group: $$Props['group'] = undefined;
 
 	$: _transitionIn = transitionIn || scaleFly;
 	$: _transitionOut = transitionOut || scaleFly;
 
-	const rootProps = getRootProps();
+	const rootProps = getRootProps(group);
 
-	const root = getRoot();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
-	const focusedItem = getFocusedItem();
+	const root = getRoot(group);
+	const itemRects = getItemRects(group);
+	const draggedItem = getDraggedItem(group);
+	const targetItem = getTargetItem(group);
+	const focusedItem = getFocusedItem(group);
 
-	const isPointerDragging = getIsPointerDragging();
-	const isPointerDropping = getIsPointerDropping();
-	const isKeyboardDragging = getIsKeyboardDragging();
-	const isKeyboardDropping = getIsKeyboardDropping();
-	const isPointerCanceling = getIsPointerCanceling();
-	const isKeyboardCanceling = getIsKeyboardCanceling();
-	const isBetweenBounds = getIsBetweenBounds();
-	const isRTL = getIsRTL();
+	const isPointerDragging = getIsPointerDragging(group);
+	const isPointerDropping = getIsPointerDropping(group);
+	const isKeyboardDragging = getIsKeyboardDragging(group);
+	const isKeyboardDropping = getIsKeyboardDropping(group);
+	const isPointerCanceling = getIsPointerCanceling(group);
+	const isKeyboardCanceling = getIsKeyboardCanceling(group);
+	const isBetweenBounds = getIsBetweenBounds(group);
+	const isRTL = getIsRTL(group);
 
 	let hasHandle = false;
 	$: {
@@ -64,7 +66,7 @@
 	}
 
 	onMount(() => {
-		hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
+		hasHandle = !!itemRef?.querySelector('[data-role="handle"]' + getGroupSelector(group));
 		setInteractiveElementsTabIndex();
 	});
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -224,7 +226,10 @@
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(event: FocusEvent) {
 		const relatedTarget = event.relatedTarget as HTMLElement | null;
-		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
+		if (
+			!relatedTarget ||
+			(relatedTarget && !relatedTarget.closest('.ssl-item' + getGroupSelector(group)))
+		) {
 			if (!$focusedItem) return;
 			dispatch(itemRef, 'itemfocusout', { item: $focusedItem });
 			await tick();
@@ -257,7 +262,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 <li
 	bind:this={itemRef}
 	{id}
-	class="ssl-item"
+	class="ssl-item {$$props.class ?? ''}"
 	style:cursor={styleCursor}
 	style:width={styleWidth}
 	style:height={styleHeight}
@@ -269,6 +274,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
+	data-group={group}
 	data-is-pointer-dragging={$isPointerDragging && draggedId === String(id)}
 	data-is-pointer-dropping={$isPointerDropping && draggedId === String(id)}
 	data-is-keyboard-dragging={$isKeyboardDragging && draggedId === String(id)}
@@ -281,8 +287,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}
 	aria-disabled={$rootProps.isDisabled || isDisabled}
-	on:focus={handleFocus}
-	on:focusout={handleFocusOut}
+	on:focus|stopPropagation={handleFocus}
+	on:focusout|stopPropagation={handleFocusOut}
 	in:_transitionIn
 	out:_transitionOut
 >

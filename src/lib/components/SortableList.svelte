@@ -43,6 +43,7 @@
 		areColliding,
 		getClosestScrollableAncestor,
 		getCollidingItem,
+		getGroupSelector,
 		getId,
 		getIndex,
 		getItemRects,
@@ -74,11 +75,12 @@
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let announcements: $$Props['announcements'] = undefined;
+	export let group: $$Props['group'] = undefined;
 
 	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
-	const rootProps = setRootProps({
+	const rootProps = setRootProps(group, {
 		gap,
 		direction,
 		transition: _transition,
@@ -107,24 +109,24 @@
 		announcements: _announcements,
 	};
 
-	const root = setRoot(null);
+	const root = setRoot(group, null);
 	let ghostStatus: GhostProps['status'] = 'unset';
-	const pointer = setPointer(null);
-	const pointerOrigin = setPointerOrigin(null);
-	const itemRects = setItemRects(null);
-	const draggedItem = setDraggedItem(null);
-	const targetItem = setTargetItem(null);
-	const focusedItem = setFocusedItem(null);
+	const pointer = setPointer(group, null);
+	const pointerOrigin = setPointerOrigin(group, null);
+	const itemRects = setItemRects(group, null);
+	const draggedItem = setDraggedItem(group, null);
+	const targetItem = setTargetItem(group, null);
+	const focusedItem = setFocusedItem(group, null);
 	let liveText: string = '';
 
-	const isPointerDragging = setIsPointerDragging(false);
-	const isPointerDropping = setIsPointerDropping(false);
-	const isKeyboardDragging = setIsKeyboardDragging(false);
-	const isKeyboardDropping = setIsKeyboardDropping(false);
-	const isPointerCanceling = setIsPointerCanceling(false);
-	const isKeyboardCanceling = setIsKeyboardCanceling(false);
-	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRTL = setIsRTL(false);
+	const isPointerDragging = setIsPointerDragging(group, false);
+	const isPointerDropping = setIsPointerDropping(group, false);
+	const isKeyboardDragging = setIsKeyboardDragging(group, false);
+	const isKeyboardDropping = setIsKeyboardDropping(group, false);
+	const isPointerCanceling = setIsPointerCanceling(group, false);
+	const isKeyboardCanceling = setIsKeyboardCanceling(group, false);
+	const isBetweenBounds = setIsBetweenBounds(group, true);
+	const isRTL = setIsRTL(group, false);
 
 	const dispatch = createEventDispatcher<{
 		mounted: MountedEventDetail;
@@ -201,7 +203,7 @@
 			return;
 
 		const target = event.target as HTMLElement;
-		const currItem = target.closest<HTMLLIElement>('.ssl-item');
+		const currItem = target.closest<HTMLLIElement>('.ssl-item' + getGroupSelector(group));
 		if (!currItem) return;
 
 		if (
@@ -226,8 +228,10 @@
 			event.preventDefault();
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
-		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
-		const targetIsOrResidesInHandle = target.closest('[data-role="handle"]');
+		const hasHandle = !!currItem.querySelector('[data-role="handle"]' + getGroupSelector(group));
+		const targetIsOrResidesInHandle = target.closest(
+			'[data-role="handle"]' + getGroupSelector(group)
+		);
 		if (hasHandle && !targetIsOrResidesInHandle) return;
 
 		// Prevent dragging if the current list item contains an interactive element
@@ -241,7 +245,7 @@
 		$pointer = { x: event.clientX, y: event.clientY };
 		$pointerOrigin = { x: event.clientX, y: event.clientY };
 		$draggedItem = currItem;
-		$itemRects = getItemRects(rootRef);
+		$itemRects = getItemRects(group, rootRef);
 		ghostStatus = 'init';
 		await tick();
 		$isPointerDragging = true;
@@ -291,12 +295,12 @@
 
 			// Re-set itemRects only during scrolling.
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-			if (scrollingSpeed !== 0) $itemRects = getItemRects(rootRef);
+			if (scrollingSpeed !== 0) $itemRects = getItemRects(group, rootRef);
 			await tick();
 			const collidingItemRect = getCollidingItem(ghostRef, $itemRects);
 			if (collidingItemRect)
 				$targetItem = rootRef.querySelector<HTMLLIElement>(
-					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+					`.ssl-item${getGroupSelector(group)}[data-item-id="${collidingItemRect.id}"]`
 				);
 			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
 
@@ -343,7 +347,7 @@
 					await tick();
 					$draggedItem = $focusedItem;
 					const draggedIndex = getIndex($focusedItem);
-					$itemRects = getItemRects(rootRef);
+					$itemRects = getItemRects(group, rootRef);
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
@@ -369,7 +373,9 @@
 
 				if (!$isKeyboardDragging) {
 					if (!$focusedItem || focusedIndex === null) {
-						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
+						const firstItem = rootRef.querySelector<HTMLLIElement>(
+							'.ssl-item' + getGroupSelector(group)
+						);
 						if (!firstItem) return;
 						firstItem.focus({ preventScroll: true });
 						if (scrollableAncestor && !isFullyVisible(firstItem, scrollableAncestor))
@@ -379,7 +385,9 @@
 
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					const items = rootRef.querySelectorAll<HTMLLIElement>(
+						'.ssl-item' + getGroupSelector(group)
+					);
 					if (
 						(step === -1 && focusedIndex === 0) ||
 						(step === 1 && focusedIndex === items.length - 1)
@@ -447,7 +455,9 @@
 			if (key === 'Home' || key === 'End') {
 				event.preventDefault();
 
-				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+				const items = rootRef.querySelectorAll<HTMLLIElement>(
+					'.ssl-item' + getGroupSelector(group)
+				);
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
 				if (!$isKeyboardDragging) {
@@ -602,11 +612,12 @@
 <!-- svelte-ignore a11y-role-supports-aria-props -->
 <ul
 	bind:this={rootRef}
-	class="ssl-list"
+	class="ssl-list {$$props.class ?? ''}"
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
 	style:pointer-events={$focusedItem ? 'none' : 'auto'}
+	data-group={group}
 	data-has-drop-marker={hasDropMarker}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
@@ -622,10 +633,11 @@
 	aria-orientation={direction}
 	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
 	aria-disabled={isDisabled}
-	on:pointerdown={handlePointerDown}
-	on:pointercancel={handlePointerCancel}
-	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'keyboard-cancel')}
+	on:pointerdown|stopPropagation={handlePointerDown}
+	on:pointercancel|stopPropagation={handlePointerCancel}
+	on:keydown|stopPropagation={handleKeyDown}
+	on:itemfocusout|stopPropagation={(event) =>
+		handlePointerAndKeyboardDrop(event.detail.item, 'keyboard-cancel')}
 >
 	<slot>
 		<p>
@@ -634,7 +646,7 @@
 		</p>
 	</slot>
 </ul>
-<SortableListGhost bind:ghostRef status={ghostStatus} />
+<SortableListGhost bind:ghostRef status={ghostStatus} {group} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <!--

@@ -25,19 +25,20 @@
 
 	export let ghostRef: $$Props['ghostRef'];
 	export let status: $$Props['status'];
+	export let group: $$Props['group'] = undefined;
 
-	const rootProps = getRootProps();
+	const rootProps = getRootProps(group);
 
-	const root = getRoot();
-	const pointer = getPointer();
-	const pointerOrigin = getPointerOrigin();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
+	const root = getRoot(group);
+	const pointer = getPointer(group);
+	const pointerOrigin = getPointerOrigin(group);
+	const itemRects = getItemRects(group);
+	const draggedItem = getDraggedItem(group);
+	const targetItem = getTargetItem(group);
 
-	const isPointerDragging = getIsPointerDragging();
-	const isPointerDropping = getIsPointerDropping();
-	const isBetweenBounds = getIsBetweenBounds();
+	const isPointerDragging = getIsPointerDragging(group);
+	const isPointerDropping = getIsPointerDropping(group);
+	const isBetweenBounds = getIsBetweenBounds(group);
 
 	$: draggedItemId = $draggedItem ? getId($draggedItem) : null;
 	let lastCloneId: string | null = null;
@@ -250,6 +251,7 @@
 	style:transition={styleTransition}
 	style:visibility={$isPointerDragging || $isPointerDropping ? 'visible' : 'hidden'}
 	style:z-index={styleZIndex}
+	data-group={group}
 	data-is-pointer-dragging={$isPointerDragging}
 	data-is-pointer-dropping={$isPointerDropping}
 	data-is-between-bounds={$isBetweenBounds}
