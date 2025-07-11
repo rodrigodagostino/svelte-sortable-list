@@ -30,28 +30,12 @@
 	<title>Has boundaries | Svelte Sortable List</title>
 </svelte:head>
 
-<div class="wrapper">
-	<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
-		{#each items as item, index (item.id)}
-			<SortableList.Item {...item} {index}>
-				<div class="ssl-item-content">
-					<span class="ssl-item-content__text">{item.text}</span>
-				</div>
-			</SortableList.Item>
-		{/each}
-	</SortableList.Root>
-</div>
-
-<style>
-	:global([data-page-pathname='with-boundaries'] .wrapper) {
-		position: relative;
-
-		&::after {
-			content: '';
-			position: absolute;
-			inset: -0.25rem;
-			border: 0.25rem dashed var(--ssl-gray-200);
-			z-index: -1;
-		}
-	}
-</style>
+<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>

@@ -30,70 +30,12 @@
 	<title>Has locked axis | Svelte Sortable List</title>
 </svelte:head>
 
-<div class="wrapper direction-{$rootProps.direction}">
-	<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
-		{#each items as item, index (item.id)}
-			<SortableList.Item {...item} {index}>
-				<div class="ssl-item-content">
-					<span class="ssl-item-content__text">{item.text}</span>
-				</div>
-			</SortableList.Item>
-		{/each}
-	</SortableList.Root>
-</div>
-
-<style>
-	:global([data-page-pathname='with-locked-axis'] .wrapper) {
-		position: relative;
-
-		&::after {
-			content: '';
-			position: absolute;
-			z-index: -1;
-		}
-
-		&.direction-vertical::after {
-			top: -8rem;
-			bottom: -8rem;
-			left: calc(50% - 0.125rem);
-			right: calc(50% - 0.125rem);
-			background-image: linear-gradient(
-				to bottom,
-				var(--ssl-gray-200),
-				var(--ssl-gray-200) 60%,
-				transparent 60%,
-				transparent 100%
-			);
-			background-size: 0.25rem 1.5rem;
-			mask-image: linear-gradient(
-				to bottom,
-				transparent,
-				black 4rem,
-				black calc(100% - 4rem),
-				transparent
-			);
-		}
-
-		&.direction-horizontal::after {
-			top: calc(50% - 0.125rem);
-			bottom: calc(50% - 0.125rem);
-			left: -8rem;
-			right: -8rem;
-			background-image: linear-gradient(
-				to right,
-				var(--ssl-gray-200),
-				var(--ssl-gray-200) 60%,
-				transparent 60%,
-				transparent 100%
-			);
-			background-size: 1.5rem 0.25rem;
-			mask-image: linear-gradient(
-				to right,
-				transparent,
-				black 4rem,
-				black calc(100% - 4rem),
-				transparent
-			);
-		}
-	}
-</style>
+<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>

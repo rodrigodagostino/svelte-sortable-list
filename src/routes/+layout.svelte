@@ -15,7 +15,6 @@
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
-		{ text: 'With drop marker', path: '/with-drop-marker' },
 		{ text: 'With custom transitions', path: '/with-custom-transitions' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
@@ -483,6 +482,72 @@
 
 		& .container {
 			align-items: center;
+		}
+	}
+
+	:global(.ssl-list[data-has-locked-axis='true']) {
+		position: relative;
+
+		&::after {
+			content: '';
+			position: absolute;
+			z-index: -1;
+		}
+
+		&[aria-orientation='vertical']::after {
+			top: -8rem;
+			bottom: -8rem;
+			left: calc(50% - 0.125rem);
+			right: calc(50% - 0.125rem);
+			background-image: linear-gradient(
+				to bottom,
+				var(--ssl-gray-200),
+				var(--ssl-gray-200) 60%,
+				transparent 60%,
+				transparent 100%
+			);
+			background-size: 0.25rem 1.5rem;
+			mask-image: linear-gradient(
+				to bottom,
+				transparent,
+				black 4rem,
+				black calc(100% - 4rem),
+				transparent
+			);
+		}
+
+		&[aria-orientation='horizontal']::after {
+			top: calc(50% - 0.125rem);
+			bottom: calc(50% - 0.125rem);
+			left: -8rem;
+			right: -8rem;
+			background-image: linear-gradient(
+				to right,
+				var(--ssl-gray-200),
+				var(--ssl-gray-200) 60%,
+				transparent 60%,
+				transparent 100%
+			);
+			background-size: 1.5rem 0.25rem;
+			mask-image: linear-gradient(
+				to right,
+				transparent,
+				black 4rem,
+				black calc(100% - 4rem),
+				transparent
+			);
+		}
+	}
+
+	:global(.ssl-list[data-has-boundaries='true']) {
+		position: relative;
+
+		&::after {
+			content: '';
+			position: absolute;
+			inset: 0.125rem;
+			border: 0.25rem dashed var(--ssl-gray-200);
+			z-index: -1;
 		}
 	}
 </style>

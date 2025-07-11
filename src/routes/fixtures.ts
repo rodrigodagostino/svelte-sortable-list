@@ -7,7 +7,6 @@ export const defaultRootProps: SortableList.RootProps = {
 		duration: 240,
 		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',
 	},
-	hasDropMarker: false,
 	hasWrapping: false,
 	hasLockedAxis: false,
 	hasBoundaries: false,
