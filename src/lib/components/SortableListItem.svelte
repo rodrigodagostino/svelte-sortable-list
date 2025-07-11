@@ -16,7 +16,7 @@
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
-	import { scaleFade } from '$lib/transitions/index.js';
+	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
 	import {
 		calculateTranslate,
@@ -38,8 +38,8 @@
 	export let transitionIn: $$Props['transitionIn'] = undefined;
 	export let transitionOut: $$Props['transitionOut'] = undefined;
 
-	$: _transitionIn = transitionIn || scaleFade;
-	$: _transitionOut = transitionOut || scaleFade;
+	$: _transitionIn = transitionIn || scaleFly;
+	$: _transitionOut = transitionOut || scaleFly;
 
 	const rootProps = getRootProps();
 
