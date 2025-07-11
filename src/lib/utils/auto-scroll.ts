@@ -22,12 +22,12 @@ export const getClosestScrollableAncestor = (element: HTMLElement) => {
 };
 
 export function isRootElement(element: HTMLElement, direction: RootProps['direction']) {
-	const docElement = document.documentElement;
+	const rootElement = document.documentElement;
 	return (
-		element === docElement ||
+		element === rootElement ||
 		(direction === 'vertical'
-			? element.clientHeight > docElement.clientHeight
-			: element.clientWidth > docElement.clientWidth)
+			? element.clientHeight > rootElement.clientHeight
+			: element.clientWidth > rootElement.clientWidth)
 	);
 }
 
@@ -131,12 +131,12 @@ export function getScrollingSpeed(
 	const SPEED_RATIO = 32;
 	// In those situations where the container is larger than the viewport,
 	// we want to use the document element as reference.
-	const docElement = document.documentElement;
+	const rootElement = document.documentElement;
 	const containerRect = container.getBoundingClientRect();
 	const top = isScrollingDocument ? 0 : containerRect.top;
 	const left = isScrollingDocument ? 0 : containerRect.left;
-	const right = isScrollingDocument ? docElement.clientWidth : containerRect.right;
-	const bottom = isScrollingDocument ? docElement.clientHeight : containerRect.bottom;
+	const right = isScrollingDocument ? rootElement.clientWidth : containerRect.right;
+	const bottom = isScrollingDocument ? rootElement.clientHeight : containerRect.bottom;
 
 	if (direction === 'vertical') {
 		if (clientY - top < offset) {

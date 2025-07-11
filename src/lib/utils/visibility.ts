@@ -7,13 +7,15 @@ export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
 	const containerRect = container.getBoundingClientRect();
 	// In those situations where the container is larger than the viewport,
 	// we want to use the document element as reference.
-	const docElement = document.documentElement;
-	const limitTop = containerRect.height < docElement.clientHeight ? containerRect.top : 0;
+	const rootElement = document.documentElement;
+	const limitTop = containerRect.height < rootElement.clientHeight ? containerRect.top : 0;
 	const limitBottom =
-		containerRect.height < docElement.clientHeight ? containerRect.bottom : docElement.clientHeight;
-	const limitLeft = containerRect.width < docElement.clientWidth ? containerRect.left : 0;
+		containerRect.height < rootElement.clientHeight
+			? containerRect.bottom
+			: rootElement.clientHeight;
+	const limitLeft = containerRect.width < rootElement.clientWidth ? containerRect.left : 0;
 	const limitRight =
-		containerRect.width < docElement.clientWidth ? containerRect.right : docElement.clientWidth;
+		containerRect.width < rootElement.clientWidth ? containerRect.right : rootElement.clientWidth;
 	const translateX = elementTranslate?.x || 0;
 	const translateY = elementTranslate?.y || 0;
 	const marginTop = parseFloat(elementStyles.marginTop);
