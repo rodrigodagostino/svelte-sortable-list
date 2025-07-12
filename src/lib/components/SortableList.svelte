@@ -114,7 +114,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
-	$: classes = ['ssl-list', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	$: classes = ['ssl-root', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
 
 	const rootProps = setRootProps({
 		gap,
@@ -656,12 +656,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>
-	.ssl-list,
-	.ssl-list :global(*) {
+	.ssl-root,
+	.ssl-root :global(*) {
 		box-sizing: border-box;
 	}
 
-	.ssl-list {
+	.ssl-root {
 		display: flex;
 		flex-wrap: var(--ssl-wrap);
 		padding-inline-start: 0;

@@ -44,12 +44,12 @@
 		0 32px 16px rgba(54, 57, 90, 0.1);
 }
 
-.ssl-list {
+.ssl-root {
 	outline-offset: calc(var(--ssl-gap) / 2 * -1);
 }
 
-.ssl-list:focus-visible,
-.ssl-list *:focus-visible {
+.ssl-root:focus-visible,
+.ssl-root *:focus-visible {
 	outline: 0.125rem solid var(--ssl-gray-800);
 }
 
