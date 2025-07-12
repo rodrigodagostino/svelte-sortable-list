@@ -373,16 +373,16 @@ This is a list of the selectors you can use to style this library’s components
 
 | Selector                                          | Points to                                                                                            |
 | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `.ssl-list`                                       | The list element, located inside the `<SortableList.Root>` component.                                |
-| `.ssl-list[aria-orientation="vertical"]`          | A `<SortableList.Root>` displayed in vertical direction.                                             |
-| `.ssl-list[aria-orientation="horizontal"]`        | A `<SortableList.Root>` displayed in horizontal direction.                                           |
-| `.ssl-list[data-has-locked-axis="true"]`          | A `<SortableList.Root>` that only allows its items to move along its main axis.                      |
-| `.ssl-list[data-has-boundaries="true"]`           | A `<SortableList.Root>` that only allows its items to move inside its limits.                        |
-| `.ssl-list[data-can-clear-on-drag-out="true"]`    | A `<SortableList.Root>` that allows the target item to be cleared on drag out.                       |
-| `.ssl-list[data-can-remove-on-drop-out="true"]`   | A `<SortableList.Root>` that allows the target item to be removed on drop out.                       |
-| `.ssl-list[data-is-locked="true"]`                | A `<SortableList.Root>` that disallows dragging for its items.                                       |
-| `.ssl-list[data-is-disabled="true"]`              | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
-| `.ssl-list[aria-disabled="true"]`                 | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
+| `.ssl-root`                                       | The list element, located inside the `<SortableList.Root>` component.                                |
+| `.ssl-root[aria-orientation="vertical"]`          | A `<SortableList.Root>` displayed in vertical direction.                                             |
+| `.ssl-root[aria-orientation="horizontal"]`        | A `<SortableList.Root>` displayed in horizontal direction.                                           |
+| `.ssl-root[data-has-locked-axis="true"]`          | A `<SortableList.Root>` that only allows its items to move along its main axis.                      |
+| `.ssl-root[data-has-boundaries="true"]`           | A `<SortableList.Root>` that only allows its items to move inside its limits.                        |
+| `.ssl-root[data-can-clear-on-drag-out="true"]`    | A `<SortableList.Root>` that allows the target item to be cleared on drag out.                       |
+| `.ssl-root[data-can-remove-on-drop-out="true"]`   | A `<SortableList.Root>` that allows the target item to be removed on drop out.                       |
+| `.ssl-root[data-is-locked="true"]`                | A `<SortableList.Root>` that disallows dragging for its items.                                       |
+| `.ssl-root[data-is-disabled="true"]`              | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
+| `.ssl-root[aria-disabled="true"]`                 | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
 | `.ssl-item`                                       | The list item element, located inside the `<SortableList.Item>` component.                           |
 | `.ssl-item[data-drag-state="pointer-dragging"]`   | A `<SortableList.Item>` that is being dragged by a pointing device.                                  |
 | `.ssl-item[data-drag-state="pointer-dropping"]`   | A `<SortableList.Item>` that is being dropped by a pointing device.                                  |
