@@ -486,7 +486,7 @@
 		}
 	}
 
-	:global(.ssl-list[data-has-locked-axis='true']) {
+	:global(.ssl-root[data-has-locked-axis='true']) {
 		position: relative;
 
 		&::after {
@@ -540,7 +540,7 @@
 		}
 	}
 
-	:global(.ssl-list[data-has-boundaries='true']) {
+	:global(.ssl-root[data-has-boundaries='true']) {
 		position: relative;
 
 		&::after {

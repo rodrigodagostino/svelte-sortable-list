@@ -47,7 +47,7 @@
 			max-width: 64.5rem;
 		}
 
-		& .ssl-list {
+		& .ssl-root {
 			justify-content: center;
 			align-items: center;
 		}
