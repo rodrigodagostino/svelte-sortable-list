@@ -43,6 +43,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		getId,
 		getIndex,
 		isInSameRow,
+		joinCSSClasses,
 	} from '$lib/utils/index.js';
 
 	type $$Props = ItemProps & { class?: string };
@@ -59,9 +60,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	$: _transitionIn = transitionIn || scaleFly;
 	$: _transitionOut = transitionOut || scaleFly;
 
-	$: classes = [
-		...new Set(['ssl-item', ...($$restProps.class ? $$restProps.class.split(' ') : [])]),
-	].join(' ');
+	$: classes = joinCSSClasses('ssl-item', $$restProps.class);
 
 	const rootProps = getRootProps();
 

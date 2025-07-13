@@ -17,9 +17,9 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
-	import { getIndex } from '$lib/utils/index.js';
+	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
 
-	$: classes = ['ssl-item-remove', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	$: classes = joinCSSClasses('ssl-item-remove', $$restProps.class);
 
 	const root = getRoot();
 	const focusedItem = getFocusedItem();

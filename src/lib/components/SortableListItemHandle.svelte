@@ -17,8 +17,9 @@ Serves as an element that limits the draggable area of a list item to itself. In
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getDragState } from '$lib/stores/index.js';
+	import { joinCSSClasses } from '$lib/utils/styles.js';
 
-	$: classes = ['ssl-item-handle', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	$: classes = joinCSSClasses('ssl-item-handle', $$restProps.class);
 
 	const dragState = getDragState();
 </script>

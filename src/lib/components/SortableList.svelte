@@ -89,6 +89,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isOrResidesInInteractiveElement,
 		isRootElement,
 		isScrollable,
+		joinCSSClasses,
 		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
@@ -114,7 +115,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
-	$: classes = ['ssl-root', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	$: classes = joinCSSClasses('ssl-root', $$restProps.class);
 
 	const rootProps = setRootProps({
 		gap,
