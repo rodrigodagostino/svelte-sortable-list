@@ -153,6 +153,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (isGhost) return 'none';
 		if (
 			$dragState === 'idle' ||
+			$dragState === 'pointer-canceling' ||
+			$dragState === 'keyboard-canceling' ||
 			!$itemRects ||
 			!$draggedItem ||
 			!$targetItem ||
