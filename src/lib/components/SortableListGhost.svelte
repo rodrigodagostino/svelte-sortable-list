@@ -248,9 +248,9 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	use:portal
 >
 	<SortableListItem
-		id={draggedId || 'ghost-item'}
+		id={draggedId || 'ssl-ghost-item'}
 		index={draggedIndex ?? -1}
-		class={$draggedItem?.className || 'ghost-item'}
+		class={$draggedItem?.className}
 	>
 		{@html draggedContent}
 	</SortableListItem>

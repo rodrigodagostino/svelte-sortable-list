@@ -59,7 +59,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	$: _transitionIn = transitionIn || scaleFly;
 	$: _transitionOut = transitionOut || scaleFly;
 
-	$: classes = ['ssl-item', ...($$restProps.class ? [$$restProps.class] : [])].join(' ');
+	$: classes = [
+		...new Set(['ssl-item', ...($$restProps.class ? $$restProps.class.split(' ') : [])]),
+	].join(' ');
 
 	const rootProps = getRootProps();
 
