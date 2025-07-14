@@ -1,4 +1,4 @@
-export type DragState =
+export type SortableListDragState =
 	| 'idle'
 	| 'pointer-dragging'
 	| 'pointer-dropping'

@@ -1,4 +1,4 @@
-export interface Announcements {
+export interface SortableListAnnouncements {
 	lifted: (draggedItem: HTMLLIElement, draggedItemIndex: number) => string;
 	dragged: (
 		draggedItem: HTMLLIElement,

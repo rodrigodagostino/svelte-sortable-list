@@ -1,30 +1,30 @@
 import { getWritableContext, setWritableContext } from './index.js';
-import type { SortableListElements } from '$lib/types/index.js';
+import type { SortableListElements as Elements } from '$lib/types/index.js';
 
-export function setRoot(context: SortableListElements['root']) {
-	return setWritableContext<SortableListElements['root']>('root', context);
+export function setRoot(context: Elements['root']) {
+	return setWritableContext<Elements['root']>('root', context);
 }
 export function getRoot() {
-	return getWritableContext<SortableListElements['root']>('root');
+	return getWritableContext<Elements['root']>('root');
 }
 
-export function setDraggedItem(context: SortableListElements['draggedItem']) {
-	return setWritableContext<SortableListElements['draggedItem']>('draggedItem', context);
+export function setDraggedItem(context: Elements['draggedItem']) {
+	return setWritableContext<Elements['draggedItem']>('draggedItem', context);
 }
 export function getDraggedItem() {
-	return getWritableContext<SortableListElements['draggedItem']>('draggedItem');
+	return getWritableContext<Elements['draggedItem']>('draggedItem');
 }
 
-export function setTargetItem(context: SortableListElements['targetItem']) {
-	return setWritableContext<SortableListElements['targetItem']>('targetItem', context);
+export function setTargetItem(context: Elements['targetItem']) {
+	return setWritableContext<Elements['targetItem']>('targetItem', context);
 }
 export function getTargetItem() {
-	return getWritableContext<SortableListElements['targetItem']>('targetItem');
+	return getWritableContext<Elements['targetItem']>('targetItem');
 }
 
-export function setFocusedItem(context: SortableListElements['focusedItem']) {
-	return setWritableContext<SortableListElements['focusedItem']>('focusedItem', context);
+export function setFocusedItem(context: Elements['focusedItem']) {
+	return setWritableContext<Elements['focusedItem']>('focusedItem', context);
 }
 export function getFocusedItem() {
-	return getWritableContext<SortableListElements['focusedItem']>('focusedItem');
+	return getWritableContext<Elements['focusedItem']>('focusedItem');
 }

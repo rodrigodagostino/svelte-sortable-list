@@ -1,4 +1,4 @@
-import type { Announcements } from '$lib/types/index.js';
+import type { SortableListAnnouncements as Announcements } from '$lib/types/index.js';
 
 export const announce: Announcements = {
 	lifted: (draggedItem, draggedItemIndex) => {

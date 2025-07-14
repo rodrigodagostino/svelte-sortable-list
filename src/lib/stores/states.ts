@@ -1,11 +1,11 @@
 import { getWritableContext, setWritableContext } from './index.js';
-import type { DragState } from '$lib/types/states.js';
+import type { SortableListDragState as DragState } from '$lib/types/states.js';
 
 export function setDragState(context: DragState) {
-	return setWritableContext<DragState>('DragState', context);
+	return setWritableContext<DragState>('dragState', context);
 }
 export function getDragState() {
-	return getWritableContext<DragState>('DragState');
+	return getWritableContext<DragState>('dragState');
 }
 
 export function setIsBetweenBounds(context: boolean) {

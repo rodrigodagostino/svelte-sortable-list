@@ -1,23 +1,23 @@
 import { getWritableContext, setWritableContext } from './index.js';
-import type { SortableListCoordinates } from '$lib/types/index.js';
+import type { SortableListCoordinates as Coordinates } from '$lib/types/index.js';
 
-export function setPointer(context: SortableListCoordinates['pointer']) {
-	return setWritableContext<SortableListCoordinates['pointer']>('pointer', context);
+export function setPointer(context: Coordinates['pointer']) {
+	return setWritableContext<Coordinates['pointer']>('pointer', context);
 }
 export function getPointer() {
-	return getWritableContext<SortableListCoordinates['pointer']>('pointer');
+	return getWritableContext<Coordinates['pointer']>('pointer');
 }
 
-export function setPointerOrigin(context: SortableListCoordinates['pointerOrigin']) {
-	return setWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin', context);
+export function setPointerOrigin(context: Coordinates['pointerOrigin']) {
+	return setWritableContext<Coordinates['pointerOrigin']>('pointerOrigin', context);
 }
 export function getPointerOrigin() {
-	return getWritableContext<SortableListCoordinates['pointerOrigin']>('pointerOrigin');
+	return getWritableContext<Coordinates['pointerOrigin']>('pointerOrigin');
 }
 
-export function setItemRects(context: SortableListCoordinates['itemRects']) {
-	return setWritableContext<SortableListCoordinates['itemRects']>('itemRects', context);
+export function setItemRects(context: Coordinates['itemRects']) {
+	return setWritableContext<Coordinates['itemRects']>('itemRects', context);
 }
 export function getItemRects() {
-	return getWritableContext<SortableListCoordinates['itemRects']>('itemRects');
+	return getWritableContext<Coordinates['itemRects']>('itemRects');
 }

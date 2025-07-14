@@ -1,6 +1,6 @@
 import type { AriaAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
-import type { Announcements } from './accessibility.js';
+import type { SortableListAnnouncements as Announcements } from './accessibility.js';
 
 export interface SortableListRootProps
 	extends Pick<
