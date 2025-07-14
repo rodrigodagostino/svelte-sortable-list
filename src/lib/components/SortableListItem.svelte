@@ -231,7 +231,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
 				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
 				`z-index ${$rootProps.transition!.duration}ms`
-			: `none`;
+			: 'none';
 
 	async function handleFocus() {
 		await tick();
