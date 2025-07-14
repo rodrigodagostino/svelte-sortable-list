@@ -145,6 +145,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	};
 
 	const root = setRoot(null);
+	let pointerId: PointerEvent['pointerId'] | null = null;
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemRects = setItemRects(null);
@@ -259,7 +260,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
-		currItem.setPointerCapture(e.pointerId);
+		pointerId = e.pointerId;
+		currItem.setPointerCapture(pointerId);
 
 		$pointer = { x: e.clientX, y: e.clientY };
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
@@ -538,6 +540,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				isCanceled: action.includes('cancel'),
 			});
 
+		if (typeof pointerId === 'number') $draggedItem?.releasePointerCapture(pointerId);
+		pointerId = null;
 		$pointer = null;
 		$pointerOrigin = null;
 		$draggedItem = null;
