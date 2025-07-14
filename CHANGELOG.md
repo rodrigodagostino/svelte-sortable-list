@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.2] (2025-07-13)
+
+### Fixed
+
+- Prevent duplicated classes in the `<SortableList.Item>` ghost.
+- Restore the returning transition for the dragged item on drag cancel.
+
+### Changed
+
+- Create and implement a function to combine CSS classes.
+
+### Docs
+
+- Fix dark line on the right side of the README’s preview image.
+
 ## [0.16.1] (2025-07-12)
 
 ### BREAKING
@@ -16,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Docs
 
 - Update the demo pages to reflect the latest changes.
-- Replace preview image with video.
+- Update the README’s preview image.
 
 ## [0.16.0] (2025-07-11)
 
@@ -1018,7 +1033,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.2...HEAD
+[0.16.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.1...v0.16.2
 [0.16.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.1...v0.16.0
 [0.15.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.15.0...v0.15.1
