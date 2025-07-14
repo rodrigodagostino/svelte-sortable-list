@@ -14,19 +14,19 @@
 		$rootProps = { ...defaultRootProps };
 	});
 
-	function handleDrop(event: SortableList.RootEvents['drop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
+	function handleDrop(e: SortableList.RootEvents['drop']) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
 
-	function handleRemoveClick(event: MouseEvent) {
-		const target = event.target as HTMLElement;
+	function handleRemoveClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
 		const item = target.closest<HTMLLIElement>('.ssl-item');
 		const itemIndex = Number(item?.dataset.itemIndex);
 		if (!item || itemIndex < 0) return;

@@ -240,8 +240,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	// `focusout` is preferred over `blur` since it detects the loss of focus
 	// on the current element and it’s descendants too.
-	async function handleFocusOut(event: FocusEvent) {
-		const relatedTarget = event.relatedTarget as HTMLElement | null;
+	async function handleFocusOut(e: FocusEvent) {
+		const relatedTarget = e.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
 			if (!$focusedItem) return;
 			dispatch(itemRef, 'itemfocusout', { item: $focusedItem });

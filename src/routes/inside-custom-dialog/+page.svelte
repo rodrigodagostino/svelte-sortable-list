@@ -12,13 +12,13 @@
 		$rootProps = { ...defaultRootProps };
 	});
 
-	function handleDrop(event: SortableList.RootEvents['drop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
+	function handleDrop(e: SortableList.RootEvents['drop']) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}

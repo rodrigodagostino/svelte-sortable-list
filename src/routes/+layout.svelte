@@ -53,8 +53,8 @@
 		value: $rootProps[key as never],
 	}));
 
-	function handleFieldChange(event: Event) {
-		const target = event.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+	function handleFieldChange(e: Event) {
+		const target = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 		const { type, name, value } = target;
 		$rootProps = {
 			...$rootProps,

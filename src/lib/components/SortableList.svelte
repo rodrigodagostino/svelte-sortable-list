@@ -221,10 +221,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		);
 	}
 
-	async function handlePointerDown(event: PointerEvent) {
+	async function handlePointerDown(e: PointerEvent) {
 		if ($dragState !== 'idle' || $focusedItem) return;
 
-		const target = event.target as HTMLElement;
+		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
 
@@ -235,7 +235,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			isDisabled ||
 			currItem.getAttribute('aria-disabled') === 'true'
 		) {
-			event.preventDefault();
+			e.preventDefault();
 			return;
 		}
 
@@ -246,8 +246,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// target is a <label> element, it will stop the execution of this event handler and the
 		// preventDefault() right after will never run, but we can’t preventDefault() for every element
 		// because we need to allow interactive elements to run normally.
-		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for'))
-			event.preventDefault();
+		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) e.preventDefault();
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
@@ -258,12 +257,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// and we’re also not dragging from a handle inside that interactive element.
 		if (isOrResidesInInteractiveElement(target, currItem) && !targetIsOrResidesInHandle) return;
 		// Prevent focus from being set on the current <SortableList.Item>.
-		event.preventDefault();
+		e.preventDefault();
 
-		currItem.setPointerCapture(event.pointerId);
+		currItem.setPointerCapture(e.pointerId);
 
-		$pointer = { x: event.clientX, y: event.clientY };
-		$pointerOrigin = { x: event.clientX, y: event.clientY };
+		$pointer = { x: e.clientX, y: e.clientY };
+		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
 		await tick();
@@ -338,14 +337,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		handlePointerAndKeyboardDrop(ghostRef, 'pointer-cancel');
 	}
 
-	async function handleKeyDown(event: KeyboardEvent) {
+	async function handleKeyDown(e: KeyboardEvent) {
 		if ($dragState === 'keyboard-dropping') {
-			event.preventDefault();
+			e.preventDefault();
 			return;
 		}
 
-		const { key } = event;
-		const target = event.target as HTMLElement;
+		const { key } = e;
+		const target = e.target as HTMLElement;
 
 		if (target === rootRef || target === $focusedItem) {
 			if (key === ' ') {
@@ -357,7 +356,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					target.dataset.isLocked === 'true'
 				)
 					return;
-				else event.preventDefault();
+				else e.preventDefault();
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
@@ -383,7 +382,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			if (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'ArrowDown' || key === 'ArrowRight') {
-				event.preventDefault();
+				e.preventDefault();
 
 				const step =
 					key === 'ArrowUp' || (key === 'ArrowLeft' && !$isRTL) || (key === 'ArrowRight' && $isRTL)
@@ -469,7 +468,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			if (key === 'Home' || key === 'End') {
-				event.preventDefault();
+				e.preventDefault();
 
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
