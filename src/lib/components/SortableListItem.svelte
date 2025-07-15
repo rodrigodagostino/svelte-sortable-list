@@ -303,8 +303,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 
 		&[data-drag-state='keyboard-dropping'] {
-			/* The following z-index is different from the one in .is-keyboard-dragging just to ensure the
-				 «transitionend» event is fired when the item is dropped using the keyboard. */
+			/* The following z-index is different from the one in [data-drag-state='keyboard-dragging'] just to
+				 ensure the «transitionend» event is fired when the item is dropped using the keyboard. */
 			z-index: 3;
 		}
 
