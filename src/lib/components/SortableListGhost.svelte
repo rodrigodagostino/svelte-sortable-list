@@ -18,7 +18,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	import { portal } from '$lib/actions/index.js';
 	import {
 		getDraggedItem,
-		getDragState,
 		getItemRects,
 		getPointer,
 		getPointerOrigin,
@@ -49,8 +48,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
-
-	const dragState = getDragState();
 
 	$: draggedId = $draggedItem ? getId($draggedItem) : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
@@ -230,7 +227,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:cursor={$dragState === 'pointer-dragging' ? 'grabbing' : 'grab'}
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:left={styleLeft}
@@ -259,7 +255,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 <style>
 	.ssl-ghost {
 		position: fixed;
-		list-style: none;
 		user-select: none;
 		backface-visibility: hidden;
 		z-index: 9999;
