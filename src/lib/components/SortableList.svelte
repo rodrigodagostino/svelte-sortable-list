@@ -318,7 +318,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
 			if (scrollingSpeed !== 0) $itemRects = getItemRects(rootRef);
 			await tick();
-			const collidingItemRect = getCollidingItem(ghostRef, $itemRects);
+			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
 			if (collidingItemRect)
 				$targetItem = rootRef.querySelector<HTMLLIElement>(
 					`.ssl-item[data-item-id="${collidingItemRect.id}"]`

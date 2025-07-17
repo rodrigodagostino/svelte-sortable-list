@@ -13,9 +13,8 @@ function getIntersectionRect(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
 }
 
-export function getCollidingItem(ghost: HTMLDivElement, items: ItemRect[]) {
-	const ghostRect = ghost.getBoundingClientRect();
-	const collidingItems = items.filter((targetItem) => areColliding(ghostRect, targetItem));
+export function getCollidingItem(ghostRect: DOMRect, itemRects: ItemRect[]) {
+	const collidingItems = itemRects.filter((targetRect) => areColliding(ghostRect, targetRect));
 	if (collidingItems.length > 1) {
 		collidingItems.sort((a, b) => {
 			const aIntersectionRect = getIntersectionRect(ghostRect, a);
