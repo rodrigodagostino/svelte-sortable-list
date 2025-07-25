@@ -53,8 +53,7 @@
 	outline: 0.125rem solid var(--ssl-gray-800);
 }
 
-.ssl-item[data-is-ghost="false"][data-drag-state="pointer-dragging"] .ssl-item-content,
-.ssl-item[data-is-ghost="false"][data-drag-state="pointer-dropping"] .ssl-item-content {
+.ssl-item[data-is-ghost="false"][data-drag-state*="pointer"] .ssl-item-content {
 	opacity: 0.5;
 
 	& > * {
@@ -109,8 +108,8 @@
 .ssl-item-handle:hover,
 .ssl-item-remove:focus,
 .ssl-item-remove:hover,
-.ssl-item[data-drag-state="pointer-dropping"] .ssl-item-handle,
-.ssl-ghost .ssl-item-handle {
+.ssl-item[data-drag-state*="pointer"] .ssl-item-handle,
+.ssl-item[data-is-ghost="true"] .ssl-item-handle {
 	background-color: var(--ssl-gray-100);
 	color: var(--ssl-gray-600);
 	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);

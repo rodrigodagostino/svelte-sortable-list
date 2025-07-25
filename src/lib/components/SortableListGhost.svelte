@@ -190,38 +190,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (state === 'remove') return ghostRef.style.transform;
 	}
 
-	function getStyleTransition(...args: unknown[]) {
-		if (state === 'unset' || state === 'init') return undefined;
-		// The next first condition applies to `canClearOnDragOut`.
-		if ((state === 'preset' && !$targetItem) || state === 'set')
-			return (
-				`transform ${$rootProps.transition!.duration}ms ${$rootProps.transition!.easing},` +
-				`z-index 0s ${$rootProps.transition!.duration}ms`
-			);
-		if (state === 'remove') return `z-index 0s ${$rootProps.transition!.duration}ms`;
-	}
-
-	function getStyleVisibility(...args: unknown[]) {
-		if (state === 'unset') return 'hidden';
-		return 'visible';
-	}
-
-	function getStyleZIndex(...args: unknown[]) {
-		if (state === 'unset') return undefined;
-		if (state === 'init' || state === 'preset') return '10000';
-		// zIndex is only set and then re-set to force the transitionend event to be fired
-		// when the ghost is dragged and dropped without being moved.
-		if (state === 'set' || state === 'remove') return '9999';
-	}
-
 	$: styleWidth = getStyleWidth($draggedItem);
 	$: styleHeight = getStyleHeight($draggedItem);
 	$: styleLeft = getStyleLeft(state);
 	$: styleTop = getStyleTop(state);
 	$: styleTransform = getStyleTransform(state, $pointer);
-	$: styleTransition = getStyleTransition(state);
-	$: styleVisibility = getStyleVisibility(state);
-	$: styleZIndex = getStyleZIndex(state);
 </script>
 
 <div
@@ -232,12 +205,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	style:left={styleLeft}
 	style:top={styleTop}
 	style:transform={styleTransform}
-	style:transition={styleTransition}
-	style:visibility={styleVisibility}
-	style:z-index={styleZIndex}
 	style:--ssl-gap="{$rootProps.gap}px"
 	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
+	style:--ssl-transition-easing={$rootProps.transition?.easing}
+	data-state={state}
 	data-can-clear-on-drag-out={$rootProps.canClearOnDragOut}
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"
@@ -257,6 +229,36 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		position: fixed;
 		user-select: none;
 		backface-visibility: hidden;
+		visibility: hidden;
 		z-index: 9999;
+
+		&[data-state='set'],
+		&[data-state='preset'][data-can-clear-on-drag-out='true']:not(
+				:has([data-is-between-bounds='true'])
+			) {
+			transition:
+				transform var(--ssl-transition-duration) var(--ssl-transition-easing),
+				z-index 0s var(--ssl-transition-duration);
+		}
+
+		&[data-state='remove'] {
+			transition: z-index 0s var(--ssl-transition-duration);
+		}
+
+		&:not([data-state='unset']) {
+			visibility: visible;
+		}
+
+		&[data-state='init'],
+		&[data-state='preset'] {
+			z-index: 10000;
+		}
+
+		/* The z-index is different from the one in [data-state='init'] and [data-state='preset'] just to force
+			 the «transitionend» event to be fired when the ghost is dragged and dropped without being moved. */
+		&[data-state='set'],
+		&[data-state='remove'] {
+			z-index: 9999;
+		}
 	}
 </style>

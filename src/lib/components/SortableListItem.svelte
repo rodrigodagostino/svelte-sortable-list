@@ -74,7 +74,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const isBetweenBounds = getIsBetweenBounds();
 	const isRTL = getIsRTL();
 
-	$: hasHandle = !!itemRef?.querySelector('[data-role="handle"]');
 	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
 		setInteractiveElementsTabIndex($dragState === 'keyboard-dragging', focusedId);
@@ -139,16 +138,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `${currentRect?.height}px`;
 	}
 
-	function getStyleMargin(...args: unknown[]) {
-		if (isGhost) return undefined;
-		if (draggedId === String(id) && !$isBetweenBounds && $rootProps.canRemoveOnDropOut) {
-			return $rootProps.direction === 'vertical'
-				? '0 calc(var(--ssl-gap) / 2)'
-				: 'calc(var(--ssl-gap) / 2) 0';
-		}
-		return 'calc(var(--ssl-gap) / 2)';
-	}
-
 	function getStyleTransform(...args: unknown[]) {
 		if (isGhost) return 'none';
 		if (
@@ -206,32 +195,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 	}
 
-	$: styleCursor =
-		$rootProps.isDisabled || isDisabled
-			? 'not-allowed'
-			: $dragState === 'pointer-dragging' && draggedId === String(id)
-				? 'grabbing'
-				: !hasHandle && !$rootProps.isLocked && !isLocked
-					? 'grab'
-					: 'initial';
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleMargin = getStyleMargin($rootProps.direction, $draggedItem, $isBetweenBounds);
-	$: styleOverflow =
-		!isGhost &&
-		($dragState === 'pointer-dragging' || $dragState === 'pointer-dropping') &&
-		draggedId === String(id) &&
-		$rootProps.canRemoveOnDropOut
-			? 'hidden'
-			: undefined;
 	$: styleTransform = getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds);
-	$: styleTransition =
-		!isGhost &&
-		($draggedItem || $dragState === 'pointer-canceling' || $dragState === 'keyboard-canceling')
-			? `width ${$rootProps.transition!.duration}ms, height ${$rootProps.transition!.duration}ms,` +
-				`margin ${$rootProps.transition!.duration}ms, transform ${$rootProps.transition!.duration}ms,` +
-				`z-index ${$rootProps.transition!.duration}ms`
-			: 'none';
 
 	async function handleFocus() {
 		await tick();
@@ -255,14 +221,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	bind:this={itemRef}
 	{id}
 	class={classes}
-	style:cursor={styleCursor}
 	style:width={styleWidth}
 	style:height={styleHeight}
-	style:margin={styleMargin}
-	style:overflow={styleOverflow}
-	style:touch-action={!hasHandle ? 'none' : undefined}
 	style:transform={styleTransform}
-	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? $dragState : 'idle'}
@@ -286,11 +247,51 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 <style>
 	.ssl-item {
+		margin: calc(var(--ssl-gap) / 2);
 		position: relative;
 		list-style: none;
 		user-select: none;
 		backface-visibility: hidden;
 		z-index: 1;
+
+		&:not(:has([data-role='handle'])),
+		& [data-role='handle'] {
+			touch-action: none;
+			cursor: grab;
+		}
+
+		&[data-drag-state='pointer-dragging'],
+		&[data-drag-state='pointer-dragging'] [data-role='handle'] {
+			cursor: grabbing;
+		}
+
+		&[data-is-locked='true'] {
+			cursor: initial;
+		}
+
+		&[aria-disabled='true'] {
+			cursor: not-allowed;
+
+			& > * {
+				pointer-events: none;
+			}
+		}
+
+		&:not([data-drag-state='idle']),
+		&:has(~ *:not([data-drag-state='idle'])),
+		&:not([data-drag-state='idle']) ~ * {
+			transition:
+				width var(--ssl-transition-duration),
+				height var(--ssl-transition-duration),
+				margin var(--ssl-transition-duration),
+				transform var(--ssl-transition-duration),
+				z-index var(--ssl-transition-duration);
+		}
+
+		&[data-is-ghost='true'] {
+			margin: 0;
+			transition: none;
+		}
 
 		&:focus,
 		&:focus-visible,
@@ -302,19 +303,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 4;
 		}
 
+		/* The z-index is different from the one in [data-drag-state='keyboard-dragging'] just to force
+			 the «transitionend» event to be fired when the item is dropped using the keyboard. */
 		&[data-drag-state='keyboard-dropping'] {
-			/* The following z-index is different from the one in [data-drag-state='keyboard-dragging'] just to
-				 ensure the «transitionend» event is fired when the item is dropped using the keyboard. */
 			z-index: 3;
 		}
 
-		&[data-drag-state='pointer-dragging'],
-		&[data-drag-state='pointer-dropping'] {
+		&[data-drag-state*='pointer'] {
 			z-index: 0;
-		}
-
-		&[aria-disabled='true'] > :global(*) {
-			pointer-events: none;
 		}
 	}
 </style>

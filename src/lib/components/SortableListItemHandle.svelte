@@ -16,20 +16,12 @@ Serves as an element that limits the draggable area of a list item to itself. In
 
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getDragState } from '$lib/stores/index.js';
 	import { joinCSSClasses } from '$lib/utils/styles.js';
 
 	$: classes = joinCSSClasses('ssl-item-handle', $$restProps.class);
-
-	const dragState = getDragState();
 </script>
 
-<span
-	class={classes}
-	style:cursor={$dragState === 'pointer-dragging' ? 'grabbing' : 'grab'}
-	data-role="handle"
-	aria-hidden="true"
->
+<span class={classes} data-role="handle" aria-hidden="true">
 	<slot>
 		<Icon name="handle" />
 	</slot>

@@ -622,6 +622,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
+	style:--ssl-transition-easing={_transition.easing}
 	data-has-locked-axis={hasLockedAxis}
 	data-has-boundaries={hasBoundaries}
 	data-can-clear-on-drag-out={canClearOnDragOut}
@@ -673,10 +674,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		&[aria-orientation='vertical'] {
 			flex-direction: column;
+
+			&[data-can-remove-on-drop-out='true']
+				.ssl-item[data-drag-state*='pointer'][data-is-between-bounds='false'] {
+				margin: 0 calc(var(--ssl-gap) / 2);
+			}
 		}
 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
+
+			&[data-can-remove-on-drop-out='true'] .ssl-item[data-is-between-bounds='false'] {
+				margin: calc(var(--ssl-gap) / 2) 0;
+			}
+		}
+
+		&[data-can-remove-on-drop-out='true']
+			.ssl-item[data-is-ghost='false'][data-drag-state*='pointer'] {
+			overflow: hidden;
 		}
 	}
 
