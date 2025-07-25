@@ -40,7 +40,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		calculateTranslate,
 		calculateTranslateWithAlignment,
 		dispatch,
-		getId,
 		getIndex,
 		isInSameRow,
 		joinCSSClasses,
@@ -103,14 +102,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	$: currentRect = $itemRects ? $itemRects[index] : null;
-	$: draggedId = $draggedItem ? getId($draggedItem) : null;
+	$: draggedId = $draggedItem ? $draggedItem.id : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
 	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
-	$: focusedId = $focusedItem ? getId($focusedItem) : null;
+	$: focusedId = $focusedItem ? $focusedItem.id : null;
 
 	function getStyleWidth(...args: unknown[]) {
 		if (!isGhost && !$rootProps.canRemoveOnDropOut) return undefined;

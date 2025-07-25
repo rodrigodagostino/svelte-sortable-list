@@ -80,7 +80,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		areColliding,
 		getClosestScrollableAncestor,
 		getCollidingItem,
-		getId,
 		getIndex,
 		getItemRects,
 		getScrollingSpeed,
@@ -276,7 +275,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		dispatch('dragstart', {
 			deviceType: 'pointer',
 			draggedItem: currItem,
-			draggedItemId: getId(currItem),
+			draggedItemId: currItem.id,
 			draggedItemIndex: getIndex(currItem),
 			isBetweenBounds: $isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
@@ -303,10 +302,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			dispatch('drag', {
 				deviceType: 'pointer',
 				draggedItem: $draggedItem,
-				draggedItemId: getId($draggedItem),
+				draggedItemId: $draggedItem.id,
 				draggedItemIndex: getIndex($draggedItem),
 				targetItem: $targetItem,
-				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemId: $targetItem ? $targetItem.id : null,
 				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 				isBetweenBounds: $isBetweenBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
@@ -375,7 +374,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
-						draggedItemId: getId($focusedItem),
+						draggedItemId: $focusedItem.id,
 						draggedItemIndex: draggedIndex,
 						isBetweenBounds: $isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
@@ -421,9 +420,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				} else {
 					if (!$draggedItem || !$itemRects) return;
 
-					const draggedId = getId($draggedItem);
+					const draggedId = $draggedItem.id;
 					const draggedIndex = getIndex($draggedItem);
-					let targetId = $targetItem ? getId($targetItem) : null;
+					let targetId = $targetItem ? $targetItem.id : null;
 					let targetIndex = $targetItem ? getIndex($targetItem) : null;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
@@ -448,7 +447,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					}
 
 					await tick();
-					targetId = getId($targetItem);
+					targetId = $targetItem.id;
 					targetIndex = getIndex($targetItem);
 					dispatch('drag', {
 						deviceType: 'keyboard',
@@ -533,10 +532,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			dispatch('dragend', {
 				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
 				draggedItem: $draggedItem,
-				draggedItemId: getId($draggedItem),
+				draggedItemId: $draggedItem.id,
 				draggedItemIndex: getIndex($draggedItem),
 				targetItem: $targetItem,
-				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemId: $targetItem ? $targetItem.id : null,
 				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 				isBetweenBounds: $isBetweenBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
@@ -573,10 +572,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			dispatch('drop', {
 				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
 				draggedItem: $draggedItem,
-				draggedItemId: getId($draggedItem),
+				draggedItemId: $draggedItem.id,
 				draggedItemIndex: draggedIndex,
 				targetItem: $targetItem,
-				targetItemId: $targetItem ? getId($targetItem) : null,
+				targetItemId: $targetItem ? $targetItem.id : null,
 				targetItemIndex: targetIndex,
 				isBetweenBounds: $isBetweenBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,

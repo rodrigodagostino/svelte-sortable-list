@@ -29,7 +29,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
-		getId,
 		getIndex,
 		isInSameRow,
 		preserveFormFieldValues,
@@ -49,7 +48,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 
-	$: draggedId = $draggedItem ? getId($draggedItem) : null;
+	$: draggedId = $draggedItem ? $draggedItem.id : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
