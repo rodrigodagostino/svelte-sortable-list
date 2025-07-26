@@ -4,7 +4,7 @@ export function isInSameRow(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return (a.y >= b.y && a.bottom <= b.bottom) || (a.y <= b.y && a.bottom >= b.bottom);
 }
 
-const INTERACTIVE_ELEMENTS = new Set([
+export const INTERACTIVE_ELEMENTS = new Set([
 	'a',
 	'audio',
 	'button',
@@ -15,7 +15,13 @@ const INTERACTIVE_ELEMENTS = new Set([
 	'textarea',
 	'video',
 ]);
-const INTERACTIVE_ROLES = new Set(['button', 'checkbox', 'link', 'tab']);
+export const INTERACTIVE_ROLES = new Set(['button', 'checkbox', 'link', 'tab']);
+export const INTERACTIVE_ROLE_ATTRIBUTES = new Set([
+	'[role="button"]',
+	'[role="checkbox"]',
+	'[role="link"]',
+	'[role="tab"]',
+]);
 
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts

@@ -41,6 +41,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		calculateTranslateWithAlignment,
 		dispatch,
 		getIndex,
+		INTERACTIVE_ELEMENTS,
+		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
 		joinCSSClasses,
 	} from '$lib/utils/index.js';
@@ -82,13 +84,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		setInteractiveElementsTabIndex();
 	});
 
+	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
 		await tick();
 		itemRef
-			?.querySelectorAll<HTMLElement>(
-				'a, audio, button, input, optgroup, option, select, textarea, video, ' +
-					'[role="button"], [role="checkbox"], [role="link"], [role="tab"]'
-			)
+			?.querySelectorAll<HTMLElement>(selectors)
 			.forEach(
 				(el) =>
 					(el.tabIndex =
