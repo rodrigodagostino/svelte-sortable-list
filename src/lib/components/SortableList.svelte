@@ -546,7 +546,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				isCanceled: action.includes('cancel'),
 			});
 
-		if (typeof pointerId === 'number') $draggedItem?.releasePointerCapture(pointerId);
+		if (typeof pointerId === 'number' && $draggedItem?.hasPointerCapture(pointerId))
+			$draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;
 		$pointer = null;
 		$pointerOrigin = null;
