@@ -217,7 +217,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	<SortableListItem
 		id={draggedId || 'ssl-ghost-item'}
 		index={draggedIndex ?? -1}
-		class={$draggedItem?.className}
+		class={$draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
 	>
 		{@html draggedContent}
 	</SortableListItem>
