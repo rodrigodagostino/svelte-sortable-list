@@ -223,7 +223,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
-		if ($dragState !== 'idle' || $focusedItem) return;
+		if ($dragState !== 'idle' || $focusedItem) {
+			e.preventDefault();
+			return;
+		}
 
 		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
