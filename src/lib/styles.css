@@ -101,7 +101,7 @@
 	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
-.ssl-item-handle:hover,
+.ssl-item[data-is-ghost="false"] .ssl-item-handle:hover,
 .ssl-item-remove:focus,
 .ssl-item-remove:hover,
 .ssl-item[data-is-ghost="true"][data-drag-state="idle"] .ssl-item-handle,
