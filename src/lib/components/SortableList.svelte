@@ -256,15 +256,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
 		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
-		const targetIsOrResidesInHandle = target.closest('[data-role="handle"]');
-		if (hasHandle && !targetIsOrResidesInHandle) {
+		const isOrResidesInHandle = target.closest('[data-role="handle"]');
+		if (hasHandle && !isOrResidesInHandle) {
 			e.preventDefault();
 			return;
 		}
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
-		if (isOrResidesInInteractiveElement(target, currItem) && !targetIsOrResidesInHandle) return;
+		if (isOrResidesInInteractiveElement(target, currItem) && !isOrResidesInHandle) return;
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
