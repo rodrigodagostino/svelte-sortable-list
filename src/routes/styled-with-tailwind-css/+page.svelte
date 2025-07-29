@@ -37,7 +37,7 @@
 		<SortableList.Item
 			{...item}
 			{index}
-			class="rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state='keyboard-dragging']]:shadow-md [&[data-drag-state='keyboard-dragging']_>_*]:bg-indigo-500 [&[data-drag-state='pointer-dragging']]:shadow-md [&[data-drag-state='pointer-dragging']_>_*]:bg-indigo-500 [&[data-is-ghost='false'][data-drag-state='pointer-dragging']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='pointer-dropping']]:opacity-0 hover:[&[data-is-ghost='false']_>_*]:bg-indigo-800"
+			class="rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state='kbd-drag']]:shadow-md [&[data-drag-state='kbd-drag']_>_*]:bg-indigo-500 [&[data-drag-state='ptr-drag']]:shadow-md [&[data-drag-state='ptr-drag']_>_*]:bg-indigo-500 [&[data-is-ghost='false'][data-drag-state='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0 hover:[&[data-is-ghost='false']_>_*]:bg-indigo-800"
 		>
 			<div
 				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors"
