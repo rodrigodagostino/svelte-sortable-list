@@ -343,11 +343,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	function handlePointerUp() {
-		handlePointerAndKeyboardDrop(ghostRef, 'pointer-drop');
+		handlePointerAndKeyboardDrop(ghostRef, 'ptr-drop');
 	}
 
 	function handlePointerCancel() {
-		handlePointerAndKeyboardDrop(ghostRef, 'pointer-cancel');
+		handlePointerAndKeyboardDrop(ghostRef, 'ptr-cancel');
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
@@ -390,7 +390,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					});
 					liveText = _announcements.lifted($draggedItem, draggedIndex);
 				} else {
-					handlePointerAndKeyboardDrop($focusedItem, 'keyboard-drop');
+					handlePointerAndKeyboardDrop($focusedItem, 'kbd-drop');
 				}
 			}
 
@@ -529,17 +529,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			if (key === 'Escape' && $draggedItem) {
-				handlePointerAndKeyboardDrop($draggedItem, 'keyboard-cancel');
+				handlePointerAndKeyboardDrop($draggedItem, 'kbd-cancel');
 			}
 		}
 	}
 
 	async function handlePointerAndKeyboardDragEnd(
-		action: 'pointer-drop' | 'pointer-cancel' | 'keyboard-drop' | 'keyboard-cancel'
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		if ($draggedItem)
 			dispatch('dragend', {
-				deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
+				deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
 				draggedItem: $draggedItem,
 				draggedItemId: $draggedItem.id,
 				draggedItemIndex: getIndex($draggedItem),
@@ -567,12 +567,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	async function handlePointerAndKeyboardDrop(
 		element: HTMLElement,
-		action: 'pointer-drop' | 'pointer-cancel' | 'keyboard-drop' | 'keyboard-cancel'
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		if (
 			!$draggedItem ||
-			(action.includes('pointer') && $dragState === 'ptr-drop') ||
-			(action.includes('keyboard') && $dragState === 'kbd-drop')
+			(action.includes('ptr') && $dragState === 'ptr-drop') ||
+			(action.includes('kbd') && $dragState === 'kbd-drop')
 		)
 			return;
 
@@ -592,24 +592,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
 			});
 
-		if (action === 'pointer-drop') {
+		if (action === 'ptr-drop') {
 			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
 			await tick();
 			if (ghostState !== 'remove') ghostState = 'set';
 			await tick();
 			$dragState = 'ptr-drop';
 			scrollingSpeed = 0;
-		} else if (action === 'pointer-cancel') {
+		} else if (action === 'ptr-cancel') {
 			if (ghostState !== 'remove') ghostState = 'set';
 			await tick();
 			$dragState = 'ptr-cancel';
 			scrollingSpeed = 0;
 		}
 
-		if (action === 'keyboard-drop' && $draggedItem) {
+		if (action === 'kbd-drop' && $draggedItem) {
 			$dragState = 'kbd-drop';
 			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
-		} else if (action === 'keyboard-cancel' && $draggedItem) {
+		} else if (action === 'kbd-cancel' && $draggedItem) {
 			$dragState = 'kbd-cancel';
 			await tick();
 			if (scrollableAncestor)
@@ -659,7 +659,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	on:pointerdown={handlePointerDown}
 	on:pointercancel={handlePointerCancel}
 	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'keyboard-cancel')}
+	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
 	<slot>
 		<p>
