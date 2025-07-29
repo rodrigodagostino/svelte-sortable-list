@@ -57,13 +57,13 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
 	function cloneDraggedItemContent(...args: unknown[]) {
-		if (!$draggedItem) return '';
+		if (!$draggedItem) return;
 
 		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		preserveFormFieldValues($draggedItem, clone);
-		return clone.innerHTML;
+		ghostRef?.children[0].replaceChildren(...clone.childNodes);
 	}
-	$: draggedContent = cloneDraggedItemContent($draggedItem);
+	$: if (state === 'init') cloneDraggedItemContent(state);
 
 	function getStyleWidth(...args: unknown[]) {
 		if (!draggedRect) return '0';
@@ -218,9 +218,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		id={draggedId || 'ssl-ghost-item'}
 		index={draggedIndex ?? -1}
 		class={$draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
-	>
-		{@html draggedContent}
-	</SortableListItem>
+	/>
 </div>
 
 <style>

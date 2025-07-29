@@ -275,8 +275,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
-		await tick();
 		ghostState = 'init';
+		await tick();
 		$dragState = 'pointer-dragging';
 		dispatch('dragstart', {
 			deviceType: 'pointer',
