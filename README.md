@@ -371,35 +371,41 @@ If you want to make use of the styles present in the demo pages, import them in 
 
 This is a list of the selectors you can use to style this library’s components to your heart’s desire:
 
-| Selector                                          | Points to                                                                                            |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `.ssl-root`                                       | The list element located inside the `<SortableList.Root>` component.                                 |
-| `.ssl-root[aria-orientation="vertical"]`          | A `<SortableList.Root>` displayed in vertical direction.                                             |
-| `.ssl-root[aria-orientation="horizontal"]`        | A `<SortableList.Root>` displayed in horizontal direction.                                           |
-| `.ssl-root[data-has-locked-axis="true"]`          | A `<SortableList.Root>` that only allows its items to move along its main axis.                      |
-| `.ssl-root[data-has-boundaries="true"]`           | A `<SortableList.Root>` that only allows its items to move inside its limits.                        |
-| `.ssl-root[data-can-clear-on-drag-out="true"]`    | A `<SortableList.Root>` that allows the target item to be cleared on drag out.                       |
-| `.ssl-root[data-can-remove-on-drop-out="true"]`   | A `<SortableList.Root>` that allows the target item to be removed on drop out.                       |
-| `.ssl-root[data-is-locked="true"]`                | A `<SortableList.Root>` that disallows dragging for its items.                                       |
-| `.ssl-root[data-is-disabled="true"]`              | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
-| `.ssl-root[aria-disabled="true"]`                 | A `<SortableList.Root>` that disallows dragging and interactivity for its items.                     |
-| `.ssl-item`                                       | The list item element located inside the `<SortableList.Item>` component.                            |
-| `.ssl-item[data-drag-state="pointer-dragging"]`   | A `<SortableList.Item>` that is being dragged by a pointing device.                                  |
-| `.ssl-item[data-drag-state="pointer-dropping"]`   | A `<SortableList.Item>` that is being dropped by a pointing device.                                  |
-| `.ssl-item[data-drag-state="pointer-canceling"]`  | A `<SortableList.Item>` that is being canceled during a pointing-device drag.                        |
-| `.ssl-item[data-drag-state="keyboard-dragging"]`  | A `<SortableList.Item>` that is being dragged by the keyboard.                                       |
-| `.ssl-item[data-drag-state="keyboard-dropping"]`  | A `<SortableList.Item>` that is being dropped by the keyboard.                                       |
-| `.ssl-item[data-drag-state="keyboard-canceling"]` | A `<SortableList.Item>` that is being canceled during a keyboard drag.                               |
-| `.ssl-item[data-is-ghost="true"]`                 | A `<SortableList.Item>` that is displayed as a placeholder inside the shadow element while dragging. |
-| `.ssl-item[data-is-between-bounds="true"]`        | A `<SortableList.Item>` that is between the list limits.                                             |
-| `.ssl-item[data-is-locked="true"]`                | A `<SortableList.Item>` that can’t be dragged.                                                       |
-| `.ssl-item[data-is-disabled="true"]`              | A `<SortableList.Item>` that can’t be dragged or interacted with.                                    |
-| `.ssl-item[aria-disabled="true"]`                 | A `<SortableList.Item>` that can’t be dragged or interacted with.                                    |
-| `.ssl-ghost`                                      | The shadow element that is displayed under the pointer when dragging.                                |
-| `.ssl-ghost[data-can-clear-on-drop-out="true"]`   | The shadow element while `canClearOnDropOut` is enabled.                                             |
-| `.ssl-ghost[data-can-remove-on-drop-out="true"]`  | The shadow element while `canRemoveOnDropOut` is enabled.                                            |
-| `.ssl-item-handle`                                | The handle element located inside the `<SortableList.ItemHandle>` component.                         |
-| `.ssl-item-remove`                                | The remove button element located inside the `<SortableList.ItemRemove>` component.                  |
+| Selector                                         | Points to                                                                                                            |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `.ssl-root`                                      | The list element located inside the `<SortableList.Root>` component.                                                 |
+| `.ssl-root[aria-orientation="vertical"]`         | A list displayed in vertical direction.                                                                              |
+| `.ssl-root[aria-orientation="horizontal"]`       | A list displayed in horizontal direction.                                                                            |
+| `.ssl-root[data-has-locked-axis="true"]`         | A list that only allows its items to move along its main axis.                                                       |
+| `.ssl-root[data-has-boundaries="true"]`          | A list that only allows its items to move inside its limits.                                                         |
+| `.ssl-root[data-can-clear-on-drag-out="true"]`   | A list that allows the target item to be cleared on drag out.                                                        |
+| `.ssl-root[data-can-remove-on-drop-out="true"]`  | A list that allows the target item to be removed on drop out.                                                        |
+| `.ssl-root[data-is-locked="true"]`               | A list that disallows dragging for its items.                                                                        |
+| `.ssl-root[data-is-disabled="true"]`             | A list that disallows dragging and interactivity for its items.                                                      |
+| `.ssl-root[aria-disabled="true"]`                | A list that disallows dragging and interactivity for its items.                                                      |
+| `.ssl-item`                                      | The list item element located inside the `<SortableList.Item>` component.                                            |
+| `.ssl-item[data-drag-state="idle"]`              | An item in its default state, ready for interaction but not currently being dragged.                                 |
+| `.ssl-item[data-drag-state="ptr-drag"]`          | An item actively being dragged using a pointing device.                                                              |
+| `.ssl-item[data-drag-state="ptr-drop"]`          | An item in the process of being dropped using a pointing device.                                                     |
+| `.ssl-item[data-drag-state="ptr-cancel"]`        | An item whose pointing device drag operation is being canceled.                                                      |
+| `.ssl-item[data-drag-state="kbd-drag"]`          | An item actively being dragged using the keyboard.                                                                   |
+| `.ssl-item[data-drag-state="kbd-drop"]`          | An item in the process of being dropped using the keyboard.                                                          |
+| `.ssl-item[data-drag-state="kbd-cancel"]`        | An item whose keyboard drag operation is being canceled.                                                             |
+| `.ssl-item[data-is-ghost="true"]`                | An item displayed as a placeholder inside the shadow element while dragging.                                         |
+| `.ssl-item[data-is-between-bounds="true"]`       | An item positioned between the list boundaries.                                                                      |
+| `.ssl-item[data-is-locked="true"]`               | An item that cannot be dragged.                                                                                      |
+| `.ssl-item[data-is-disabled="true"]`             | An item that cannot be dragged or interacted with.                                                                   |
+| `.ssl-item[aria-disabled="true"]`                | An item that cannot be dragged or interacted with.                                                                   |
+| `.ssl-ghost`                                     | The shadow element displayed under the pointer during drag operations.                                               |
+| `.ssl-ghost[data-ghost-state="idle"]`            | The shadow element in its default state, not currently active.                                                       |
+| `.ssl-ghost[data-ghost-state="ptr-drag"]`        | The shadow element actively following a pointing device during drag.                                                 |
+| `.ssl-ghost[data-ghost-state="ptr-predrop"]`     | The shadow element positioned at the required location, ready to be dropped by a pointing device.                    |
+| `.ssl-ghost[data-ghost-state="ptr-drop"]`        | The shadow element in the process of being dropped by a pointing device.                                             |
+| `.ssl-ghost[data-ghost-state="ptr-remove"]`      | The shadow element after an item has been dropped outside the list boundaries while `canRemoveOnDropOut` is enabled. |
+| `.ssl-ghost[data-can-clear-on-drop-out="true"]`  | The shadow element while `canClearOnDropOut` is enabled.                                                             |
+| `.ssl-ghost[data-can-remove-on-drop-out="true"]` | The shadow element while `canRemoveOnDropOut` is enabled.                                                            |
+| `.ssl-item-handle`                               | The handle element located inside the `<SortableList.ItemHandle>` component.                                         |
+| `.ssl-item-remove`                               | The remove button element located inside the `<SortableList.ItemRemove>` component.                                  |
 
 > [!TIP]
 > Combining the available selectors appropriately should be enough to style the list and the list items to your heart’s content.
