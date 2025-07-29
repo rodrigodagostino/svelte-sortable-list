@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.4] (2025-07-29)
+
+### Added
+
+- Support mousewheel scroll during pointer dragging.
+
+### Changed
+
+- Replace JS with CSS where possible.
+- Remove the unnecessary calls to the `getId()` function.
+- Improve and clean up the `<SortableList.ItemHandle>` base styles.
+
+### Performance
+
+- Optimize the `querySelectorAll()` argument in the `setInteractiveElementsTabIndex()` function.
+
+### Fixed
+
+- Correct the condition for the `data-is-between-bounds` attribute in `<SortableList.Item>`.
+- Prevent item focus when clicking outside of the item’s handle.
+- Add a better safety check to pointer capture release (failing on mobile).
+- Avoid having duplicated hashed CSS classes in `<SortableList.Item>` ghost.
+- Prevent item focus when another item is being dragged.
+
 ## [0.16.3] (2025-07-22)
 
 ### Changed
@@ -1040,7 +1064,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...HEAD
+[0.16.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.3...v0.16.4
 [0.16.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.2...v0.16.3
 [0.16.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.1...v0.16.2
 [0.16.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.0...v0.16.1
