@@ -180,12 +180,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
 	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
 	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLLIElement;
+	let activeElement: HTMLLIElement | null = null;
 	beforeUpdate(() => {
-		activeElement = document?.activeElement as HTMLLIElement;
+		activeElement = $focusedItem;
 	});
 	afterUpdate(() => {
-		if (activeElement) activeElement.focus({ preventScroll: true });
+		if (activeElement && activeElement !== document.activeElement) {
+			activeElement.focus({ preventScroll: true });
+		}
 	});
 
 	let scrollingSpeed = 0;
