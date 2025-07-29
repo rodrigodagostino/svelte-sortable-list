@@ -660,7 +660,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 >
 	<slot>
 		<p>
-			To display your list, provide an array of <code>items</code> to
+			To display your list, put a few <code>{'<SortableList.Item>'}</code> inside your
 			<code>{'<SortableList.Root>'}</code>.
 		</p>
 	</slot>
