@@ -77,7 +77,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
-		setInteractiveElementsTabIndex($dragState === 'keyboard-dragging', focusedId);
+		setInteractiveElementsTabIndex($dragState === 'kbd-drag', focusedId);
 	}
 
 	onMount(() => {
@@ -92,7 +92,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			.forEach(
 				(el) =>
 					(el.tabIndex =
-						$dragState !== 'keyboard-dragging' &&
+						$dragState !== 'kbd-drag' &&
 						focusedId === String(id) &&
 						!$rootProps.isDisabled &&
 						!isDisabled
@@ -141,8 +141,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (isGhost) return 'none';
 		if (
 			$dragState === 'idle' ||
-			$dragState === 'pointer-canceling' ||
-			$dragState === 'keyboard-canceling' ||
+			$dragState === 'ptr-cancel' ||
+			$dragState === 'kbd-cancel' ||
 			!$itemRects ||
 			!$draggedItem ||
 			!$targetItem ||
@@ -259,8 +259,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			cursor: grab;
 		}
 
-		&[data-drag-state='pointer-dragging'],
-		&[data-drag-state='pointer-dragging'] [data-role='handle'] {
+		&[data-drag-state='ptr-drag'],
+		&[data-drag-state='ptr-drag'] [data-role='handle'] {
 			cursor: grabbing;
 		}
 
@@ -298,17 +298,17 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 2;
 		}
 
-		&[data-drag-state='keyboard-dragging'] {
+		&[data-drag-state='kbd-drag'] {
 			z-index: 4;
 		}
 
-		/* The z-index is different from the one in [data-drag-state='keyboard-dragging'] just to force
+		/* The z-index is different from the one in [data-drag-state='kbd-drag'] just to force
 			 the «transitionend» event to be fired when the item is dropped using the keyboard. */
-		&[data-drag-state='keyboard-dropping'] {
+		&[data-drag-state='kbd-drop'] {
 			z-index: 3;
 		}
 
-		&[data-drag-state*='pointer'] {
+		&[data-drag-state*='ptr'] {
 			z-index: 0;
 		}
 	}

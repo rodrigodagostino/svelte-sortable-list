@@ -277,7 +277,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$itemRects = getItemRects(rootRef);
 		ghostState = 'init';
 		await tick();
-		$dragState = 'pointer-dragging';
+		$dragState = 'ptr-drag';
 		dispatch('dragstart', {
 			deviceType: 'pointer',
 			draggedItem: currItem,
@@ -300,7 +300,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (rafId || $dragState !== 'pointer-dragging') return;
+		if (rafId || $dragState !== 'ptr-drag') return;
 
 		rafId = requestAnimationFrame(async () => {
 			if (!$draggedItem || !$itemRects || !ghostRef) return;
@@ -351,7 +351,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
-		if ($dragState === 'keyboard-dropping') {
+		if ($dragState === 'kbd-drop') {
 			e.preventDefault();
 			return;
 		}
@@ -373,8 +373,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-				if ($dragState !== 'keyboard-dragging') {
-					$dragState = 'keyboard-dragging';
+				if ($dragState !== 'kbd-drag') {
+					$dragState = 'kbd-drag';
 
 					await tick();
 					$draggedItem = $focusedItem;
@@ -403,7 +403,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
 
-				if ($dragState !== 'keyboard-dragging') {
+				if ($dragState !== 'kbd-drag') {
 					if (!$focusedItem || focusedIndex === null) {
 						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItem) return;
@@ -475,7 +475,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				}
 
 				await tick();
-				const scrollTarget = $dragState !== 'keyboard-dragging' ? $focusedItem : $targetItem;
+				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
@@ -486,7 +486,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
-				if ($dragState !== 'keyboard-dragging') {
+				if ($dragState !== 'kbd-drag') {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -522,7 +522,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				}
 
 				await tick();
-				const scrollTarget = $dragState !== 'keyboard-dragging' ? $focusedItem : $targetItem;
+				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
 				const step = key === 'Home' ? -1 : 1;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
@@ -571,8 +571,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	) {
 		if (
 			!$draggedItem ||
-			(action.includes('pointer') && $dragState === 'pointer-dropping') ||
-			(action.includes('keyboard') && $dragState === 'keyboard-dropping')
+			(action.includes('pointer') && $dragState === 'ptr-drop') ||
+			(action.includes('keyboard') && $dragState === 'kbd-drop')
 		)
 			return;
 
@@ -597,20 +597,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			await tick();
 			if (ghostState !== 'remove') ghostState = 'set';
 			await tick();
-			$dragState = 'pointer-dropping';
+			$dragState = 'ptr-drop';
 			scrollingSpeed = 0;
 		} else if (action === 'pointer-cancel') {
 			if (ghostState !== 'remove') ghostState = 'set';
 			await tick();
-			$dragState = 'pointer-canceling';
+			$dragState = 'ptr-cancel';
 			scrollingSpeed = 0;
 		}
 
 		if (action === 'keyboard-drop' && $draggedItem) {
-			$dragState = 'keyboard-dropping';
+			$dragState = 'kbd-drop';
 			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
 		} else if (action === 'keyboard-cancel' && $draggedItem) {
-			$dragState = 'keyboard-canceling';
+			$dragState = 'kbd-cancel';
 			await tick();
 			if (scrollableAncestor)
 				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
@@ -691,7 +691,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			flex-direction: column;
 
 			&[data-can-remove-on-drop-out='true']
-				.ssl-item[data-drag-state*='pointer'][data-is-between-bounds='false'] {
+				.ssl-item[data-drag-state*='ptr'][data-is-between-bounds='false'] {
 				margin: 0 calc(var(--ssl-gap) / 2);
 			}
 		}
@@ -704,8 +704,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 		}
 
-		&[data-can-remove-on-drop-out='true']
-			.ssl-item[data-is-ghost='false'][data-drag-state*='pointer'] {
+		&[data-can-remove-on-drop-out='true'] .ssl-item[data-is-ghost='false'][data-drag-state*='ptr'] {
 			overflow: hidden;
 		}
 	}
