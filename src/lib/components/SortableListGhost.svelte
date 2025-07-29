@@ -65,16 +65,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 	$: if (state === 'ptr-drag') cloneDraggedItemContent(state);
 
-	function getStyleWidth(...args: unknown[]) {
-		if (!draggedRect) return '0';
-		return `${draggedRect?.width || 0}px`;
-	}
-
-	function getStyleHeight(...args: unknown[]) {
-		if (!draggedRect) return '0';
-		return `${draggedRect?.height || 0}px`;
-	}
-
 	function getStyleLeft(...args: unknown[]) {
 		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
@@ -189,8 +179,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (state === 'ptr-remove') return ghostRef.style.transform;
 	}
 
-	$: styleWidth = getStyleWidth($draggedItem);
-	$: styleHeight = getStyleHeight($draggedItem);
 	$: styleLeft = getStyleLeft(state);
 	$: styleTop = getStyleTop(state);
 	$: styleTransform = getStyleTransform(state, $pointer);
@@ -199,8 +187,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 <div
 	bind:this={ghostRef}
 	class="ssl-ghost"
-	style:width={styleWidth}
-	style:height={styleHeight}
 	style:left={styleLeft}
 	style:top={styleTop}
 	style:transform={styleTransform}
