@@ -559,9 +559,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$draggedItem = null;
 		$targetItem = null;
 		$itemRects = null;
-		ghostState = 'unset';
-		$dragState = 'idle';
 		$isBetweenBounds = true;
+		ghostState = 'unset';
+		await tick();
+		$dragState = 'idle';
 	}
 
 	async function handlePointerAndKeyboardDrop(
@@ -594,12 +595,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (action === 'pointer-drop') {
 			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
 			await tick();
-			$dragState = 'pointer-dropping';
 			if (ghostState !== 'remove') ghostState = 'set';
+			await tick();
+			$dragState = 'pointer-dropping';
 			scrollingSpeed = 0;
 		} else if (action === 'pointer-cancel') {
-			$dragState = 'pointer-canceling';
 			if (ghostState !== 'remove') ghostState = 'set';
+			await tick();
+			$dragState = 'pointer-canceling';
 			scrollingSpeed = 0;
 		}
 
