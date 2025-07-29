@@ -154,7 +154,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let liveText: string = '';
 
 	const dragState = setDragState('idle');
-	let ghostState: GhostProps['state'] = 'unset';
+	let ghostState: GhostProps['state'] = 'idle';
 	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRTL = setIsRTL(false);
 
@@ -275,7 +275,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
-		ghostState = 'init';
+		ghostState = 'ptr-drag';
 		await tick();
 		$dragState = 'ptr-drag';
 		dispatch('dragstart', {
@@ -560,7 +560,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$targetItem = null;
 		$itemRects = null;
 		$isBetweenBounds = true;
-		ghostState = 'unset';
+		ghostState = 'idle';
 		await tick();
 		$dragState = 'idle';
 	}
@@ -593,14 +593,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			});
 
 		if (action === 'ptr-drop') {
-			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'remove' : 'preset';
+			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
 			await tick();
-			if (ghostState !== 'remove') ghostState = 'set';
+			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
 			await tick();
 			$dragState = 'ptr-drop';
 			scrollingSpeed = 0;
 		} else if (action === 'ptr-cancel') {
-			if (ghostState !== 'remove') ghostState = 'set';
+			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
 			await tick();
 			$dragState = 'ptr-cancel';
 			scrollingSpeed = 0;

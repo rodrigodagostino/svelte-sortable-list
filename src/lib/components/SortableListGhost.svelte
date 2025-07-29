@@ -63,7 +63,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		preserveFormFieldValues($draggedItem, clone);
 		ghostRef?.children[0].replaceChildren(...clone.childNodes);
 	}
-	$: if (state === 'init') cloneDraggedItemContent(state);
+	$: if (state === 'ptr-drag') cloneDraggedItemContent(state);
 
 	function getStyleWidth(...args: unknown[]) {
 		if (!draggedRect) return '0';
@@ -76,10 +76,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleLeft(...args: unknown[]) {
-		if (state === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
-		if (state === 'remove') return ghostRef.style.left;
+		if (state === 'ptr-remove') return ghostRef.style.left;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
 
@@ -93,10 +93,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTop(...args: unknown[]) {
-		if (state === 'unset' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
 
-		if (state === 'remove') return ghostRef.style.top;
+		if (state === 'ptr-remove') return ghostRef.style.top;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
@@ -117,12 +117,12 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTransform(...args: unknown[]) {
-		if (state === 'unset' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
+		if (state === 'idle' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
 
-		if (state === 'init' && draggedRect) {
+		if (state === 'ptr-drag' && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
 				const x =
 					$rootProps.direction === 'horizontal' ||
@@ -168,7 +168,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (state === 'preset' && typeof draggedIndex === 'number' && draggedRect) {
+		if (state === 'ptr-predrop' && typeof draggedIndex === 'number' && draggedRect) {
 			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
 
@@ -184,9 +184,9 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (state === 'set') return 'translate3d(0, 0, 0)';
+		if (state === 'ptr-drop') return 'translate3d(0, 0, 0)';
 
-		if (state === 'remove') return ghostRef.style.transform;
+		if (state === 'ptr-remove') return ghostRef.style.transform;
 	}
 
 	$: styleWidth = getStyleWidth($draggedItem);
@@ -208,7 +208,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
 	style:--ssl-transition-easing={$rootProps.transition?.easing}
-	data-state={state}
+	data-ghost-state={state}
 	data-can-clear-on-drag-out={$rootProps.canClearOnDragOut}
 	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
 	aria-hidden="true"
@@ -229,32 +229,32 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		visibility: hidden;
 		z-index: 9999;
 
-		&[data-state='set'],
-		&[data-state='preset'][data-can-clear-on-drag-out='true']:not(
+		&[data-ghost-state='ptr-predrop'][data-can-clear-on-drag-out='true']:not(
 				:has([data-is-between-bounds='true'])
-			) {
+			),
+		&[data-ghost-state='ptr-drop'] {
 			transition:
 				transform var(--ssl-transition-duration) var(--ssl-transition-easing),
 				z-index 0s var(--ssl-transition-duration);
 		}
 
-		&[data-state='remove'] {
+		&[data-ghost-state='ptr-remove'] {
 			transition: z-index 0s var(--ssl-transition-duration);
 		}
 
-		&:not([data-state='unset']) {
+		&:not([data-ghost-state='idle']) {
 			visibility: visible;
 		}
 
-		&[data-state='init'],
-		&[data-state='preset'] {
+		&[data-ghost-state='ptr-drag'],
+		&[data-ghost-state='ptr-predrop'] {
 			z-index: 10000;
 		}
 
-		/* The z-index is different from the one in [data-state='init'] and [data-state='preset'] just to force
+		/* The z-index is different from the one in [data-ghost-state='ptr-drag'] and [data-ghost-state='ptr-predrop'] just to force
 			 the «transitionend» event to be fired when the ghost is dragged and dropped without being moved. */
-		&[data-state='set'],
-		&[data-state='remove'] {
+		&[data-ghost-state='ptr-drop'],
+		&[data-ghost-state='ptr-remove'] {
 			z-index: 9999;
 		}
 	}

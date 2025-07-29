@@ -68,5 +68,5 @@ export interface SortableListGhostProps {
 	/** Reference to the Ghost used in its parent component. */
 	ghostRef: HTMLDivElement;
 	/** State in which the Ghost is in. */
-	state: 'init' | 'preset' | 'set' | 'remove' | 'unset';
+	state: 'idle' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 }
