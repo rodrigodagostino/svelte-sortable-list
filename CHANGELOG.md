@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.5] (2025-07-29)
+
+### BREAKING
+
+- Shorten the drag states names.
+- Rename the ghost states and state data attribute.
+
+### Changed
+
+- Update the default message of the `<SortableList.Root>` slot.
+- Set every drag state following the same pattern as `pointer-dragging`.
+- Remove unnecessary CSS inline styles in `<SortableListGhost>`.
+
+### Performance
+
+- Reduce the frequency in which the manual focus is triggered.
+
+### Fixed
+
+- Ensure Ghost is fully initialized before pointer-dragging starts (this was causing the transitions for the `<SortableList.Item>` content to not be played when a pointer-drag started).
+- Fully correct the condition for the `data-is-between-bounds` attribute in `<SortableList.Item>`.
+- Correct the base styles for the `<SortableList.ItemHandle>` color transitions.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Update the README to reflect the latest changes.
+
 ## [0.16.4] (2025-07-29)
 
 ### Added
@@ -1064,7 +1092,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...HEAD
+[0.16.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...v0.16.5
 [0.16.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.3...v0.16.4
 [0.16.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.2...v0.16.3
 [0.16.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.1...v0.16.2
