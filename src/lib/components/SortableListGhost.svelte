@@ -57,11 +57,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
 	function cloneDraggedItemContent(...args: unknown[]) {
-		if (!$draggedItem) return;
+		if (!ghostRef || !$draggedItem) return;
 
 		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		preserveFormFieldValues($draggedItem, clone);
-		ghostRef?.children[0].replaceChildren(...clone.children);
+		ghostRef.children[0].replaceChildren(...clone.children);
 	}
 	$: if (state === 'ptr-drag') cloneDraggedItemContent(state);
 
@@ -107,7 +107,8 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTransform(...args: unknown[]) {
-		if (state === 'idle' || !$root || !$pointer || !$pointerOrigin) return 'translate3d(0, 0, 0)';
+		if (state === 'idle' || !ghostRef || !$root || !$pointer || !$pointerOrigin)
+			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
