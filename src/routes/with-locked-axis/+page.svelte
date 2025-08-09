@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>Has locked axis | Svelte Sortable List</title>
+	<title>Has locked axis — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>

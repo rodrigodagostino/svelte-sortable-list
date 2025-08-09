@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Disabled items | Svelte Sortable List</title>
+	<title>Disabled items — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>

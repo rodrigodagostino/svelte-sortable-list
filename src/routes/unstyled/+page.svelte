@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>Unstyled | Svelte Sortable List</title>
+	<title>Unstyled — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>

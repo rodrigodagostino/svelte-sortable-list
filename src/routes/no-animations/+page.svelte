@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-	<title>No animations | Svelte Sortable List</title>
+	<title>No animations — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>

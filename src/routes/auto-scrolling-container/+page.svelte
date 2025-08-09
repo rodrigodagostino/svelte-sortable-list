@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>Auto scrolling container | Svelte Sortable List</title>
+	<title>Auto scrolling container — Svelte Sortable List</title>
 </svelte:head>
 
 <div class="wrapper direction-{$rootProps.direction}">

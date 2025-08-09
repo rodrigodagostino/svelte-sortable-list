@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>Varying heights | Svelte Sortable List</title>
+	<title>Varying heights — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>

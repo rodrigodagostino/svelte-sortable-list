@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>Styled with Tailwind CSS | Svelte Sortable List</title>
+	<title>Styled with Tailwind CSS — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root

@@ -39,7 +39,7 @@
 </script>
 
 <svelte:head>
-	<title>Inside dialog | Svelte Sortable List</title>
+	<title>Inside dialog — Svelte Sortable List</title>
 </svelte:head>
 
 <button class="button" on:click={handleOpenDialog}>Open dialog</button>

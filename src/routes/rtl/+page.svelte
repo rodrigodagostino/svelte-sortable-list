@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>RTL | Svelte Sortable List</title>
+	<title>RTL — Svelte Sortable List</title>
 </svelte:head>
 
 <div class="wrapper" dir="rtl">

@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>With handle | Svelte Sortable List</title>
+	<title>With handle — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
