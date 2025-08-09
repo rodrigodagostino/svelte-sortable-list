@@ -38,7 +38,15 @@
 	<title>With custom transitions | Svelte Sortable List</title>
 </svelte:head>
 
-<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
+<SortableList.Root
+	{...$rootProps}
+	transition={{
+		duration: 320,
+		easing: 'cubic-bezier(0.8, -0.4, 0.5, 1)',
+	}}
+	on:drop={handleDrop}
+	on:dragend={handleDragEnd}
+>
 	{#each items as item, index (item.id)}
 		<SortableList.Item
 			{...item}

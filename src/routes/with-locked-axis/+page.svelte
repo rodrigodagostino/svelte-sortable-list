@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
+	import { defaultRootProps, getVaryingItems } from '../fixtures.js';
 	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = getDefaultItems(5);
+	let items = getVaryingItems(5);
 
 	onMount(() => {
 		$rootProps = {
@@ -39,3 +39,10 @@
 		</SortableList.Item>
 	{/each}
 </SortableList.Root>
+
+<style>
+	:global([data-page-pathname='with-locked-axis'] .ssl-root) {
+		justify-content: center;
+		align-items: center;
+	}
+</style>

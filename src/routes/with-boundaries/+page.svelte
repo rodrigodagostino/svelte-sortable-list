@@ -39,3 +39,10 @@
 		</SortableList.Item>
 	{/each}
 </SortableList.Root>
+
+<style>
+	:global([data-page-pathname='with-boundaries'] .ssl-root) {
+		justify-content: center;
+		align-items: center;
+	}
+</style>
