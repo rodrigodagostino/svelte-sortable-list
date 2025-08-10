@@ -61,7 +61,9 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		preserveFormFieldValues($draggedItem, clone);
-		ghostRef.children[0].replaceChildren(...clone.children);
+		// `childNodes` is used to always preserve the dragged item’s content,
+		// even when only a text node is present inside.
+		ghostRef.children[0].replaceChildren(...clone.childNodes);
 	}
 	$: if (state === 'ptr-drag') cloneDraggedItemContent(state);
 
