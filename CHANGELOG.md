@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] (2025-08-10)
+
+### Test
+
+- Add base E2E tests.
+
+### Changed
+
+- Use `children` instead of `childNodes` when cloning the dragged item content.
+- Improve `ghostRef` existence checks.
+
+### Chore
+
+- Add Playwright.
+- Set up Playwright GitHub actions.
+- Update Playwright config to better handle flaky tests.
+
+### Docs
+
+- Improve feature showcase in the **“With boundaries”**, **“With locked axis”** and **“With custom transitions”** demo pages.
+- Replace the vertical bar (`|`) with an em dash (`—`) in the demo page titles.
+- Capitalize every list item text.
+
 ## [0.16.5] (2025-07-29)
 
 ### BREAKING
@@ -1092,7 +1115,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...v0.17.0
 [0.16.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...v0.16.5
 [0.16.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.3...v0.16.4
 [0.16.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.2...v0.16.3
