@@ -304,7 +304,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		/* The z-index is different from the one in [data-drag-state='kbd-drag'] just to force
 			 the «transitionend» event to be fired when the item is dropped using the keyboard. */
-		&[data-drag-state='kbd-drop'] {
+		&[data-drag-state='kbd-drop'],
+		&[data-drag-state='kbd-cancel'] {
 			z-index: 3;
 		}
 
