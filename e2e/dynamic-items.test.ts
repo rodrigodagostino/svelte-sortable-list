@@ -15,7 +15,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 		// Get the initial order of items to verify the starting state
 		const initialItems = await page.locator('.ssl-item .ssl-item-content__text').allTextContents();
 
-		// Verify initial state - expecting List Item 1, 2, 3, 4, 5
+		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
 		// Click the remove button for List Item 3

@@ -14,17 +14,13 @@ test.describe('Sortable List - With Locked Axis', () => {
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 
-		// Get bounding box for precise drag operation
+		// Get bounding boxes for precise drag operation
 		const initialBox = await draggedItem.boundingBox();
-
-		if (!initialBox) throw new Error('Could not get item bounding box');
-
-		const initialX = initialBox.x;
-
-		// Get bounding box for precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
 
-		if (!draggedBox) throw new Error('Could not get List Item 1 or List Item 3 bounding box');
+		if (!initialBox || !draggedBox) throw new Error('Could not get item bounding box');
+
+		const initialX = initialBox.x;
 
 		// Start drag from the center of the dragged item
 		await page.mouse.move(
@@ -56,10 +52,10 @@ test.describe('Sortable List - With Locked Axis', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Get final position
+		// Get the final position
 		const finalBox = await draggedItem.boundingBox();
 
-		// X position should remain consistent throughout drag
+		// The X position should remain consistent throughout drag
 		if (finalBox) {
 			const xDrift = Math.abs(finalBox.x - initialX);
 			expect(xDrift).toBeLessThan(2); // Allow for subpixel rendering

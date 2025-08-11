@@ -17,7 +17,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 
 		if (!draggedBox) throw new Error('Could not get first item bounding box');
 
-		// Get initial scroll position
+		// Get the initial scroll position
 		const initialScroll = await page.evaluate(() => window.scrollY);
 
 		// Hover over the first item
@@ -41,7 +41,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Wait for auto scroll to happen
+		// Wait for the auto scroll to happen
 		await page.waitForTimeout(2000);
 
 		// Move back to the middle of the viewport
@@ -73,7 +73,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 
 		if (!draggedBox) throw new Error('Could not get last item bounding box');
 
-		// Get initial scroll position
+		// Get the initial scroll position
 		const initialScroll = await page.evaluate(() => window.scrollY);
 
 		// Hover over the last item
@@ -95,7 +95,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Wait for auto scroll to happen
+		// Wait for the auto scroll to happen
 		await page.waitForTimeout(2000);
 
 		// Move back to the middle of the viewport
@@ -113,7 +113,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify scrolling occurred (should be less than initial scroll since we're scrolling up)
+		// Verify scrolling occurred (should be less than the initial scroll since we're scrolling up)
 		const newScroll = await page.evaluate(() => window.scrollY);
 		expect(newScroll).toBeLessThan(initialScroll);
 	});

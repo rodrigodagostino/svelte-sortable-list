@@ -84,7 +84,7 @@ test.describe('Sortable List - Interactive Items', () => {
 			// Wait for the drag operation to complete by checking the drag state returns to idle
 			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
-			// Get final position
+			// Get the final position
 			const finalBox = await draggedItem.boundingBox();
 			expect(finalBox?.y).toBeGreaterThanOrEqual(initialBox.y);
 		}

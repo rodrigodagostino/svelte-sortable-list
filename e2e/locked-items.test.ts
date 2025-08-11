@@ -10,7 +10,7 @@ test.describe('Sortable List - Locked Items', () => {
 	});
 
 	test('should not be able to drag locked items', async ({ page }) => {
-		// Get all items and identify locked ones
+		// Get all items and identify the locked ones
 		const lockedItems = await page.locator('.ssl-item[data-is-locked="true"]').all();
 
 		for (const lockedItem of lockedItems) {
@@ -40,7 +40,7 @@ test.describe('Sortable List - Locked Items', () => {
 
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
-			// Locked item should not have moved
+			// The locked item should not have moved
 			expect(finalBox.y).toBe(initialBox.y);
 
 			// Release the mouse to drop
@@ -51,7 +51,7 @@ test.describe('Sortable List - Locked Items', () => {
 	test('should not be able to focus or interact with locked items via keyboard', async ({
 		page,
 	}) => {
-		// Get all items and identify locked ones
+		// Get all items and identify the locked ones
 		const lockedItems = await page.locator('.ssl-item[data-is-locked="true"]').all();
 
 		for (const lockedItem of lockedItems) {
@@ -73,12 +73,12 @@ test.describe('Sortable List - Locked Items', () => {
 			// Try to move with keyboard
 			await page.keyboard.press('ArrowDown');
 
-			// Get new position
+			// Get the new position
 			const finalBox = await lockedItem.boundingBox();
 
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
-			// Locked item should not have moved
+			// The locked item should not have moved
 			expect(finalBox.y).toBe(initialBox.y);
 		}
 	});

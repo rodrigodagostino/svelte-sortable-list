@@ -24,7 +24,7 @@ test.describe('Sortable List - With Handle', () => {
 	});
 
 	test('should only allow dragging from handle', async ({ page }) => {
-		// Find dragged item (List Item 1)
+		// Find the dragged item (List Item 1)
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 		const initialBox = await draggedItem.boundingBox();
@@ -57,7 +57,7 @@ test.describe('Sortable List - With Handle', () => {
 		const root = page.locator('.ssl-root');
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 
-		// Verify initial state - expecting List Item 1, 2, 3, 4, 5
+		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
 		// Find the dragged item (List Item 1) and its handle
@@ -114,7 +114,7 @@ test.describe('Sortable List - With Handle', () => {
 			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
 			.allTextContents();
 
-		// After dragging List Item 1 to position 3, expected order should be:
+		// After dragging the List Item 1 to position 3, expected order should be:
 		// List Item 2, List Item 3, List Item 1, List Item 4, List Item 5
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
 	});

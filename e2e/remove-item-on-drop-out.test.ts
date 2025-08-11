@@ -15,7 +15,7 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Get the initial order of items to verify the starting state
 		const initialItems = await page.locator('.ssl-item .ssl-item-content__text').allTextContents();
 
-		// Verify initial state - expecting List Item 1, 2, 3, 4, 5
+		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
 		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
 
 		// Find the root element, the dragged item (List Item 3) and the ghost element
@@ -80,7 +80,7 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
 			.allTextContents();
 
-		// After dragging List Item 3 outside the list, the expected order should be:
+		// After dragging the List Item 3 outside the list, the expected order should be:
 		// List Item 1, List Item 2, List Item 4, List Item 5
 		expect(finalItems).toEqual(removeItem(initialItems, 2));
 	});

@@ -46,7 +46,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Item should be constrained by left and top boundaries
+		// The item should be constrained by the left and top boundaries
 		let ghostBox = await ghost.boundingBox();
 		if (!ghostBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(ghostBox.x);
@@ -59,7 +59,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Item should be constrained by right and top boundaries
+		// The item should be constrained by the right and top boundaries
 		ghostBox = await ghost.boundingBox();
 		if (!ghostBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
@@ -74,7 +74,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Item should be constrained by right and bottom boundaries
+		// The item should be constrained by the right and bottom boundaries
 		ghostBox = await ghost.boundingBox();
 		if (!ghostBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
@@ -91,7 +91,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 10 } // Smooth movement
 		);
 
-		// Item should be constrained by left and bottom boundaries
+		// The item should be constrained by the left and bottom boundaries
 		ghostBox = await ghost.boundingBox();
 		if (!ghostBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(ghostBox.x);

@@ -10,7 +10,7 @@ test.describe('Sortable List - Disabled Items', () => {
 	});
 
 	test('should not be able to drag disabled items', async ({ page }) => {
-		// Get all items and identify disabled ones
+		// Get all items and identify the disabled ones
 		const disabledItems = await page.locator('.ssl-item[aria-disabled="true"]').all();
 
 		for (const disabledItem of disabledItems) {
@@ -40,7 +40,7 @@ test.describe('Sortable List - Disabled Items', () => {
 
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
-			// Disabled item should not have moved
+			// The disabled item should not have moved
 			expect(finalBox.y).toBe(initialBox.y);
 
 			// Release the mouse to drop
@@ -51,7 +51,7 @@ test.describe('Sortable List - Disabled Items', () => {
 	test('should not be able to focus or interact with disabled items via keyboard', async ({
 		page,
 	}) => {
-		// Get all items and identify disabled ones
+		// Get all items and identify the disabled ones
 		const disabledItems = await page.locator('.ssl-item[aria-disabled="true"]').all();
 
 		for (const disabledItem of disabledItems) {
@@ -73,12 +73,12 @@ test.describe('Sortable List - Disabled Items', () => {
 			// Try to move with keyboard
 			await page.keyboard.press('ArrowDown');
 
-			// Get new position
+			// Get the new position
 			const finalBox = await disabledItem.boundingBox();
 
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
-			// Disabled item should not have moved
+			// The disabled item should not have moved
 			expect(finalBox.y).toBe(initialBox.y);
 		}
 	});
