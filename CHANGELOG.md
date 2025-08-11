@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.1] (2025-08-11)
+
+### Test
+
+- Add more E2E tests for keyboard navigation.
+
+### Fixed
+
+- Revert back to using `childNodes` when cloning the dragged item content.
+- Add a missing CSS selector to trigger a drag state change after `kbd-cancel`.
+
 ## [0.17.0] (2025-08-10)
 
 ### Test
@@ -1115,7 +1126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...HEAD
+[0.17.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...v0.17.0
 [0.16.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...v0.16.5
 [0.16.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.3...v0.16.4
