@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.2] (2025-08-11)
+
+### Test
+
+- Add E2E tests for the **“No transitions”** page.
+- Add E2E tests for the **“Clear target on drag out”** page.
+- Add E2E tests for the **“Inside dialog”** page.
+- Add E2E tests for the **“Auto scrolling dialog”** page.
+- Add E2E tests for the **“With wrapping”** page.
+- Add E2E tests for the **“RTL”** page.
+
+### Changed
+
+- Adjust the tests logic to make them more consistent with each other.
+
+### Fixed
+
+- Prevent closing the `<dialog>` element when pressing the Escape key to cancel a keyboard drag.
+
+### Chore
+
+- Add more test scripts.
+
+### Docs
+
+- Capitalize every missing list item text.
+- Rename the **“No animations”** demo page to **“No transitions”**.
+- Rename the **“With custom transitions”** demo page to **Custom transitions”**.
+- Rename the **“With custom announcements”** demo page to **“Custom announcements”**.
+
 ## [0.17.1] (2025-08-11)
 
 ### Test
@@ -1126,7 +1156,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...HEAD
+[0.17.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...v0.17.0
 [0.16.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.4...v0.16.5
