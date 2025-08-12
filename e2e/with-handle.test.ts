@@ -86,11 +86,11 @@ test.describe('Sortable List - With Handle', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
-
 		// Verify the ghost element appears during drag
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
+
+		// Verify the drag state is active
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
 		// Move to the target position (below List Item 3)
 		await page.mouse.move(
@@ -102,12 +102,12 @@ test.describe('Sortable List - With Handle', () => {
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
-
 		// Verify the ghost element disappears after drag completes
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
 		await expect(ghost).toBeHidden();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();

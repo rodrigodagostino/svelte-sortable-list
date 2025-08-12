@@ -47,12 +47,12 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
-
 		// Verify the ghost element appears during drag
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
 		await expect(ghost).toBeVisible();
+
+		// Verify the drag state is active
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
 		// Calculate a drop position outside the list boundaries
 		// Drop it to the right of the list container
