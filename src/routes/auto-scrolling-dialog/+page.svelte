@@ -9,7 +9,7 @@
 
 	let items = Array.from({ length: 100 }, (_, i) => ({
 		id: `list-item-${i + 1}`,
-		text: `List item ${i + 1}`,
+		text: `List Item ${i + 1}`,
 	}));
 
 	onMount(() => {

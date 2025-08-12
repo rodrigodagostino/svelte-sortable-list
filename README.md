@@ -77,23 +77,23 @@ yarn add @rodrigodagostino/svelte-sortable-list
 	let items: SortableList.ItemData[] = [
 		{
 			id: 'list-item-1',
-			text: 'List item 1',
+			text: 'List Item 1',
 		},
 		{
 			id: 'list-item-2',
-			text: 'List item 2',
+			text: 'List Item 2',
 		},
 		{
 			id: 'list-item-3',
-			text: 'List item 3',
+			text: 'List Item 3',
 		},
 		{
 			id: 'list-item-4',
-			text: 'List item 4',
+			text: 'List Item 4',
 		},
 		{
 			id: 'list-item-5',
-			text: 'List item 5',
+			text: 'List Item 5',
 		},
 	];
 
