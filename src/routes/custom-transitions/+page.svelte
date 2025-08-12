@@ -35,7 +35,7 @@
 </script>
 
 <svelte:head>
-	<title>With custom transitions — Svelte Sortable List</title>
+	<title>Custom transitions — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root
