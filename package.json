@@ -18,8 +18,13 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
+		"test": "pnpm test:e2e",
 		"test:e2e": "playwright test",
-		"test": "pnpm test:e2e"
+		"test:e2e:debug": "playwright test --debug",
+		"test:e2e:headed": "playwright test --headed",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:trace": "playwright test --trace on",
+		"test:e2e:trigger-flaky": "playwright test --repeat-each=100 --workers=4 -x"
 	},
 	"exports": {
 		".": {
