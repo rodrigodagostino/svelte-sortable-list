@@ -53,7 +53,7 @@
 </script>
 
 <svelte:head>
-	<title>With custom announcements — Svelte Sortable List</title>
+	<title>Custom announcements — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root

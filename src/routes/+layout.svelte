@@ -20,7 +20,6 @@
 		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
-		{ text: 'With custom announcements', path: '/with-custom-announcements' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
 		{ text: 'Interactive items', path: '/interactive-items' },
 		{ text: 'Auto scrolling', path: '/auto-scrolling' },
@@ -34,6 +33,7 @@
 		{ text: 'Inside custom dialog', path: '/inside-custom-dialog' },
 		{ text: 'Clear target on drag out', path: '/clear-target-on-drag-out' },
 		{ text: 'Remove item on drop out', path: '/remove-item-on-drop-out' },
+		{ text: 'Custom announcements', path: '/custom-announcements' },
 		{ text: 'RTL', path: '/rtl' },
 	];
 
