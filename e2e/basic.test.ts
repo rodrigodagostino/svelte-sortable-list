@@ -154,6 +154,9 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
+		// Verify the dragged item is still focused
+		expect(focusedItem).toBeFocused();
+
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
