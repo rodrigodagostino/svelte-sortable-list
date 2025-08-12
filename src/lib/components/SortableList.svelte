@@ -529,6 +529,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			if (key === 'Escape' && $draggedItem) {
+				// Prevent closing the <dialog> if the dragged item is inside one.
+				if (rootRef.closest<HTMLDialogElement>('dialog')) e.preventDefault();
 				handlePointerAndKeyboardDrop($draggedItem, 'kbd-cancel');
 			}
 		}
