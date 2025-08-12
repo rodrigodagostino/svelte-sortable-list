@@ -53,11 +53,11 @@ test.describe('Sortable List - With Handle', () => {
 	});
 
 	test('should drag List Item 1 to List Item 3 position using the handle', async ({ page }) => {
-		// Get the initial order of items to verify the starting state
+		// Find the root element
 		const root = page.locator('.ssl-root');
-		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 
-		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
+		// Get the initial order of items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
 		// Find the dragged item (List Item 1) and its handle
@@ -109,13 +109,8 @@ test.describe('Sortable List - With Handle', () => {
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
 		await expect(ghost).toBeHidden();
 
-		// Verify final order after drag operation
-		const finalItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 1 to position 3, expected order should be:
-		// List Item 2, List Item 3, List Item 1, List Item 4, List Item 5
+		// Verify the final order
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
 	});
 

@@ -58,8 +58,8 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify scrolling occurred
-		const newScroll = await page.evaluate(() => window.scrollY);
-		expect(newScroll).toBeGreaterThan(initialScroll);
+		const finalScroll = await page.evaluate(() => window.scrollY);
+		expect(finalScroll).toBeGreaterThan(initialScroll);
 	});
 
 	test('should auto scroll when dragging to the top', async ({ page }) => {

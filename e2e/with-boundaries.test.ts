@@ -39,7 +39,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Try to drag way outside the container (left and up)
+		// Try to drag way outside the list (left and up)
 		await page.mouse.move(
 			40,
 			40,
@@ -52,7 +52,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(ghostBox.x);
 		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(ghostBox.y);
 
-		// Try to drag way outside the container (right and up)
+		// Try to drag way outside the list (right and up)
 		await page.mouse.move(
 			viewport.width - 40,
 			40,
@@ -67,7 +67,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		);
 		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(ghostBox.y);
 
-		// Try to drag way outside the container (right and down)
+		// Try to drag way outside the list (right and down)
 		await page.mouse.move(
 			viewport.width - 40,
 			viewport.height - 40,
@@ -84,7 +84,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			ghostBox.y + ghostBox.height
 		);
 
-		// Try to drag way outside the container (left and down)
+		// Try to drag way outside the list (left and down)
 		await page.mouse.move(
 			40,
 			viewport.height - 40,

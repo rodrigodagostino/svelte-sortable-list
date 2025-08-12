@@ -14,7 +14,7 @@ test.describe('Sortable List - With Locked Axis', () => {
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 
-		// Get bounding boxes for precise drag operation
+		// Get the bounding boxes for precise drag operation
 		const initialBox = await draggedItem.boundingBox();
 		const draggedBox = await draggedItem.boundingBox();
 

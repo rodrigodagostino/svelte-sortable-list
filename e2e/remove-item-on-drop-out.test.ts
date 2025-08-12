@@ -12,14 +12,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 	});
 
 	test('should remove List Item 3 by dropping it outside list', async ({ page }) => {
-		// Get the initial order of items to verify the starting state
-		const initialItems = await page.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		// Find the root element
+		const root = page.locator('.ssl-root');
 
-		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
 
 		// Find the root element, the dragged item (List Item 3) and the ghost element
-		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-3"]');
 		const ghost = page.locator('.ssl-ghost');
 
@@ -75,13 +75,8 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Verify dragged item has been removed
 		await expect(draggedItem).toBeHidden();
 
-		// Verify the final order after the drag operation
-		const finalItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 3 outside the list, the expected order should be:
-		// List Item 1, List Item 2, List Item 4, List Item 5
+		// Verify the final order
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(removeItem(initialItems, 2));
 	});
 });

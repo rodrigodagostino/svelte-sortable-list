@@ -68,7 +68,7 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the final order after drag operation
+		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(initialItems);
 	});

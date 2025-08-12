@@ -10,8 +10,11 @@ test.describe('Sortable List - Locked Items', () => {
 	});
 
 	test('should not be able to drag locked items', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
 		// Get all items and identify the locked ones
-		const lockedItems = await page.locator('.ssl-item[data-is-locked="true"]').all();
+		const lockedItems = await root.locator('.ssl-item[data-is-locked="true"]').all();
 
 		for (const lockedItem of lockedItems) {
 			// Get the initial position
@@ -51,8 +54,11 @@ test.describe('Sortable List - Locked Items', () => {
 	test('should not be able to focus or interact with locked items via keyboard', async ({
 		page,
 	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
 		// Get all items and identify the locked ones
-		const lockedItems = await page.locator('.ssl-item[data-is-locked="true"]').all();
+		const lockedItems = await root.locator('.ssl-item[data-is-locked="true"]').all();
 
 		for (const lockedItem of lockedItems) {
 			// Try to focus the locked item

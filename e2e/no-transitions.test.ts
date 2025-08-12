@@ -68,7 +68,7 @@ test.describe('Sortable List - No Transitions', () => {
 		// Verify the drag operation completed instantly
 		expect(endTime - startTime).toBeLessThan(40);
 
-		// Verify the final order after drag operation
+		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
 	});

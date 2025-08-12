@@ -10,8 +10,11 @@ test.describe('Sortable List - Disabled Items', () => {
 	});
 
 	test('should not be able to drag disabled items', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
 		// Get all items and identify the disabled ones
-		const disabledItems = await page.locator('.ssl-item[aria-disabled="true"]').all();
+		const disabledItems = await root.locator('.ssl-item[aria-disabled="true"]').all();
 
 		for (const disabledItem of disabledItems) {
 			// Get the initial position
@@ -51,8 +54,11 @@ test.describe('Sortable List - Disabled Items', () => {
 	test('should not be able to focus or interact with disabled items via keyboard', async ({
 		page,
 	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
 		// Get all items and identify the disabled ones
-		const disabledItems = await page.locator('.ssl-item[aria-disabled="true"]').all();
+		const disabledItems = await root.locator('.ssl-item[aria-disabled="true"]').all();
 
 		for (const disabledItem of disabledItems) {
 			// Try to focus the disabled item

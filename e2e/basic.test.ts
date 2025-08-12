@@ -12,11 +12,11 @@ test.describe('Sortable List - Basic', () => {
 	});
 
 	test('should drag List Item 1 to List Item 3 position using mouse', async ({ page }) => {
-		// Get the initial order of the items to verify the starting state
+		// Find the root element
 		const root = page.locator('.ssl-root');
-		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 
-		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
 		// Find the dragged item (List Item 1) and the target item (List Item 3)
@@ -76,13 +76,8 @@ test.describe('Sortable List - Basic', () => {
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
 		await expect(ghost).toBeHidden();
 
-		// Verify final order after drag operation
-		const finalItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 1 to position 3, expected order should be:
-		// List Item 2, List Item 3, List Item 1, List Item 4, List Item 5
+		// Verify the final order
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
 	});
 
@@ -123,56 +118,12 @@ test.describe('Sortable List - Basic', () => {
 	});
 
 	test('should drag List Item 1 to List Item 3 position using keyboard', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
 		// Get the initial order of items to verify the starting state
-		const initialItems = await page.locator('.ssl-item .ssl-item-content__text').allTextContents();
-
-		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
-
-		// Focus on the root element
-		const root = page.locator('.ssl-root');
-		await root.focus();
-
-		// Navigate to the first item using the arrow keys
-		await page.keyboard.press('ArrowDown');
-
-		// Verify the List Item 1 is focused
-		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
-		await expect(focusedItem).toContainText('List Item 1');
-
-		// Start dragging with the Space key
-		await page.keyboard.press('Space');
-
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
-
-		// Move down twice to reach the List Item 3 position (past List Item 2 and List Item 3)
-		await page.keyboard.press('ArrowDown');
-		await page.keyboard.press('ArrowDown');
-
-		// Drop the item with Space key
-		await page.keyboard.press('Space');
-
-		// Wait for drop to start by checking the drag state changes to kbd-drop
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drop');
-
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
-
-		// Verify the final order after the drag operation
-		const finalItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 1 to position 3, expected order should be:
-		// List Item 2, List Item 3, List Item 1, List Item 4, List Item 5
-		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
-	});
-
-	test('should cancel keyboard drag with Escape key', async ({ page }) => {
-		// Find the root element and its items
-		const root = page.locator('.ssl-root');
-		const items = page.locator('.ssl-item');
 
 		// Focus the root element
 		await root.focus();
@@ -190,7 +141,47 @@ test.describe('Sortable List - Basic', () => {
 		// Verify the drag state is active
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
 
-		// Move down twice to reach the List Item 3 position (past List Item 2 and List Item 3)
+		// Move down twice to reach the List Item 3 position
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowDown');
+
+		// Drop the item with Space key
+		await page.keyboard.press('Space');
+
+		// Wait for drop to start by checking the drag state changes to kbd-drop
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drop');
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the final order
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
+	});
+
+	test('should cancel keyboard drag with Escape key', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Focus the root and navigate to the first item
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+
+		// Verify the List Item 1 is focused
+		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		await expect(focusedItem).toContainText('List Item 1');
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+
+		// Verify the drag state is active
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+
+		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
 
@@ -203,12 +194,9 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the original order is maintained
-		await expect(items.nth(0)).toContainText('List Item 1');
-		await expect(items.nth(1)).toContainText('List Item 2');
-		await expect(items.nth(2)).toContainText('List Item 3');
-		await expect(items.nth(3)).toContainText('List Item 4');
-		await expect(items.nth(4)).toContainText('List Item 5');
+		// Verify original order is maintained
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(finalItems).toEqual(initialItems);
 	});
 
 	test('should support keyboard navigation with Home and End keys', async ({ page }) => {
@@ -232,14 +220,14 @@ test.describe('Sortable List - Basic', () => {
 	});
 
 	test('should support keyboard drag with Home and End keys', async ({ page }) => {
-		// Get the initial order of items to verify the starting state
-		const initialItems = await page.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		// Find the root element
+		const root = page.locator('.ssl-root');
 
-		// Verify the initial state - expecting List Item 1, 2, 3, 4, 5
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
 		// Focus on the root element
-		const root = page.locator('.ssl-root');
 		await root.focus();
 
 		// Navigate to the first item using the arrow keys
@@ -264,13 +252,8 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the final order after the drag operation
-		const midwayItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 1 to position 3, expected order should be:
-		// List Item 2, List Item 3, List Item 4, List Item 5, List Item 1
+		// Verify the midway order
+		const midwayItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(midwayItems).toEqual(sortItems(initialItems, 0, 4));
 
 		// Start dragging with the Space key
@@ -288,13 +271,8 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the final order after the drag operation
-		const finalItems = await page
-			.locator('.ssl-item[data-is-ghost="false"] .ssl-item-content__text')
-			.allTextContents();
-
-		// After dragging the List Item 1 to position 3, expected order should be:
-		// List Item 1, List Item 2, List Item 3, List Item 4, List Item 5
+		// Verify the final order
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(midwayItems, 4, 0));
 	});
 });
