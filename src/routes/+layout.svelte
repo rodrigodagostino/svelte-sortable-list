@@ -24,6 +24,7 @@
 		{ text: 'Interactive items', path: '/interactive-items' },
 		{ text: 'Auto scrolling', path: '/auto-scrolling' },
 		{ text: 'Auto scrolling container', path: '/auto-scrolling-container' },
+		{ text: 'Auto scrolling container horizontal', path: '/auto-scrolling-container-horizontal' },
 		{ text: 'Auto scrolling dialog', path: '/auto-scrolling-dialog' },
 		{ text: 'Locked list', path: '/locked-list' },
 		{ text: 'Locked items', path: '/locked-items' },
