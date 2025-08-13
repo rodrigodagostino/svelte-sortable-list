@@ -277,8 +277,8 @@
 <style>
 	.app {
 		width: 100%;
-		min-height: 100vh;
-		min-height: 100svh;
+		min-height: 96vh;
+		min-height: 96svh;
 	}
 
 	.container {
