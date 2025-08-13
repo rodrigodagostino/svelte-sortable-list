@@ -194,6 +194,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let isScrollingDocument = true;
 	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
 	let scrollableAncestorScrollTop: number | undefined = 0;
+	let scrollableAncestorScrollLeft: number | undefined = 0;
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
 	$: if (scrollingSpeed !== 0) scroll();
 
@@ -324,9 +325,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			// Re-set itemRects only during scrolling.
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-			if (scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop) {
+			if (
+				scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
+				scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
+			) {
 				$itemRects = getItemRects(rootRef);
 				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
+				scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
 			}
 			await tick();
 			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
