@@ -625,6 +625,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$targetItem = null;
 		$itemRects = null;
 		$isBetweenBounds = true;
+		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		ghostState = 'idle';
 		await tick();
 		$dragState = 'idle';
