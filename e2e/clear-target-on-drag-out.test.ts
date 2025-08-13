@@ -14,6 +14,10 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
 		// Get the initial order of the items to verify the starting state
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
@@ -25,7 +29,6 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Get the bounding boxes for a precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
 		const targetBox = await targetItem.boundingBox();
-
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
 
@@ -41,21 +44,10 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Verify the drag state is active
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
-		// Move to the target position (center of List Item 3)
-		await page.mouse.move(
-			targetBox.x + targetBox.width / 2,
-			targetBox.y + targetBox.height / 2,
-			{ steps: 10 } // Smooth movement
-		);
-
-		// Get the viewport size
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
-
 		// Move to the right edge of the viewport
 		await page.mouse.move(
-			viewport.width - 80,
-			targetBox.y + targetBox.height / 2,
+			draggedBox.x + draggedBox.width / 2,
+			viewport.height - 80,
 			{ steps: 10 } // Smooth movement
 		);
 

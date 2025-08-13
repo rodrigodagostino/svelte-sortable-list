@@ -15,6 +15,10 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
 		// Get the initial order of the items to verify the starting state
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
@@ -32,17 +36,13 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// Get the bounding boxes for a precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
-		const rootBox = await root.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 3 bounding box');
 
-		if (!rootBox || !draggedBox) throw new Error('Could not get List Item 3 bounding box');
-
-		// Calculate center of the dragged item
-		const draggedCenterX = draggedBox.x + draggedBox.width / 2;
-		const draggedCenterY = draggedBox.y + draggedBox.height / 2;
-
-		// Perform the drag and drop operation
 		// Start the drag from the center of the dragged item
-		await page.mouse.move(draggedCenterX, draggedCenterY);
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
 
 		// Press the mouse down to start dragging
 		await page.mouse.down();
@@ -54,13 +54,12 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Verify the drag state is active
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
-		// Calculate a drop position outside the list boundaries
-		// Drop it to the right of the list container
-		const dropX = rootBox.x + rootBox.width + draggedBox.width / 2 + 40;
-		const dropY = draggedCenterY; // Keep same Y position
-
 		// Drag outside the list boundaries
-		await page.mouse.move(dropX, dropY, { steps: 10 });
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			viewport.height - 80,
+			{ steps: 10 } // Smooth movement
+		);
 
 		// Release the mouse to drop
 		await page.mouse.up();
