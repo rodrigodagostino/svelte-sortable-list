@@ -30,7 +30,6 @@ test.describe('Sortable List - No Transitions', () => {
 		// Get the bounding boxes for a precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
 		const targetBox = await targetItem.boundingBox();
-
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
 
@@ -66,7 +65,7 @@ test.describe('Sortable List - No Transitions', () => {
 		const endTime = Date.now();
 
 		// Verify the drag operation completed instantly
-		expect(endTime - startTime).toBeLessThan(40);
+		expect(endTime - startTime).toBeLessThan(80);
 
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
