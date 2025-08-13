@@ -536,37 +536,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 	}
 
-	async function handlePointerAndKeyboardDragEnd(
-		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
-	) {
-		if ($draggedItem)
-			dispatch('dragend', {
-				deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
-				draggedItem: $draggedItem,
-				draggedItemId: $draggedItem.id,
-				draggedItemIndex: getIndex($draggedItem),
-				targetItem: $targetItem,
-				targetItemId: $targetItem ? $targetItem.id : null,
-				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-				isBetweenBounds: $isBetweenBounds,
-				canRemoveOnDropOut: canRemoveOnDropOut || false,
-				isCanceled: action.includes('cancel'),
-			});
-
-		if (typeof pointerId === 'number' && $draggedItem?.hasPointerCapture(pointerId))
-			$draggedItem?.releasePointerCapture(pointerId);
-		pointerId = null;
-		$pointer = null;
-		$pointerOrigin = null;
-		$draggedItem = null;
-		$targetItem = null;
-		$itemRects = null;
-		$isBetweenBounds = true;
-		ghostState = 'idle';
-		await tick();
-		$dragState = 'idle';
-	}
-
 	async function handlePointerAndKeyboardDrop(
 		element: HTMLElement,
 		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
@@ -628,6 +597,37 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (_transition.duration > 0) element?.addEventListener('transitionend', handleTransitionEnd);
 		else handlePointerAndKeyboardDragEnd(action);
+	}
+
+	async function handlePointerAndKeyboardDragEnd(
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
+	) {
+		if ($draggedItem)
+			dispatch('dragend', {
+				deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
+				draggedItem: $draggedItem,
+				draggedItemId: $draggedItem.id,
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? $targetItem.id : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
+				isCanceled: action.includes('cancel'),
+			});
+
+		if (typeof pointerId === 'number' && $draggedItem?.hasPointerCapture(pointerId))
+			$draggedItem?.releasePointerCapture(pointerId);
+		pointerId = null;
+		$pointer = null;
+		$pointerOrigin = null;
+		$draggedItem = null;
+		$targetItem = null;
+		$itemRects = null;
+		$isBetweenBounds = true;
+		ghostState = 'idle';
+		await tick();
+		$dragState = 'idle';
 	}
 </script>
 
