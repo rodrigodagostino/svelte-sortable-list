@@ -80,6 +80,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		areColliding,
 		getClosestScrollableAncestor,
 		getCollidingItem,
+		getGroupSelector,
+		getId,
 		getIndex,
 		getItemRects,
 		getScrollingSpeed,
@@ -110,13 +112,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	export let isLocked: $$Props['isLocked'] = false;
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let announcements: $$Props['announcements'] = undefined;
+	export let group: $$Props['group'] = undefined;
 
 	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
 	$: classes = joinCSSClasses('ssl-root', $$restProps.class);
 
-	const rootProps = setRootProps({
+	const rootProps = setRootProps(group, {
 		gap,
 		direction,
 		transition: _transition,
@@ -143,20 +146,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		announcements: _announcements,
 	};
 
-	const root = setRoot(null);
+	const root = setRoot(group, null);
 	let pointerId: PointerEvent['pointerId'] | null = null;
-	const pointer = setPointer(null);
-	const pointerOrigin = setPointerOrigin(null);
-	const itemRects = setItemRects(null);
-	const draggedItem = setDraggedItem(null);
-	const targetItem = setTargetItem(null);
-	const focusedItem = setFocusedItem(null);
+	const pointer = setPointer(group, null);
+	const pointerOrigin = setPointerOrigin(group, null);
+	const itemRects = setItemRects(group, null);
+	const draggedItem = setDraggedItem(group, null);
+	const targetItem = setTargetItem(group, null);
+	const focusedItem = setFocusedItem(group, null);
 	let liveText: string = '';
 
-	const dragState = setDragState('idle');
+	const dragState = setDragState(group, 'idle');
 	let ghostState: GhostProps['state'] = 'idle';
-	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRTL = setIsRTL(false);
+	const isBetweenBounds = setIsBetweenBounds(group, true);
+	const isRTL = setIsRTL(group, false);
 
 	const dispatch = createEventDispatcher<{
 		mounted: MountedEventDetail;
@@ -231,7 +234,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 
 		const target = e.target as HTMLElement;
-		const currItem = target.closest<HTMLLIElement>('.ssl-item');
+		const currItem = target.closest<HTMLLIElement>('.ssl-item' + getGroupSelector(group));
 		if (!currItem) return;
 
 		if (
@@ -255,12 +258,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) e.preventDefault();
 
 		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
-		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
-		const isOrResidesInHandle = target.closest('[data-role="handle"]');
-		if (hasHandle && !isOrResidesInHandle) {
-			e.preventDefault();
-			return;
-		}
+		const hasHandle = !!currItem.querySelector('[data-role="handle"]' + getGroupSelector(group));
+		const isOrResidesInHandle = target.closest('[data-role="handle"]' + getGroupSelector(group));
+		if (hasHandle && !isOrResidesInHandle) return;
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
@@ -274,7 +274,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointer = { x: e.clientX, y: e.clientY };
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
-		$itemRects = getItemRects(rootRef);
+		$itemRects = getItemRects(group, rootRef);
 		ghostState = 'ptr-drag';
 		await tick();
 		$dragState = 'ptr-drag';
@@ -325,14 +325,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			// Re-set itemRects only during scrolling.
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
 			if (scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop) {
-				$itemRects = getItemRects(rootRef);
+				$itemRects = getItemRects(group, rootRef);
 				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
 			}
 			await tick();
 			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
 			if (collidingItemRect)
 				$targetItem = rootRef.querySelector<HTMLLIElement>(
-					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+					`.ssl-item${getGroupSelector(group)}[data-item-id="${collidingItemRect.id}"]`
 				);
 			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
 
@@ -379,7 +379,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					$draggedItem = $focusedItem;
 					const draggedIndex = getIndex($focusedItem);
-					$itemRects = getItemRects(rootRef);
+					$itemRects = getItemRects(group, rootRef);
 					dispatch('dragstart', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
@@ -405,7 +405,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				if ($dragState !== 'kbd-drag') {
 					if (!$focusedItem || focusedIndex === null) {
-						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
+						const firstItem = rootRef.querySelector<HTMLLIElement>(
+							'.ssl-item' + getGroupSelector(group)
+						);
 						if (!firstItem) return;
 						firstItem.focus({ preventScroll: true });
 						if (scrollableAncestor && !isFullyVisible(firstItem, scrollableAncestor))
@@ -415,7 +417,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					const items = rootRef.querySelectorAll<HTMLLIElement>(
+						'.ssl-item' + getGroupSelector(group)
+					);
 					if (
 						(step === -1 && focusedIndex === 0) ||
 						(step === 1 && focusedIndex === items.length - 1)
@@ -483,7 +487,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === 'Home' || key === 'End') {
 				e.preventDefault();
 
-				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+				const items = rootRef.querySelectorAll<HTMLLIElement>(
+					'.ssl-item' + getGroupSelector(group)
+				);
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
 				if ($dragState !== 'kbd-drag') {
@@ -640,6 +646,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
 	style:--ssl-transition-easing={_transition.easing}
+	data-group={group}
 	data-has-locked-axis={hasLockedAxis}
 	data-has-boundaries={hasBoundaries}
 	data-can-clear-on-drag-out={canClearOnDragOut}
@@ -658,10 +665,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		: undefined}
 	aria-describedby={$$restProps['aria-describedby'] || undefined}
 	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
-	on:pointerdown={handlePointerDown}
-	on:pointercancel={handlePointerCancel}
-	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
+	on:pointerdown|stopPropagation={handlePointerDown}
+	on:pointercancel|stopPropagation={handlePointerCancel}
+	on:keydown|stopPropagation={handleKeyDown}
+	on:itemfocusout|stopPropagation={(event) =>
+		handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
 	<slot>
 		<p>
@@ -673,7 +681,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <!-- The following if clause will prevent the <SortableListItem> -->
 <!-- inside <SortableListGhost> from transitioning out on page navigation. -->
 {#if $root}
-	<SortableListGhost bind:ghostRef state={ghostState} />
+	<SortableListGhost bind:ghostRef state={ghostState} {group} />
 {/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 

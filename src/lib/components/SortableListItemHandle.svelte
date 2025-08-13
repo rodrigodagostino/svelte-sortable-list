@@ -17,11 +17,16 @@ Serves as an element that limits the draggable area of a list item to itself. In
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { joinCSSClasses } from '$lib/utils/styles.js';
+	import type { SortableListItemHandleProps as ItemHandleProps } from '$lib/types/props.js';
+
+	type $$Props = ItemHandleProps;
+
+	export let group: $$Props['group'] = undefined;
 
 	$: classes = joinCSSClasses('ssl-item-handle', $$restProps.class);
 </script>
 
-<span class={classes} data-role="handle" aria-hidden="true">
+<span class={classes} data-group={group} data-role="handle" aria-hidden="true">
 	<slot>
 		<Icon name="handle" />
 	</slot>

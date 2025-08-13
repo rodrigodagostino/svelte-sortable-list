@@ -1,6 +1,7 @@
 import type { AriaAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
 import type { SortableListAnnouncements as Announcements } from './accessibility.js';
+import type { Group } from '$lib/stores/index.js';
 
 export interface SortableListRootProps
 	extends Pick<
@@ -46,6 +47,7 @@ export interface SortableListRootProps
 	isDisabled?: boolean;
 	/** The announcements to be read out by the screen reader during drag and drop operations. */
 	announcements?: Announcements;
+	group?: Group;
 }
 
 export interface SortableListItemProps
@@ -62,6 +64,7 @@ export interface SortableListItemProps
 	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
 	/** Animation played when the item is removed from the list. */
 	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
+	group?: Group;
 }
 
 export interface SortableListGhostProps {
@@ -69,4 +72,13 @@ export interface SortableListGhostProps {
 	ghostRef: HTMLDivElement;
 	/** State in which the Ghost is in. */
 	state: 'idle' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
+	group?: Group;
+}
+
+export interface SortableListItemHandleProps {
+	group?: Group;
+}
+
+export interface SortableListItemRemoveProps {
+	group?: Group;
 }

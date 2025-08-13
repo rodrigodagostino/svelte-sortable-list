@@ -40,6 +40,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		calculateTranslate,
 		calculateTranslateWithAlignment,
 		dispatch,
+		getGroupSelector,
+		getId,
 		getIndex,
 		INTERACTIVE_ELEMENTS,
 		INTERACTIVE_ROLE_ATTRIBUTES,
@@ -57,23 +59,24 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let transitionIn: $$Props['transitionIn'] = undefined;
 	export let transitionOut: $$Props['transitionOut'] = undefined;
+	export let group: $$Props['group'] = undefined;
 
 	$: _transitionIn = transitionIn || scaleFly;
 	$: _transitionOut = transitionOut || scaleFly;
 
 	$: classes = joinCSSClasses('ssl-item', $$restProps.class);
 
-	const rootProps = getRootProps();
+	const rootProps = getRootProps(group);
 
-	const root = getRoot();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
-	const focusedItem = getFocusedItem();
+	const root = getRoot(group);
+	const itemRects = getItemRects(group);
+	const draggedItem = getDraggedItem(group);
+	const targetItem = getTargetItem(group);
+	const focusedItem = getFocusedItem(group);
 
-	const dragState = getDragState();
-	const isBetweenBounds = getIsBetweenBounds();
-	const isRTL = getIsRTL();
+	const dragState = getDragState(group);
+	const isBetweenBounds = getIsBetweenBounds(group);
+	const isRTL = getIsRTL(group);
 
 	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
@@ -207,7 +210,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
+		if (
+			!relatedTarget ||
+			(relatedTarget && !relatedTarget.closest('.ssl-item' + getGroupSelector(group)))
+		) {
 			if (!$focusedItem) return;
 			dispatch(itemRef, 'itemfocusout', { item: $focusedItem });
 			await tick();
@@ -223,6 +229,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:transform={styleTransform}
+	data-group={group}
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? $dragState : 'idle'}
@@ -236,8 +243,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-label={$$restProps['aria-label'] || undefined}
 	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}
-	on:focus={handleFocus}
-	on:focusout={handleFocusOut}
+	on:focus|stopPropagation={handleFocus}
+	on:focusout|stopPropagation={handleFocusOut}
 	in:_transitionIn
 	out:_transitionOut
 >

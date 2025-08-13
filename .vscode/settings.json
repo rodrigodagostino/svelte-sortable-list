@@ -11,5 +11,8 @@
 	"files.eol": "\n",
 	"eslint.format.enable": true,
 	"eslint.lintTask.enable": true,
-	"eslint.validate": ["javascript", "javascriptreact", "svelte"]
+	"eslint.validate": ["javascript", "javascriptreact", "svelte"],
+	"[svelte]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
 }
