@@ -425,11 +425,10 @@
 
 		& table {
 			border-collapse: collapse;
-			max-width: 100%;
 			margin-block: 0.5rem;
 
-			@media (min-width: 26em) {
-				table-layout: auto;
+			@media (min-width: 32em) {
+				width: auto;
 			}
 		}
 
@@ -446,17 +445,9 @@
 			border-bottom: 1px solid var(--ssl-gray-200);
 			text-align: start;
 
-			&:nth-child(3) {
-				width: 44%;
-			}
-
 			&:first-child,
 			&:last-child {
 				width: 0;
-
-				@media (min-width: 26em) {
-					width: 50%;
-				}
 			}
 		}
 
@@ -464,9 +455,16 @@
 			font-family: monospace;
 		}
 
+		& label {
+			display: block;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+
 		& input:not([type='checkbox']),
-		& select {
-			width: 7.75rem;
+		& select,
+		& textarea {
 			max-width: 100%;
 			padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 			border-radius: 0.25rem;
@@ -475,7 +473,7 @@
 
 	.app-main {
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: 1fr;
 		min-height: 100%;
 		padding: 3rem;
