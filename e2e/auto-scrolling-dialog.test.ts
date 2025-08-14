@@ -7,6 +7,11 @@ test.describe('Sortable List - Auto Scrolling Dialog', () => {
 	});
 
 	test('should handle dialog scrolling during drag operations', async ({ page }) => {
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
+		// Get the dialog element
 		const dialog = page.locator('dialog');
 
 		// Open dialog
@@ -26,7 +31,6 @@ test.describe('Sortable List - Auto Scrolling Dialog', () => {
 		// Find the dragged item (List Item 1)
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 		const draggedBox = await draggedItem.boundingBox();
-
 		if (!draggedBox) throw new Error('Could not get first item bounding box');
 
 		// Hover over the first item
@@ -42,8 +46,6 @@ test.describe('Sortable List - Auto Scrolling Dialog', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
 		// Move to the bottom edge of the viewport to trigger auto scroll
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
@@ -51,13 +53,13 @@ test.describe('Sortable List - Auto Scrolling Dialog', () => {
 		);
 
 		// Wait for the auto scroll to happen
-		await page.waitForTimeout(2000);
+		await page.waitForTimeout(1000);
 
 		// Move back to the middle of the viewport
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Release the mouse to drop

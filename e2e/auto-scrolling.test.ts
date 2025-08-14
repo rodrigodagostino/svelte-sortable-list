@@ -10,11 +10,14 @@ test.describe('Sortable List - Auto Scrolling', () => {
 	});
 
 	test('should auto scroll when dragging to the bottom', async ({ page }) => {
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
 		// Find the dragged item (List Item 1)
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 		const draggedBox = await draggedItem.boundingBox();
-
 		if (!draggedBox) throw new Error('Could not get first item bounding box');
 
 		// Get the initial scroll position
@@ -33,8 +36,6 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
 		// Move to the bottom edge of the viewport to trigger auto scroll
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
@@ -42,13 +43,13 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		);
 
 		// Wait for the auto scroll to happen
-		await page.waitForTimeout(2000);
+		await page.waitForTimeout(1000);
 
 		// Move back to the middle of the viewport
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Release the mouse to drop
@@ -63,6 +64,10 @@ test.describe('Sortable List - Auto Scrolling', () => {
 	});
 
 	test('should auto scroll when dragging to the top', async ({ page }) => {
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
 		// Scroll to the bottom first
 		await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
@@ -70,7 +75,6 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-100"]');
 		const draggedBox = await draggedItem.boundingBox();
-
 		if (!draggedBox) throw new Error('Could not get last item bounding box');
 
 		// Get the initial scroll position
@@ -96,15 +100,13 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		);
 
 		// Wait for the auto scroll to happen
-		await page.waitForTimeout(2000);
+		await page.waitForTimeout(1000);
 
 		// Move back to the middle of the viewport
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Release the mouse to drop
@@ -114,7 +116,7 @@ test.describe('Sortable List - Auto Scrolling', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify scrolling occurred (should be less than the initial scroll since we're scrolling up)
-		const newScroll = await page.evaluate(() => window.scrollY);
-		expect(newScroll).toBeLessThan(initialScroll);
+		const finalScroll = await page.evaluate(() => window.scrollY);
+		expect(finalScroll).toBeLessThan(initialScroll);
 	});
 });
