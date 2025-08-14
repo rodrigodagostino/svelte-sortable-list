@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.3] (2025-08-14)
+
+### Test
+
+- Add E2E tests for the **“Auto scrolling container”** page.
+- Add E2E tests for the **“Auto scrolling container horizontal”** page.
+- Adjust the auto scrolling tests to make them more consistent with each other.
+- Check that the focused item is still focused after keyboard drop.
+- Check for changes on ghost state before drag state.
+- Increase maximum duration in the **“No transitions”** page test.
+- Adjust the **“Clear target in drag out”** and **“Remove item on drop out”** page tests so they pass on mobile (move the dragged item downwards instead of sideways).
+
+### Fixed
+
+- Ensure `rafId` is cleared on drop (necessary on mobile when `transitionDuration` is `0ms`).
+- Re-set `itemRects` during horizontal auto scrolling.
+- Ensure `scrollableAncestor` is always up to date.
+
+### Chore
+
+- Shorten package test scripts.
+
+### Docs
+
+- Add **“Auto scrolling horizontal”** demo page.
+- Rename the **“Auto scrolling”** demo page to **“Auto scrolling window”**.
+- Prevent the layout elements from overflowing the viewport.
+- Reduce the layout `min-height` to `96svh`.
+
 ## [0.17.2] (2025-08-11)
 
 ### Test
@@ -1156,7 +1185,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...HEAD
+[0.17.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...v0.17.1
 [0.17.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.16.5...v0.17.0
