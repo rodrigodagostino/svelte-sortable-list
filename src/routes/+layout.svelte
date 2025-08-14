@@ -22,7 +22,7 @@
 		{ text: 'With locked axis', path: '/with-locked-axis' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
 		{ text: 'Interactive items', path: '/interactive-items' },
-		{ text: 'Auto scrolling', path: '/auto-scrolling' },
+		{ text: 'Auto scrolling window', path: '/auto-scrolling-window' },
 		{ text: 'Auto scrolling container', path: '/auto-scrolling-container' },
 		{ text: 'Auto scrolling container horizontal', path: '/auto-scrolling-container-horizontal' },
 		{ text: 'Auto scrolling dialog', path: '/auto-scrolling-dialog' },

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Sortable List - Auto Scrolling', () => {
+test.describe('Sortable List - Auto Scrolling Window', () => {
 	test.beforeEach(async ({ page }) => {
-		// Navigate to the Auto Scrolling page
-		await page.goto('/auto-scrolling');
+		// Navigate to the Auto Scrolling Window page
+		await page.goto('/auto-scrolling-window');
 
 		// Wait for the root element to be loaded
 		await page.locator('.ssl-root').waitFor();
