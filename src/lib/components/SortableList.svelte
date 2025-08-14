@@ -192,9 +192,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
-	$: scrollableAncestor = getClosestScrollableAncestor(rootRef);
+	let scrollableAncestor: HTMLElement | undefined;
 	let scrollableAncestorScrollTop: number | undefined = 0;
 	let scrollableAncestorScrollLeft: number | undefined = 0;
+	$: if (rootRef || $draggedItem) scrollableAncestor = getClosestScrollableAncestor(rootRef);
 	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
 	$: if (scrollingSpeed !== 0) scroll();
 
@@ -203,11 +204,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (BROWSER)
 			requestAnimationFrame(() => {
-				if (!shouldAutoScroll(scrollableAncestor, direction, scrollingSpeed)) return;
+				if (!shouldAutoScroll(scrollableAncestor!, direction, scrollingSpeed)) return;
 
 				const x = direction === 'horizontal' ? scrollingSpeed : 0;
 				const y = direction === 'vertical' ? scrollingSpeed : 0;
-				scrollableAncestor.scrollBy(x, y);
+				scrollableAncestor!.scrollBy(x, y);
 
 				if (scrollingSpeed !== 0) scroll();
 			});
