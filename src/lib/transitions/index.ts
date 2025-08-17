@@ -13,6 +13,8 @@ interface ScaleFlyParams {
 	duration?: number;
 	/** Easing function. */
 	easing?: EasingFunction;
+	/** Axis. */
+	axis?: 'x' | 'y';
 	/** X position. */
 	x?: number;
 	/** Y position. */
@@ -29,6 +31,7 @@ interface ScaleFlyParams {
  * @param params.delay Delay (in milliseconds).
  * @param params.duration Duration (in milliseconds).
  * @param params.easing Easing function.
+ * @param params.axis Axis.
  * @param params.x X position.
  * @param params.y Y position.
  * @param params.opacity Opacity.
@@ -36,41 +39,58 @@ interface ScaleFlyParams {
  */
 export function scaleFly(
 	node: HTMLElement,
-	{ delay = 0, duration = 240, easing = sineInOut, x = 0, y = 0, opacity = 0 }: ScaleFlyParams = {}
+	{
+		delay = 0,
+		duration = 240,
+		easing = sineInOut,
+		axis = 'y',
+		x = 0,
+		y = 0,
+		opacity = 0,
+	}: ScaleFlyParams = {}
 ): TransitionConfig {
 	const style = getComputedStyle(node);
+
 	const transform = style.transform === 'none' ? '' : style.transform;
-	const [xValue, xUnit] = split_css_unit(x);
-	const [yValue, yUnit] = split_css_unit(y);
-	const target_opacity = +style.opacity;
-	const od = target_opacity * (1 - opacity);
-	const height = node.getBoundingClientRect().height;
-	const padding_top = parseFloat(style.paddingTop);
-	const padding_bottom = parseFloat(style.paddingBottom);
-	const target_padding_top = +style.paddingTop;
-	const target_padding_bottom = +style.paddingBottom;
-	const margin_top = parseFloat(style.marginTop);
-	const margin_bottom = parseFloat(style.marginBottom);
-	const target_margin_top = +style.marginTop;
-	const target_margin_bottom = +style.marginBottom;
-	const border_top_width = parseFloat(style.borderTopWidth);
-	const border_bottom_width = parseFloat(style.borderBottomWidth);
-	const target_border_top_width = +style.borderTopWidth;
-	const target_border_bottom_width = +style.borderBottomWidth;
+	const [x_value, x_unit] = split_css_unit(x);
+	const [y_value, y_unit] = split_css_unit(y);
+	const opacity_target_value = +style.opacity;
+	const opacity_delta_value = opacity_target_value * (1 - opacity);
+	const primary_property = axis === 'y' ? 'height' : 'width';
+	const primary_property_value = node.getBoundingClientRect()[primary_property];
+	const primary_property_opposite = axis === 'y' ? 'width' : 'height';
+	const primary_property_opposite_value = node.getBoundingClientRect()[primary_property_opposite];
+	const secondary_properties = axis === 'y' ? ['top', 'bottom'] : ['left', 'right'];
+	const capitalized_secondary_properties = secondary_properties.map(
+		(e) => `${e[0].toUpperCase()}${e.slice(1)}` as 'Left' | 'Right' | 'Top' | 'Bottom'
+	);
+	const padding_start_value = parseFloat(style[`padding${capitalized_secondary_properties[0]}`]);
+	const padding_end_value = parseFloat(style[`padding${capitalized_secondary_properties[1]}`]);
+	const margin_start_value = parseFloat(style[`margin${capitalized_secondary_properties[0]}`]);
+	const margin_end_value = parseFloat(style[`margin${capitalized_secondary_properties[1]}`]);
+	const border_width_start_value = parseFloat(
+		style[`border${capitalized_secondary_properties[0]}Width`]
+	);
+	const border_width_end_value = parseFloat(
+		style[`border${capitalized_secondary_properties[1]}Width`]
+	);
 
 	return {
 		delay,
 		duration,
 		easing,
 		css: (t, u) =>
-			`transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * xValue}${xUnit}` : x}, ${t <= 0.5 ? `${(1 - t) * yValue}${yUnit}` : y}, 0);` +
-			`opacity: ${t <= 0.5 ? `${target_opacity - od * u * 2};` : `${target_opacity}px;`}` +
-			`height: ${t <= 0.5 ? `${t * 2 * height}px;` : `${height}px;`}` +
-			`padding-top: ${t <= 0.5 ? `${t * 2 * padding_top}px;` : `${target_padding_top}px;`}` +
-			`padding-bottom: ${t <= 0.5 ? `${t * 2 * padding_bottom}px;` : `${target_padding_bottom}px;`}` +
-			`margin-top: ${t <= 0.5 ? `${t * 2 * margin_top}px;` : `${target_margin_top}px;`}` +
-			`margin-bottom: ${t <= 0.5 ? `${t * 2 * margin_bottom}px;` : `${target_margin_bottom}px;`}` +
-			`border-top-width: ${t <= 0.5 ? `${t * 2 * border_top_width}px;` : `${target_border_top_width}px;`}` +
-			`border-bottom-width: ${t <= 0.5 ? `${t * 2 * border_bottom_width}px;` : `${target_border_bottom_width}px;`}`,
+			`transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * x_value}${x_unit}` : x}, ${t <= 0.5 ? `${(1 - t) * y_value}${y_unit}` : y}, 0);` +
+			`opacity: ${t > 0.5 ? opacity_target_value - opacity_delta_value * u * 2 : 0};` +
+			`${primary_property}: ${t <= 0.5 ? t * 2 * primary_property_value : primary_property_value}px;` +
+			`${primary_property_opposite}: ${primary_property_opposite_value}px;` +
+			`padding-${secondary_properties[0]}: ${t <= 0.5 ? t * 2 * padding_start_value : padding_start_value}px;` +
+			`padding-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * padding_end_value : padding_end_value}px;` +
+			`margin-${secondary_properties[0]}: ${t <= 0.5 ? t * 2 * margin_start_value : margin_start_value}px;` +
+			`margin-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * margin_end_value : margin_end_value}px;` +
+			`border-${secondary_properties[0]}-width: ${t <= 0.5 ? t * 2 * border_width_start_value : border_width_start_value}px;` +
+			`border-${secondary_properties[1]}-width: ${t <= 0.5 ? t * 2 * border_width_end_value : border_width_end_value}px;` +
+			`min-${primary_property}: 0;` +
+			'overflow: hidden;',
 	};
 }

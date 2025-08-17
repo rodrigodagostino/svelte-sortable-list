@@ -58,8 +58,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	export let transitionIn: $$Props['transitionIn'] = undefined;
 	export let transitionOut: $$Props['transitionOut'] = undefined;
 
-	$: _transitionIn = transitionIn || scaleFly;
-	$: _transitionOut = transitionOut || scaleFly;
+	$: _transitionIn =
+		transitionIn ||
+		((node: HTMLElement) =>
+			scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }));
+	$: _transitionOut =
+		transitionOut ||
+		((node: HTMLElement) =>
+			scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }));
 
 	$: classes = joinCSSClasses('ssl-item', $$restProps.class);
 

@@ -296,9 +296,9 @@ Utility functions to simplify common list operations:
 
 Built-in transition functions for smooth animations:
 
-| Function   | Description                                   | Parameters                                                                                                                                                                                      |
-| ---------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `scaleFly` | Animates an element scaling and flying in/out | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;x: number<br>&nbsp;&nbsp;y: number<br>&nbsp;&nbsp;opacity: number<br>}</pre> |
+| Function   | Description                                   | Parameters                                                                                                                                                                                                                      |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `scaleFly` | Animates an element scaling and flying in/out | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;axis: 'x' \| 'y'<br>&nbsp;&nbsp;x: number<br>&nbsp;&nbsp;y: number<br>&nbsp;&nbsp;opacity: number<br>}</pre> |
 
 **Example:**
 
