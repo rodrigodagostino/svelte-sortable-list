@@ -118,26 +118,24 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	$: focusedId = $focusedItem ? $focusedItem.id : null;
 
 	function getStyleWidth(...args: unknown[]) {
-		if (!isGhost && !$rootProps.canRemoveOnDropOut) return undefined;
+		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
-			draggedId === String(id) &&
+			$rootProps.direction === 'horizontal' &&
 			!$isBetweenBounds &&
-			$rootProps.canRemoveOnDropOut &&
-			$rootProps.direction === 'horizontal'
+			$rootProps.canRemoveOnDropOut
 		)
 			return '0';
 		return `${currentRect?.width}px`;
 	}
 
 	function getStyleHeight(...args: unknown[]) {
-		if (!$rootProps.canRemoveOnDropOut) return undefined;
+		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
-			draggedId === String(id) &&
+			$rootProps.direction === 'vertical' &&
 			!$isBetweenBounds &&
-			$rootProps.canRemoveOnDropOut &&
-			$rootProps.direction === 'vertical'
+			$rootProps.canRemoveOnDropOut
 		)
 			return '0';
 		return `${currentRect?.height}px`;
