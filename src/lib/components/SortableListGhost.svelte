@@ -65,7 +65,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		// even when only a text node is present inside.
 		ghostRef.children[0].replaceChildren(...clone.childNodes);
 	}
-	$: if (state === 'ptr-drag') cloneDraggedItemContent(state);
+	$: if (state === 'ptr-drag-start') cloneDraggedItemContent(state);
 
 	function getStyleLeft(...args: unknown[]) {
 		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
@@ -115,7 +115,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		const ghostRect = ghostRef.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
 
-		if (state === 'ptr-drag' && draggedRect) {
+		if ((state === 'ptr-drag-start' || state === 'ptr-drag') && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
 				const x =
 					$rootProps.direction === 'horizontal' ||
@@ -235,12 +235,12 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			visibility: visible;
 		}
 
-		&[data-ghost-state='ptr-drag'],
+		&[data-ghost-state*='ptr-drag'],
 		&[data-ghost-state='ptr-predrop'] {
 			z-index: 10000;
 		}
 
-		/* The z-index is different from the one in [data-ghost-state='ptr-drag'] and [data-ghost-state='ptr-predrop'] just to force
+		/* The z-index is different from the one in [data-ghost-state*='ptr-drag'] and [data-ghost-state='ptr-predrop'] just to force
 			 the «transitionend» event to be fired when the ghost is dragged and dropped without being moved. */
 		&[data-ghost-state='ptr-drop'],
 		&[data-ghost-state='ptr-remove'] {

@@ -40,13 +40,13 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		await page.mouse.down();
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the right edge of the viewport to trigger auto scroll
 		await page.mouse.move(
 			viewport.width - 200,
 			draggedBox.y + draggedBox.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Wait for the auto scroll to happen
@@ -104,13 +104,13 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		await page.mouse.down();
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the left to trigger auto scroll
 		await page.mouse.move(
 			200,
 			draggedBox.y + draggedBox.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Wait for the auto scroll to happen

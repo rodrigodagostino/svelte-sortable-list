@@ -46,13 +46,13 @@ test.describe('Sortable List - Inside Dialog', () => {
 		await page.mouse.down();
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the target position
 		await page.mouse.move(
 			targetBox.x + targetBox.width / 2,
 			targetBox.y + targetBox.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Release the mouse to drop
@@ -98,7 +98,7 @@ test.describe('Sortable List - Inside Dialog', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down three times to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
@@ -145,7 +145,7 @@ test.describe('Sortable List - Inside Dialog', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');

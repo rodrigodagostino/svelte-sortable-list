@@ -33,7 +33,7 @@ test.describe('Sortable List - RTL', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowLeft');

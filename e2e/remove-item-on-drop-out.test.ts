@@ -48,17 +48,17 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		await page.mouse.down();
 
 		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
+		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
 		await expect(ghost).toBeVisible();
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Drag outside the list boundaries
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Release the mouse to drop

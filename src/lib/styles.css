@@ -85,8 +85,8 @@
 	opacity: 0.5;
 }
 
-.ssl-item[data-drag-state="ptr-drag"][data-is-ghost="true"] .ssl-item-content,
-.ssl-item[data-drag-state="kbd-drag"] .ssl-item-content {
+.ssl-item[data-drag-state*="ptr-drag"][data-is-ghost="true"] .ssl-item-content,
+.ssl-item[data-drag-state*="kbd-drag"] .ssl-item-content {
 	box-shadow: var(--ssl-box-shadow-1);
 }
 
@@ -105,7 +105,7 @@
 .ssl-item-remove:focus,
 .ssl-item-remove:hover,
 .ssl-item[data-is-ghost="true"][data-drag-state="idle"] .ssl-item-handle,
-.ssl-item[data-is-ghost="true"][data-drag-state="ptr-drag"] .ssl-item-handle {
+.ssl-item[data-is-ghost="true"][data-drag-state*="ptr-drag"] .ssl-item-handle {
 	background-color: var(--ssl-gray-100);
 	color: var(--ssl-gray-600);
 }

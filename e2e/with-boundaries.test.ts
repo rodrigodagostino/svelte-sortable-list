@@ -43,7 +43,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			40,
 			40,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// The item should be constrained by the left and top boundaries
@@ -56,7 +56,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			viewport.width - 40,
 			40,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// The item should be constrained by the right and top boundaries
@@ -71,7 +71,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			viewport.width - 40,
 			viewport.height - 40,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// The item should be constrained by the right and bottom boundaries
@@ -88,7 +88,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			40,
 			viewport.height - 40,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// The item should be constrained by the left and bottom boundaries

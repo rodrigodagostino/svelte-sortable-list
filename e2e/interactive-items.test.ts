@@ -69,13 +69,13 @@ test.describe('Sortable List - Interactive Items', () => {
 			await page.mouse.down();
 
 			// Verify the drag state is active
-			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 			// Move the item down
 			await page.mouse.move(
 				targetBox.x + 8,
 				targetBox.y + targetBox.height / 2,
-				{ steps: 10 } // Smooth movement
+				{ steps: 20 } // Smooth movement
 			);
 
 			// Release the mouse to drop
@@ -127,7 +127,7 @@ test.describe('Sortable List - Interactive Items', () => {
 			await page.mouse.down();
 
 			// Verify the drag state is active
-			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 			// Verify the form elements retained their values
 			const ghostFormField = ghost

@@ -277,9 +277,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
-		ghostState = 'ptr-drag';
+		ghostState = 'ptr-drag-start';
 		await tick();
-		$dragState = 'ptr-drag';
+		$dragState = 'ptr-drag-start';
 		dispatch('dragstart', {
 			deviceType: 'pointer',
 			draggedItem: currItem,
@@ -302,7 +302,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (rafId || $dragState !== 'ptr-drag') return;
+		if (rafId) return;
+
+		if (ghostState !== 'ptr-drag' || $dragState !== 'ptr-drag') {
+			ghostState = 'ptr-drag';
+			await tick();
+			$dragState = 'ptr-drag';
+		}
 
 		rafId = requestAnimationFrame(async () => {
 			if (!$draggedItem || !$itemRects || !ghostRef) return;
@@ -378,9 +384,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				else e.preventDefault();
 
 				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
-
-				if ($dragState !== 'kbd-drag') {
-					$dragState = 'kbd-drag';
+				if ($dragState === 'idle') {
+					$dragState = 'kbd-drag-start';
 
 					await tick();
 					$draggedItem = $focusedItem;
@@ -409,7 +414,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
 
-				if ($dragState !== 'kbd-drag') {
+				if ($dragState !== 'kbd-drag-start' && $dragState !== 'kbd-drag') {
 					if (!$focusedItem || focusedIndex === null) {
 						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItem) return;
@@ -464,6 +469,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					targetId = $targetItem.id;
 					targetIndex = getIndex($targetItem);
+
+					await tick();
+					$dragState = 'kbd-drag';
+
 					dispatch('drag', {
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
@@ -492,7 +501,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
-				if ($dragState !== 'kbd-drag') {
+				if ($dragState !== 'kbd-drag-start' && $dragState !== 'kbd-drag') {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -519,6 +528,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						return;
 
 					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
+
+					await tick();
+					$dragState = 'kbd-drag';
+
 					liveText = _announcements.dragged(
 						$draggedItem,
 						draggedIndex,

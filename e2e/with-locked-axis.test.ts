@@ -35,21 +35,21 @@ test.describe('Sortable List - With Locked Axis', () => {
 		await page.mouse.move(
 			draggedBox.x,
 			initialBox.y + 100,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Move back up
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width,
 			initialBox.y + 50,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Move down again
 		await page.mouse.move(
 			draggedBox.x,
 			initialBox.y + 150,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Get the final position

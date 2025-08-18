@@ -83,7 +83,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
 	$: {
-		setInteractiveElementsTabIndex($dragState === 'kbd-drag', focusedId);
+		setInteractiveElementsTabIndex($dragState === 'kbd-drag-start', focusedId);
 	}
 
 	onMount(() => {
@@ -98,6 +98,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			.forEach(
 				(el) =>
 					(el.tabIndex =
+						$dragState !== 'kbd-drag-start' &&
 						$dragState !== 'kbd-drag' &&
 						focusedId === String(id) &&
 						!$rootProps.isDisabled &&
@@ -263,8 +264,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			cursor: grab;
 		}
 
-		&[data-drag-state='ptr-drag'],
-		&[data-drag-state='ptr-drag'] [data-role='handle'] {
+		&[data-drag-state*='ptr-drag'],
+		&[data-drag-state*='ptr-drag'] [data-role='handle'] {
 			cursor: grabbing;
 		}
 
@@ -302,11 +303,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 2;
 		}
 
-		&[data-drag-state='kbd-drag'] {
+		&[data-drag-state*='kbd-drag'] {
 			z-index: 4;
 		}
 
-		/* The z-index is different from the one in [data-drag-state='kbd-drag'] just to force
+		/* The z-index is different from the one in [data-drag-state*='kbd-drag'] just to force
 			 the «transitionend» event to be fired when the item is dropped using the keyboard. */
 		&[data-drag-state='kbd-drop'],
 		&[data-drag-state='kbd-cancel'] {

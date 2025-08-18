@@ -50,17 +50,17 @@ test.describe('Sortable List - Basic', () => {
 		await page.mouse.down();
 
 		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
+		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
 		await expect(ghost).toBeVisible();
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the target position (center of List Item 3)
 		await page.mouse.move(
 			targetBox.x + targetBox.width / 2,
 			targetBox.y + targetBox.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Release the mouse to drop
@@ -139,7 +139,7 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
@@ -182,7 +182,7 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
@@ -244,7 +244,7 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down to the end of the list
 		await page.keyboard.press('End');
@@ -263,7 +263,7 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 
 		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down to the start of the list
 		await page.keyboard.press('Home');

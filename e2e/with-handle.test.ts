@@ -87,16 +87,16 @@ test.describe('Sortable List - With Handle', () => {
 		await page.mouse.down();
 
 		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
+		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
 
 		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the target position (below List Item 3)
 		await page.mouse.move(
 			handleBox.x + handleBox.width / 2,
 			targetBox.y + targetBox.height / 2,
-			{ steps: 10 } // Smooth movement
+			{ steps: 20 } // Smooth movement
 		);
 
 		// Release the mouse to drop
