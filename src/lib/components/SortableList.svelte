@@ -543,6 +543,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					$dragState = 'kbd-drag';
 
+					dispatch('drag', {
+						deviceType: 'keyboard',
+						draggedItem: $draggedItem,
+						draggedItemId: $draggedItem.id,
+						draggedItemIndex: draggedIndex,
+						targetItem: $targetItem,
+						targetItemId: $targetItem.id,
+						targetItemIndex: targetIndex,
+						isBetweenBounds: $isBetweenBounds,
+						canRemoveOnDropOut: canRemoveOnDropOut || false,
+					});
+
 					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
 				}
 
