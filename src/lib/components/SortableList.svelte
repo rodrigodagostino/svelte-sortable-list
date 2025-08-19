@@ -190,6 +190,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 	});
 
+	let transitionTimeoutId: number | null = null;
+
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
 	let scrollableAncestor: HTMLElement | undefined;
@@ -630,11 +632,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (propertyName === 'z-index') {
 				handlePointerAndKeyboardDragEnd(action);
 				element?.removeEventListener('transitionend', handleTransitionEnd);
+				if (transitionTimeoutId) {
+					clearTimeout(transitionTimeoutId);
+					transitionTimeoutId = null;
+				}
 			}
 		}
 
-		if (_transition.duration > 0) element?.addEventListener('transitionend', handleTransitionEnd);
-		else handlePointerAndKeyboardDragEnd(action);
+		if (_transition.duration > 0) {
+			element?.addEventListener('transitionend', handleTransitionEnd);
+			// Ensure the drag operation completes even if `transitionend` doesn’t fire.
+			transitionTimeoutId = setTimeout(() => {
+				handlePointerAndKeyboardDragEnd(action);
+				element?.removeEventListener('transitionend', handleTransitionEnd);
+				transitionTimeoutId = null;
+			}, _transition.duration + 100);
+		} else {
+			handlePointerAndKeyboardDragEnd(action);
+		}
 	}
 
 	async function handlePointerAndKeyboardDragEnd(
