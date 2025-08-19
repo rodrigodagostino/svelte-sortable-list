@@ -67,6 +67,10 @@
 			border-left: 0.375rem solid var(--ssl-gray-300);
 			border-right: 0.375rem solid var(--ssl-gray-300);
 			overflow: auto hidden;
+
+			& .ssl-item-content__text {
+				white-space: nowrap;
+			}
 		}
 	}
 </style>
