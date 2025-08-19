@@ -529,9 +529,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
-						(key === 'Home' && draggedIndex === 0 && !targetItem) ||
+						(key === 'Home' && draggedIndex === 0 && !$targetItem) ||
 						(key === 'Home' && targetIndex === 0) ||
-						(key === 'End' && draggedIndex === $itemRects.length - 1 && !targetItem) ||
+						(key === 'End' && draggedIndex === $itemRects.length - 1 && !$targetItem) ||
 						(key === 'End' && targetIndex === $itemRects.length - 1)
 					)
 						return;
