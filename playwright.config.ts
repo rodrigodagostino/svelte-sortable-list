@@ -1,6 +1,20 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+	projects: [
+		{
+			name: 'chromium',
+			use: {
+				...devices['Desktop Chrome'],
+			},
+		},
+		{
+			name: 'Mobile Chrome',
+			use: {
+				...devices['Pixel 5'],
+			},
+		},
+	],
 	webServer: {
 		command: 'pnpm build && pnpm preview',
 		port: 4173,
