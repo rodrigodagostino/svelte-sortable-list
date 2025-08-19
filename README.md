@@ -375,7 +375,7 @@ To use the demo page styles in your project:
 Use these CSS selectors to customize the appearance of list components:
 
 > [!IMPORTANT]
-> **Styling best practices**: To avoid conflicts with core styles and transitions, avoid applying transitions directly to the `.ssl-item` and `.ssl-ghost` selectors. Instead, create a content wrapper element (like `.ssl-item-content`) as a child of `.ssl-item`. The ghost element will automatically mirror the list item’s content and appearance.
+> **Styling best practices**: To prevent conflicts with core styles and transitions, avoid applying transitions directly through the `.ssl-item` and `.ssl-ghost` selectors. Instead, create a content wrapper element (like `.ssl-item-content`) as a child of `.ssl-item`. The ghost element will automatically mirror the list item’s content and appearance.
 
 | Selector                                         | Description                                                                                     |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
