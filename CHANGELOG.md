@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.4] (2025-08-19)
+
+### BREAKING
+
+- Align drag states with drag events.
+
+### Test
+
+- Adjust the Playwright config to run on Chromium and Mobile Chrome.
+- Optimize the auto scrolling container tests for mobile.
+
+### Changed
+
+- Simplify the conditions for the `getStyleWidth()` and `getStyleHeight()` functions in `<SortableList.Item>`.
+- Make event handlers logic more cohesive.
+- Add a fallback timeout to ensure the drag operation completes even if `transitionend` doesn’t fire (also prevents flakiness in several keyboard drag tests).
+
+### Fixed
+
+- Adjust the `scaleFly` transition to work properly when `direction` is set to `horizontal`.
+- Correct wrong calls to `$targetItem`.
+- Add missing event dispatch.
+
+### Docs
+
+- Prevent item text wrapping in the **“Auto scrolling container horizontal”** demo page.
+- Add full coverage to drag states through Tailwind classes in the «Styled with Tailwind CSS» demo page.
+- Make **“Styling best practices”** in the README more clear.
+
 ## [0.17.3] (2025-08-14)
 
 ### Test
@@ -1185,7 +1214,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...HEAD
+[0.17.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...v0.17.2
 [0.17.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.0...v0.17.1
