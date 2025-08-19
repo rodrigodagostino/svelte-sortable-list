@@ -10,14 +10,10 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 	});
 
 	test('should auto scroll when dragging to the bottom', async ({ page }) => {
-		// Get the viewport size
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
-
 		// Find the wrapper element
 		const wrapper = page.locator('.wrapper');
 		const wrapperBox = await wrapper.boundingBox();
-		if (!wrapperBox) throw new Error('Could not get viewport size');
+		if (!wrapperBox) throw new Error('Could not get wrapper size');
 
 		// Find the dragged item (List Item 1)
 		const root = page.locator('.ssl-root');
@@ -42,20 +38,20 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 		// Verify the drag state is active
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Move to the bottom edge of the viewport to trigger auto scroll
+		// Move to the bottom edge of the wrapper to trigger auto scroll
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
-			viewport.height - 80,
+			wrapperBox.x + wrapperBox.height,
 			{ steps: 20 } // Smooth movement
 		);
 
 		// Wait for the auto scroll to happen
 		await page.waitForTimeout(1000);
 
-		// Move back to the middle of the viewport
+		// Move back to the middle of the wrapper
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
-			viewport.height / 2,
+			wrapperBox.y + wrapperBox.height / 2,
 			{ steps: 40 } // Smooth movement
 		);
 
@@ -71,14 +67,10 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 	});
 
 	test('should auto scroll when dragging to the top', async ({ page }) => {
-		// Get the viewport size
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
-
 		// Find the wrapper element
 		const wrapper = page.locator('.wrapper');
 		const wrapperBox = await wrapper.boundingBox();
-		if (!wrapperBox) throw new Error('Could not get viewport size');
+		if (!wrapperBox) throw new Error('Could not get wrapper size');
 
 		// Scroll to the bottom first
 		await wrapper.evaluate((el) => el.scrollTo(0, el.scrollHeight));
@@ -109,7 +101,7 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 		// Move to the top to trigger auto scroll
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
-			80,
+			wrapperBox.y,
 			{ steps: 20 } // Smooth movement
 		);
 
@@ -119,7 +111,7 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 		// Move back to the middle of the wrapper
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
-			viewport.height / 2,
+			wrapperBox.y + wrapperBox.height / 2,
 			{ steps: 40 } // Smooth movement
 		);
 

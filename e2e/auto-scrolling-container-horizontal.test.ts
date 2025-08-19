@@ -10,10 +10,6 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 	});
 
 	test('should auto scroll when dragging to the right', async ({ page }) => {
-		// Get the viewport size
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
-
 		// Find the wrapper element
 		const wrapper = page.locator('.wrapper');
 		const wrapperBox = await wrapper.boundingBox();
@@ -42,19 +38,19 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		// Verify the drag state is active
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Move to the right edge of the viewport to trigger auto scroll
+		// Move to the right edge of the wrapper to trigger auto scroll
 		await page.mouse.move(
-			viewport.width - 200,
+			wrapperBox.x + wrapperBox.width,
 			draggedBox.y + draggedBox.height / 2,
 			{ steps: 20 } // Smooth movement
 		);
 
 		// Wait for the auto scroll to happen
-		await page.waitForTimeout(1000);
+		await page.waitForTimeout(2000);
 
-		// Move back to the middle of the viewport
+		// Move back to the middle of the wrapper
 		await page.mouse.move(
-			viewport.width / 2,
+			wrapperBox.x + wrapperBox.width / 2,
 			draggedBox.y + draggedBox.height / 2,
 			{ steps: 40 } // Smooth movement
 		);
@@ -71,10 +67,6 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 	});
 
 	test('should auto scroll when dragging to the left', async ({ page }) => {
-		// Get the viewport size
-		const viewport = page.viewportSize();
-		if (!viewport) throw new Error('Could not get viewport size');
-
 		// Find the wrapper element
 		const wrapper = page.locator('.wrapper');
 		const wrapperBox = await wrapper.boundingBox();
@@ -106,19 +98,19 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		// Verify the drag state is active
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Move to the left to trigger auto scroll
+		// Move to the left edge of the wrapper to trigger auto scroll
 		await page.mouse.move(
-			200,
+			wrapperBox.x,
 			draggedBox.y + draggedBox.height / 2,
 			{ steps: 20 } // Smooth movement
 		);
 
 		// Wait for the auto scroll to happen
-		await page.waitForTimeout(1000);
+		await page.waitForTimeout(2000);
 
 		// Move back to the middle of the wrapper
 		await page.mouse.move(
-			viewport.width / 2,
+			wrapperBox.x + wrapperBox.width / 2,
 			draggedBox.y + draggedBox.height / 2,
 			{ steps: 40 } // Smooth movement
 		);
