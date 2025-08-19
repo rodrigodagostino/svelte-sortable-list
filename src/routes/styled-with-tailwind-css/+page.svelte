@@ -29,7 +29,7 @@
 
 <SortableList.Root
 	{...$rootProps}
-	class="rounded-md focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-indigo-600"
+	class="rounded-lg focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-indigo-600"
 	on:drop={handleDrop}
 	on:dragend={handleDragEnd}
 >
@@ -37,10 +37,10 @@
 		<SortableList.Item
 			{...item}
 			{index}
-			class="rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state*='kbd-drag']]:shadow-md [&[data-drag-state*='kbd-drag']_>_*]:bg-indigo-500 [&[data-drag-state*='ptr-drag']]:shadow-md [&[data-drag-state*='ptr-drag']_>_*]:bg-indigo-500 [&[data-is-ghost='false'][data-drag-state*='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0 hover:[&[data-is-ghost='false']_>_*]:bg-indigo-800"
+			class="group rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state*='kbd-drag']]:shadow-md [&[data-drag-state*='ptr-drag']]:shadow-md [&[data-is-ghost='false'][data-drag-state*='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors"
+				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors group-focus-within:bg-indigo-800 group-[[data-drag-state*='kbd-drag']]:bg-indigo-500 group-[[data-drag-state*='ptr-drag']]:bg-indigo-500 group-[[data-is-ghost='false']:hover]:bg-indigo-800"
 			>
 				<span class="text-base font-medium uppercase text-white">{item.text}</span>
 			</div>
