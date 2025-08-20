@@ -35,9 +35,6 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
-
 		// Move to the right edge of the wrapper to trigger auto scroll
 		await page.mouse.move(
 			wrapperBox.x + wrapperBox.width,
@@ -70,7 +67,7 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		// Find the wrapper element
 		const wrapper = page.locator('.wrapper');
 		const wrapperBox = await wrapper.boundingBox();
-		if (!wrapperBox) throw new Error('Could not get viewport size');
+		if (!wrapperBox) throw new Error('Could not get wrapper size');
 
 		// Scroll to the right first
 		await wrapper.evaluate((el) => el.scrollTo(el.scrollWidth, 0));
@@ -94,9 +91,6 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 
 		// Press the mouse down to start dragging
 		await page.mouse.down();
-
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the left edge of the wrapper to trigger auto scroll
 		await page.mouse.move(

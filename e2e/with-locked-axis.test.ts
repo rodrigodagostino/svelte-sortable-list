@@ -17,7 +17,6 @@ test.describe('Sortable List - With Locked Axis', () => {
 		// Get the bounding boxes for precise drag operation
 		const initialBox = await draggedItem.boundingBox();
 		const draggedBox = await draggedItem.boundingBox();
-
 		if (!initialBox || !draggedBox) throw new Error('Could not get item bounding box');
 
 		const initialX = initialBox.x;

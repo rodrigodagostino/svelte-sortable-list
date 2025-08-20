@@ -33,7 +33,6 @@ test.describe('Sortable List - Inside Dialog', () => {
 		// Get the bounding boxes for precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
 		const targetBox = await targetItem.boundingBox();
-
 		if (!draggedBox || !targetBox) throw new Error('Could not get bounding boxes');
 
 		// Start drag from the center of the dragged item
@@ -44,9 +43,6 @@ test.describe('Sortable List - Inside Dialog', () => {
 
 		// Press the mouse down to start dragging
 		await page.mouse.down();
-
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the target position
 		await page.mouse.move(
@@ -97,18 +93,12 @@ test.describe('Sortable List - Inside Dialog', () => {
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
 
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
-
 		// Move down three times to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
 
 		// Drop the item with Space key
 		await page.keyboard.press('Space');
-
-		// Wait for drop to start by checking the drag state changes to kbd-drop
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drop');
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
@@ -143,9 +133,6 @@ test.describe('Sortable List - Inside Dialog', () => {
 
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
-
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');

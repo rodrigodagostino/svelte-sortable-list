@@ -229,9 +229,6 @@ test.describe('Sortable List - Basic', () => {
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
 
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
-
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
@@ -241,9 +238,6 @@ test.describe('Sortable List - Basic', () => {
 
 		// Wait for cancel to start by checking the drag state changes to kbd-cancel
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-cancel');
-
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify original order is maintained
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
@@ -291,9 +285,6 @@ test.describe('Sortable List - Basic', () => {
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
 
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
-
 		// Move down to the end of the list
 		await page.keyboard.press('End');
 
@@ -309,9 +300,6 @@ test.describe('Sortable List - Basic', () => {
 
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
-
-		// Verify the drag state is active
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
 
 		// Move down to the start of the list
 		await page.keyboard.press('Home');

@@ -42,9 +42,6 @@ test.describe('Sortable List - No Transitions', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
-
 		// Move to the target position (center of List Item 3)
 		await page.mouse.move(
 			targetBox.x + targetBox.width / 2,

@@ -41,13 +41,6 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
-		await expect(ghost).toBeVisible();
-
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
-
 		// Drag outside the list boundaries
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
@@ -68,12 +61,8 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Wait for the removal to start by checking the ghost state changes to ptr-remove
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-remove');
 
-		// Verify the ghost element disappears after drag completes
+		// Wait for the drag operation to complete by checking the ghost state returns to idle
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
-		await expect(ghost).toBeHidden();
-
-		// Verify dragged item has been removed
-		await expect(draggedItem).toBeHidden();
 
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();

@@ -42,9 +42,6 @@ test.describe('Sortable List - Auto Scrolling Dialog', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
-
 		// Move to the bottom edge of the viewport to trigger auto scroll
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,

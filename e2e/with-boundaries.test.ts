@@ -20,13 +20,11 @@ test.describe('Sortable List - With Boundaries', () => {
 
 		// Get the viewport size
 		const viewport = page.viewportSize();
-
 		if (!viewport) throw new Error('Could not get viewport size');
 
 		// Get the bounding boxes for a precise drag operation
 		const rootBox = await root.boundingBox();
 		const draggedBox = await draggedItem.boundingBox();
-
 		if (!rootBox || !draggedBox)
 			throw new Error('Could not get Root element or List Item 1 bounding box');
 
