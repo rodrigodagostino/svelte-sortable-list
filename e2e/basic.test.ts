@@ -19,12 +19,14 @@ test.describe('Sortable List - Basic', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
-		// Find the dragged item (List Item 1) and the target item (List Item 3)
+		// Find the dragged item (List Item 1), its content and the target item (List Item 3)
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
+		const draggedItemContent = draggedItem.locator('.ssl-item-content');
 		const targetItem = root.locator('[data-item-id="list-item-3"]');
 
-		// Find the ghost element
+		// Find the ghost element and its content
 		const ghost = page.locator('.ssl-ghost');
+		const ghostItemContent = ghost.locator('.ssl-item-content');
 
 		// Verify both items exist
 		await expect(draggedItem).toBeVisible();
@@ -40,6 +42,9 @@ test.describe('Sortable List - Basic', () => {
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
 
+		// Verify the dragged item content has full opacity
+		await expect(draggedItemContent).toHaveCSS('opacity', '1');
+
 		// Start drag from the center of the dragged item
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
@@ -53,8 +58,17 @@ test.describe('Sortable List - Basic', () => {
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
 		await expect(ghost).toBeVisible();
 
-		// Verify the drag state is active
+		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Verify the ghost item content has the correct box-shadow
+		await expect(ghostItemContent).toHaveCSS(
+			'box-shadow',
+			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+		);
+
+		// Verify the dragged item content has reduced opacity
+		await expect(draggedItemContent).toHaveCSS('opacity', '0.5');
 
 		// Move to the target position (center of List Item 3)
 		await page.mouse.move(
@@ -62,6 +76,15 @@ test.describe('Sortable List - Basic', () => {
 			targetBox.y + targetBox.height / 2,
 			{ steps: 20 } // Smooth movement
 		);
+
+		// Verify the ghost item content has the correct box-shadow
+		await expect(ghostItemContent).toHaveCSS(
+			'box-shadow',
+			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+		);
+
+		// Verify the dragged item content has reduced opacity
+		await expect(draggedItemContent).toHaveCSS('opacity', '0.5');
 
 		// Release the mouse to drop
 		await page.mouse.up();
@@ -76,6 +99,12 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
+		// Verify the ghost item content has no box-shadow
+		await expect(ghostItemContent).toHaveCSS('box-shadow', 'none');
+
+		// Verify the dragged item content has full opacity
+		await expect(draggedItemContent).toHaveCSS('opacity', '1');
+
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
@@ -86,13 +115,8 @@ test.describe('Sortable List - Basic', () => {
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 
-		// Get the computed style
-		const cursor = await draggedItem.evaluate((el) => {
-			return window.getComputedStyle(el).cursor;
-		});
-
-		// Should show grab cursor on handle
-		expect(cursor).toMatch(/grab/);
+		// Verify the cursor is the grab cursor
+		expect(draggedItem).toHaveCSS('cursor', 'grab');
 
 		// When dragging, should show grabbing cursor
 		const draggedBox = await draggedItem.boundingBox();
@@ -108,10 +132,7 @@ test.describe('Sortable List - Basic', () => {
 		await page.mouse.down();
 
 		// Check cursor changes to grabbing during drag
-		const draggingCursor = await draggedItem.evaluate((el) => {
-			return window.getComputedStyle(el).cursor;
-		});
-		expect(draggingCursor).toMatch(/grabbing/);
+		expect(draggedItem).toHaveCSS('cursor', 'grabbing');
 
 		// Release the mouse to drop
 		await page.mouse.up();
@@ -135,8 +156,23 @@ test.describe('Sortable List - Basic', () => {
 		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
 		await expect(focusedItem).toContainText('List Item 1');
 
+		// Get the focused item content
+		const focusedItemContent = focusedItem.locator('.ssl-item-content');
+
+		// Verify the focused item has the correct outline
+		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
+
+		// Verify the ghost item content has no box-shadow
+		await expect(focusedItemContent).toHaveCSS('box-shadow', 'none');
+
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
+
+		// Verify the focused item content has the correct box-shadow
+		await expect(focusedItemContent).toHaveCSS(
+			'box-shadow',
+			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+		);
 
 		// Verify the drag state is active
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
@@ -144,6 +180,12 @@ test.describe('Sortable List - Basic', () => {
 		// Move down twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
+
+		// Verify the focused item content has the correct box-shadow
+		await expect(focusedItemContent).toHaveCSS(
+			'box-shadow',
+			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+		);
 
 		// Drop the item with Space key
 		await page.keyboard.press('Space');
@@ -154,8 +196,14 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
+		// Verify the ghost item content has no box-shadow
+		await expect(focusedItemContent).toHaveCSS('box-shadow', 'none');
+
 		// Verify the dragged item is still focused
 		expect(focusedItem).toBeFocused();
+
+		// Verify the focused item has the correct outline
+		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
 
 		// Verify the final order
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();

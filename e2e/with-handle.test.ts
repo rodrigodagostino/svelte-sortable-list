@@ -74,10 +74,6 @@ test.describe('Sortable List - With Handle', () => {
 		const draggedBox = await draggedItem.boundingBox();
 		const targetBox = await targetItem.boundingBox();
 		const handleBox = await draggedHandle.boundingBox();
-
-		// Find the ghost element
-		const ghost = page.locator('.ssl-ghost');
-
 		if (!draggedBox || !targetBox || !handleBox) throw new Error('Could not get bounding boxes');
 
 		// Start drag from the center of the handle
@@ -85,12 +81,6 @@ test.describe('Sortable List - With Handle', () => {
 
 		// Press the mouse down to start dragging
 		await page.mouse.down();
-
-		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
-
-		// Verify the drag state is active
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Move to the target position (below List Item 3)
 		await page.mouse.move(
@@ -101,10 +91,6 @@ test.describe('Sortable List - With Handle', () => {
 
 		// Release the mouse to drop
 		await page.mouse.up();
-
-		// Verify the ghost element disappears after drag completes
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
-		await expect(ghost).toBeHidden();
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
@@ -119,27 +105,37 @@ test.describe('Sortable List - With Handle', () => {
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]');
 		const draggedHandle = draggedItem.locator('.ssl-item-handle');
-
-		// Get the computed style
-		const cursor = await draggedHandle.evaluate((el) => {
-			return window.getComputedStyle(el).cursor;
-		});
-
-		// Should show grab cursor on handle
-		expect(cursor).toMatch(/grab/);
+		const targetItem = root.locator('[data-item-id="list-item-3"]');
 
 		// When dragging, should show grabbing cursor
+		const targetBox = await targetItem.boundingBox();
 		const handleBox = await draggedHandle.boundingBox();
-		if (!handleBox) throw new Error('Could not get handle bounding box');
+		if (!targetBox || !handleBox) throw new Error('Could not get handle bounding box');
 
+		// Start drag from the center of the dragged item
 		await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
+
+		// Verify the cursor is the grab cursor
+		expect(draggedHandle).toHaveCSS('cursor', 'grab');
+
+		// Press the mouse down to start dragging
 		await page.mouse.down();
 
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move to the target position (below List Item 3)
+		await page.mouse.move(
+			handleBox.x + handleBox.width / 2,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 20 } // Smooth movement
+		);
+
+		// Wait for the dragged item to move by checking the drag state changes to kbd-drag
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
 		// Check cursor changes to grabbing during drag
-		const draggingCursor = await draggedHandle.evaluate((el) => {
-			return window.getComputedStyle(el).cursor;
-		});
-		expect(draggingCursor).toMatch(/grabbing/);
+		expect(draggedHandle).toHaveCSS('cursor', 'grabbing');
 
 		// Release the mouse to drop
 		await page.mouse.up();

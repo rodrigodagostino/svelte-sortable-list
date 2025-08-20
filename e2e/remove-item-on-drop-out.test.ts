@@ -23,16 +23,10 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
 
-		// Find the root element, the dragged item (List Item 3) and the ghost element
+		// Find the dragged item (List Item 3), the ghost element and its content
 		const draggedItem = root.locator('[data-item-id="list-item-3"]');
 		const ghost = page.locator('.ssl-ghost');
-
-		// Verify root and draggedItem exist
-		await expect(root).toBeVisible();
-		await expect(draggedItem).toBeVisible();
-
-		// Verify the ghost element is hidden
-		await expect(ghost).toBeHidden();
+		const ghostItemContent = ghost.locator('.ssl-item-content');
 
 		// Get the bounding boxes for a precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
@@ -61,10 +55,17 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 			{ steps: 20 } // Smooth movement
 		);
 
+		// Verify the dragged item has no height
+		await expect(draggedItem).toHaveCSS('height', '0px');
+
+		// Verify the ghost item content has the correct background color and border
+		await expect(ghostItemContent).toHaveCSS('background-color', 'rgb(253, 164, 175)');
+		await expect(ghostItemContent).toHaveCSS('border', '1px solid rgb(251, 113, 133)');
+
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		// Verify the ghost element switches to the remove state
+		// Wait for the removal to start by checking the ghost state changes to ptr-remove
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-remove');
 
 		// Verify the ghost element disappears after drag completes

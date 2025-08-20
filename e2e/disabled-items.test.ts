@@ -17,9 +17,11 @@ test.describe('Sortable List - Disabled Items', () => {
 		const disabledItems = await root.locator('.ssl-item[aria-disabled="true"]').all();
 
 		for (const disabledItem of disabledItems) {
+			// Check that the cursor is not allowed
+			expect(disabledItem).toHaveCSS('cursor', 'not-allowed');
+
 			// Get the initial position
 			const initialBox = await disabledItem.boundingBox();
-
 			if (!initialBox) throw new Error('Could not get item bounding box');
 
 			// Start the drag from the center of the item
@@ -40,7 +42,6 @@ test.describe('Sortable List - Disabled Items', () => {
 
 			// Get the final position
 			const finalBox = await disabledItem.boundingBox();
-
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
 			// The disabled item should not have moved
@@ -73,7 +74,6 @@ test.describe('Sortable List - Disabled Items', () => {
 
 			// Check if the item is still in its original position
 			const initialBox = await disabledItem.boundingBox();
-
 			if (!initialBox) throw new Error('Could not get item bounding box');
 
 			// Try to move with keyboard
@@ -81,7 +81,6 @@ test.describe('Sortable List - Disabled Items', () => {
 
 			// Get the new position
 			const finalBox = await disabledItem.boundingBox();
-
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
 			// The disabled item should not have moved
