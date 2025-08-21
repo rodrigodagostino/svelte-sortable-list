@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.5] (2025-08-21)
+
+### Test
+
+- Add E2E tests for the **“Direction horizontal”** page.
+- Add checks for elements appearance.
+- Remove redundant checks.
+- Extract states and appearance checks into separate tests for the **“Basic”** page.
+
 ## [0.17.4] (2025-08-19)
 
 ### BREAKING
@@ -1214,7 +1223,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...HEAD
+[0.17.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...v0.17.5
 [0.17.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...v0.17.3
 [0.17.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.1...v0.17.2

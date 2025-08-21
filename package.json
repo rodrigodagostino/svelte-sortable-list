@@ -1,6 +1,6 @@
 {
 	"name": "@rodrigodagostino/svelte-sortable-list",
-	"version": "0.17.4",
+	"version": "0.17.5",
 	"author": "Rodrigo D’Agostino <rodrigo.dagostino@proton.me>",
 	"license": "MIT",
 	"type": "module",
@@ -23,7 +23,7 @@
 		"test:headed": "playwright test --headed",
 		"test:ui": "playwright test --ui",
 		"test:trace": "playwright test --trace on",
-		"test:trigger-flaky": "playwright test --repeat-each=100 --workers=4 -x"
+		"test:trigger-flaky": "playwright test --repeat-each=20 --workers=4 -x"
 	},
 	"exports": {
 		".": {
