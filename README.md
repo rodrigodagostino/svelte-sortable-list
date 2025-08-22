@@ -202,7 +202,7 @@ The following example demonstrates how to translate announcements to Spanish (ad
 
 ## Components
 
-The package provides four main components for building sortable lists:
+This package follows the [Compound Component Pattern](https://www.smashingmagazine.com/2021/08/compound-components-react/), inspired in the remarkable work of [Hunter Johnston](https://github.com/huntabyte) in [Bits UI](https://github.com/huntabyte/bits-ui). This pattern allows you to access modular components that work together seamlessly, all stemming from a single source.
 
 | Component                   | Description                                                                                                                                                                 |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
