@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] (2025-08-22)
+
+### Chores
+
+- Upgrade dependencies.
+
+### Docs
+
+- Update the README to describe the use and inspiration of the **Compound Component Pattern**.
+
 ## [0.17.5] (2025-08-21)
 
 ### Test
@@ -63,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Re-set `itemRects` during horizontal auto scrolling.
 - Ensure `scrollableAncestor` is always up to date.
 
-### Chore
+### Chores
 
 - Shorten package test scripts.
 
@@ -93,7 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Prevent closing the `<dialog>` element when pressing the Escape key to cancel a keyboard drag.
 
-### Chore
+### Chores
 
 - Add more test scripts.
 
@@ -126,7 +136,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `children` instead of `childNodes` when cloning the dragged item content.
 - Improve `ghostRef` existence checks.
 
-### Chore
+### Chores
 
 - Add Playwright.
 - Set up Playwright GitHub actions.
@@ -428,7 +438,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Avoid having an inner container in the `<SortableItem>` and `<Ghost>` components. These were initially added to correctly display the transitions for the `<Ghost>` component fired on `pointerdown`. The code was adjusted to simply wait until all the necessary parts are ready before making the `<Ghost>`’s content visible.
 
-### Chore
+### Chores
 
 - Set `esm-env` as a peer dependency.
 
@@ -1223,7 +1233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...v1.0.0
 [0.17.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...v0.17.5
 [0.17.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...v0.17.4
 [0.17.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.2...v0.17.3
