@@ -100,3 +100,10 @@ export interface SortableListItemHandleProps {
 	/** Content to be rendered inside the handle. */
 	children?: Snippet;
 }
+
+export interface SortableListItemRemoveProps {
+	/** Content to be rendered inside the handle. */
+	children?: Snippet;
+	/** Callback fired when the remove button is clicked. */
+	onclick?: (event: MouseEvent) => void;
+}

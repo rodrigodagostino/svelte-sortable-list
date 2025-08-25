@@ -9,7 +9,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 		<div class="ssl-item-content">
 			{item.text}
 		</div>
-		<SortableList.ItemRemove on:click={handleRemoveClick} />
+		<SortableList.ItemRemove onclick={handleRemoveClick} />
 	</SortableList.Item>
 ```
 -->
@@ -17,14 +17,18 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
+	import type { SortableListItemRemoveProps } from '$lib/types/props.js';
 	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
 
-	$: classes = joinCSSClasses('ssl-item-remove', $$restProps.class);
+	let { children, onclick, ...restProps }: SortableListItemRemoveProps & { class?: string } =
+		$props();
+
+	const classes = $derived(joinCSSClasses('ssl-item-remove', restProps.class));
 
 	const root = getRoot();
 	const focusedItem = getFocusedItem();
 
-	function handleClick() {
+	function handleClick(e: MouseEvent) {
 		if ($focusedItem && $root) {
 			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
@@ -38,11 +42,15 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 				$root.focus();
 			}
 		}
+
+		onclick?.(e);
 	}
 </script>
 
-<button class={classes} data-role="remove" on:click={handleClick} on:click>
-	<slot>
+<button class={classes} data-role="remove" onclick={handleClick}>
+	{#if children}
+		{@render children()}
+	{:else}
 		<Icon name="remove" />
-	</slot>
+	{/if}
 </button>
