@@ -14,6 +14,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 -->
 
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import SortableListItem from './SortableListItem.svelte';
 	import { portal } from '$lib/actions/index.js';
 	import {
@@ -34,10 +35,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		preserveFormFieldValues,
 	} from '$lib/utils/index.js';
 
-	type $$Props = GhostProps;
-
-	export let ghostRef: $$Props['ghostRef'];
-	export let state: $$Props['state'];
+	let { ghostRef = $bindable(), state }: GhostProps = $props();
 
 	const rootProps = getRootProps();
 
@@ -48,13 +46,17 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
 
-	$: draggedId = $draggedItem ? $draggedItem.id : null;
-	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
+	const draggedId = $derived($draggedItem ? $draggedItem.id : null);
+	const draggedIndex = $derived($draggedItem ? getIndex($draggedItem) : null);
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
-	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
+	const draggedRect = $derived(
+		$itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null
+	);
+	const targetIndex = $derived($targetItem ? getIndex($targetItem) : null);
+	const targetRect = $derived(
+		$itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null
+	);
 
 	function cloneDraggedItemContent(...args: unknown[]) {
 		if (!ghostRef || !$draggedItem) return;
@@ -65,7 +67,9 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		// even when only a text node is present inside.
 		ghostRef.children[0].replaceChildren(...clone.childNodes);
 	}
-	$: if (state === 'ptr-drag-start') cloneDraggedItemContent(state);
+	$effect.pre(() => {
+		if (state === 'ptr-drag-start') untrack(() => cloneDraggedItemContent());
+	});
 
 	function getStyleLeft(...args: unknown[]) {
 		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
@@ -182,9 +186,19 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (state === 'ptr-remove') return ghostRef.style.transform;
 	}
 
-	$: styleLeft = getStyleLeft(state);
-	$: styleTop = getStyleTop(state);
-	$: styleTransform = getStyleTransform(state, $pointer);
+	const styleLeft = $derived.by(() => {
+		state;
+		return untrack(() => getStyleLeft());
+	});
+	const styleTop = $derived.by(() => {
+		state;
+		return untrack(() => getStyleTop());
+	});
+	const styleTransform = $derived.by(() => {
+		state;
+		$pointer;
+		return untrack(() => getStyleTransform());
+	});
 </script>
 
 <div
