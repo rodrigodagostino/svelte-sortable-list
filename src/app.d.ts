@@ -12,7 +12,7 @@ declare global {
 
 declare module 'svelte/elements' {
 	export interface HTMLAttributes<T> {
-		'on:itemfocusout'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
+		onitemfocusout?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 	}
 
 	export interface AriaAttributes {

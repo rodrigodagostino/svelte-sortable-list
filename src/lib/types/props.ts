@@ -1,6 +1,15 @@
+import type { Snippet } from 'svelte';
 import type { AriaAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
 import type { SortableListAnnouncements as Announcements } from './accessibility.js';
+import type {
+	MountedEvent,
+	DragStartEvent,
+	DragEvent,
+	DropEvent,
+	DragEndEvent,
+	DestroyedEvent,
+} from './events.js';
 
 export interface SortableListRootProps
 	extends Pick<
@@ -46,6 +55,20 @@ export interface SortableListRootProps
 	isDisabled?: boolean;
 	/** The announcements to be read out by the screen reader during drag and drop operations. */
 	announcements?: Announcements;
+	/** Content to be rendered inside the list. */
+	children?: Snippet;
+	/** Callback fired when the component is mounted. */
+	onmounted?: (event: MountedEvent) => void;
+	/** Callback fired when an item starts to be dragged by a pointer device or a keyboard. */
+	ondragstart?: (event: DragStartEvent) => void;
+	/** Callback fired when a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). */
+	ondrag?: (event: DragEvent) => void;
+	/** Callback fired when a dragged item is released by a pointer device or a keyboard. */
+	ondrop?: (event: DropEvent) => void;
+	/** Callback fired when a dragged item reaches its destination after being released. */
+	ondragend?: (event: DragEndEvent) => void;
+	/** Callback fired when the component is destroyed. */
+	ondestroyed?: (event: DestroyedEvent) => void;
 }
 
 export interface SortableListItemProps

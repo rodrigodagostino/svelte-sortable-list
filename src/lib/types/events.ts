@@ -1,4 +1,4 @@
-interface EventDetail {
+interface Event {
 	/** The device type that triggered the event. */
 	deviceType: 'pointer' | 'keyboard';
 	/** The dragged item element. */
@@ -19,35 +19,32 @@ interface EventDetail {
 	canRemoveOnDropOut: boolean;
 }
 
-export type MountedEventDetail = null;
+export type MountedEvent = null;
 
-export type DragStartEventDetail = Omit<
-	EventDetail,
-	'targetItem' | 'targetItemId' | 'targetItemIndex'
->;
+export type DragStartEvent = Omit<Event, 'targetItem' | 'targetItemId' | 'targetItemIndex'>;
 
-export type DragEventDetail = EventDetail;
+export type DragEvent = Event;
 
-export type DropEventDetail = EventDetail;
+export type DropEvent = Event;
 
-export type DragEndEventDetail = EventDetail & {
+export type DragEndEvent = Event & {
 	/** Whether the drag operation was canceled */
 	isCanceled: boolean;
 };
 
-export type DestroyedEventDetail = null;
+export type DestroyedEvent = null;
 
 export interface SortableListRootEvents {
 	/** Fired when the component is mounted. */
-	mounted: CustomEvent<MountedEventDetail>;
+	onmounted: MountedEvent;
 	/** Fired when an item starts to be dragged by a pointer device or a keyboard. */
-	dragstart: CustomEvent<DragStartEventDetail>;
+	ondragstart: DragStartEvent;
 	/** Fired when a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). */
-	drag: CustomEvent<DragEventDetail>;
+	ondrag: DragEvent;
 	/** Fired when a dragged item is released by a pointer device or a keyboard. */
-	drop: CustomEvent<DropEventDetail>;
+	ondrop: DropEvent;
 	/** Fired when a dragged item reaches its destination after being released. */
-	dragend: CustomEvent<DragEndEventDetail>;
+	ondragend: DragEndEvent;
 	/** Fired when the component is destroyed. */
-	destroyed: CustomEvent<DestroyedEventDetail>;
+	ondestroyed: DestroyedEvent;
 }

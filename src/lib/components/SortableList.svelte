@@ -19,16 +19,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `announcements`: announcements to be read out by the screen reader during drag and drop operations.
 
 ### Events
-- `mounted`: the component is mounted.
-- `dragstart`: an item starts to be dragged by a pointer device or a keyboard.
-- `drag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
-- `drop`: a dragged item is released by a pointer device or a keyboard.
-- `dragend`: a dragged item reaches its destination after being released.
-- `destroyed`: the component is destroyed.
+- `onmounted`: the component is mounted.
+- `ondragstart`: an item starts to be dragged by a pointer device or a keyboard.
+- `ondrag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
+- `ondrop`: a dragged item is released by a pointer device or a keyboard.
+- `ondragend`: a dragged item reaches its destination after being released.
+- `ondestroyed`: the component is destroyed.
 
 ### Usage
 ```svelte
-	<SortableList.Root on:drop={handleDrop} on:dragend={handleDragEnd}>
+	<SortableList.Root ondrop={handleDrop} ondragend={handleDragEnd}>
 		{#each items as item, index (item.id)}
 			<SortableList.Item {...item} {index}>
 				<div class="ssl-item-content">
@@ -41,14 +41,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 -->
 
 <script lang="ts">
-	import {
-		afterUpdate,
-		beforeUpdate,
-		createEventDispatcher,
-		onDestroy,
-		onMount,
-		tick,
-	} from 'svelte';
+	import { onDestroy, onMount, tick, untrack } from 'svelte';
+	import type { Writable } from 'svelte/store';
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import {
@@ -65,14 +59,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
-		DestroyedEventDetail,
-		DragEndEventDetail,
-		DragEventDetail,
-		DragStartEventDetail,
-		DropEventDetail,
-		MountedEventDetail,
 		SortableListGhostProps as GhostProps,
-		SortableListRootEvents as RootEvents,
 		SortableListRootProps as RootProps,
 	} from '$lib/types/index.js';
 	import {
@@ -93,113 +80,117 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
-	type $$Props = RootProps & { class?: string };
-	type $$Events = RootEvents;
+	let rootRef: HTMLUListElement = $state()!;
+	let ghostRef: HTMLDivElement = $state()!;
 
-	let rootRef: HTMLUListElement;
-	let ghostRef: HTMLDivElement;
+	let {
+		gap = 12,
+		direction = 'vertical',
+		transition = undefined,
+		hasWrapping = false,
+		hasLockedAxis = false,
+		hasBoundaries = false,
+		canClearOnDragOut = false,
+		canRemoveOnDropOut = false,
+		isLocked = false,
+		isDisabled = false,
+		announcements = undefined,
+		onmounted,
+		ondragstart,
+		ondrag,
+		ondrop,
+		ondragend,
+		ondestroyed,
+		children,
+		...restProps
+	}: RootProps & { class?: string } = $props();
 
-	export let gap: $$Props['gap'] = 12;
-	export let direction: $$Props['direction'] = 'vertical';
-	export let transition: $$Props['transition'] = undefined;
-	export let hasWrapping: $$Props['hasWrapping'] = false;
-	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
-	export let hasBoundaries: $$Props['hasBoundaries'] = false;
-	export let canClearOnDragOut: $$Props['canClearOnDragOut'] = false;
-	export let canRemoveOnDropOut: $$Props['canRemoveOnDropOut'] = false;
-	export let isLocked: $$Props['isLocked'] = false;
-	export let isDisabled: $$Props['isDisabled'] = false;
-	export let announcements: $$Props['announcements'] = undefined;
-
-	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
-	$: _announcements = announcements || announce;
-
-	$: classes = joinCSSClasses('ssl-root', $$restProps.class);
-
-	const rootProps = setRootProps({
-		gap,
-		direction,
-		transition: _transition,
-		hasWrapping,
-		hasLockedAxis,
-		hasBoundaries,
-		canClearOnDragOut,
-		canRemoveOnDropOut,
-		isLocked,
-		isDisabled,
-		announcements: _announcements,
+	const _transition = $derived({
+		duration: 240,
+		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',
+		...transition,
 	});
-	$: $rootProps = {
-		gap,
-		direction,
-		transition: _transition,
-		hasWrapping,
-		hasLockedAxis,
-		hasBoundaries,
-		canClearOnDragOut,
-		canRemoveOnDropOut,
-		isLocked,
-		isDisabled,
-		announcements: _announcements,
-	};
+	const _announcements = $derived(announcements || announce);
+
+	const classes = $derived(joinCSSClasses('ssl-root', restProps.class));
+
+	const rootProps: Writable<RootProps> = setRootProps({});
+	$effect(() => {
+		$rootProps = {
+			gap,
+			direction,
+			transition: _transition,
+			hasWrapping,
+			hasLockedAxis,
+			hasBoundaries,
+			canClearOnDragOut,
+			canRemoveOnDropOut,
+			isLocked,
+			isDisabled,
+			announcements: _announcements,
+			onmounted,
+			ondragstart,
+			ondrag,
+			ondrop,
+			ondragend,
+			ondestroyed,
+		};
+	});
 
 	const root = setRoot(null);
-	let pointerId: PointerEvent['pointerId'] | null = null;
+	let pointerId: PointerEvent['pointerId'] | null = $state(null);
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	const itemRects = setItemRects(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
-	let liveText: string = '';
+	let liveText = $state('');
 
 	const dragState = setDragState('idle');
-	let ghostState: GhostProps['state'] = 'idle';
+	let ghostState: GhostProps['state'] = $state('idle');
 	const isBetweenBounds = setIsBetweenBounds(true);
 	const isRTL = setIsRTL(false);
 
-	const dispatch = createEventDispatcher<{
-		mounted: MountedEventDetail;
-		dragstart: DragStartEventDetail;
-		drag: DragEventDetail;
-		drop: DropEventDetail;
-		dragend: DragEndEventDetail;
-		destroyed: DestroyedEventDetail;
-	}>();
-
 	onMount(() => {
-		dispatch('mounted');
+		onmounted?.(null);
 		$root = rootRef;
 		$isRTL = getTextDirection(rootRef) === 'rtl';
 	});
 
 	onDestroy(() => {
-		dispatch('destroyed');
+		ondestroyed?.(null);
 	});
 
 	// Svelte currently does not retain focus when elements are moved (even when keyed),
 	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
 	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLLIElement | null = null;
-	beforeUpdate(() => {
+	let activeElement: HTMLLIElement | null = $state(null);
+	$effect.pre(() => {
 		activeElement = $focusedItem;
 	});
-	afterUpdate(() => {
-		if (activeElement && activeElement !== document.activeElement) {
-			activeElement.focus({ preventScroll: true });
-		}
+	$effect(() => {
+		if ($dragState !== 'idle') return;
+
+		untrack(() => {
+			if (activeElement && activeElement !== document.activeElement) {
+				activeElement.focus({ preventScroll: true });
+			}
+		});
 	});
 
-	let transitionTimeoutId: number | null = null;
+	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 
-	let scrollingSpeed = 0;
-	let isScrollingDocument = true;
-	let scrollableAncestor: HTMLElement | undefined;
-	let scrollableAncestorScrollTop: number | undefined = 0;
-	let scrollableAncestorScrollLeft: number | undefined = 0;
-	$: if (rootRef || $draggedItem) scrollableAncestor = getClosestScrollableAncestor(rootRef);
-	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
-	$: if (scrollingSpeed !== 0) scroll();
+	let scrollingSpeed = $state(0);
+	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(rootRef));
+	let scrollableAncestorScrollTop: number | undefined = $state(0);
+	let scrollableAncestorScrollLeft: number | undefined = $state(0);
+	let isScrollingDocument = $derived(
+		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : false
+	);
+	$effect(() => {
+		if (scrollingSpeed !== 0) untrack(() => scroll());
+	});
 
 	function scroll() {
 		if (!scrollableAncestor) return;
@@ -285,7 +276,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		await tick();
 		$dragState = 'ptr-drag-start';
 
-		dispatch('dragstart', {
+		ondragstart?.({
 			deviceType: 'pointer',
 			draggedItem: currItem,
 			draggedItemId: currItem.id,
@@ -342,7 +333,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				);
 			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
 
-			dispatch('drag', {
+			ondrag?.({
 				deviceType: 'pointer',
 				draggedItem: $draggedItem,
 				draggedItemId: $draggedItem.id,
@@ -399,7 +390,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					$dragState = 'kbd-drag-start';
 
-					dispatch('dragstart', {
+					ondragstart?.({
 						deviceType: 'keyboard',
 						draggedItem: $focusedItem,
 						draggedItemId: $focusedItem.id,
@@ -482,7 +473,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					$dragState = 'kbd-drag';
 
-					dispatch('drag', {
+					ondrag?.({
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
 						draggedItemId: $draggedItem.id,
@@ -545,7 +536,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					$dragState = 'kbd-drag';
 
-					dispatch('drag', {
+					ondrag?.({
 						deviceType: 'keyboard',
 						draggedItem: $draggedItem,
 						draggedItemId: $draggedItem.id,
@@ -616,7 +607,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			liveText = _announcements.canceled($draggedItem, draggedIndex);
 		}
 
-		dispatch('drop', {
+		ondrop?.({
 			deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
 			draggedItem: $draggedItem,
 			draggedItemId: $draggedItem.id,
@@ -662,7 +653,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		await tick();
 		$dragState = 'idle';
 
-		dispatch('dragend', {
+		ondragend?.({
 			deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
 			draggedItem: $draggedItem,
 			draggedItemId: $draggedItem.id,
@@ -689,7 +680,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 </script>
 
-<!-- svelte-ignore a11y-role-supports-aria-props -->
+<!-- svelte-ignore a11y_role_supports_aria_props -->
 <ul
 	bind:this={rootRef}
 	class={classes}
@@ -708,29 +699,31 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	role="listbox"
 	aria-orientation={direction}
 	aria-disabled={isDisabled}
-	aria-label={$$restProps['aria-label'] || undefined}
-	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
-	aria-description={!$$restProps['aria-describedby']
-		? $$restProps['aria-description'] ||
+	aria-label={restProps['aria-label'] || undefined}
+	aria-labelledby={restProps['aria-labelledby'] || undefined}
+	aria-description={!restProps['aria-describedby']
+		? restProps['aria-description'] ||
 			'Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.'
 		: undefined}
-	aria-describedby={$$restProps['aria-describedby'] || undefined}
+	aria-describedby={restProps['aria-describedby'] || undefined}
 	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
-	on:pointerdown={handlePointerDown}
-	on:pointercancel={handlePointerCancel}
-	on:keydown={handleKeyDown}
-	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
+	onpointerdown={handlePointerDown}
+	onpointercancel={handlePointerCancel}
+	onkeydown={handleKeyDown}
+	onitemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
-	<slot>
+	{#if children}
+		{@render children()}
+	{:else}
 		<p>
 			To display your list, put a few <code>{'<SortableList.Item>'}</code> inside your
 			<code>{'<SortableList.Root>'}</code>.
 		</p>
-	</slot>
+	{/if}
 </ul>
 <!-- The following if clause will prevent the <SortableListItem> -->
 <!-- inside <SortableListGhost> from transitioning out on page navigation. -->
-{#if $root}
+{#if rootRef}
 	<SortableListGhost bind:ghostRef state={ghostState} />
 {/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
@@ -751,7 +744,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			flex-direction: column;
 
 			&[data-can-remove-on-drop-out='true']
-				.ssl-item[data-drag-state*='ptr'][data-is-between-bounds='false'] {
+				:global(.ssl-item[data-drag-state*='ptr'][data-is-between-bounds='false']) {
 				margin: 0 calc(var(--ssl-gap) / 2);
 			}
 		}
@@ -759,12 +752,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
 
-			&[data-can-remove-on-drop-out='true'] .ssl-item[data-is-between-bounds='false'] {
+			&[data-can-remove-on-drop-out='true'] :global(.ssl-item[data-is-between-bounds='false']) {
 				margin: calc(var(--ssl-gap) / 2) 0;
 			}
 		}
 
-		&[data-can-remove-on-drop-out='true'] .ssl-item[data-is-ghost='false'][data-drag-state*='ptr'] {
+		&[data-can-remove-on-drop-out='true']
+			:global(.ssl-item[data-is-ghost='false'][data-drag-state*='ptr']) {
 			overflow: hidden;
 		}
 	}
