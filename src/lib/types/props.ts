@@ -95,3 +95,8 @@ export interface SortableListGhostProps {
 	/** State in which the Ghost is in. */
 	state: 'idle' | 'ptr-drag-start' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 }
+
+export interface SortableListItemHandleProps {
+	/** Content to be rendered inside the handle. */
+	children?: Snippet;
+}
