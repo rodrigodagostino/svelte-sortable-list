@@ -85,6 +85,8 @@ export interface SortableListItemProps
 	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
 	/** Animation played when the item is removed from the list. */
 	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
+	/** Content to be rendered inside the item. */
+	children?: Snippet;
 }
 
 export interface SortableListGhostProps {

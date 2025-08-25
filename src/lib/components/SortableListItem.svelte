@@ -47,27 +47,31 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		joinCSSClasses,
 	} from '$lib/utils/index.js';
 
-	type $$Props = ItemProps & { class?: string };
+	let itemRef: HTMLLIElement = $state()!;
 
-	let itemRef: HTMLLIElement;
+	let {
+		id,
+		index,
+		isLocked = false,
+		isDisabled = false,
+		transitionIn = undefined,
+		transitionOut = undefined,
+		children,
+		...restProps
+	}: ItemProps & { class?: string } = $props();
 
-	export let id: $$Props['id'];
-	export let index: $$Props['index'];
-	export let isLocked: $$Props['isLocked'] = false;
-	export let isDisabled: $$Props['isDisabled'] = false;
-	export let transitionIn: $$Props['transitionIn'] = undefined;
-	export let transitionOut: $$Props['transitionOut'] = undefined;
-
-	$: _transitionIn =
+	const _transitionIn = $derived(
 		transitionIn ||
-		((node: HTMLElement) =>
-			scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }));
-	$: _transitionOut =
+			((node: HTMLElement) =>
+				scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }))
+	);
+	const _transitionOut = $derived(
 		transitionOut ||
-		((node: HTMLElement) =>
-			scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }));
+			((node: HTMLElement) =>
+				scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }))
+	);
 
-	$: classes = joinCSSClasses('ssl-item', $$restProps.class);
+	const classes = $derived(joinCSSClasses('ssl-item', restProps.class));
 
 	const rootProps = getRootProps();
 
@@ -81,10 +85,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const isBetweenBounds = getIsBetweenBounds();
 	const isRTL = getIsRTL();
 
-	$: isGhost = !!itemRef?.parentElement?.classList.contains('ssl-ghost');
-	$: {
+	const isGhost = $derived(!!itemRef?.parentElement?.classList.contains('ssl-ghost'));
+	$effect(() => {
 		setInteractiveElementsTabIndex($dragState === 'kbd-drag-start', focusedId);
-	}
+	});
 
 	onMount(() => {
 		setInteractiveElementsTabIndex();
@@ -108,15 +112,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			);
 	}
 
-	$: currentRect = $itemRects ? $itemRects[index] : null;
-	$: draggedId = $draggedItem ? $draggedItem.id : null;
-	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
+	const currentRect = $derived($itemRects ? $itemRects[index] : null);
+	const draggedId = $derived($draggedItem ? $draggedItem.id : null);
+	const draggedIndex = $derived($draggedItem ? getIndex($draggedItem) : null);
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
-	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
-	$: focusedId = $focusedItem ? $focusedItem.id : null;
+	const draggedRect = $derived(
+		$itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null
+	);
+	const targetIndex = $derived($targetItem ? getIndex($targetItem) : null);
+	const targetRect = $derived(
+		$itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null
+	);
+	const focusedId = $derived($focusedItem ? $focusedItem.id : null);
 
 	function getStyleWidth(...args: unknown[]) {
 		if (draggedId !== String(id)) return undefined;
@@ -199,9 +207,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 	}
 
-	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
-	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleTransform = getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds);
+	const styleWidth = $derived(getStyleWidth($draggedItem, $isBetweenBounds));
+	const styleHeight = $derived(getStyleHeight($draggedItem, $isBetweenBounds));
+	const styleTransform = $derived(
+		getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds)
+	);
 
 	async function handleFocus() {
 		await tick();
@@ -238,15 +248,15 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	tabindex={focusedId === String(id) ? 0 : -1}
 	role="option"
 	aria-disabled={$rootProps.isDisabled || isDisabled}
-	aria-label={$$restProps['aria-label'] || undefined}
-	aria-labelledby={$$restProps['aria-labelledby'] || undefined}
+	aria-label={restProps['aria-label'] || undefined}
+	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}
-	on:focus={handleFocus}
-	on:focusout={handleFocusOut}
+	onfocus={handleFocus}
+	onfocusout={handleFocusOut}
 	in:_transitionIn
 	out:_transitionOut
 >
-	<slot />
+	{@render children?.()}
 </li>
 
 <style>
@@ -259,13 +269,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		z-index: 1;
 
 		&:not(:has([data-role='handle'])),
-		& [data-role='handle'] {
+		& :global([data-role='handle']) {
 			touch-action: none;
 			cursor: grab;
 		}
 
 		&[data-drag-state*='ptr-drag'],
-		&[data-drag-state*='ptr-drag'] [data-role='handle'] {
+		&[data-drag-state*='ptr-drag'] :global([data-role='handle']) {
 			cursor: grabbing;
 		}
 
@@ -276,14 +286,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		&[aria-disabled='true'] {
 			cursor: not-allowed;
 
-			& > * {
+			& > :global(*) {
 				pointer-events: none;
 			}
 		}
 
 		&:not([data-drag-state='idle']),
-		&:has(~ *:not([data-drag-state='idle'])),
-		&:not([data-drag-state='idle']) ~ * {
+		&:has(:global(~ *:not([data-drag-state='idle']))),
+		&:not([data-drag-state='idle']) ~ :global(*) {
 			transition:
 				width var(--ssl-transition-duration),
 				height var(--ssl-transition-duration),
