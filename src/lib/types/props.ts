@@ -92,8 +92,6 @@ export interface SortableListItemProps
 export interface SortableListGhostProps {
 	/** Reference to the Ghost used in its parent component. */
 	ghostRef: HTMLDivElement;
-	/** State in which the Ghost is in. */
-	state: 'idle' | 'ptr-drag-start' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 }
 
 export interface SortableListItemHandleProps {

@@ -42,26 +42,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 <script lang="ts">
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
-	import type { Writable } from 'svelte/store';
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
-	import {
-		setDragState,
-		setDraggedItem,
-		setFocusedItem,
-		setIsBetweenBounds,
-		setIsRTL,
-		setItemRects,
-		setPointer,
-		setPointerOrigin,
-		setRoot,
-		setRootProps,
-		setTargetItem,
-	} from '$lib/stores/index.js';
-	import type {
-		SortableListGhostProps as GhostProps,
-		SortableListRootProps as RootProps,
-	} from '$lib/types/index.js';
+	import { setSortableListRootState } from '$lib/states/index.js';
+	import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
 		announce,
 		areColliding,
@@ -105,6 +89,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		...restProps
 	}: RootProps & { class?: string } = $props();
 
+	const rootState = setSortableListRootState();
+
 	const _transition = $derived({
 		duration: 240,
 		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',
@@ -112,11 +98,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 	const _announcements = $derived(announcements || announce);
 
-	const classes = $derived(joinCSSClasses('ssl-root', restProps.class));
-
-	const rootProps: Writable<RootProps> = setRootProps({});
 	$effect(() => {
-		$rootProps = {
+		rootState.props = {
 			gap,
 			direction,
 			transition: _transition,
@@ -137,25 +120,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		};
 	});
 
-	const root = setRoot(null);
+	const classes = $derived(joinCSSClasses('ssl-root', restProps.class));
 	let pointerId: PointerEvent['pointerId'] | null = $state(null);
-	const pointer = setPointer(null);
-	const pointerOrigin = setPointerOrigin(null);
-	const itemRects = setItemRects(null);
-	const draggedItem = setDraggedItem(null);
-	const targetItem = setTargetItem(null);
-	const focusedItem = setFocusedItem(null);
 	let liveText = $state('');
-
-	const dragState = setDragState('idle');
-	let ghostState: GhostProps['state'] = $state('idle');
-	const isBetweenBounds = setIsBetweenBounds(true);
-	const isRTL = setIsRTL(false);
+	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 
 	onMount(() => {
 		onmounted?.(null);
-		$root = rootRef;
-		$isRTL = getTextDirection(rootRef) === 'rtl';
+		rootState.ref = rootRef;
+		rootState.isRTL = getTextDirection(rootRef) === 'rtl';
 	});
 
 	onDestroy(() => {
@@ -167,10 +140,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	// https://github.com/sveltejs/svelte/issues/3973
 	let activeElement: HTMLLIElement | null = $state(null);
 	$effect.pre(() => {
-		activeElement = $focusedItem;
+		activeElement = rootState.focusedItem;
 	});
 	$effect(() => {
-		if ($dragState !== 'idle') return;
+		if (rootState.dragState !== 'idle') return;
 
 		untrack(() => {
 			if (activeElement && activeElement !== document.activeElement) {
@@ -178,8 +151,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 		});
 	});
-
-	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 
 	let scrollingSpeed = $state(0);
 	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(rootRef));
@@ -220,7 +191,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
-		if ($dragState !== 'idle' || $focusedItem) {
+		if (rootState.dragState !== 'idle' || rootState.focusedItem) {
 			e.preventDefault();
 			return;
 		}
@@ -266,22 +237,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		pointerId = e.pointerId;
 		currItem.setPointerCapture(pointerId);
 
-		$pointer = { x: e.clientX, y: e.clientY };
-		$pointerOrigin = { x: e.clientX, y: e.clientY };
-		$draggedItem = currItem;
-		$itemRects = getItemRects(rootRef);
+		rootState.pointer = { x: e.clientX, y: e.clientY };
+		rootState.pointerOrigin = { x: e.clientX, y: e.clientY };
+		rootState.draggedItem = currItem;
+		rootState.itemRects = getItemRects(rootRef);
 
 		await tick();
-		ghostState = 'ptr-drag-start';
+		rootState.ghostState = 'ptr-drag-start';
 		await tick();
-		$dragState = 'ptr-drag-start';
+		rootState.dragState = 'ptr-drag-start';
 
 		ondragstart?.({
 			deviceType: 'pointer',
 			draggedItem: currItem,
 			draggedItemId: currItem.id,
 			draggedItemIndex: getIndex(currItem),
-			isBetweenBounds: $isBetweenBounds,
+			isBetweenBounds: rootState.isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
@@ -300,20 +271,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (rafId) return;
 
-		if (ghostState !== 'ptr-drag' || $dragState !== 'ptr-drag') {
+		if (rootState.ghostState !== 'ptr-drag' || rootState.dragState !== 'ptr-drag') {
 			await tick();
-			ghostState = 'ptr-drag';
+			rootState.ghostState = 'ptr-drag';
 			await tick();
-			$dragState = 'ptr-drag';
+			rootState.dragState = 'ptr-drag';
 		}
 
 		rafId = requestAnimationFrame(async () => {
-			if (!$draggedItem || !$itemRects || !ghostRef) return;
+			if (!rootState.draggedItem || !rootState.itemRects || !ghostRef) return;
 
 			const rootRect = rootRef.getBoundingClientRect();
 			const ghostRect = ghostRef.getBoundingClientRect();
-			$pointer = { x: clientX, y: clientY };
-			$isBetweenBounds = areColliding(ghostRect, rootRect);
+			rootState.pointer = { x: clientX, y: clientY };
+			rootState.isBetweenBounds = areColliding(ghostRect, rootRect);
 
 			// Re-set itemRects only during scrolling.
 			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
@@ -321,27 +292,28 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
 				scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
 			) {
-				$itemRects = getItemRects(rootRef);
+				rootState.itemRects = getItemRects(rootRef);
 				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
 				scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
 			}
 			await tick();
-			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
+			const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
 			if (collidingItemRect)
-				$targetItem = rootRef.querySelector<HTMLLIElement>(
+				rootState.targetItem = rootRef.querySelector<HTMLLIElement>(
 					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 				);
-			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+			else if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isBetweenBounds))
+				rootState.targetItem = null;
 
 			ondrag?.({
 				deviceType: 'pointer',
-				draggedItem: $draggedItem,
-				draggedItemId: $draggedItem.id,
-				draggedItemIndex: getIndex($draggedItem),
-				targetItem: $targetItem,
-				targetItemId: $targetItem ? $targetItem.id : null,
-				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-				isBetweenBounds: $isBetweenBounds,
+				draggedItem: rootState.draggedItem,
+				draggedItemId: rootState.draggedItem.id,
+				draggedItemIndex: getIndex(rootState.draggedItem),
+				targetItem: rootState.targetItem,
+				targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
+				targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
+				isBetweenBounds: rootState.isBetweenBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
 			});
 
@@ -360,7 +332,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
-		if ($dragState === 'kbd-drop') {
+		if (rootState.dragState === 'kbd-drop') {
 			e.preventDefault();
 			return;
 		}
@@ -368,7 +340,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const { key } = e;
 		const target = e.target as HTMLElement;
 
-		if (target === rootRef || target === $focusedItem) {
+		if (target === rootRef || target === rootState.focusedItem) {
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
@@ -380,28 +352,28 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					return;
 				else e.preventDefault();
 
-				if (!$focusedItem || target.getAttribute('aria-disabled') === 'true') return;
+				if (!rootState.focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
-				if ($dragState === 'idle') {
-					$draggedItem = $focusedItem;
-					const draggedIndex = getIndex($focusedItem);
-					$itemRects = getItemRects(rootRef);
+				if (rootState.dragState === 'idle') {
+					rootState.draggedItem = rootState.focusedItem;
+					const draggedIndex = getIndex(rootState.focusedItem);
+					rootState.itemRects = getItemRects(rootRef);
 
 					await tick();
-					$dragState = 'kbd-drag-start';
+					rootState.dragState = 'kbd-drag-start';
 
 					ondragstart?.({
 						deviceType: 'keyboard',
-						draggedItem: $focusedItem,
-						draggedItemId: $focusedItem.id,
+						draggedItem: rootState.focusedItem,
+						draggedItemId: rootState.focusedItem.id,
 						draggedItemIndex: draggedIndex,
-						isBetweenBounds: $isBetweenBounds,
+						isBetweenBounds: rootState.isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					liveText = _announcements.lifted($draggedItem, draggedIndex);
+					liveText = _announcements.lifted(rootState.draggedItem, draggedIndex);
 				} else {
-					handlePointerAndKeyboardDrop($focusedItem, 'kbd-drop');
+					handlePointerAndKeyboardDrop(rootState.focusedItem, 'kbd-drop');
 				}
 			}
 
@@ -409,13 +381,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				e.preventDefault();
 
 				const step =
-					key === 'ArrowUp' || (key === 'ArrowLeft' && !$isRTL) || (key === 'ArrowRight' && $isRTL)
+					key === 'ArrowUp' ||
+					(key === 'ArrowLeft' && !rootState.isRTL) ||
+					(key === 'ArrowRight' && rootState.isRTL)
 						? -1
 						: 1;
-				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
+				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
 
-				if ($dragState !== 'kbd-drag-start' && $dragState !== 'kbd-drag') {
-					if (!$focusedItem || focusedIndex === null) {
+				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
+					if (!rootState.focusedItem || focusedIndex === null) {
 						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItem) return;
 
@@ -436,63 +410,81 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						return;
 
 					if (step === 1)
-						($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+						(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
+							preventScroll: true,
+						});
 					else
-						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+						(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
+							preventScroll: true,
+						});
 				} else {
-					if (!$draggedItem || !$itemRects) return;
+					if (!rootState.draggedItem || !rootState.itemRects) return;
 
-					const draggedIndex = getIndex($draggedItem);
-					let targetIndex = $targetItem ? getIndex($targetItem) : null;
+					const draggedIndex = getIndex(rootState.draggedItem);
+					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
-						(step === -1 && draggedIndex === 0 && !$targetItem) ||
+						(step === -1 && draggedIndex === 0 && !rootState.targetItem) ||
 						(step === -1 && targetIndex === 0) ||
-						(step === 1 && draggedIndex === $itemRects.length - 1 && !$targetItem) ||
-						(step === 1 && targetIndex === $itemRects.length - 1)
+						(step === 1 &&
+							draggedIndex === rootState.itemRects.length - 1 &&
+							!rootState.targetItem) ||
+						(step === 1 && targetIndex === rootState.itemRects.length - 1)
 					)
 						return;
 
-					if (!$targetItem) {
-						$targetItem =
+					if (!rootState.targetItem) {
+						rootState.targetItem =
 							step === 1
-								? ($draggedItem.nextElementSibling as HTMLLIElement)
-								: ($draggedItem.previousElementSibling as HTMLLIElement);
+								? (rootState.draggedItem.nextElementSibling as HTMLLIElement)
+								: (rootState.draggedItem.previousElementSibling as HTMLLIElement);
 					} else {
-						$targetItem =
+						rootState.targetItem =
 							step === 1
-								? ($targetItem.nextElementSibling as HTMLLIElement)
-								: ($targetItem.previousElementSibling as HTMLLIElement);
+								? (rootState.targetItem.nextElementSibling as HTMLLIElement)
+								: (rootState.targetItem.previousElementSibling as HTMLLIElement);
 					}
 
 					await tick();
-					const targetId = $targetItem.id;
-					targetIndex = getIndex($targetItem);
+					const targetId = rootState.targetItem.id;
+					targetIndex = getIndex(rootState.targetItem);
 
 					await tick();
-					$dragState = 'kbd-drag';
+					rootState.dragState = 'kbd-drag';
 
 					ondrag?.({
 						deviceType: 'keyboard',
-						draggedItem: $draggedItem,
-						draggedItemId: $draggedItem.id,
+						draggedItem: rootState.draggedItem,
+						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
-						targetItem: $targetItem,
+						targetItem: rootState.targetItem,
 						targetItemId: targetId,
 						targetItemIndex: targetIndex,
-						isBetweenBounds: $isBetweenBounds,
+						isBetweenBounds: rootState.isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
-						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
+					if (scrollableAncestor && !isFullyVisible(rootState.targetItem, scrollableAncestor))
+						scrollIntoView(
+							rootState.targetItem,
+							scrollableAncestor,
+							direction,
+							step,
+							isScrollingDocument
+						);
 
-					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
+					liveText = _announcements.dragged(
+						rootState.draggedItem,
+						draggedIndex,
+						rootState.targetItem,
+						targetIndex
+					);
 				}
 
 				await tick();
-				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
+				const scrollTarget =
+					rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
@@ -501,9 +493,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				e.preventDefault();
 
 				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
-				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
+				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
-				if ($dragState !== 'kbd-drag-start' && $dragState !== 'kbd-drag') {
+				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -515,53 +507,61 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (key === 'Home') items[0]?.focus({ preventScroll: true });
 					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemRects) return;
+					if (!rootState.draggedItem || !rootState.itemRects) return;
 
-					const draggedIndex = getIndex($draggedItem);
-					let targetIndex = $targetItem ? getIndex($targetItem) : null;
+					const draggedIndex = getIndex(rootState.draggedItem);
+					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 					// Prevent moving the selected item if it’s the first or last item,
 					// or is at the top or bottom of the list.
 					if (
-						(key === 'Home' && draggedIndex === 0 && !$targetItem) ||
+						(key === 'Home' && draggedIndex === 0 && !rootState.targetItem) ||
 						(key === 'Home' && targetIndex === 0) ||
-						(key === 'End' && draggedIndex === $itemRects.length - 1 && !$targetItem) ||
-						(key === 'End' && targetIndex === $itemRects.length - 1)
+						(key === 'End' &&
+							draggedIndex === rootState.itemRects.length - 1 &&
+							!rootState.targetItem) ||
+						(key === 'End' && targetIndex === rootState.itemRects.length - 1)
 					)
 						return;
 
-					$targetItem = key === 'Home' ? items[0] : items[items.length - 1];
+					rootState.targetItem = key === 'Home' ? items[0] : items[items.length - 1];
 					await tick();
-					targetIndex = getIndex($targetItem);
+					targetIndex = getIndex(rootState.targetItem);
 
 					await tick();
-					$dragState = 'kbd-drag';
+					rootState.dragState = 'kbd-drag';
 
 					ondrag?.({
 						deviceType: 'keyboard',
-						draggedItem: $draggedItem,
-						draggedItemId: $draggedItem.id,
+						draggedItem: rootState.draggedItem,
+						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
-						targetItem: $targetItem,
-						targetItemId: $targetItem.id,
+						targetItem: rootState.targetItem,
+						targetItemId: rootState.targetItem.id,
 						targetItemIndex: targetIndex,
-						isBetweenBounds: $isBetweenBounds,
+						isBetweenBounds: rootState.isBetweenBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
+					liveText = _announcements.dragged(
+						rootState.draggedItem,
+						draggedIndex,
+						rootState.targetItem,
+						targetIndex
+					);
 				}
 
 				await tick();
-				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
+				const scrollTarget =
+					rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
 				const step = key === 'Home' ? -1 : 1;
 				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
-			if (key === 'Escape' && $draggedItem) {
+			if (key === 'Escape' && rootState.draggedItem) {
 				// Prevent closing the <dialog> if the dragged item is inside one.
 				if (rootRef.closest<HTMLDialogElement>('dialog')) e.preventDefault();
-				handlePointerAndKeyboardDrop($draggedItem, 'kbd-cancel');
+				handlePointerAndKeyboardDrop(rootState.draggedItem, 'kbd-cancel');
 			}
 		}
 	}
@@ -571,51 +571,63 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		if (
-			!$draggedItem ||
-			(action.includes('ptr') && $dragState === 'ptr-drop') ||
-			(action.includes('kbd') && $dragState === 'kbd-drop')
+			!rootState.draggedItem ||
+			(action.includes('ptr') && rootState.dragState === 'ptr-drop') ||
+			(action.includes('kbd') && rootState.dragState === 'kbd-drop')
 		)
 			return;
 
 		await tick();
-		const draggedIndex = getIndex($draggedItem);
-		const targetIndex = $targetItem ? getIndex($targetItem) : null;
+		const draggedIndex = getIndex(rootState.draggedItem);
+		const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
 		if (action === 'ptr-drop') {
 			await tick();
-			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
+			rootState.ghostState =
+				!rootState.isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
 			await tick();
-			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
+			if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 			await tick();
-			$dragState = 'ptr-drop';
+			rootState.dragState = 'ptr-drop';
 		} else if (action === 'ptr-cancel') {
 			await tick();
-			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
+			if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 			await tick();
-			$dragState = 'ptr-cancel';
+			rootState.dragState = 'ptr-cancel';
 		}
 
 		if (action === 'kbd-drop') {
 			await tick();
-			$dragState = 'kbd-drop';
-			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
+			rootState.dragState = 'kbd-drop';
+			liveText = _announcements.dropped(
+				rootState.draggedItem,
+				draggedIndex,
+				rootState.targetItem,
+				targetIndex
+			);
 		} else if (action === 'kbd-cancel') {
 			await tick();
-			$dragState = 'kbd-cancel';
+			rootState.dragState = 'kbd-cancel';
 			if (scrollableAncestor)
-				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
-			liveText = _announcements.canceled($draggedItem, draggedIndex);
+				scrollIntoView(
+					rootState.draggedItem,
+					scrollableAncestor,
+					direction,
+					-1,
+					isScrollingDocument
+				);
+			liveText = _announcements.canceled(rootState.draggedItem, draggedIndex);
 		}
 
 		ondrop?.({
 			deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
-			draggedItem: $draggedItem,
-			draggedItemId: $draggedItem.id,
+			draggedItem: rootState.draggedItem,
+			draggedItemId: rootState.draggedItem.id,
 			draggedItemIndex: draggedIndex,
-			targetItem: $targetItem,
-			targetItemId: $targetItem ? $targetItem.id : null,
+			targetItem: rootState.targetItem,
+			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
 			targetItemIndex: targetIndex,
-			isBetweenBounds: $isBetweenBounds,
+			isBetweenBounds: rootState.isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
@@ -646,35 +658,35 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerAndKeyboardDragEnd(
 		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
-		if (!$draggedItem) return;
+		if (!rootState.draggedItem) return;
 
 		await tick();
-		ghostState = 'idle';
+		rootState.ghostState = 'idle';
 		await tick();
-		$dragState = 'idle';
+		rootState.dragState = 'idle';
 
 		ondragend?.({
 			deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
-			draggedItem: $draggedItem,
-			draggedItemId: $draggedItem.id,
-			draggedItemIndex: getIndex($draggedItem),
-			targetItem: $targetItem,
-			targetItemId: $targetItem ? $targetItem.id : null,
-			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-			isBetweenBounds: $isBetweenBounds,
+			draggedItem: rootState.draggedItem,
+			draggedItemId: rootState.draggedItem.id,
+			draggedItemIndex: getIndex(rootState.draggedItem),
+			targetItem: rootState.targetItem,
+			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
+			targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
+			isBetweenBounds: rootState.isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			isCanceled: action.includes('cancel'),
 		});
 
-		if (typeof pointerId === 'number' && $draggedItem?.hasPointerCapture(pointerId))
-			$draggedItem?.releasePointerCapture(pointerId);
+		if (typeof pointerId === 'number' && rootState.draggedItem?.hasPointerCapture(pointerId))
+			rootState.draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;
-		$pointer = null;
-		$pointerOrigin = null;
-		$draggedItem = null;
-		$targetItem = null;
-		$itemRects = null;
-		$isBetweenBounds = true;
+		rootState.pointer = null;
+		rootState.pointerOrigin = null;
+		rootState.draggedItem = null;
+		rootState.targetItem = null;
+		rootState.itemRects = null;
+		rootState.isBetweenBounds = true;
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		scrollingSpeed = 0;
 	}
@@ -684,7 +696,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <ul
 	bind:this={rootRef}
 	class={classes}
-	style:pointer-events={$focusedItem ? 'none' : 'auto'}
+	style:pointer-events={rootState.focusedItem ? 'none' : 'auto'}
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
@@ -706,7 +718,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.'
 		: undefined}
 	aria-describedby={restProps['aria-describedby'] || undefined}
-	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
+	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
 	onpointerdown={handlePointerDown}
 	onpointercancel={handlePointerCancel}
 	onkeydown={handleKeyDown}
@@ -724,7 +736,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <!-- The following if clause will prevent the <SortableListItem> -->
 <!-- inside <SortableListGhost> from transitioning out on page navigation. -->
 {#if rootRef}
-	<SortableListGhost bind:ghostRef state={ghostState} />
+	<SortableListGhost bind:ghostRef />
 {/if}
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 

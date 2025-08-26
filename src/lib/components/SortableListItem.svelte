@@ -23,17 +23,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import {
-		getDragState,
-		getDraggedItem,
-		getFocusedItem,
-		getIsBetweenBounds,
-		getIsRTL,
-		getItemRects,
-		getRoot,
-		getRootProps,
-		getTargetItem,
-	} from '$lib/stores/index.js';
+	import { getSortableListRootState } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
 	import {
@@ -63,36 +53,18 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const _transitionIn = $derived(
 		transitionIn ||
 			((node: HTMLElement) =>
-				scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }))
+				scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' }))
 	);
 	const _transitionOut = $derived(
 		transitionOut ||
 			((node: HTMLElement) =>
-				scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' }))
+				scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' }))
 	);
 
+	const rootState = getSortableListRootState();
+
 	const classes = $derived(joinCSSClasses('ssl-item', restProps.class));
-
-	const rootProps = getRootProps();
-
-	const root = getRoot();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
-	const focusedItem = getFocusedItem();
-
-	const dragState = getDragState();
-	const isBetweenBounds = getIsBetweenBounds();
-	const isRTL = getIsRTL();
-
 	const isGhost = $derived(!!itemRef?.parentElement?.classList.contains('ssl-ghost'));
-	$effect(() => {
-		setInteractiveElementsTabIndex($dragState === 'kbd-drag-start', focusedId);
-	});
-
-	onMount(() => {
-		setInteractiveElementsTabIndex();
-	});
 
 	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
@@ -102,37 +74,46 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			.forEach(
 				(el) =>
 					(el.tabIndex =
-						$dragState !== 'kbd-drag-start' &&
-						$dragState !== 'kbd-drag' &&
+						rootState.dragState !== 'kbd-drag-start' &&
+						rootState.dragState !== 'kbd-drag' &&
 						focusedId === String(id) &&
-						!$rootProps.isDisabled &&
+						!rootState.props.isDisabled &&
 						!isDisabled
 							? 0
 							: -1)
 			);
 	}
+	$effect(() => {
+		setInteractiveElementsTabIndex(rootState.dragState === 'kbd-drag-start', focusedId);
+	});
 
-	const currentRect = $derived($itemRects ? $itemRects[index] : null);
-	const draggedId = $derived($draggedItem ? $draggedItem.id : null);
-	const draggedIndex = $derived($draggedItem ? getIndex($draggedItem) : null);
-	// $itemRects is used as a reliable reference to the item’s position in the list
+	onMount(() => {
+		setInteractiveElementsTabIndex();
+	});
+
+	const currentRect = $derived(rootState.itemRects ? rootState.itemRects[index] : null);
+	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
+	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
+	// rootState.itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
 	const draggedRect = $derived(
-		$itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null
+		rootState.itemRects && typeof draggedIndex === 'number'
+			? rootState.itemRects[draggedIndex]
+			: null
 	);
-	const targetIndex = $derived($targetItem ? getIndex($targetItem) : null);
+	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
 	const targetRect = $derived(
-		$itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null
+		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
 	);
-	const focusedId = $derived($focusedItem ? $focusedItem.id : null);
+	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
 	function getStyleWidth(...args: unknown[]) {
 		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
-			$rootProps.direction === 'horizontal' &&
-			!$isBetweenBounds &&
-			$rootProps.canRemoveOnDropOut
+			rootState.props.direction === 'horizontal' &&
+			!rootState.isBetweenBounds &&
+			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
 		return `${currentRect?.width}px`;
@@ -142,9 +123,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
-			$rootProps.direction === 'vertical' &&
-			!$isBetweenBounds &&
-			$rootProps.canRemoveOnDropOut
+			rootState.props.direction === 'vertical' &&
+			!rootState.isBetweenBounds &&
+			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
 		return `${currentRect?.height}px`;
@@ -153,12 +134,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	function getStyleTransform(...args: unknown[]) {
 		if (isGhost) return 'none';
 		if (
-			$dragState === 'idle' ||
-			$dragState === 'ptr-cancel' ||
-			$dragState === 'kbd-cancel' ||
-			!$itemRects ||
-			!$draggedItem ||
-			!$targetItem ||
+			rootState.dragState === 'idle' ||
+			rootState.dragState === 'ptr-cancel' ||
+			rootState.dragState === 'kbd-cancel' ||
+			!rootState.itemRects ||
+			!rootState.draggedItem ||
+			!rootState.targetItem ||
 			currentRect === null ||
 			draggedIndex === null ||
 			draggedRect === null ||
@@ -173,19 +154,23 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				(index < draggedIndex && index >= targetIndex)
 			) {
 				const step = index > draggedIndex ? -1 : 1;
-				const operator = index > draggedIndex === !$isRTL ? '-' : '';
+				const operator = index > draggedIndex === !rootState.isRTL ? '-' : '';
 				const x =
-					$rootProps.direction === 'vertical'
+					rootState.props.direction === 'vertical'
 						? '0'
-						: isInSameRow(currentRect, $itemRects[index + step])
-							? `${operator}${draggedRect.width + $rootProps.gap!}px`
-							: `${$itemRects[index + step].right - currentRect.right}px`;
+						: isInSameRow(currentRect, rootState.itemRects[index + step])
+							? `${operator}${draggedRect.width + rootState.props.gap!}px`
+							: `${rootState.itemRects[index + step].right - currentRect.right}px`;
 				const y =
-					$rootProps.direction === 'vertical'
-						? `${operator}${draggedRect.height + $rootProps.gap!}px`
-						: isInSameRow(currentRect, $itemRects[index + step])
+					rootState.props.direction === 'vertical'
+						? `${operator}${draggedRect.height + rootState.props.gap!}px`
+						: isInSameRow(currentRect, rootState.itemRects[index + step])
 							? '0'
-							: calculateTranslateWithAlignment($root!, $itemRects[index + step], currentRect);
+							: calculateTranslateWithAlignment(
+									rootState.ref!,
+									rootState.itemRects[index + step],
+									currentRect
+								);
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -193,29 +178,34 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			}
 		} else {
 			const x =
-				$rootProps.direction === 'vertical'
+				rootState.props.direction === 'vertical'
 					? '0'
 					: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
 			const y =
-				$rootProps.direction === 'vertical'
+				rootState.props.direction === 'vertical'
 					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 					: isInSameRow(draggedRect, targetRect)
 						? '0'
-						: calculateTranslateWithAlignment($root!, targetRect, draggedRect);
+						: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 	}
 
-	const styleWidth = $derived(getStyleWidth($draggedItem, $isBetweenBounds));
-	const styleHeight = $derived(getStyleHeight($draggedItem, $isBetweenBounds));
+	const styleWidth = $derived(getStyleWidth(rootState.draggedItem, rootState.isBetweenBounds));
+	const styleHeight = $derived(getStyleHeight(rootState.draggedItem, rootState.isBetweenBounds));
 	const styleTransform = $derived(
-		getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds)
+		getStyleTransform(
+			rootState.draggedItem,
+			rootState.targetItem,
+			rootState.dragState,
+			rootState.isBetweenBounds
+		)
 	);
 
 	async function handleFocus() {
 		await tick();
-		$focusedItem = itemRef;
+		rootState.focusedItem = itemRef;
 	}
 
 	// `focusout` is preferred over `blur` since it detects the loss of focus
@@ -223,10 +213,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
-			if (!$focusedItem) return;
-			dispatch(itemRef, 'itemfocusout', { item: $focusedItem });
+			if (!rootState.focusedItem) return;
+			dispatch(itemRef, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
-			$focusedItem = null;
+			rootState.focusedItem = null;
 		}
 	}
 </script>
@@ -240,14 +230,15 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transform={styleTransform}
 	data-item-id={id}
 	data-item-index={index}
-	data-drag-state={draggedId === String(id) ? $dragState : 'idle'}
+	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
 	data-is-ghost={isGhost}
-	data-is-between-bounds={$isBetweenBounds || (draggedId === String(id) && $isBetweenBounds)}
-	data-is-locked={$rootProps.isLocked || isLocked}
-	data-is-disabled={$rootProps.isDisabled || isDisabled}
+	data-is-between-bounds={rootState.isBetweenBounds ||
+		(draggedId === String(id) && rootState.isBetweenBounds)}
+	data-is-locked={rootState.props.isLocked || isLocked}
+	data-is-disabled={rootState.props.isDisabled || isDisabled}
 	tabindex={focusedId === String(id) ? 0 : -1}
 	role="option"
-	aria-disabled={$rootProps.isDisabled || isDisabled}
+	aria-disabled={rootState.props.isDisabled || isDisabled}
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}

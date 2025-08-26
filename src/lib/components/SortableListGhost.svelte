@@ -5,11 +5,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 ### Props
 - `ghostRef`: reference to the Ghost used in its parent component.
-- `state`: state in which the Ghost is in.
 
 ### Usage
 ```svelte
-	<SortableListGhost bind:ghostRef state={ghostState} />
+	<SortableListGhost bind:ghostRef />
 ```
 -->
 
@@ -17,15 +16,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	import { untrack } from 'svelte';
 	import SortableListItem from './SortableListItem.svelte';
 	import { portal } from '$lib/actions/index.js';
-	import {
-		getDraggedItem,
-		getItemRects,
-		getPointer,
-		getPointerOrigin,
-		getRoot,
-		getRootProps,
-		getTargetItem,
-	} from '$lib/stores/index.js';
+	import { getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListGhostProps as GhostProps } from '$lib/types/index.js';
 	import {
 		calculateTranslate,
@@ -35,52 +26,53 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		preserveFormFieldValues,
 	} from '$lib/utils/index.js';
 
-	let { ghostRef = $bindable(), state }: GhostProps = $props();
+	let { ghostRef = $bindable() }: GhostProps = $props();
 
-	const rootProps = getRootProps();
+	const rootState = getSortableListRootState();
 
-	const root = getRoot();
-	const pointer = getPointer();
-	const pointerOrigin = getPointerOrigin();
-	const itemRects = getItemRects();
-	const draggedItem = getDraggedItem();
-	const targetItem = getTargetItem();
-
-	const draggedId = $derived($draggedItem ? $draggedItem.id : null);
-	const draggedIndex = $derived($draggedItem ? getIndex($draggedItem) : null);
-	// $itemRects is used as a reliable reference to the item’s position in the list
+	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
+	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
+	// rootState.itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
 	const draggedRect = $derived(
-		$itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null
+		rootState.itemRects && typeof draggedIndex === 'number'
+			? rootState.itemRects[draggedIndex]
+			: null
 	);
-	const targetIndex = $derived($targetItem ? getIndex($targetItem) : null);
+	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
 	const targetRect = $derived(
-		$itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null
+		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
 	);
 
 	function cloneDraggedItemContent(...args: unknown[]) {
-		if (!ghostRef || !$draggedItem) return;
+		if (!ghostRef || !rootState.draggedItem) return;
 
-		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
-		preserveFormFieldValues($draggedItem, clone);
+		const clone = rootState.draggedItem.cloneNode(true) as HTMLLIElement;
+		preserveFormFieldValues(rootState.draggedItem, clone);
 		// `childNodes` is used to always preserve the dragged item’s content,
 		// even when only a text node is present inside.
 		ghostRef.children[0].replaceChildren(...clone.childNodes);
 	}
 	$effect.pre(() => {
-		if (state === 'ptr-drag-start') untrack(() => cloneDraggedItemContent());
+		if (rootState.ghostState === 'ptr-drag-start') untrack(() => cloneDraggedItemContent());
 	});
 
 	function getStyleLeft(...args: unknown[]) {
-		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (
+			rootState.ghostState === 'idle' ||
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
+			!rootState.itemRects
+		)
 			return '0';
 
-		if (state === 'ptr-remove') return ghostRef.style.left;
+		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.left;
 
-		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
+		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
+			return `${draggedRect.x}px`;
 
 		const left =
-			$rootProps.direction === 'vertical'
+			rootState.props.direction === 'vertical'
 				? draggedRect.x
 				: draggedIndex < targetIndex
 					? targetRect.right - draggedRect.width
@@ -89,16 +81,22 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTop(...args: unknown[]) {
-		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (
+			rootState.ghostState === 'idle' ||
+			typeof draggedIndex !== 'number' ||
+			!draggedRect ||
+			!rootState.itemRects
+		)
 			return '0';
 
-		if (state === 'ptr-remove') return ghostRef.style.top;
+		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.top;
 
-		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
+		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
+			return `${draggedRect.y}px`;
 
-		const alignItems = $root && window.getComputedStyle($root).alignItems;
+		const alignItems = rootState.ref && window.getComputedStyle(rootState.ref).alignItems;
 		const top =
-			$rootProps.direction === 'vertical'
+			rootState.props.direction === 'vertical'
 				? draggedIndex < targetIndex
 					? targetRect.bottom - draggedRect.height
 					: targetRect.y
@@ -113,90 +111,103 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTransform(...args: unknown[]) {
-		if (state === 'idle' || !ghostRef || !$root || !$pointer || !$pointerOrigin)
+		if (
+			rootState.ghostState === 'idle' ||
+			!ghostRef ||
+			!rootState ||
+			!rootState.pointer ||
+			!rootState.pointerOrigin
+		)
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
-		const rootRect = $root.getBoundingClientRect();
+		const rootRect = rootState.ref?.getBoundingClientRect();
 
-		if ((state === 'ptr-drag-start' || state === 'ptr-drag') && draggedRect) {
-			if (!$rootProps.hasBoundaries) {
+		if (!rootRect) return 'translate3d(0, 0, 0)';
+
+		if (
+			(rootState.ghostState === 'ptr-drag-start' || rootState.ghostState === 'ptr-drag') &&
+			draggedRect
+		) {
+			if (!rootState.props.hasBoundaries) {
 				const x =
-					$rootProps.direction === 'horizontal' ||
-					($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
-						? `${$pointer.x - $pointerOrigin.x}px`
+					rootState.props.direction === 'horizontal' ||
+					(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
+						? `${rootState.pointer.x - rootState.pointerOrigin.x}px`
 						: 0;
 				const y =
-					$rootProps.direction === 'vertical' ||
-					($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
-						? `${$pointer.y - $pointerOrigin.y}px`
+					rootState.props.direction === 'vertical' ||
+					(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
+						? `${rootState.pointer.y - rootState.pointerOrigin.y}px`
 						: 0;
 				return `translate3d(${x}, ${y}, 0)`;
 			}
 
 			const x =
-				$rootProps.direction === 'horizontal' ||
-				($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
+				rootState.props.direction === 'horizontal' ||
+				(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedRect.x) < rootRect.x + $rootProps.gap! / 2
-						? `${rootRect.x - draggedRect.x + $rootProps.gap! / 2}px`
+						rootState.pointer.x - (rootState.pointerOrigin.x - draggedRect.x) <
+						rootRect.x + rootState.props.gap! / 2
+						? `${rootRect.x - draggedRect.x + rootState.props.gap! / 2}px`
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
-							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedRect.x) >
-							  rootRect.right - $rootProps.gap! / 2
-							? `${rootRect.right - draggedRect.x - ghostRect.width - $rootProps.gap! / 2}px`
-							: `${$pointer.x - $pointerOrigin.x}px`
+							rootState.pointer.x + ghostRect.width - (rootState.pointerOrigin.x - draggedRect.x) >
+							  rootRect.right - rootState.props.gap! / 2
+							? `${rootRect.right - draggedRect.x - ghostRect.width - rootState.props.gap! / 2}px`
+							: `${rootState.pointer.x - rootState.pointerOrigin.x}px`
 					: 0;
 			const y =
-				$rootProps.direction === 'vertical' ||
-				($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
+				rootState.props.direction === 'vertical' ||
+				(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedRect.y) < rootRect.y + $rootProps.gap! / 2
-						? `${rootRect.y - draggedRect.y + $rootProps.gap! / 2}px`
+						rootState.pointer.y - (rootState.pointerOrigin.y - draggedRect.y) <
+						rootRect.y + rootState.props.gap! / 2
+						? `${rootRect.y - draggedRect.y + rootState.props.gap! / 2}px`
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
-							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedRect.y) >
-							  rootRect.bottom - $rootProps.gap! / 2
-							? `${rootRect.bottom - draggedRect.y - ghostRect.height - $rootProps.gap! / 2}px`
-							: `${$pointer.y - $pointerOrigin.y}px`
+							rootState.pointer.y + ghostRect.height - (rootState.pointerOrigin.y - draggedRect.y) >
+							  rootRect.bottom - rootState.props.gap! / 2
+							? `${rootRect.bottom - draggedRect.y - ghostRect.height - rootState.props.gap! / 2}px`
+							: `${rootState.pointer.y - rootState.pointerOrigin.y}px`
 					: 0;
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (state === 'ptr-predrop' && typeof draggedIndex === 'number' && draggedRect) {
-			if (!$targetItem || typeof targetIndex !== 'number' || !targetRect)
+		if (rootState.ghostState === 'ptr-predrop' && typeof draggedIndex === 'number' && draggedRect) {
+			if (!rootState.ref || !rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
 				return 'translate3d(0, 0, 0)';
 
 			const x =
-				$rootProps.direction === 'vertical'
+				rootState.props.direction === 'vertical'
 					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
 					: calculateTranslate('x', ghostRect, targetRect, draggedIndex, targetIndex);
 			const y =
-				$rootProps.direction === 'vertical'
+				rootState.props.direction === 'vertical'
 					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment($root, ghostRect, targetRect);
+					: calculateTranslateWithAlignment(rootState.ref, ghostRect, targetRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (state === 'ptr-drop') return 'translate3d(0, 0, 0)';
+		if (rootState.ghostState === 'ptr-drop') return 'translate3d(0, 0, 0)';
 
-		if (state === 'ptr-remove') return ghostRef.style.transform;
+		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.transform;
 	}
 
 	const styleLeft = $derived.by(() => {
-		state;
+		rootState.ghostState;
 		return untrack(() => getStyleLeft());
 	});
 	const styleTop = $derived.by(() => {
-		state;
+		rootState.ghostState;
 		return untrack(() => getStyleTop());
 	});
 	const styleTransform = $derived.by(() => {
-		state;
-		$pointer;
+		rootState.ghostState;
+		rootState.pointer;
 		return untrack(() => getStyleTransform());
 	});
 </script>
@@ -207,20 +218,20 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	style:left={styleLeft}
 	style:top={styleTop}
 	style:transform={styleTransform}
-	style:--ssl-gap="{$rootProps.gap}px"
-	style:--ssl-wrap={$rootProps.hasWrapping ? 'wrap' : 'nowrap'}
-	style:--ssl-transition-duration="{$rootProps.transition?.duration}ms"
-	style:--ssl-transition-easing={$rootProps.transition?.easing}
-	data-ghost-state={state}
-	data-can-clear-on-drag-out={$rootProps.canClearOnDragOut}
-	data-can-remove-on-drop-out={$rootProps.canRemoveOnDropOut}
+	style:--ssl-gap="{rootState.props.gap}px"
+	style:--ssl-wrap={rootState.props.hasWrapping ? 'wrap' : 'nowrap'}
+	style:--ssl-transition-duration="{rootState.props.transition?.duration}ms"
+	style:--ssl-transition-easing={rootState.props.transition?.easing}
+	data-ghost-state={rootState.ghostState}
+	data-can-clear-on-drag-out={rootState.props.canClearOnDragOut}
+	data-can-remove-on-drop-out={rootState.props.canRemoveOnDropOut}
 	aria-hidden="true"
 	use:portal
 >
 	<SortableListItem
 		id={draggedId || 'ssl-ghost-item'}
 		index={draggedIndex ?? -1}
-		class={$draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
+		class={rootState.draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
 	/>
 </div>
 

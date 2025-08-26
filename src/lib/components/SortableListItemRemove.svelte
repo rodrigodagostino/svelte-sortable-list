@@ -16,30 +16,33 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
-	import type { SortableListItemRemoveProps } from '$lib/types/props.js';
+	import { getSortableListRootState } from '$lib/states/index.js';
+	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
 	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
 
-	let { children, onclick, ...restProps }: SortableListItemRemoveProps & { class?: string } =
-		$props();
+	let { children, onclick, ...restProps }: ItemRemoveProps & { class?: string } = $props();
+
+	const rootState = getSortableListRootState();
 
 	const classes = $derived(joinCSSClasses('ssl-item-remove', restProps.class));
 
-	const root = getRoot();
-	const focusedItem = getFocusedItem();
-
 	function handleClick(e: MouseEvent) {
-		if ($focusedItem && $root) {
-			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item');
+		if (rootState.focusedItem && rootState.ref) {
+			const items = rootState.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
-				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
+				const step = getIndex(rootState.focusedItem) !== items.length - 1 ? 1 : -1;
 				if (step === 1)
-					($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
-				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+					(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
+						preventScroll: true,
+					});
+				else
+					(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
+						preventScroll: true,
+					});
 			} else {
 				// Focus the root element (if there are no items left) before removing.
-				$root.focus();
+				rootState.ref.focus();
 			}
 		}
 
