@@ -13,7 +13,9 @@ Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRem
 -->
 
 <script lang="ts">
-	export let name: 'handle' | 'remove';
+	import type { IconProps } from '$lib/types/props.js';
+
+	let { name }: IconProps = $props();
 
 	// Thank you, Lucide :)
 	// https://lucide.dev

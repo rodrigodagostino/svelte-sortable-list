@@ -107,3 +107,8 @@ export interface SortableListItemRemoveProps {
 	/** Callback fired when the remove button is clicked. */
 	onclick?: (event: MouseEvent) => void;
 }
+
+export interface IconProps {
+	/** Name of the icon to display. */
+	name: 'handle' | 'remove';
+}
