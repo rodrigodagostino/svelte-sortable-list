@@ -1,4 +1,4 @@
-import type { ItemRect, TextDirection } from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
 export function getId(element: HTMLLIElement): string {
@@ -34,12 +34,12 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	);
 }
 
-export const getTextDirection = (element: HTMLElement): TextDirection => {
+export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
 	if (!element) return 'auto';
 
 	let parent = element.parentElement;
 	while (parent) {
-		if (parent.getAttribute('dir')) return parent.getAttribute('dir') as TextDirection;
+		if (parent.getAttribute('dir')) return parent.getAttribute('dir') as HTMLElement['dir'];
 		parent = parent.parentElement;
 	}
 
