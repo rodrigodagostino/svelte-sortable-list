@@ -2,23 +2,23 @@
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
-	import { rootProps } from '../stores.js';
+	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
 
-	let items = getDefaultItems(5);
-	let isDialogOpen = false;
+	let items = $state(getDefaultItems(5));
+	let isDialogOpen = $state(false);
 
 	onMount(() => {
-		$rootProps = { ...defaultRootProps };
+		layoutState.props = { ...defaultRootProps };
 	});
 
-	function handleDrop(e: SortableList.RootEvents['drop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
+	function handleDrop(e: SortableList.RootEvents['ondrop']) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
+	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
@@ -36,15 +36,15 @@
 	<title>Inside custom dialog — Svelte Sortable List</title>
 </svelte:head>
 
-<button class="button" on:click={handleOpenDialog}>Open dialog</button>
+<button class="button" onclick={handleOpenDialog}>Open dialog</button>
 <div
-	class="dialog direction-{$rootProps.direction}"
+	class="dialog direction-{layoutState.props.direction}"
 	class:is-open={isDialogOpen}
 	role="dialog"
 	aria-modal="true"
 >
 	<div class="dialog__window">
-		<button class="dialog__close button" on:click={handleCloseDialog}>
+		<button class="dialog__close button" onclick={handleCloseDialog}>
 			<svg
 				width="24"
 				height="24"
@@ -61,7 +61,7 @@
 			</svg>
 			<span class="sr-only">Close dialog</span>
 		</button>
-		<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
+		<SortableList.Root {...layoutState.props} ondrop={handleDrop} ondragend={handleDragEnd}>
 			{#each items as item, index (item.id)}
 				<SortableList.Item {...item} {index}>
 					<div class="ssl-item-content">
@@ -71,7 +71,7 @@
 			{/each}
 		</SortableList.Root>
 	</div>
-	<button class="dialog__backdrop" on:click={handleCloseDialog}>Close dialog</button>
+	<button class="dialog__backdrop" onclick={handleCloseDialog}>Close dialog</button>
 </div>
 
 <style>

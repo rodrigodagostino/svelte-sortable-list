@@ -2,22 +2,22 @@
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
-	import { rootProps } from '../stores.js';
+	import layoutState from '../states.svelte.js';
 	import '../../app.css';
 
-	let items = getDefaultItems(5);
+	let items = $state(getDefaultItems(5));
 
 	onMount(() => {
-		$rootProps = { ...defaultRootProps };
+		layoutState.props = { ...defaultRootProps };
 	});
 
-	function handleDrop(e: SortableList.RootEvents['drop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
+	function handleDrop(e: SortableList.RootEvents['ondrop']) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
+	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
@@ -28,10 +28,10 @@
 </svelte:head>
 
 <SortableList.Root
-	{...$rootProps}
+	{...layoutState.props}
 	class="rounded-lg focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-indigo-600"
-	on:drop={handleDrop}
-	on:dragend={handleDragEnd}
+	ondrop={handleDrop}
+	ondragend={handleDragEnd}
 >
 	{#each items as item, index (item.id)}
 		<SortableList.Item
