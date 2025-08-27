@@ -733,11 +733,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		</p>
 	{/if}
 </ul>
-<!-- The following if clause will prevent the <SortableListItem> -->
-<!-- inside <SortableListGhost> from transitioning out on page navigation. -->
-{#if rootRef}
-	<SortableListGhost bind:ghostRef />
-{/if}
+<SortableListGhost bind:ghostRef />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>

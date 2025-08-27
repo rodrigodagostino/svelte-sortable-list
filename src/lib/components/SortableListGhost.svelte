@@ -228,11 +228,15 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	aria-hidden="true"
 	use:portal
 >
-	<SortableListItem
-		id={draggedId || 'ssl-ghost-item'}
-		index={draggedIndex ?? -1}
-		class={rootState.draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
-	/>
+	<!-- The following if clause will prevent <SortableListItem> -->
+	<!-- from transitioning out on page navigation. -->
+	{#if rootState.ref}
+		<SortableListItem
+			id={draggedId || 'ssl-ghost-item'}
+			index={draggedIndex ?? -1}
+			class={rootState.draggedItem?.className.replace(/\s*s-[a-zA-Z0-9]{12}\s*/g, '')}
+		/>
+	{/if}
 </div>
 
 <style>
