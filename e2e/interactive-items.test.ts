@@ -149,4 +149,38 @@ test.describe('Sortable List - Interactive Items', () => {
 			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 		}
 	});
+
+	test('should reset interactive element tabindex after focusing outside the list', async ({
+		page,
+	}) => {
+		// Find the root element and focus it
+		const root = page.locator('.ssl-root');
+		await root.focus();
+
+		// Navigate to the third item using the arrow keys
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowDown');
+
+		// Verify the List Item 3 is focused
+		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		await expect(focusedItem).toBeFocused();
+
+		// Focus the interactive element inside use the Tab key
+		await page.keyboard.press('Tab');
+
+		// Verify the interactive element is focused
+		const interactiveElement = focusedItem.locator('select');
+		await expect(focusedItem).toContainText('List Item 3');
+		await expect(interactiveElement).toBeFocused();
+
+		// Tab away from the interactive element
+		await page.keyboard.press('Tab');
+
+		// Tab back to the root
+		await page.keyboard.press('Shift+Tab');
+
+		// Verify the root element is focused
+		await expect(root).toBeFocused();
+	});
 });
