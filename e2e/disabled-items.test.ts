@@ -65,9 +65,8 @@ test.describe('Sortable List - Disabled Items', () => {
 			// Try to focus the disabled item
 			await disabledItem.focus();
 
-			// Check if it’s really focused
-			const isFocused = await disabledItem.evaluate((el) => el === document.activeElement);
-			expect(isFocused).toBe(true);
+			// Verify the disabled item is focused
+			await expect(disabledItem).toBeFocused();
 
 			// Try to interact with keyboard
 			await page.keyboard.press('Space');

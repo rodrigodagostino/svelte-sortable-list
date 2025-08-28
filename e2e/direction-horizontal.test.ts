@@ -74,6 +74,7 @@ test.describe('Sortable List - Direction Horizontal', () => {
 		// Verify the List Item 1 is focused
 		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
 		await expect(focusedItem).toContainText('List Item 1');
+		await expect(focusedItem).toBeFocused();
 
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
