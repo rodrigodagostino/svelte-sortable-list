@@ -698,6 +698,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		scrollingSpeed = 0;
 	}
+
+	function handleContextMenu(e: MouseEvent) {
+		if (rootState.dragState !== 'idle') {
+			e.preventDefault();
+		}
+	}
 </script>
 
 <!-- svelte-ignore a11y_role_supports_aria_props -->
@@ -729,6 +735,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
 	onpointerdown={handlePointerDown}
 	onkeydown={handleKeyDown}
+	oncontextmenu={handleContextMenu}
 	onitemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
 	{#if children}
