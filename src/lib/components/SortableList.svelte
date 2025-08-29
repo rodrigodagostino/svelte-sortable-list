@@ -191,7 +191,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
-		if (rootState.dragState !== 'idle' || rootState.focusedItem) {
+		if (e.button !== 0 || rootState.dragState !== 'idle' || rootState.focusedItem) {
 			e.preventDefault();
 			return;
 		}
