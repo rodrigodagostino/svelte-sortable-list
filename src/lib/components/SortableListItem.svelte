@@ -203,7 +203,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
 	$: styleTransform = getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds);
 
-	async function handleFocus() {
+	async function handleFocus(e: FocusEvent) {
+		if ($dragState.includes('ptr')) {
+			e.preventDefault();
+			return;
+		}
+
 		await tick();
 		$focusedItem = itemRef;
 	}
