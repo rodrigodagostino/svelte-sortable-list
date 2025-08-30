@@ -14,5 +14,3 @@ export interface SortableListAnnouncements {
 	) => string;
 	canceled: (draggedItem: HTMLLIElement, draggedItemIndex: number) => string;
 }
-
-export type TextDirection = 'ltr' | 'rtl' | 'auto';
