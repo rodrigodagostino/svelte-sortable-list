@@ -30,25 +30,28 @@ test.describe('Sortable List - With Locked Axis', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
 		// Move down a bit
 		await page.mouse.move(
 			draggedBox.x,
 			initialBox.y + 100,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Move back up
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width,
 			initialBox.y + 50,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Move down again
 		await page.mouse.move(
 			draggedBox.x,
 			initialBox.y + 150,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Get the final position

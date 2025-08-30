@@ -41,11 +41,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
 		// Drag outside the list boundaries
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Verify the dragged item has no height

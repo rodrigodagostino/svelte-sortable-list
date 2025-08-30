@@ -37,7 +37,7 @@ test.describe('Sortable List - Disabled Items', () => {
 			await page.mouse.move(
 				initialBox.x + initialBox.width / 2,
 				initialBox.y + initialBox.height * 2,
-				{ steps: 20 } // Smooth movement
+				{ steps: 40 } // Smooth movement
 			);
 
 			// Get the final position

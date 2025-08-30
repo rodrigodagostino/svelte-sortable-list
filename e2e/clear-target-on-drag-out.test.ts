@@ -41,11 +41,14 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
 		// Move to the right edge of the viewport
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// Release the mouse to drop
