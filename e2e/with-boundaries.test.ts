@@ -37,11 +37,14 @@ test.describe('Sortable List - With Boundaries', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
 		// Try to drag way outside the list (left and up)
 		await page.mouse.move(
 			40,
 			40,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// The item should be constrained by the left and top boundaries
@@ -54,7 +57,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			viewport.width - 40,
 			40,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// The item should be constrained by the right and top boundaries
@@ -69,7 +72,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			viewport.width - 40,
 			viewport.height - 40,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// The item should be constrained by the right and bottom boundaries
@@ -86,7 +89,7 @@ test.describe('Sortable List - With Boundaries', () => {
 		await page.mouse.move(
 			40,
 			viewport.height - 40,
-			{ steps: 20 } // Smooth movement
+			{ steps: 40 } // Smooth movement
 		);
 
 		// The item should be constrained by the left and bottom boundaries

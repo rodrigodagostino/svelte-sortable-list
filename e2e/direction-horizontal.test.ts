@@ -79,6 +79,9 @@ test.describe('Sortable List - Direction Horizontal', () => {
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
 
+		// Verify the drag state is active
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
 		// Move right twice to reach the List Item 3 position
 		await page.keyboard.press('ArrowRight');
 		await page.keyboard.press('ArrowRight');
