@@ -92,7 +92,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const rootState = setSortableListRootState();
 
 	const _transition = $derived({
-		duration: 240,
+		duration: 320,
 		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',
 		...transition,
 	});

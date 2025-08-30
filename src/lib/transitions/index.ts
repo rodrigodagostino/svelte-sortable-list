@@ -41,7 +41,7 @@ export function scaleFly(
 	node: HTMLElement,
 	{
 		delay = 0,
-		duration = 240,
+		duration = 320,
 		easing = sineInOut,
 		axis = 'y',
 		x = 0,
