@@ -111,7 +111,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	export let isDisabled: $$Props['isDisabled'] = false;
 	export let announcements: $$Props['announcements'] = undefined;
 
-	$: _transition = { duration: 240, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
+	$: _transition = { duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)', ...transition };
 	$: _announcements = announcements || announce;
 
 	$: classes = joinCSSClasses('ssl-root', $$restProps.class);
