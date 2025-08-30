@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] (2025-08-30)
+
+### Changed
+
+- Migrate `<SortableList>` to Svelte 5.
+- Migrate `<SortableListGhost>` to Svelte 5.
+- Migrate `<SortableListItem>` to Svelte 5.
+- Migrate `<SortableListItemHandle>` to Svelte 5.
+- Migrate `<SortableListItemRemove>` to Svelte 5.
+- Switch from **Stores + Context API** to **Classes + Context API** for global state management.
+- Replace the `textDirection` type with a native type.
+- Move render condition inside `<SortableListGhost>`.
+- Increase the default transition duration to `320` ms.
+
+### Fixed
+
+- Restrict dragging to the left mouse button only.
+- Add the `pointercancel` handler to the dragged item during drag.
+- Prevent the right-click context menu from opening during drag.
+- Prevent the dragged item from being focused during drag (Chromium).
+- Attach event listeners to `rootRef` to prevent potential memory leaks.
+- Add a fallback for the `pointerup` event not firing on tap-and-release without movement (Webkit iOS).
+
+### Test
+
+- Add test to check that the tabindex in interactive elements is reset after focusing outside of the list.
+- Fully check that focused items are actually focused.
+- Adjust all tests to make dragging more reliable.
+- Reduce flakiness in the **“With handle”** page cursor test.
+
+### Chores
+
+- Upgrade dependencies.
+- Enable TS error for unread local variables.
+
+### Docs
+
+- Migrate demo pages to Svelte 5.
+- Prevent `<dialog>` premature closing (Webkit browsers).
+- Avoid menus auto-close on window resize.
+- Update the README to reflect the latest changes.
+
 ## [1.0.0] (2025-08-22)
 
 ### Chores
