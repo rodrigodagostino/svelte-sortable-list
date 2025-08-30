@@ -303,6 +303,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			},
 			{ once: true }
 		);
+		currItem.addEventListener(
+			'pointercancel',
+			() => {
+				currItem.removeEventListener('pointermove', handlePointerMove);
+				handlePointerCancel();
+			},
+			{ once: true }
+		);
 	}
 
 	let rafId: number | null = null;
@@ -717,7 +725,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	aria-describedby={$$restProps['aria-describedby'] || undefined}
 	aria-activedescendant={$focusedItem ? $focusedItem.id : undefined}
 	on:pointerdown={handlePointerDown}
-	on:pointercancel={handlePointerCancel}
 	on:keydown={handleKeyDown}
 	on:itemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
