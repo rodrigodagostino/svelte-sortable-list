@@ -256,19 +256,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		currItem.addEventListener('pointermove', handlePointerMove);
-		currItem.addEventListener(
+		rootRef.addEventListener('pointermove', handlePointerMove);
+		rootRef.addEventListener(
 			'pointerup',
 			() => {
-				currItem.removeEventListener('pointermove', handlePointerMove);
+				rootRef.removeEventListener('pointermove', handlePointerMove);
 				handlePointerUp();
 			},
 			{ once: true }
 		);
-		currItem.addEventListener(
+		rootRef.addEventListener(
 			'pointercancel',
 			() => {
-				currItem.removeEventListener('pointermove', handlePointerMove);
+				rootRef.removeEventListener('pointermove', handlePointerMove);
 				handlePointerCancel();
 			},
 			{ once: true }
