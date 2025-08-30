@@ -273,6 +273,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			},
 			{ once: true }
 		);
+		// Provide a fallback for the pointerup event not firing on Webkit for iOS.
+		// This occurs when tapping an item to start dragging and releasing without movement.
+		rootRef.addEventListener(
+			'lostpointercapture',
+			() => {
+				rootRef.removeEventListener('pointermove', handlePointerMove);
+				handlePointerCancel();
+			},
+			{ once: true }
+		);
 	}
 
 	let rafId: number | null = null;
