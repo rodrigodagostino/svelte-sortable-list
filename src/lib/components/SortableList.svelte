@@ -229,7 +229,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
-		if ($dragState !== 'idle' || $focusedItem) {
+		if (e.button !== 0 || $dragState !== 'idle' || $focusedItem) {
 			e.preventDefault();
 			return;
 		}
