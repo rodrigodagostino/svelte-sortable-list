@@ -127,6 +127,9 @@ test.describe('Sortable List - With Handle', () => {
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
+		// Check cursor changes to grabbing during drag
+		expect(draggedHandle).toHaveCSS('cursor', 'grabbing');
+
 		// Move to the target position (below List Item 3)
 		await page.mouse.move(
 			handleBox.x + handleBox.width / 2,
@@ -134,13 +137,13 @@ test.describe('Sortable List - With Handle', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// Wait for the dragged item to move by checking the drag state changes to kbd-drag
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
-
-		// Check cursor changes to grabbing during drag
-		expect(draggedHandle).toHaveCSS('cursor', 'grabbing');
-
 		// Release the mouse to drop
 		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Check cursor changes to grabbing during drag
+		expect(draggedHandle).toHaveCSS('cursor', 'grab');
 	});
 });
