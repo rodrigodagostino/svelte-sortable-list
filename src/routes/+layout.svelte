@@ -79,10 +79,6 @@
 			isControlsExpanded = false;
 		}
 	}}
-	on:resize={() => {
-		isMenuExpanded = false;
-		isControlsExpanded = false;
-	}}
 />
 
 <div id="app" class="app" data-page-pathname={$page.url.pathname.replace('/', '')}>
