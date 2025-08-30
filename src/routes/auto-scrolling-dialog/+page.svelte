@@ -6,6 +6,7 @@
 	import '$lib/styles.css';
 
 	let dialogRef: HTMLDialogElement;
+	let dialogInnerRef: HTMLDivElement;
 
 	let items = Array.from({ length: 100 }, (_, i) => ({
 		id: `list-item-${i + 1}`,
@@ -29,7 +30,16 @@
 
 	function handleClickDialog(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (target?.nodeName === 'DIALOG') handleCloseDialog();
+		const dialogInnerRect = dialogInnerRef?.getBoundingClientRect();
+		if (
+			target?.nodeName === 'DIALOG' &&
+			dialogInnerRect &&
+			(e.clientX < dialogInnerRect.left ||
+				e.clientX > dialogInnerRect.right ||
+				e.clientY < dialogInnerRect.top ||
+				e.clientY > dialogInnerRect.bottom)
+		)
+			handleCloseDialog();
 	}
 
 	function handleOpenDialog() {
@@ -70,7 +80,7 @@
 		</svg>
 		<span class="sr-only">Close dialog</span>
 	</button>
-	<div class="dialog__inner">
+	<div bind:this={dialogInnerRef} class="dialog__inner">
 		<SortableList.Root {...$rootProps} on:drop={handleDrop} on:dragend={handleDragEnd}>
 			{#each items as item, index (item.id)}
 				<SortableList.Item id={item.id} {index}>
