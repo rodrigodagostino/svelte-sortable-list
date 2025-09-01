@@ -210,6 +210,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		rootState.pointer;
 		return untrack(() => getStyleTransform());
 	});
+
+	function handlePointerDown(e: PointerEvent) {
+		// Prevent focusing the item inside when clicking on the ghost.
+		e.preventDefault();
+	}
 </script>
 
 <div
@@ -226,6 +231,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	data-can-clear-on-drag-out={rootState.props.canClearOnDragOut}
 	data-can-remove-on-drop-out={rootState.props.canRemoveOnDropOut}
 	aria-hidden="true"
+	onpointerdown={handlePointerDown}
 	use:portal
 >
 	<!-- The following if clause will prevent <SortableListItem> -->
