@@ -4,6 +4,9 @@
 	import layoutState from './states.svelte.js';
 	import { toKebabCase } from './utils.js';
 	import type { SortableListRootProps as RootProps } from '$lib/types/props.js';
+	import '@fontsource/rubik/400.css';
+	import '@fontsource/rubik/600.css';
+	import '@fontsource/jetbrains-mono';
 	import './styles.css';
 
 	interface Props {
@@ -307,6 +310,7 @@
 		max-height: calc(100vh - 1.5rem);
 		max-height: calc(100dvh - 1.5rem);
 		background-color: var(--ssl-gray-500);
+		border-radius: 0.25rem;
 		box-shadow: var(--ssl-box-shadow-4);
 		position: fixed;
 		top: 0.75rem;
@@ -359,7 +363,7 @@
 		}
 
 		&[aria-current='page'] {
-			font-weight: 700;
+			font-weight: 600;
 			color: var(--ssl-white-rich);
 		}
 	}
@@ -375,6 +379,7 @@
 		width: 100%;
 		margin-block: 0.25rem;
 		border-style: solid;
+		border-width: 1px;
 		color: var(--ssl-gray-400);
 	}
 
@@ -396,6 +401,7 @@
 		max-width: calc(100% - 1.5rem);
 		max-height: calc(100% - 1.5rem);
 		background-color: var(--ssl-white);
+		border-radius: 0.25rem;
 		box-shadow: var(--ssl-box-shadow-4);
 		position: fixed;
 		right: 0.75rem;
@@ -454,7 +460,7 @@
 		}
 
 		& td {
-			font-family: monospace;
+			font-family: 'JetBrains Mono', monospace;
 		}
 
 		& label {

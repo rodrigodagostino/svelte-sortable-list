@@ -44,6 +44,9 @@
 		"esm-env": "^1.0.0"
 	},
 	"devDependencies": {
+		"@fontsource/jetbrains-mono": "5.2.6",
+		"@fontsource/poppins": "5.2.6",
+		"@fontsource/rubik": "5.2.6",
 		"@playwright/test": "1.55.0",
 		"@sveltejs/adapter-auto": "6.1.0",
 		"@sveltejs/kit": "2.36.2",
