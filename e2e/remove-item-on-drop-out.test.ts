@@ -56,7 +56,10 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// Verify the ghost item content has the correct background color and border
 		await expect(ghostItemContent).toHaveCSS('background-color', 'rgb(253, 164, 175)');
-		await expect(ghostItemContent).toHaveCSS('border', '1px solid rgb(251, 113, 133)');
+		await expect(ghostItemContent).toHaveCSS(
+			'box-shadow',
+			'rgb(251, 113, 133) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+		);
 
 		// Release the mouse to drop
 		await page.mouse.up();

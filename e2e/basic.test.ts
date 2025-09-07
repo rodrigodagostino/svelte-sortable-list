@@ -174,7 +174,7 @@ test.describe('Sortable List - Basic', () => {
 		// Verify the ghost item content has the correct box-shadow
 		await expect(ghostItemContent).toHaveCSS(
 			'box-shadow',
-			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
 
 		// Release the mouse to drop
@@ -185,7 +185,10 @@ test.describe('Sortable List - Basic', () => {
 		await expect(ghost).toBeHidden();
 
 		// Verify the ghost item content has no box-shadow
-		await expect(ghostItemContent).toHaveCSS('box-shadow', 'none');
+		await expect(ghostItemContent).toHaveCSS(
+			'box-shadow',
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
+		);
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
@@ -249,7 +252,10 @@ test.describe('Sortable List - Basic', () => {
 		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
 
 		// Verify the ghost item content has no box-shadow
-		await expect(focusedItemContent).toHaveCSS('box-shadow', 'none');
+		await expect(focusedItemContent).toHaveCSS(
+			'box-shadow',
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
+		);
 
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
@@ -257,7 +263,7 @@ test.describe('Sortable List - Basic', () => {
 		// Verify the focused item content has the correct box-shadow
 		await expect(focusedItemContent).toHaveCSS(
 			'box-shadow',
-			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
 
 		// Move down twice
@@ -267,7 +273,7 @@ test.describe('Sortable List - Basic', () => {
 		// Verify the focused item content has the correct box-shadow
 		await expect(focusedItemContent).toHaveCSS(
 			'box-shadow',
-			'rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
 
 		// Drop the item with Space key
@@ -277,7 +283,10 @@ test.describe('Sortable List - Basic', () => {
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify the ghost item content has no box-shadow
-		await expect(focusedItemContent).toHaveCSS('box-shadow', 'none');
+		await expect(focusedItemContent).toHaveCSS(
+			'box-shadow',
+			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
+		);
 
 		// Verify the dragged item is still focused
 		expect(focusedItem).toBeFocused();
