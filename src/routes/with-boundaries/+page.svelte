@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>Has boundaries — Svelte Sortable List</title>
+	<title>With boundaries — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...layoutState.props} ondrop={handleDrop} ondragend={handleDragEnd}>
