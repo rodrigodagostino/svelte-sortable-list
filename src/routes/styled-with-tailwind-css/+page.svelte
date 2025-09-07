@@ -29,7 +29,7 @@
 
 <SortableList.Root
 	{...layoutState.props}
-	class="rounded-lg focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-indigo-600"
+	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800!"
 	ondrop={handleDrop}
 	ondragend={handleDragEnd}
 >
@@ -37,12 +37,14 @@
 		<SortableList.Item
 			{...item}
 			{index}
-			class="group rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state*='kbd-drag']]:shadow-md [&[data-drag-state*='ptr-drag']]:shadow-md [&[data-is-ghost='false'][data-drag-state*='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0"
+			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors group-focus-within:bg-indigo-800 group-[[data-drag-state*='kbd-drag']]:bg-indigo-500 group-[[data-drag-state*='ptr-drag']]:bg-indigo-500 group-[[data-is-ghost='false']:hover]:bg-indigo-800"
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-[[data-drag-state*='kbd-drag']]:bg-indigo-400 group-[[data-drag-state*='kbd-drag']]:shadow-lg group-[[data-drag-state*='kbd-drag']]:shadow-indigo-900/72 group-[[data-drag-state*='ptr-drag']]:bg-indigo-400 group-[[data-drag-state*='ptr-drag']]:shadow-lg group-[[data-drag-state*='ptr-drag']]:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
 			>
-				<span class="text-base font-medium uppercase text-white">{item.text}</span>
+				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
+					{item.text}
+				</span>
 			</div>
 		</SortableList.Item>
 	{/each}
