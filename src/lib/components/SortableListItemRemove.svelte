@@ -15,18 +15,20 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 -->
 
 <script lang="ts">
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Icon from '$lib/components/Icon.svelte';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
 	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
 
-	let { children, onclick, ...restProps }: ItemRemoveProps & { class?: string } = $props();
+	let { children, ...restProps }: ItemRemoveProps & HTMLButtonAttributes & { class?: string } =
+		$props();
 
 	const rootState = getSortableListRootState();
 
 	const classes = $derived(joinCSSClasses('ssl-item-remove', restProps.class));
 
-	function handleClick(e: MouseEvent) {
+	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
 		if (rootState.focusedItem && rootState.ref) {
 			const items = rootState.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
@@ -46,11 +48,11 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 			}
 		}
 
-		onclick?.(e);
+		restProps.onclick?.(e);
 	}
 </script>
 
-<button class={classes} data-role="remove" onclick={handleClick}>
+<button {...restProps} class={classes} data-role="remove" onclick={handleClick}>
 	{#if children}
 		{@render children()}
 	{:else}
