@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] (2025-09-07)
+
+### Added
+
+- Extend the `<SortableList.ItemRemove>` component to support `restProps`.
+
+### Fixed
+
+- Prevent item focus when clicking on ghost.
+
+### Test
+
+- Update the **“Interactive items”** tests to match the latest changes made to the demo page.
+
+### Docs
+
+- Ensure the `<body>` element takes a `min-height` of `100dvh`.
+
 ## [1.0.1] (2025-08-30)
 
 ### Changed
@@ -1267,7 +1285,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...v1.0.0
 [0.17.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...v0.17.5
