@@ -15,9 +15,6 @@ importers:
       '@fontsource/jetbrains-mono':
         specifier: 5.2.6
         version: 5.2.6
-      '@fontsource/poppins':
-        specifier: 5.2.6
-        version: 5.2.6
       '@fontsource/rubik':
         specifier: 5.2.6
         version: 5.2.6
@@ -299,9 +296,6 @@ packages:
 
   '@fontsource/jetbrains-mono@5.2.6':
     resolution: {integrity: sha512-nz//dBr99hXZmHp10wgNI00qThWImkzRR5PQjvRM+rpmuHO5rYBJCqPPWufidCvmkkryXx/GOP/lgqsM3R3Org==}
-
-  '@fontsource/poppins@5.2.6':
-    resolution: {integrity: sha512-NFr0121+vWCfzLDVvSZOzwAjRUaNj6QHA9gtUh/KHHoWf1Qn23EkwVFs63XZ6UtF5K1b3UNmCx77YEMGgV7BOQ==}
 
   '@fontsource/rubik@5.2.6':
     resolution: {integrity: sha512-KNY87CIXAzmKMfL8gnQV0nbePn9g/kG3tF4GJoUEASSz+ECFWYoPir8TSySblYfXTInDL/kHJm6CMrrEW/U/ZA==}
@@ -1738,8 +1732,6 @@ snapshots:
       levn: 0.4.1
 
   '@fontsource/jetbrains-mono@5.2.6': {}
-
-  '@fontsource/poppins@5.2.6': {}
 
   '@fontsource/rubik@5.2.6': {}
 
