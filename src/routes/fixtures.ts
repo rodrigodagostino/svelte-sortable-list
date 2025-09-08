@@ -3,6 +3,7 @@ import type { SortableList } from '$lib/index.js';
 export const defaultRootProps: SortableList.RootProps = {
 	gap: 12,
 	direction: 'vertical',
+	delay: 0,
 	transition: {
 		duration: 320,
 		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',

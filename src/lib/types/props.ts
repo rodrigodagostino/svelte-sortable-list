@@ -24,6 +24,8 @@ export interface SortableListRootProps
 	gap?: number;
 	/** Orientation in which items will be arranged. */
 	direction?: 'vertical' | 'horizontal';
+	/** Time before the drag operation starts (in milliseconds). Helps prevent accidental dragging. */
+	delay?: number;
 	/** Object containing `transition` and `duration` properties. */
 	transition?: {
 		/** Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations. */

@@ -69,6 +69,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let {
 		gap = 12,
 		direction = 'vertical',
+		delay = 0,
 		transition = undefined,
 		hasWrapping = false,
 		hasLockedAxis = false,
@@ -101,6 +102,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.props = {
 			gap,
 			direction,
+			delay,
 			transition: _transition,
 			hasWrapping,
 			hasLockedAxis,
@@ -121,8 +123,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	const classes = $derived(['ssl-root', restProps.class]);
 	let pointerId: PointerEvent['pointerId'] | null = $state(null);
-	let liveText = $state('');
+	let delayTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
+	let liveText = $state('');
 
 	onMount(() => {
 		onmounted?.(null);
@@ -241,6 +244,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(rootRef);
 
+		if (delay <= 0) await handlePointerDragStart(currItem);
+		else {
+			rootRef.addEventListener('pointermove', handlePointerMoveWithDelay);
+			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
+		}
+	}
+
+	async function handlePointerDragStart(currItem: HTMLLIElement) {
+		rootRef.removeEventListener('pointermove', handlePointerMoveWithDelay);
+
 		await tick();
 		rootState.ghostState = 'ptr-drag-start';
 		await tick();
@@ -282,6 +295,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			},
 			{ once: true }
 		);
+	}
+
+	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
+		if (delayTimeoutId !== null && rootState.pointerOrigin) {
+			const threshold = 10;
+			const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
+			const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
+
+			if ((deltaX > threshold || deltaY > threshold) && delayTimeoutId) {
+				clearTimeout(delayTimeoutId);
+				delayTimeoutId = null;
+			}
+		}
 	}
 
 	let rafId: number | null = null;
