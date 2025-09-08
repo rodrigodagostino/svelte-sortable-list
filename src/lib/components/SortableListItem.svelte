@@ -34,7 +34,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		INTERACTIVE_ELEMENTS,
 		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
-		joinCSSClasses,
 	} from '$lib/utils/index.js';
 
 	let itemRef: HTMLLIElement = $state()!;
@@ -63,7 +62,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	const rootState = getSortableListRootState();
 
-	const classes = $derived(joinCSSClasses('ssl-item', restProps.class));
+	const classes = $derived(['ssl-item', restProps.class]);
 	const isGhost = $derived(!!itemRef?.parentElement?.classList.contains('ssl-ghost'));
 
 	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');

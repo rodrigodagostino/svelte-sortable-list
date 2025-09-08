@@ -39,7 +39,3 @@ export function calculateTranslateWithAlignment(
 			? `${a.bottom - b.bottom}px`
 			: `${a.y - b.y}px`;
 }
-
-export function joinCSSClasses(classes: string, restClasses: string | undefined) {
-	return [...new Set([classes, ...(restClasses ? restClasses.split(' ') : [])])].join(' ');
-}

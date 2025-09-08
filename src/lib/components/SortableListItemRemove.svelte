@@ -19,14 +19,14 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	import Icon from '$lib/components/Icon.svelte';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
-	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
+	import { getIndex } from '$lib/utils/index.js';
 
 	let { children, ...restProps }: ItemRemoveProps & HTMLButtonAttributes & { class?: string } =
 		$props();
 
 	const rootState = getSortableListRootState();
 
-	const classes = $derived(joinCSSClasses('ssl-item-remove', restProps.class));
+	const classes = $derived(['ssl-item-remove', restProps.class]);
 
 	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
 		if (rootState.focusedItem && rootState.ref) {

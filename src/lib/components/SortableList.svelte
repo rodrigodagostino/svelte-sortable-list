@@ -59,7 +59,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isOrResidesInInteractiveElement,
 		isRootElement,
 		isScrollable,
-		joinCSSClasses,
 		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
@@ -120,7 +119,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		};
 	});
 
-	const classes = $derived(joinCSSClasses('ssl-root', restProps.class));
+	const classes = $derived(['ssl-root', restProps.class]);
 	let pointerId: PointerEvent['pointerId'] | null = $state(null);
 	let liveText = $state('');
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
