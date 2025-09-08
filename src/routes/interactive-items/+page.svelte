@@ -34,17 +34,17 @@
 				{#if item.type === 'input'}
 					<div class="form-field">
 						<label for="form-field-{item.id}">{item.text}</label>
-						<input id="form-field-{item.id}" type="text" />
+						<input id="form-field-{item.id}" type="text" value={item.value} />
 					</div>
 				{:else if item.type === 'textarea'}
 					<div class="form-field">
 						<label for="form-field-{item.id}">{item.text}</label>
-						<textarea id="form-field-{item.id}"></textarea>
+						<textarea id="form-field-{item.id}">{item.value}</textarea>
 					</div>
 				{:else if item.type === 'select'}
 					<div class="form-field">
 						<label for="form-field-{item.id}">{item.text}</label>
-						<select id="form-field-{item.id}" name="form-field-{item.id}">
+						<select id="form-field-{item.id}" name="form-field-{item.id}" value="option-2">
 							<option value="">--Choose an option--</option>
 							<option value="option-1">Option 1</option>
 							<option value="option-2">Option 2</option>
@@ -55,11 +55,11 @@
 					<fieldset>
 						<legend>{item.text}</legend>
 						<label for="option-1">
-							<input type="checkbox" id="option-1" name="option-1" />
+							<input type="checkbox" id="option-1" name="option-1" checked />
 							Option 1
 						</label>
 						<label for="option-2">
-							<input type="checkbox" id="option-2" name="option-2" />
+							<input type="checkbox" id="option-2" name="option-2" checked />
 							Option 2
 						</label>
 						<label for="option-3">
@@ -100,6 +100,11 @@
 		width: 200px;
 		padding: 0.25rem;
 		margin-top: 0.25rem;
+		background-color: var(--ssl-white-rich);
+	}
+
+	input[type='checkbox'] {
+		margin: revert;
 	}
 
 	fieldset {
@@ -110,6 +115,7 @@
 		width: 200px;
 		padding: 0.5rem 1rem 1rem 0.75rem;
 		margin-inline: unset;
+		border: 0.125rem groove var(--ssl-gray-100);
 	}
 
 	legend {

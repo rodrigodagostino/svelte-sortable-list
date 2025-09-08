@@ -61,11 +61,13 @@ export function getInteractiveItems(): SortableList.ItemData[] {
 			id: 'list-item-1',
 			text: 'List Item 1',
 			type: 'input',
+			value: 'Input field',
 		},
 		{
 			id: 'list-item-2',
 			text: 'List Item 2',
 			type: 'textarea',
+			value: 'Textarea field',
 		},
 		{
 			id: 'list-item-3',
