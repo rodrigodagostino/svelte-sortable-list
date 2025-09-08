@@ -41,7 +41,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button class={classes} data-role="remove" on:click={handleClick} on:click>
+<button {...$$restProps} class={classes} data-role="remove" on:click={handleClick} on:click>
 	<slot>
 		<Icon name="remove" />
 	</slot>
