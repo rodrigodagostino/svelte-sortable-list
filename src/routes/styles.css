@@ -145,6 +145,8 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	display: flex;
 	justify-content: center;
+	min-height: 100vh;
+	min-height: 100dvh;
 }
 
 code {
