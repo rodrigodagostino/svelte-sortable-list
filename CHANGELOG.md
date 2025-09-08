@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] (2025-09-07)
+
+### Added
+
+- Extend the `<SortableList.ItemRemove>` component to support `restProps`.
+
+### Changed
+
+- Renovate base styles.
+- Switch to the Svelte 5 new [objects and arrays](https://svelte.dev/docs/svelte/class#Attributes-Objects-and-arrays) `class` conversion.
+
+### Fixed
+
+- Prevent item focus when clicking on ghost.
+
+### Test
+
+- Update tests to match the latest changes made to the demo pages.
+
+### Chores
+
+- Upgrade Tailwind to v4.
+
+### Docs
+
+- Renovate demo pages styles.
+- Renovate **“Style with Tailwind CSS”** demo page.
+- Add default values to form fields in the **“Interactive items”** demo page.
+- Correct demo page titles.
+
 ## [2.0.0] (2025-08-30)
 
 ### Changed
@@ -1275,7 +1305,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...v1.0.0
 [0.17.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.4...v0.17.5
 [0.17.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.3...v0.17.4
