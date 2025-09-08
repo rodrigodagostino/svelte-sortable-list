@@ -26,6 +26,7 @@
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'With handle', path: '/with-handle' },
+		{ text: 'With delay', path: '/with-delay' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },

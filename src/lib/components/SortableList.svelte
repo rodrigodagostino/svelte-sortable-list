@@ -297,19 +297,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		);
 	}
 
-	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
-		if (delayTimeoutId !== null && rootState.pointerOrigin) {
-			const threshold = 10;
-			const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
-			const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
-
-			if ((deltaX > threshold || deltaY > threshold) && delayTimeoutId) {
-				clearTimeout(delayTimeoutId);
-				delayTimeoutId = null;
-			}
-		}
-	}
-
 	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
 		if (rafId) return;
@@ -364,6 +351,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			rafId = null;
 		});
+	}
+
+	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
+		if (delayTimeoutId !== null && rootState.pointerOrigin) {
+			const threshold = 10;
+			const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
+			const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
+
+			if ((deltaX > threshold || deltaY > threshold) && delayTimeoutId) {
+				clearTimeout(delayTimeoutId);
+				delayTimeoutId = null;
+			}
+		}
 	}
 
 	function handlePointerUp() {
