@@ -15,14 +15,12 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 -->
 
 <script lang="ts">
-	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Icon from '$lib/components/Icon.svelte';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
-	let { children, ...restProps }: ItemRemoveProps & HTMLButtonAttributes & { class?: string } =
-		$props();
+	let { children, ...restProps }: ItemRemoveProps = $props();
 
 	const rootState = getSortableListRootState();
 

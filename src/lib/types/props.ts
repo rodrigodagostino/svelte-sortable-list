@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { AriaAttributes } from 'svelte/elements';
+import type { AriaAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
 import type { SortableListAnnouncements as Announcements } from './accessibility.js';
 import type {
@@ -92,7 +92,7 @@ export interface SortableListItemProps
 }
 
 export interface SortableListGhostProps {
-	/** Reference to the Ghost used in its parent component. */
+	/** Reference to the Ghost used in the Root component. */
 	ghostRef: HTMLDivElement;
 }
 
@@ -101,11 +101,9 @@ export interface SortableListItemHandleProps {
 	children?: Snippet;
 }
 
-export interface SortableListItemRemoveProps {
-	/** Content to be rendered inside the handle. */
+export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
+	/** Content to be rendered inside the remove button. */
 	children?: Snippet;
-	/** Callback fired when the remove button is clicked. */
-	onclick?: (event: MouseEvent) => void;
 }
 
 export interface IconProps {
