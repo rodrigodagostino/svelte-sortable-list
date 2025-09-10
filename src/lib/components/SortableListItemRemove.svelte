@@ -50,7 +50,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button {...restProps} class={classes} data-role="remove" onclick={handleClick}>
+<button {...restProps} class={classes} onclick={handleClick}>
 	{#if children}
 		{@render children()}
 	{:else}

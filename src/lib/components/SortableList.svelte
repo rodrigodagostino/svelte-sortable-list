@@ -222,17 +222,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// because we need to allow interactive elements to run normally.
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) e.preventDefault();
 
-		// Prevent dragging if the current list item contains a handle, but we’re not dragging from it.
-		const hasHandle = !!currItem.querySelector('[data-role="handle"]');
-		const isOrResidesInHandle = target.closest('[data-role="handle"]');
-		if (hasHandle && !isOrResidesInHandle) {
+		// Prevent dragging if the current list item contains an item handle, but we’re not dragging from it.
+		const hasItemHandle = !!currItem.querySelector('.ssl-item-handle');
+		const isOrResidesInItemHandle = target.closest('.ssl-item-handle');
+		if (hasItemHandle && !isOrResidesInItemHandle) {
 			e.preventDefault();
 			return;
 		}
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
-		if (isOrResidesInInteractiveElement(target, currItem) && !isOrResidesInHandle) return;
+		if (isOrResidesInInteractiveElement(target, currItem) && !isOrResidesInItemHandle) return;
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 

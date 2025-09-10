@@ -23,7 +23,7 @@ Serves as an element that limits the draggable area of a list item to itself. In
 	const classes = $derived(['ssl-item-handle', restProps.class]);
 </script>
 
-<span class={classes} data-role="handle" aria-hidden="true">
+<span class={classes} aria-hidden="true">
 	{#if children}
 		{@render children()}
 	{:else}
