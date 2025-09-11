@@ -118,20 +118,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	$: classes = joinCSSClasses('ssl-root', $$restProps.class);
 
-	const rootProps = setRootProps({
-		gap,
-		direction,
-		delay,
-		transition: _transition,
-		hasWrapping,
-		hasLockedAxis,
-		hasBoundaries,
-		canClearOnDragOut,
-		canRemoveOnDropOut,
-		isLocked,
-		isDisabled,
-		announcements: _announcements,
-	});
+	const rootProps = setRootProps({});
 	$: $rootProps = {
 		gap,
 		direction,
