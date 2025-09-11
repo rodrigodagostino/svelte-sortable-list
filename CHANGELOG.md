@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] (2025-09-10)
+
+### BREAKING
+
+- Remove the `data-role` attribute from the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.
+
+### Added
+
+- Add delay feature.
+
+### Test
+
+- Add E2E tests for the **“With delay”** page.
+
+### Docs
+
+- Add **“With delay”** demo page.
+
 ## [1.0.2] (2025-09-07)
 
 ### Added
@@ -1285,7 +1303,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v0.17.5...v1.0.0
