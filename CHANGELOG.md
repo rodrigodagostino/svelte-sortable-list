@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] (2025-09-10)
+
+### Docs
+
+- Add the correct control type to the `delay` prop in demo pages.
+- Add the missing description for the `delay` prop to the in-editor hints.
+
 ## [2.1.0] (2025-09-10)
 
 ### BREAKING
@@ -1327,7 +1334,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.0.1...v2.1.0
 [2.0.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.0...v2.0.0
