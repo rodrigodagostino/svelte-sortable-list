@@ -52,7 +52,7 @@
 		Object.entries(layoutState.props).map(([key, value]) => ({
 			label: key,
 			type:
-				key === 'gap'
+				key === 'gap' || key === 'delay'
 					? 'number'
 					: key === 'transition'
 						? 'textarea'
