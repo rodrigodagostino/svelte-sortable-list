@@ -42,7 +42,7 @@
 	$: controls = Object.keys($rootProps).map((key) => ({
 		label: key,
 		type:
-			key === 'gap'
+			key === 'gap' || key === 'delay'
 				? 'number'
 				: key === 'transition'
 					? 'textarea'
