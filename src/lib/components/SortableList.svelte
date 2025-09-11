@@ -6,6 +6,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 ### Props
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
+- `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.
 - `transition`:
 		- `duration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.
 		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the ghost drop transition.
@@ -101,6 +102,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	export let gap: $$Props['gap'] = 12;
 	export let direction: $$Props['direction'] = 'vertical';
+	export let delay: $$Props['delay'] = 0;
 	export let transition: $$Props['transition'] = undefined;
 	export let hasWrapping: $$Props['hasWrapping'] = false;
 	export let hasLockedAxis: $$Props['hasLockedAxis'] = false;
@@ -119,6 +121,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const rootProps = setRootProps({
 		gap,
 		direction,
+		delay,
 		transition: _transition,
 		hasWrapping,
 		hasLockedAxis,
@@ -132,6 +135,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	$: $rootProps = {
 		gap,
 		direction,
+		delay,
 		transition: _transition,
 		hasWrapping,
 		hasLockedAxis,
@@ -190,7 +194,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 	});
 
-	let transitionTimeoutId: number | null = null;
+	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
+	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 	let scrollingSpeed = 0;
 	let isScrollingDocument = true;
@@ -280,6 +285,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$draggedItem = currItem;
 		$itemRects = getItemRects(rootRef);
 
+		if (typeof delay === 'number' && delay <= 0) await handlePointerDragStart(currItem);
+		else {
+			rootRef.addEventListener('pointermove', handlePointerMoveWithDelay);
+			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
+		}
+	}
+
+	async function handlePointerDragStart(currItem: HTMLLIElement) {
 		await tick();
 		ghostState = 'ptr-drag-start';
 		await tick();
@@ -376,6 +389,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			rafId = null;
 		});
+	}
+
+	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
+		if (delayTimeoutId !== null && $pointerOrigin) {
+			const threshold = 10;
+			const deltaX = Math.abs(clientX - $pointerOrigin.x);
+			const deltaY = Math.abs(clientY - $pointerOrigin.y);
+
+			if ((deltaX > threshold || deltaY > threshold) && delayTimeoutId) {
+				clearTimeout(delayTimeoutId);
+				delayTimeoutId = null;
+			}
+		}
 	}
 
 	function handlePointerUp() {
