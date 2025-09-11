@@ -263,14 +263,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		backface-visibility: hidden;
 		z-index: 1;
 
-		&:not(:has([data-role='handle'])),
-		& [data-role='handle'] {
+		&:not(:has(.ssl-item-handle)),
+		& .ssl-item-handle {
 			touch-action: none;
 			cursor: grab;
 		}
 
 		&[data-drag-state*='ptr-drag'],
-		&[data-drag-state*='ptr-drag'] [data-role='handle'] {
+		&[data-drag-state*='ptr-drag'] .ssl-item-handle {
 			cursor: grabbing;
 		}
 

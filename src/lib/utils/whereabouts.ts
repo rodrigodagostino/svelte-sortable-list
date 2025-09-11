@@ -27,7 +27,7 @@ export const INTERACTIVE_ROLE_ATTRIBUTES = new Set([
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
 export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLElement) {
 	while (target !== root) {
-		if (target.dataset.role && target.dataset.role === 'handle') return false;
+		if (target.classList.contains('ssl-item-handle')) return false;
 
 		const tagName = target.tagName.toLowerCase();
 		if (INTERACTIVE_ELEMENTS.has(tagName)) return true;

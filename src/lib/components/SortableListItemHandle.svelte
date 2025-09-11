@@ -21,7 +21,7 @@ Serves as an element that limits the draggable area of a list item to itself. In
 	$: classes = joinCSSClasses('ssl-item-handle', $$restProps.class);
 </script>
 
-<span class={classes} data-role="handle" aria-hidden="true">
+<span class={classes} aria-hidden="true">
 	<slot>
 		<Icon name="handle" />
 	</slot>
