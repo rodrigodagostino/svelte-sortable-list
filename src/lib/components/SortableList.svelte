@@ -6,6 +6,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 ### Props
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
+- `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.
 - `transition`:
 		- `duration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.
 		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the ghost drop transition.
