@@ -292,7 +292,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				rootRef.removeEventListener('pointermove', handlePointerMove);
-				handlePointerCancel();
+				if (rootState.dragState === 'ptr-drag-start') handlePointerCancel();
 			},
 			{ once: true }
 		);
