@@ -264,8 +264,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
+		currItem.setPointerCapture(e.pointerId);
 		pointerId = e.pointerId;
-		currItem.setPointerCapture(pointerId);
 
 		$pointer = { x: e.clientX, y: e.clientY };
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
