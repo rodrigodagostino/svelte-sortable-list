@@ -690,7 +690,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			element?.addEventListener('transitionend', handleTransitionEnd);
 			// Ensure the drag operation completes even if `transitionend` doesn’t fire.
 			transitionTimeoutId = setTimeout(() => {
-				handlePointerAndKeyboardDragEnd(action);
 				element?.removeEventListener('transitionend', handleTransitionEnd);
 				transitionTimeoutId = null;
 			}, _transition.duration + 100);
