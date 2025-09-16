@@ -298,10 +298,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		);
 	}
 
-	let rafId: number | null = null;
 	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (rafId) return;
-
 		if (rootState.ghostState !== 'ptr-drag' || rootState.dragState !== 'ptr-drag') {
 			await tick();
 			rootState.ghostState = 'ptr-drag';
@@ -309,49 +306,45 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.dragState = 'ptr-drag';
 		}
 
-		rafId = requestAnimationFrame(async () => {
-			if (!rootState.draggedItem || !rootState.itemRects || !ghostRef) return;
+		if (!rootState.draggedItem || !rootState.itemRects || !ghostRef) return;
 
-			const rootRect = rootRef.getBoundingClientRect();
-			const ghostRect = ghostRef.getBoundingClientRect();
-			rootState.pointer = { x: clientX, y: clientY };
-			rootState.isBetweenBounds = areColliding(ghostRect, rootRect);
+		const rootRect = rootRef.getBoundingClientRect();
+		const ghostRect = ghostRef.getBoundingClientRect();
+		rootState.pointer = { x: clientX, y: clientY };
+		rootState.isBetweenBounds = areColliding(ghostRect, rootRect);
 
-			// Re-set itemRects only during scrolling.
-			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-			if (
-				scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
-				scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
-			) {
-				rootState.itemRects = getItemRects(rootRef);
-				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
-				scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
-			}
-			await tick();
-			const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
-			if (collidingItemRect)
-				rootState.targetItem = rootRef.querySelector<HTMLLIElement>(
-					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
-				);
-			else if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isBetweenBounds))
-				rootState.targetItem = null;
+		// Re-set itemRects only during scrolling.
+		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
+		if (
+			scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
+			scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
+		) {
+			rootState.itemRects = getItemRects(rootRef);
+			scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
+			scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
+		}
+		await tick();
+		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
+		if (collidingItemRect)
+			rootState.targetItem = rootRef.querySelector<HTMLLIElement>(
+				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+			);
+		else if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isBetweenBounds))
+			rootState.targetItem = null;
 
-			ondrag?.({
-				deviceType: 'pointer',
-				draggedItem: rootState.draggedItem,
-				draggedItemId: rootState.draggedItem.id,
-				draggedItemIndex: getIndex(rootState.draggedItem),
-				targetItem: rootState.targetItem,
-				targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
-				targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
-				isBetweenBounds: rootState.isBetweenBounds,
-				canRemoveOnDropOut: canRemoveOnDropOut || false,
-			});
-
-			if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
-
-			rafId = null;
+		ondrag?.({
+			deviceType: 'pointer',
+			draggedItem: rootState.draggedItem,
+			draggedItemId: rootState.draggedItem.id,
+			draggedItemIndex: getIndex(rootState.draggedItem),
+			targetItem: rootState.targetItem,
+			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
+			targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
+			isBetweenBounds: rootState.isBetweenBounds,
+			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
+
+		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
 
 	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
@@ -730,7 +723,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.targetItem = null;
 		rootState.itemRects = null;
 		rootState.isBetweenBounds = true;
-		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		scrollingSpeed = 0;
 	}
 
