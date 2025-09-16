@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] (2025-09-15)
+
+### Changed
+
+- Remove unnecessary `rootProps` initialization.
+- Prevent possible outdated value for `pointerId`.
+
+### Fixed
+
+- Ensure the `lostpointercapture` event is fired only when necessary.
+- Remove a repeated call to the `handlePointerAndKeyboardDragEnd()` function.
+- Prevent the ghost from dropping in an outdated target by removing the debounce from the `pointermove` handler.
+
 ## [1.1.1] (2025-09-10)
 
 ### Docs
@@ -1309,7 +1322,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.0.1...v1.0.2
