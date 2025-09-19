@@ -34,7 +34,7 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	);
 }
 
-export const getTextDirection = (element?: HTMLElement): HTMLElement['dir'] => {
+export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
 	if (!element) return 'auto';
 
 	try {
