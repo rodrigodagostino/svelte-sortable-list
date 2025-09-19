@@ -37,13 +37,7 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
 	if (!element) return 'auto';
 
-	let parent = element.parentElement;
-	while (parent) {
-		if (parent.getAttribute('dir')) return parent.getAttribute('dir') as HTMLElement['dir'];
-		parent = parent.parentElement;
-	}
-
-	return 'auto';
+	return window.getComputedStyle(element).direction || 'auto';
 };
 
 function preserveInputValue(source: HTMLInputElement, clone: HTMLInputElement): void {
