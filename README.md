@@ -9,7 +9,6 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 **Live demos:**
 
 - [Netlify](https://svelte-sortable-list.netlify.app)
-- [Vercel](https://svelte-sortable-list.vercel.app)
 
 ## Table of contents
 
