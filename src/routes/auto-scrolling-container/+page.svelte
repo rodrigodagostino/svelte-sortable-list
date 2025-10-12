@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { defaultRootProps } from '../fixtures.js';
+	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
 	import { rootProps } from '../stores.js';
 	import '$lib/styles.css';
 
-	let items = Array.from({ length: 100 }, (_, i) => ({
-		id: `list-item-${i + 1}`,
-		text: `List Item ${i + 1}`,
-	}));
+	let items = getDefaultItems(100);
 
 	onMount(() => {
 		$rootProps = { ...defaultRootProps };
