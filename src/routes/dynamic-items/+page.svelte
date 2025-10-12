@@ -7,7 +7,6 @@
 	import '$lib/styles.css';
 
 	let items = $state(getDefaultItems(5));
-	let newItem: string = $state('');
 
 	onMount(() => {
 		layoutState.props = { ...defaultRootProps };
@@ -31,6 +30,13 @@
 		if (!item || itemIndex < 0) return;
 		items = removeItem(items, itemIndex);
 	}
+
+	function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const text = formData.get('text') as string;
+		items = [...items, { id: `${toKebabCase(text)}-${Date.now()}`, text }];
+	}
 </script>
 
 <svelte:head>
@@ -49,15 +55,8 @@
 </SortableList.Root>
 
 <button class="button" onclick={() => (items = getDefaultItems(5))}>Reset</button>
-
-<form
-	class="form"
-	onsubmit={(e) => {
-		e.preventDefault();
-		items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }];
-	}}
->
-	<input type="text" class="form-input" bind:value={newItem} required />
+<form class="form" onsubmit={handleSubmit}>
+	<input type="text" class="form-input" name="text" required />
 	<button type="submit" class="button">Add item</button>
 </form>
 
