@@ -8,7 +8,6 @@
 	import '$lib/styles.css';
 
 	let items = getDefaultItems(5);
-	let newItem: string;
 
 	onMount(() => {
 		$rootProps = { ...defaultRootProps };
@@ -31,6 +30,13 @@
 		const itemIndex = Number(item?.dataset.itemIndex);
 		if (!item || itemIndex < 0) return;
 		items = removeItem(items, itemIndex);
+	}
+
+	function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const text = formData.get('text') as string;
+		items = [...items, { id: `${toKebabCase(text)}-${Date.now()}`, text }];
 	}
 </script>
 
@@ -63,13 +69,8 @@
 </SortableList.Root>
 
 <button class="button" on:click={() => (items = getDefaultItems(5))}>Reset</button>
-
-<form
-	class="form"
-	on:submit|preventDefault={() =>
-		(items = [...items, { id: `${toKebabCase(newItem)}-${Date.now()}`, text: newItem }])}
->
-	<input type="text" class="form-input" bind:value={newItem} required />
+<form class="form" on:submit={handleSubmit}>
+	<input type="text" class="form-input" name="text" required />
 	<button type="submit" class="button">Add item</button>
 </form>
 
