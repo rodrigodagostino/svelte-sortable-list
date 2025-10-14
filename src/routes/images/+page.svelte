@@ -148,7 +148,7 @@
 <style>
 	:global([data-page-pathname='images']) {
 		& .app-main .container {
-			max-width: 64.5rem;
+			max-width: 60.5rem;
 		}
 
 		& .ssl-root {
@@ -161,11 +161,20 @@
 		}
 	}
 
+	:global(.ssl-item[data-drag-state*='ptr-drag'][data-is-ghost='true'] .ssl-item-image),
+	:global(.ssl-item[data-drag-state*='kbd-drag'] .ssl-item-image) {
+		box-shadow:
+			inset 0 0 0 0.0625rem var(--ssl-gray-300),
+			var(--ssl-box-shadow-2);
+	}
+
 	:global(.ssl-item-image) {
 		width: 8rem;
 		height: 8rem;
 		border-radius: 0.25rem;
 		object-fit: cover;
-		transition: opacity var(--ssl-transition-duration);
+		transition:
+			box-shadow var(--ssl-transition-duration),
+			opacity var(--ssl-transition-duration);
 	}
 </style>
