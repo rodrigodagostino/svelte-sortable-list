@@ -163,9 +163,8 @@
 
 	:global(.ssl-item[data-drag-state*='ptr-drag'][data-is-ghost='true'] .ssl-item-image),
 	:global(.ssl-item[data-drag-state*='kbd-drag'] .ssl-item-image) {
-		box-shadow:
-			inset 0 0 0 0.0625rem var(--ssl-gray-300),
-			var(--ssl-box-shadow-2);
+		box-shadow: var(--ssl-box-shadow-2);
+		transform: rotate3d(0, 0, 1, -10deg);
 	}
 
 	:global(.ssl-item-image) {
@@ -173,8 +172,10 @@
 		height: 8rem;
 		border-radius: 0.25rem;
 		object-fit: cover;
+		transform: rotate3d(0, 0, 0, 0deg);
 		transition:
 			box-shadow var(--ssl-transition-duration),
+			transform var(--ssl-transition-duration),
 			opacity var(--ssl-transition-duration);
 	}
 </style>
