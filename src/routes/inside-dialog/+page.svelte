@@ -102,6 +102,7 @@
 		max-height: 80vh;
 		max-height: 80dvh;
 		padding: 0;
+		margin: auto;
 		background-color: var(--ssl-gray-100);
 		box-shadow: var(--ssl-box-shadow-4);
 		border: none;
