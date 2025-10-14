@@ -44,7 +44,7 @@
 <style>
 	:global([data-page-pathname='with-wrapping']) {
 		& .app-main .container {
-			max-width: 64.5rem;
+			max-width: 63.75rem;
 		}
 
 		& .ssl-root {
