@@ -30,6 +30,7 @@
 		{ text: 'With wrapping', path: '/with-wrapping' },
 		{ text: 'With boundaries', path: '/with-boundaries' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
+		{ text: 'Images', path: '/images' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
 		{ text: 'Interactive items', path: '/interactive-items' },
 		{ text: 'Auto scrolling window', path: '/auto-scrolling-window' },
