@@ -12,7 +12,7 @@ class SortableListRootState {
 	itemRects: Context['itemRects'] = $state(null);
 	pointer: Context['pointer'] = $state(null);
 	pointerOrigin: Context['pointerOrigin'] = $state(null);
-	isBetweenBounds: Context['isBetweenBounds'] = $state(false);
+	isBetweenBounds: Context['isBetweenBounds'] = $state(true);
 	isRTL: Context['isRTL'] = $state(false);
 }
 
