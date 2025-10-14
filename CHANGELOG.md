@@ -7,11 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.4] (2025-10-14)
+
+### Fixed
+
+- Set `isBetweenBounds` default value to `true`.
+- Revert back to solid background color in base styles.
+
+### Docs
+
+- Add **“Images”** demo page.
+- Add the Netlify badge to the README.
+- Generate items with the intended function (`getDefaultItems()`) in the **“Auto scrolling”** demo pages.
+- Improve the form data handling in the **“Custom transitions”** and **“Dynamic items”** demo pages.
+- Restore missing CSS color custom property.
+
 ## [2.1.3] (2025-10-07)
 
 ### Fixed
 
-- Fix: extend RTL detection (thank you, [Daniel Acuña](https://github.com/DaniAcu) :) ([#23](https://github.com/rodrigodagostino/svelte-sortable-list/pull/23)).
+- Extend RTL detection (thank you, [Daniel Acuña](https://github.com/DaniAcu) :) ([#23](https://github.com/rodrigodagostino/svelte-sortable-list/pull/23)).
 
 ### Docs
 
@@ -1356,7 +1371,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.4...HEAD
+[2.1.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.0...v2.1.1
