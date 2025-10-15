@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.5] (2025-10-14)
+## [2.1.6] (2025-10-14)
+
+### Docs
+
+- Improve **“Images”** demo page drag visibility.
+- Ensure dialog is always centered in **“Inside dialog”** demo page.
+
+## [2.1.5] (2025-10-14)
+
+### Docs
 
 - Adjust **“With wrapping”** demo page `max-width`.
 - Adjust **“Images”** demo page `max-width` and add shadow during drag.
@@ -1376,7 +1385,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.6...HEAD
+[2.1.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.2...v2.1.3
