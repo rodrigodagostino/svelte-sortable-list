@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.7] (2025-11-11)
+
+### Fixed
+
+- Ensure `<SortableListGhost>` is positioned correctly during `ptr-predrop`.
+
+### Docs
+
+- Add the **“Styles > CSS frameworks”** section REPL examples and to the README.
+
 ## [2.1.6] (2025-10-14)
 
 ### Docs
@@ -1385,7 +1395,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.6...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.7...HEAD
+[2.1.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.6...v2.1.7
 [2.1.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.3...v2.1.4
