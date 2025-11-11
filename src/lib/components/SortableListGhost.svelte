@@ -113,6 +113,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	function getStyleTransform(...args: unknown[]) {
 		if (
 			rootState.ghostState === 'idle' ||
+			rootState.ghostState === 'ptr-drop' ||
 			!ghostRef ||
 			!rootState ||
 			!rootState.pointer ||
@@ -191,8 +192,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
-
-		if (rootState.ghostState === 'ptr-drop') return 'translate3d(0, 0, 0)';
 
 		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.transform;
 	}
