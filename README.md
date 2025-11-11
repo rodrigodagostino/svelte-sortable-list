@@ -39,6 +39,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - [Styles](#styles)
   - [Selectors](#selectors)
   - [Custom properties](#custom-properties)
+  - [CSS frameworks](#css-frameworks)
 - [Motivation](#motivation)
 
 ## Features
@@ -78,11 +79,13 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ### Use it
 
+[REPL](https://svelte.dev/playground/35d0e5a2c5c44ebbb2e03ffb2553a020)
+
 ```svelte
 <script lang="ts">
 	import { SortableList, sortItems } from '@rodrigodagostino/svelte-sortable-list';
 
-	let items: SortableList.ItemData[] = [
+	let items: SortableList.ItemData[] = $state([
 		{
 			id: 'list-item-1',
 			text: 'List Item 1',
@@ -103,7 +106,7 @@ yarn add @rodrigodagostino/svelte-sortable-list
 			id: 'list-item-5',
 			text: 'List Item 5',
 		},
-	];
+	]);
 
 	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = e;
@@ -112,7 +115,7 @@ yarn add @rodrigodagostino/svelte-sortable-list
 	}
 </script>
 
-<SortableList.Root ondrop={handleDrop} ondragend={handleDragEnd}>
+<SortableList.Root ondragend={handleDragEnd}>
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">
@@ -277,6 +280,8 @@ Utility functions to simplify common list operations:
 
 **Example:**
 
+[REPL](https://svelte.dev/playground/04976cd9375447c497a2e809be5f80ef)
+
 ```svelte
 <script lang="ts">
 	import { SortableList, removeItem, sortItems } from '@rodrigodagostino/svelte-sortable-list';
@@ -309,6 +314,8 @@ Built-in transition functions for smooth animations:
 | `scaleFly` | Animates an element scaling and flying in/out | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;axis: 'x' \| 'y'<br>&nbsp;&nbsp;x: number<br>&nbsp;&nbsp;y: number<br>&nbsp;&nbsp;opacity: number<br>}</pre> |
 
 **Example:**
+
+[REPL](https://svelte.dev/playground/af72849dee3f4c5bb5e7e25a723545ca)
 
 ```svelte
 <script lang="ts">
@@ -371,6 +378,8 @@ TypeScript definitions for type-safe development:
 ### Importing default styles
 
 To use the demo page styles in your project:
+
+[REPL](https://svelte.dev/playground/7cbf814cdbb041e3ab81fa9e42c5398f)
 
 ```svelte
 <script>
@@ -449,6 +458,39 @@ CSS custom properties for global styling control:
 | `--ssl-wrap`                | Whether list items are forced onto one line (`nowrap`) or can wrap onto multiple lines (`wrap`).                                                                                                                                                                      |
 | `--ssl-transition-duration` | Time it takes for ghost (dropping) and item (translation, addition, removal) transitions to complete (in milliseconds).                                                                                                                                               |
 | `--ssl-transition-easing`   | Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects the ghost drop transition. |
+
+### CSS frameworks
+
+Use your favorite CSS framework to style the SSL components.
+
+> [!IMPORTANT]
+> **Styling best practices**: To prevent conflicts with core styles and transitions, avoid applying transitions directly to the `<SortableList.Root>` and `<SortableList.Item>` components.
+
+**Example using Tailwind CSS:**
+
+[REPL](https://svelte.dev/playground/55d51548e4804adc85064ee232f543ef#H4sIAAAAAAAAA5VW247bNhD9lVm1iLyFaGudddKqVtEgCdAAecr2zfIDLVIyG4oUyJHXhmEgH9Ev7JcUpCSvb3Ud-MHSXM4czo3aBopWPEiCpxWXyOFJG6QLyeGzsAirMfzz7W94wo3kDJ4FLuFPKuSzUAzePz0FUVAIyW2QzLYBbmqH4wRB1KO-q-uh9chBFCyo5ZfkuVbIFdogCaY2N6JGkFSVaRagzYLfMpWhqGptELZ7fo5eBFYb_IS8srCDwugKwt-NZkaUmtFSWxRKj9owxHaORAqL4a8HoDf6jKzLgh3m1np3laHkCMKFT454DR2lDxTpbA4p_GiRIh_MnEOG2_YvQ8ESCB0ucQjkIYx6DfI1JhD6Ajgk2Ot20XWQ8RWQ8a0gr6-AvL4V5PEKyOOtIJMrIJNjkPl9V5KiUTkKrWBJFZP8g6HlR8UG_KRCX7TGjyvXdLNQK2ZoyRUL5_fQccm1sq7dnKbkzIX8pBhfR4DUlBwPBMK-pyrnbkB2kAL3rZWhKGBwd6B79QrchOjiFAHSNIVQNdWCm9CZncaEuzQ9dbrfp8x3f_oyCQMvif6fuc8Y7jI1HbVD5wZNTc_S5KxySa1Ns8DoRjHOyCwevhlPDK_mUOi8sWQlrFhInugGpVCcjE_kpFfoorAcyfjuPxyFYqLU5Oc4vssCF3pfnXR7VNJdpvxm2P7Aab5sxxCo9Q8RCJ84n4uhYPe7Nl3Hh3OZ6NO4HQ6HzrgzzHDrEfavfQJKo5sa-jRUrDuF24xCnZ3-RNyf_bL27OSZr4gPP2Vi1T-_kCkkX7cHJzlXyA381VgUxaZ_PeC5KPsAkziGek3eQr0hYxDKUTJClQePB1wADVVWuJEiswXNv7oMKEZyLbWJFnpN7JIy_TwHnxpydLSXoG_iuDOYzRhFSlxRid-MP6Xh1wXzgnA-P_B5vNmnpUBk-X32XZxf4nj0dnzFtUbz3fQOfW6hd8H-Cj1hSbnUFtOwoNLycJ4s9Yqb-bWMn_lcZuEI6JrmAjck7hvxoBUznNqaKuibsNqQ8XACbkETd8GD5JS5HkJRLhEKrZBUnImmam2elwI5NHXNTU4t7-73_rf1E-sM96OX4XTkIr4Mw4iJVfc2HZ2NdLsVRm4r-OV2ttDaPedvc2-blFIvqBwsNNvsLwAmbC3pJoHSCNat9FrSnPurySbQjtiRpvuOOdE5AIK8qiVFZyObStkEKqEquh7EETwUpt3FGZa0TuBh6FdrJ1pyl8cEaIO6E1VCkV6cU5kPHuJ4tQQCj4ZXPdQlI3ZmVVPmipXA-CViRU0pVAJx9-5LWNBKyE0C74ygMoI_uFxxFDmNwFJlieVGFAcXSpfcIApcLYMETcN38yjA7uuxk_wLvZl0034KAAA)
+
+```svelte
+<SortableList.Root
+	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800!"
+>
+	{#each items as item, index (item.id)}
+		<SortableList.Item
+			{...item}
+			{index}
+			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
+		>
+			<div
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-[[data-drag-state*='kbd-drag']]:bg-indigo-400 group-[[data-drag-state*='kbd-drag']]:shadow-lg group-[[data-drag-state*='kbd-drag']]:shadow-indigo-900/72 group-[[data-drag-state*='ptr-drag']]:bg-indigo-400 group-[[data-drag-state*='ptr-drag']]:shadow-lg group-[[data-drag-state*='ptr-drag']]:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
+			>
+				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
+					{item.text}
+				</span>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>
+```
 
 ## Motivation
 
