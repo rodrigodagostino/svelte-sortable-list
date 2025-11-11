@@ -30,6 +30,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - [Styles](#styles)
   - [Selectors](#selectors)
   - [Custom properties](#custom-properties)
+  - [CSS frameworks](#css-frameworks)
 - [Motivation](#motivation)
 
 ## Features
@@ -69,6 +70,8 @@ yarn add @rodrigodagostino/svelte-sortable-list
 
 ### Use it
 
+[REPL](https://svelte.dev/playground/234a53f9604048dbbbfe4885d0b4000d?version=4.2.20)
+
 ```svelte
 <script lang="ts">
 	import { SortableList, sortItems } from '@rodrigodagostino/svelte-sortable-list';
@@ -96,8 +99,8 @@ yarn add @rodrigodagostino/svelte-sortable-list
 		},
 	];
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
@@ -268,19 +271,21 @@ Utility functions to simplify common list operations:
 
 **Example:**
 
+[REPL](https://svelte.dev/playground/905c7381793f47768cdbfa437ee432fc?version=4.2.20)
+
 ```svelte
 <script lang="ts">
 	import { SortableList, removeItem, sortItems } from '@rodrigodagostino/svelte-sortable-list';
 	...
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
 
-	function handleRemoveClick(event: MouseEvent) {
-		const target = event.target as HTMLElement;
+	function handleRemoveClick(e: MouseEvent) {
+		const target = e.target as HTMLElement;
 		const item = target.closest<HTMLLIElement>('.ssl-item');
 		const itemIndex = Number(item?.dataset.itemIndex);
 		if (!item || itemIndex < 0) return;
@@ -300,6 +305,8 @@ Built-in transition functions for smooth animations:
 | `scaleFly` | Animates an element scaling and flying in/out | <pre>{<br>&nbsp;&nbsp;delay: number<br>&nbsp;&nbsp;duration: number<br>&nbsp;&nbsp;easing: function<br>&nbsp;&nbsp;axis: 'x' \| 'y'<br>&nbsp;&nbsp;x: number<br>&nbsp;&nbsp;y: number<br>&nbsp;&nbsp;opacity: number<br>}</pre> |
 
 **Example:**
+
+[REPL](https://svelte.dev/playground/a027450fff994790b8e81bf391f850a7?version=4.2.20)
 
 ```svelte
 <script lang="ts">
@@ -344,13 +351,13 @@ TypeScript definitions for type-safe development:
 	import type { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 	...
 
-	function handleDrop(event: SortableList.RootEvents['drop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = event.detail;
+	function handleDrop(e: SortableList.RootEvents['drop']) {
+		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
 		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
@@ -362,6 +369,8 @@ TypeScript definitions for type-safe development:
 ### Importing default styles
 
 To use the demo page styles in your project:
+
+[REPL](https://svelte.dev/playground/ce6f7ddb166c4d6e9f16728520b89a7e?version=4.2.20)
 
 ```svelte
 <script>
@@ -440,6 +449,37 @@ CSS custom properties for global styling control:
 | `--ssl-wrap`                | Whether list items are forced onto one line (`nowrap`) or can wrap onto multiple lines (`wrap`).                                                                                                                                                                      |
 | `--ssl-transition-duration` | Time it takes for ghost (dropping) and item (translation, addition, removal) transitions to complete (in milliseconds).                                                                                                                                               |
 | `--ssl-transition-easing`   | Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects the ghost drop transition. |
+
+### CSS frameworks
+
+Use your favorite CSS framework to style the SSL components.
+
+> [!IMPORTANT]
+> **Styling best practices**: To prevent conflicts with core styles and transitions, avoid applying transitions directly to the `<SortableList.Root>` and `<SortableList.Item>` components.
+
+**Example using Tailwind CSS:**
+
+[REPL](https://svelte.dev/playground/ce6f7ddb166c4d6e9f16728520b89a7e?version=4.2.20#H4sIAAAAAAAAA5VWwW7jNhD9lVkVWDuFKNvZZBGo1mIX2xZdoKemtygHWhzJbClSIEdODMNAP6Jf2C8pSEu2ZadOerL4ZuYN-YYz9CbSvMYoje5XqAjh3ljiC4Xwq3QEqxn889ffcE9rhQKeJC3hdy7Vk9QCvt7fR3FUSoUuSh82Ea0bz-OBKO5ZvzRN4gJzFEcL7vAlvDCaUJOL0mjuCisbAsV1leURuTz6lOucZN0YS7DZ789vLwaLtVnhN8I6Bmcs-S8Xgyu4wp_VGrZQWlPD6LM1wsrKCF4ZR1KbyS45cx0dU9LR59UsmSUfRz8cZfx_oRPnlXJJ4Vxg0TkpJJB-W5DBgwdy2ux-cpIihZEPZ96DzUZxbyF8phRGoQj-ULC3bePLJNcXSK7fSvLhAsmHt5LcXCC5eSvJ7QWS2yHJY6d42eqCpNGw5Foo_NHy6ictxngFXZLCaOfvkrC8qlB4rm9a4HMMxG2FdARI95XrAv3t30IGmAgkLlW4ITnJEsbvjlzevwffBaY8JYIsy2Ck23qBduTdTlPDuyw7DbraS9Jdn_0NHwckfv0AV2Gj21zPJ7vG8s2k58dNlPxmDHmvQnHnsjyyptUCBVMVlKZoXWpaUlLjcMWuT9amLB0Sm57AUgtZGfZx2hnYSjq5UDhkPUV79jN8mOXMfMiWR_5MRqdeI9Qi2wxuwzbXYa5svkNeLLsG5S58xCBDSYLKiRRX210hhrJ5jfsCbZIk8c6dY06bwLBf9tJW1rQN9ALXojuFn6tSnygyBPeCnMCdHv9hPRL_4f2D4MSZl4M54oTfZ6M_FyIAo8fH1C25ME9-Uy-6NmQvuErHqqVxlI1KrhyOHl9hMA0vJK3Z9O0MPYFpBgS7OufhYget50Ku-u-D8qXC512VWYGa0MIfrSNZrvvlUVEW1bFwzTO7g2bNboAs1076ycIKo4x1EOrJBtIfgu-m087h4RXpDzG3F2OOFbwQcyZlujQrtMcxd32DDKTLae4arqEXzQ9c5h9tKI0mVqOQbQ1t06AtPBrsT0tJmEefNqFbPLSdTzzNoSITIVfdaj45a6JdH058H4ZBdTacdjMrvKzBN62UWXA1Xhix3s90IV2j-DqFykrRjedG8QLDM-JS2NV5YOn-d5zYPAEjrBvFyfuottYuhVrqmj-PpzHMSrubqzlVvElhllzfWqw7aImyWlIKvCXTQbXUrIcLrorxbDpdLYHBjcW6p3rJSZx5NVwIqasUrg8Za24rqVOYdutQrJLXUq1T-GIlVzH8gmqFJAseg-PaMYdWlkePQxA3ikPJo5Rsi9vHOPJPnf-v1yH_AsI_QzAsCgAA)
+
+```svelte
+<SortableList.Root
+	class="rounded-lg focus:outline focus:outline-2 focus:outline-offset-0 focus:outline-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-indigo-600"
+>
+	{#each items as item, index (item.id)}
+		<SortableList.Item
+			{...item}
+			{index}
+			class="group rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state*='kbd-drag']]:shadow-md [&[data-drag-state*='ptr-drag']]:shadow-md [&[data-is-ghost='false'][data-drag-state*='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0"
+		>
+			<div
+				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors group-focus-within:bg-indigo-800 group-[[data-drag-state*='kbd-drag']]:bg-indigo-500 group-[[data-drag-state*='ptr-drag']]:bg-indigo-500 group-[[data-is-ghost='false']:hover]:bg-indigo-800"
+			>
+				<span class="text-base font-medium uppercase text-white">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>
+```
 
 ## Motivation
 
