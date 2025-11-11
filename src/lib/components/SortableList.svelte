@@ -617,15 +617,27 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (action === 'ptr-drop') {
 			await tick();
 			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
-			await tick();
-			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
-			await tick();
-			$dragState = 'ptr-drop';
+			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
+			// that depends on `ptr-predrop` has been set before continuing.
+			requestAnimationFrame(async () => {
+				if (ghostState !== 'ptr-remove') {
+					await tick();
+					ghostState = 'ptr-drop';
+				}
+				await tick();
+				$dragState = 'ptr-drop';
+			});
 		} else if (action === 'ptr-cancel') {
-			await tick();
-			if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
-			await tick();
-			$dragState = 'ptr-cancel';
+			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
+			// that depends on `ptr-predrop` has been set before continuing.
+			requestAnimationFrame(async () => {
+				if (ghostState !== 'ptr-remove') {
+					await tick();
+					ghostState = 'ptr-drop';
+				}
+				await tick();
+				$dragState = 'ptr-cancel';
+			});
 		}
 
 		if (action === 'kbd-drop') {

@@ -109,7 +109,14 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	function getStyleTransform(...args: unknown[]) {
-		if (state === 'idle' || !ghostRef || !$root || !$pointer || !$pointerOrigin)
+		if (
+			state === 'idle' ||
+			state === 'ptr-drop' ||
+			!ghostRef ||
+			!$root ||
+			!$pointer ||
+			!$pointerOrigin
+		)
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ghostRef.getBoundingClientRect();
@@ -176,8 +183,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
-
-		if (state === 'ptr-drop') return 'translate3d(0, 0, 0)';
 
 		if (state === 'ptr-remove') return ghostRef.style.transform;
 	}
