@@ -257,7 +257,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		await tick();
 		rootState.ghostState = 'ptr-drag-start';
-		await tick();
 		rootState.dragState = 'ptr-drag-start';
 
 		ondragstart?.({
@@ -302,7 +301,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (rootState.ghostState !== 'ptr-drag' || rootState.dragState !== 'ptr-drag') {
 			await tick();
 			rootState.ghostState = 'ptr-drag';
-			await tick();
 			rootState.dragState = 'ptr-drag';
 		}
 
@@ -704,7 +702,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		await tick();
 		rootState.ghostState = 'idle';
-		await tick();
 		rootState.dragState = 'idle';
 
 		ondragend?.({
