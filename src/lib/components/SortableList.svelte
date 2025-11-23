@@ -282,7 +282,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
 		await tick();
 		ghostState = 'ptr-drag-start';
-		await tick();
 		$dragState = 'ptr-drag-start';
 
 		dispatch('dragstart', {
@@ -327,7 +326,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (ghostState !== 'ptr-drag' || $dragState !== 'ptr-drag') {
 			await tick();
 			ghostState = 'ptr-drag';
-			await tick();
 			$dragState = 'ptr-drag';
 		}
 
@@ -688,7 +686,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		await tick();
 		ghostState = 'idle';
-		await tick();
 		$dragState = 'idle';
 
 		dispatch('dragend', {
