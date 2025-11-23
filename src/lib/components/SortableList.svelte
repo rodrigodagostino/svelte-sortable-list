@@ -622,25 +622,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			await tick();
 			rootState.ghostState =
 				!rootState.isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
+			await tick();
 			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
 			// that depends on `ptr-predrop` has been set before continuing.
 			requestAnimationFrame(async () => {
-				if (rootState.ghostState !== 'ptr-remove') {
-					await tick();
-					rootState.ghostState = 'ptr-drop';
-				}
-				await tick();
+				if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 				rootState.dragState = 'ptr-drop';
 			});
 		} else if (action === 'ptr-cancel') {
+			await tick();
 			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
 			// that depends on `ptr-predrop` has been set before continuing.
 			requestAnimationFrame(async () => {
-				if (rootState.ghostState !== 'ptr-remove') {
-					await tick();
-					rootState.ghostState = 'ptr-drop';
-				}
-				await tick();
+				if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 				rootState.dragState = 'ptr-cancel';
 			});
 		}
