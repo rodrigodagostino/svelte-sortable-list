@@ -282,6 +282,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
 		await tick();
 		ghostState = 'ptr-drag-start';
+		await tick();
 		$dragState = 'ptr-drag-start';
 
 		dispatch('dragstart', {
@@ -615,18 +616,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (action === 'ptr-drop') {
 			await tick();
 			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
-			await tick();
 			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
 			// that depends on `ptr-predrop` has been set before continuing.
 			requestAnimationFrame(async () => {
+				await tick();
 				if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
 				$dragState = 'ptr-drop';
 			});
 		} else if (action === 'ptr-cancel') {
-			await tick();
 			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
 			// that depends on `ptr-predrop` has been set before continuing.
 			requestAnimationFrame(async () => {
+				await tick();
 				if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
 				$dragState = 'ptr-cancel';
 			});
