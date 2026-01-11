@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.10] (2026-01-10)
+
+### Fixed
+
+- Allow interaction with interactive elements when their item contains a handle.
+
+### Test
+
+- Add E2E tests for the **“Interactive items with handle”** page.
+
+### Docs
+
+- Add **“Interactive items with handle”** demo page.
+
 ## [2.1.9] (2025-11-23)
 
 ### Fixed
@@ -1408,7 +1422,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.9...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.10...HEAD
+[2.1.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.9...v2.1.10
 [2.1.9]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.8...v2.1.9
 [2.1.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.7...v2.1.8
 [2.1.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.6...v2.1.7
