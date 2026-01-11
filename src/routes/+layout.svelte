@@ -24,6 +24,7 @@
 		{ text: 'Images', path: '/images' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
 		{ text: 'Interactive items', path: '/interactive-items' },
+		{ text: 'Interactive items with handle', path: '/interactive-items-with-handle' },
 		{ text: 'Auto scrolling window', path: '/auto-scrolling-window' },
 		{ text: 'Auto scrolling container', path: '/auto-scrolling-container' },
 		{ text: 'Auto scrolling container horizontal', path: '/auto-scrolling-container-horizontal' },
