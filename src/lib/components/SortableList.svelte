@@ -203,10 +203,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
 
+		const isOrResidesInInteractiveElem = isOrResidesInInteractiveElement(target, currItem);
 		if (
-			(isLocked && !isOrResidesInInteractiveElement(target, currItem)) ||
-			(currItem.dataset.isLocked === 'true' &&
-				!isOrResidesInInteractiveElement(target, currItem)) ||
+			(isLocked && !isOrResidesInInteractiveElem) ||
+			(currItem.dataset.isLocked === 'true' && !isOrResidesInInteractiveElem) ||
 			isDisabled ||
 			currItem.getAttribute('aria-disabled') === 'true'
 		) {
@@ -226,14 +226,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent dragging if the current list item contains an item handle, but we’re not dragging from it.
 		const hasItemHandle = !!currItem.querySelector('.ssl-item-handle');
 		const isOrResidesInItemHandle = target.closest('.ssl-item-handle');
-		if (hasItemHandle && !isOrResidesInItemHandle) {
+		if (hasItemHandle && !isOrResidesInItemHandle && !isOrResidesInInteractiveElem) {
 			e.preventDefault();
 			return;
 		}
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
-		if (isOrResidesInInteractiveElement(target, currItem) && !isOrResidesInItemHandle) return;
+		if (isOrResidesInInteractiveElem && !isOrResidesInItemHandle) return;
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
