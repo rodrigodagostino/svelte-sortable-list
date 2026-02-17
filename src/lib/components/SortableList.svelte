@@ -629,13 +629,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				rootState.dragState = 'ptr-drop';
 			});
 		} else if (action === 'ptr-cancel') {
-			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
-			// that depends on `ptr-predrop` has been set before continuing.
-			requestAnimationFrame(async () => {
-				await tick();
-				if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
-				rootState.dragState = 'ptr-cancel';
-			});
+			await tick();
+			if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
+			rootState.dragState = 'ptr-cancel';
 		}
 
 		if (action === 'kbd-drop') {
@@ -661,10 +657,27 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			liveText = _announcements.canceled(rootState.draggedItem, draggedIndex);
 		}
 
+		if (action === 'ptr-drop') {
+			// Use requestAnimationFrame() to ensure finalizePointerAndKeyboardDrop()
+			// runs in the same frame as the `ptr-drop` state changes above.
+			requestAnimationFrame(() =>
+				finalizePointerAndKeyboardDrop(element, action, draggedIndex, targetIndex)
+			);
+		} else {
+			finalizePointerAndKeyboardDrop(element, action, draggedIndex, targetIndex);
+		}
+	}
+
+	function finalizePointerAndKeyboardDrop(
+		element: HTMLElement,
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel',
+		draggedIndex: number,
+		targetIndex: number | null
+	) {
 		ondrop?.({
 			deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
-			draggedItem: rootState.draggedItem,
-			draggedItemId: rootState.draggedItem.id,
+			draggedItem: rootState.draggedItem!,
+			draggedItemId: rootState.draggedItem!.id,
 			draggedItemIndex: draggedIndex,
 			targetItem: rootState.targetItem,
 			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
