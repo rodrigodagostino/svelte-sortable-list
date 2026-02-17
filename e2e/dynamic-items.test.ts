@@ -11,7 +11,9 @@ test.describe('Sortable List - Dynamic Items', () => {
 		await page.locator('.ssl-root').waitFor();
 	});
 
-	test('should remove List Item 3 by clicking on its remove button', async ({ page }) => {
+	test('should remove List Item 3 and List Item 2 by clicking on their remove buttons', async ({
+		page,
+	}) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
@@ -19,16 +21,32 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
+		// === FIRST REMOVAL OPERATION ===
 		// Click the remove button for List Item 3
 		const listItem3 = root.locator('[data-item-id="list-item-3"]');
 		await listItem3.locator('.ssl-item-remove').click();
 
-		// Verify dragged item has been removed
+		// Verify List Item 3 has been removed
 		await listItem3.waitFor({ state: 'detached' });
 		await expect(listItem3).toBeHidden();
 
-		// Verify the final order
+		// Verify the order after first removal
+		const itemsAfterFirstRemoval = await root
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(itemsAfterFirstRemoval).toEqual(removeItem(initialItems, 2));
+
+		// === SECOND REMOVAL OPERATION ===
+		// Click the remove button for List Item 2
+		const listItem2 = root.locator('[data-item-id="list-item-2"]');
+		await listItem2.locator('.ssl-item-remove').click();
+
+		// Verify List Item 2 has been removed
+		await listItem2.waitFor({ state: 'detached' });
+		await expect(listItem2).toBeHidden();
+
+		// Verify the final order after both removals
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
-		expect(finalItems).toEqual(removeItem(initialItems, 2));
+		expect(finalItems).toEqual(removeItem(itemsAfterFirstRemoval, 1));
 	});
 });

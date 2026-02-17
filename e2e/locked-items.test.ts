@@ -19,7 +19,6 @@ test.describe('Sortable List - Locked Items', () => {
 		for (const lockedItem of lockedItems) {
 			// Get the initial position
 			const initialBox = await lockedItem.boundingBox();
-
 			if (!initialBox) throw new Error('Could not get item bounding box');
 
 			// Start the drag from the center of the item
@@ -40,7 +39,6 @@ test.describe('Sortable List - Locked Items', () => {
 
 			// Get the final position
 			const finalBox = await lockedItem.boundingBox();
-
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
 			// The locked item should not have moved
@@ -73,7 +71,6 @@ test.describe('Sortable List - Locked Items', () => {
 
 			// Check if the item is still in its original position
 			const initialBox = await lockedItem.boundingBox();
-
 			if (!initialBox) throw new Error('Could not get item bounding box');
 
 			// Try to move with keyboard
@@ -81,7 +78,6 @@ test.describe('Sortable List - Locked Items', () => {
 
 			// Get the new position
 			const finalBox = await lockedItem.boundingBox();
-
 			if (!finalBox) throw new Error('Could not get item bounding box');
 
 			// The locked item should not have moved

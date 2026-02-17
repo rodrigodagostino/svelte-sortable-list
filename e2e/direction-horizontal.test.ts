@@ -57,7 +57,9 @@ test.describe('Sortable List - Direction Horizontal', () => {
 		await expect(items.nth(0)).toBeFocused();
 	});
 
-	test('should support side arrows dragging for horizontal direction', async ({ page }) => {
+	test('should support side arrows dragging for horizontal direction with two items', async ({
+		page,
+	}) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
@@ -68,11 +70,12 @@ test.describe('Sortable List - Direction Horizontal', () => {
 		// Focus the root element
 		await root.focus();
 
+		// === FIRST DRAG OPERATION ===
 		// Navigate to the first item using the arrow keys (ArrowRight for horizontal)
 		await page.keyboard.press('ArrowRight');
 
 		// Verify the List Item 1 is focused
-		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		let focusedItem = root.locator('.ssl-item[aria-selected="true"]');
 		await expect(focusedItem).toContainText('List Item 1');
 		await expect(focusedItem).toBeFocused();
 
@@ -92,8 +95,44 @@ test.describe('Sortable List - Direction Horizontal', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the final order
+		// Verify the order after first drag
+		const itemsAfterFirstDrag = await root
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(itemsAfterFirstDrag).toEqual(sortItems(initialItems, 0, 2));
+
+		// === SECOND DRAG OPERATION ===
+		// Navigate back to List Item 2 (now at the first position after the previous drag)
+		await page.keyboard.press('ArrowLeft');
+		await page.keyboard.press('ArrowLeft');
+
+		// Verify List Item 2 is focused
+		focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		await expect(focusedItem).toContainText('List Item 2');
+		await expect(focusedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+
+		// Verify the drag state is active
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Move right three times to reach the List Item 4 position
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('ArrowRight');
+
+		// Drop the item with Space key
+		await page.keyboard.press('Space');
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the focused item is still focused
+		expect(focusedItem).toBeFocused();
+
+		// Verify the final order after both drags
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
-		expect(finalItems).toEqual(sortItems(initialItems, 0, 2));
+		expect(finalItems).toEqual(sortItems(sortItems(initialItems, 0, 2), 0, 3));
 	});
 });
