@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.11] (2026-02-18)
+
+### Fixed
+
+- Prevent `dragState` and `ghostState` from breaking after dropping an item when duration is set to `0`.
+- Ensure the drag operation completes even if `transitionend` doesn’t fire.
+
+### Test
+
+- Adjust E2E tests to drag a minimum of two items.
+- Increase the expected time difference to reduce flakiness in the E2E test for the «No transitions» page.
+- Add missing await to cursor assertion checks in the E2E tests for the «With handle» page.
+
+### Docs
+
+- Update the LICENSE to include the current year.
+
 ## [2.1.10] (2026-01-10)
 
 ### Fixed
@@ -1422,7 +1439,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.10...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.11...HEAD
+[2.1.11]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.10...v2.1.11
 [2.1.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.9...v2.1.10
 [2.1.9]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.8...v2.1.9
 [2.1.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.7...v2.1.8
