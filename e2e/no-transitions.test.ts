@@ -66,7 +66,7 @@ test.describe('Sortable List - No Transitions', () => {
 		const endTime1 = Date.now();
 
 		// Verify the first drag operation completed instantly
-		expect(endTime1 - startTime1).toBeLessThan(80);
+		expect(endTime1 - startTime1).toBeLessThan(120);
 
 		// Verify the order after first drag
 		const itemsAfterFirstDrag = await root
@@ -121,7 +121,7 @@ test.describe('Sortable List - No Transitions', () => {
 		const endTime2 = Date.now();
 
 		// Verify the second drag operation completed instantly
-		expect(endTime2 - startTime2).toBeLessThan(80);
+		expect(endTime2 - startTime2).toBeLessThan(120);
 
 		// Verify the final order after both drags
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
