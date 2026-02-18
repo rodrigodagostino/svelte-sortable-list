@@ -165,7 +165,7 @@ test.describe('Sortable List - With Handle', () => {
 		await page.mouse.move(handleBox.x + handleBox.width / 2, handleBox.y + handleBox.height / 2);
 
 		// Verify the cursor is the grab cursor
-		expect(draggedHandle).toHaveCSS('cursor', 'grab');
+		await expect(draggedHandle).toHaveCSS('cursor', 'grab');
 
 		// Press the mouse down to start dragging
 		await page.mouse.down();
@@ -174,7 +174,7 @@ test.describe('Sortable List - With Handle', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 		// Check cursor changes to grabbing during drag
-		expect(draggedHandle).toHaveCSS('cursor', 'grabbing');
+		await expect(draggedHandle).toHaveCSS('cursor', 'grabbing');
 
 		// Move to the target position (below List Item 3)
 		await page.mouse.move(
@@ -190,6 +190,6 @@ test.describe('Sortable List - With Handle', () => {
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Check cursor changes to grabbing during drag
-		expect(draggedHandle).toHaveCSS('cursor', 'grab');
+		await expect(draggedHandle).toHaveCSS('cursor', 'grab');
 	});
 });
