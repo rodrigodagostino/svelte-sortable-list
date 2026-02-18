@@ -91,6 +91,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 
 	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
 		await tick();
 		itemRef
@@ -118,6 +119,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 	$: focusedId = $focusedItem ? $focusedItem.id : null;
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleWidth(...args: unknown[]) {
 		if (draggedId !== String(id)) return undefined;
 		if (
@@ -130,6 +132,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `${currentRect?.width}px`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleHeight(...args: unknown[]) {
 		if (draggedId !== String(id)) return undefined;
 		if (
@@ -142,6 +145,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `${currentRect?.height}px`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (isGhost) return 'none';
 		if (

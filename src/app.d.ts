@@ -11,7 +11,7 @@ declare global {
 }
 
 declare module 'svelte/elements' {
-	export interface HTMLAttributes<T> {
+	export interface HTMLAttributes {
 		'on:itemfocusout'?: (event: CustomEvent<{ item: HTMLLIElement }>) => void;
 	}
 

@@ -56,6 +56,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
 	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function cloneDraggedItemContent(...args: unknown[]) {
 		if (!ghostRef || !$draggedItem) return;
 
@@ -67,6 +68,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 	$: if (state === 'ptr-drag-start') cloneDraggedItemContent(state);
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleLeft(...args: unknown[]) {
 		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
@@ -84,6 +86,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		return `${left}px`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTop(...args: unknown[]) {
 		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
 			return '0';
@@ -108,6 +111,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		return `${top}px`;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
 		if (
 			state === 'idle' ||
@@ -216,7 +220,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 >
 	<!-- The following if clause will prevent <SortableListItem> -->
 	<!-- from transitioning out on page navigation. -->
-	{#if root}
+	{#if $root}
 		<SortableListItem
 			id={draggedId || 'ssl-ghost-item'}
 			index={draggedIndex ?? -1}

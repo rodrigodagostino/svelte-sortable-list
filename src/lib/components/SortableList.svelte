@@ -95,6 +95,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	} from '$lib/utils/index.js';
 
 	type $$Props = RootProps & { class?: string };
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	type $$Events = RootEvents;
 
 	let rootRef: HTMLUListElement;

@@ -57,6 +57,8 @@
 		"svelte": "^4.0.0 || ^5.0.0"
 	},
 	"devDependencies": {
+		"@eslint/compat": "2.0.2",
+		"@eslint/js": "9.39.2",
 		"@playwright/test": "1.58.2",
 		"@sveltejs/adapter-auto": "7.0.1",
 		"@sveltejs/kit": "2.52.0",
