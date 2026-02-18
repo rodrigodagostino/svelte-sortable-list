@@ -156,7 +156,8 @@
 				<span>v{version}</span>
 			</a>
 			<hr class="separator" />
-			{#each links as { text, path }}
+			{#each links as { text, path } (path)}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a class="link" href={path} aria-current={page.url.pathname === path ? 'page' : undefined}>
 					{text}
 				</a>
@@ -226,7 +227,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each controls as { id, type, label, min, options, value }}
+					{#each controls as { id, type, label, min, options, value } (id)}
 						<tr>
 							<td></td>
 							<td><label for={id}>{label}</label></td>
@@ -252,7 +253,7 @@
 								{:else if type === 'select'}
 									<select {id} name={label} {value} onchange={handleFieldChange}>
 										{#if options}
-											{#each options as option}
+											{#each options as option (option)}
 												<option value={option}>{option}</option>
 											{/each}
 										{/if}

@@ -53,8 +53,6 @@
 </svelte:head>
 
 <button class="button" onclick={handleOpenDialog}>Open dialog</button>
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <dialog
 	bind:this={dialogRef}
 	class="dialog direction-{layoutState.props.direction}"

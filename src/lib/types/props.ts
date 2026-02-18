@@ -11,15 +11,14 @@ import type {
 	DestroyedEvent,
 } from './events.js';
 
-export interface SortableListRootProps
-	extends Pick<
-		AriaAttributes & {
-			// `aria-description` is still in W3C Editor's Draft for ARIA 1.3,
-			// but it is already correctly interpreted by screen readers.
-			'aria-description'?: string | undefined | null;
-		},
-		'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
-	> {
+export interface SortableListRootProps extends Pick<
+	AriaAttributes & {
+		// `aria-description` is still in W3C Editor's Draft for ARIA 1.3,
+		// but it is already correctly interpreted by screen readers.
+		'aria-description'?: string | undefined | null;
+	},
+	'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
+> {
 	/** Separation between items (in pixels). */
 	gap?: number;
 	/** Orientation in which items will be arranged. */
@@ -73,8 +72,10 @@ export interface SortableListRootProps
 	ondestroyed?: (event: DestroyedEvent) => void;
 }
 
-export interface SortableListItemProps
-	extends Pick<AriaAttributes, 'aria-label' | 'aria-labelledby'> {
+export interface SortableListItemProps extends Pick<
+	AriaAttributes,
+	'aria-label' | 'aria-labelledby'
+> {
 	/** Unique identifier for each item. */
 	id: string;
 	/** Position of the item in the list. */
@@ -84,9 +85,15 @@ export interface SortableListItemProps
 	/** If `true`, will prevent the item from being dragged and change its appearance to dimmed. */
 	isDisabled?: boolean;
 	/** Animation played when the item is added to the list. */
-	transitionIn?: (node: HTMLElement, params?: any) => TransitionConfig;
+	transitionIn?: (
+		node: HTMLElement,
+		params?: Record<string, unknown> | undefined
+	) => TransitionConfig;
 	/** Animation played when the item is removed from the list. */
-	transitionOut?: (node: HTMLElement, params?: any) => TransitionConfig;
+	transitionOut?: (
+		node: HTMLElement,
+		params?: Record<string, unknown> | undefined
+	) => TransitionConfig;
 	/** Content to be rendered inside the item. */
 	children?: Snippet;
 }

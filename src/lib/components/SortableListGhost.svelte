@@ -44,7 +44,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
 	);
 
-	function cloneDraggedItemContent(...args: unknown[]) {
+	function cloneDraggedItemContent() {
 		if (!ghostRef || !rootState.draggedItem) return;
 
 		const clone = rootState.draggedItem.cloneNode(true) as HTMLLIElement;
@@ -57,7 +57,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (rootState.ghostState === 'ptr-drag-start') untrack(() => cloneDraggedItemContent());
 	});
 
-	function getStyleLeft(...args: unknown[]) {
+	function getStyleLeft() {
 		if (
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
@@ -80,7 +80,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		return `${left}px`;
 	}
 
-	function getStyleTop(...args: unknown[]) {
+	function getStyleTop() {
 		if (
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
@@ -110,7 +110,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		return `${top}px`;
 	}
 
-	function getStyleTransform(...args: unknown[]) {
+	function getStyleTransform() {
 		if (
 			rootState.ghostState === 'idle' ||
 			rootState.ghostState === 'ptr-drop' ||
@@ -197,16 +197,16 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	}
 
 	const styleLeft = $derived.by(() => {
-		rootState.ghostState;
+		void rootState.ghostState;
 		return untrack(() => getStyleLeft());
 	});
 	const styleTop = $derived.by(() => {
-		rootState.ghostState;
+		void rootState.ghostState;
 		return untrack(() => getStyleTop());
 	});
 	const styleTransform = $derived.by(() => {
-		rootState.ghostState;
-		rootState.pointer;
+		void rootState.ghostState;
+		void rootState.pointer;
 		return untrack(() => getStyleTransform());
 	});
 
