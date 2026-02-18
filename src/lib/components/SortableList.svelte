@@ -686,24 +686,29 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		function handleTransitionEnd({ propertyName }: TransitionEvent) {
-			if (propertyName === 'z-index') {
-				handlePointerAndKeyboardDragEnd(action);
-				element?.removeEventListener('transitionend', handleTransitionEnd);
-				if (transitionTimeoutId) {
-					clearTimeout(transitionTimeoutId);
-					transitionTimeoutId = null;
-				}
-			}
-		}
-
 		if (_transition.duration > 0) {
-			element?.addEventListener('transitionend', handleTransitionEnd);
+			const transitionEnd = new Promise<void>((resolve) => {
+				function handleTransitionEnd({ propertyName }: TransitionEvent) {
+					if (propertyName === 'z-index') {
+						element?.removeEventListener('transitionend', handleTransitionEnd);
+						if (transitionTimeoutId) {
+							clearTimeout(transitionTimeoutId);
+							transitionTimeoutId = null;
+						}
+						resolve();
+					}
+				}
+				element?.addEventListener('transitionend', handleTransitionEnd);
+			});
+
+			const transitionTimeout = new Promise<void>((resolve) => {
+				transitionTimeoutId = setTimeout(resolve, _transition.duration + 100);
+			});
+
 			// Ensure the drag operation completes even if `transitionend` doesn’t fire.
-			transitionTimeoutId = setTimeout(() => {
-				element?.removeEventListener('transitionend', handleTransitionEnd);
-				transitionTimeoutId = null;
-			}, _transition.duration + 100);
+			Promise.race([transitionEnd, transitionTimeout]).then(() =>
+				handlePointerAndKeyboardDragEnd(action)
+			);
 		} else {
 			handlePointerAndKeyboardDragEnd(action);
 		}
@@ -786,8 +791,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		{@render children()}
 	{:else}
 		<p>
-			To display your list, put a few <code>{'<SortableList.Item>'}</code> inside your
-			<code>{'<SortableList.Root>'}</code>.
+			To display your list, put a few <code>&lt;SortableList.Item&gt;</code> inside your
+			<code>&lt;SortableList.Root&gt;</code>.
 		</p>
 	{/if}
 </ul>
