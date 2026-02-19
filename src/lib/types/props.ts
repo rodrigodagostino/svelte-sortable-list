@@ -1,4 +1,4 @@
-import type { AriaAttributes } from 'svelte/elements';
+import type { AriaAttributes, HTMLButtonAttributes } from 'svelte/elements';
 import type { TransitionConfig } from 'svelte/transition';
 import type { SortableListAnnouncements as Announcements } from './accessibility.js';
 
@@ -87,4 +87,9 @@ export interface SortableListGhostProps {
 export interface SortableListItemHandleProps {
 	/** Reference to the handle element. */
 	ref?: HTMLSpanElement | null;
+}
+
+export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
+	/** Reference to the remove element. */
+	ref?: HTMLButtonElement | null;
 }

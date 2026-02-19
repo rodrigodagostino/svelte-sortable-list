@@ -25,6 +25,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Root>` events](#sortablelistroot-events)
   - [`<SortableList.Item>` props](#sortablelistitem-props)
   - [`<SortableList.ItemHandle>` props](#sortablelistitemhandle-props)
+  - [`<SortableList.ItemRemove>` props](#sortablelistitemremove-props)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
 - [Types](#types)
@@ -268,6 +269,12 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Prop  | Type                                   | Default | Possible values                        | Description                      |
 | ----- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
 | `ref` | `HTMLSpanElement \| null \| undefined` | `null`  | `HTMLSpanElement \| null \| undefined` | Reference to the handle element. |
+
+### `<SortableList.ItemRemove>` props
+
+| Prop  | Type                                     | Default | Possible values                          | Description                      |
+| ----- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
+| `ref` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
 
 ## Utilities
 
