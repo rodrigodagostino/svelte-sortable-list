@@ -83,3 +83,8 @@ export interface SortableListGhostProps {
 	/** State in which the ghost is in. */
 	state: 'idle' | 'ptr-drag-start' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 }
+
+export interface SortableListItemHandleProps {
+	/** Reference to the handle element. */
+	ref?: HTMLSpanElement | null;
+}
