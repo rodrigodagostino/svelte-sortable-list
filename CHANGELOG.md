@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.12] (2026-02-19)
+
+### Added
+
+- Expose `<SortableList.Root>` ref via bindable prop.
+- Expose `<SortableList.Item>` ref via bindable prop.
+- Expose `<SortableList.ItemHandle>` ref via bindable prop.
+- Expose `<SortableList.ItemRemove>` ref via bindable prop.
+
 ## [2.1.11] (2026-02-18)
 
 ### Fixed
@@ -1439,7 +1448,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.11...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.12...HEAD
+[2.1.12]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.11...v2.1.12
 [2.1.11]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.10...v2.1.11
 [2.1.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.9...v2.1.10
 [2.1.9]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.8...v2.1.9
