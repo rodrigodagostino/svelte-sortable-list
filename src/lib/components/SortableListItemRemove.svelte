@@ -3,6 +3,9 @@
 ## <SortableList.ItemRemove>
 Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
 
+### Props
+- `ref`: reference to the remove element (HTMLButtonElement).
+
 ### Usage
 ```svelte
 	<SortableList.Item id={item.id} {index}>
@@ -20,7 +23,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
 	import { getIndex } from '$lib/utils/index.js';
 
-	let { children, ...restProps }: ItemRemoveProps = $props();
+	let { ref = $bindable(null), children, ...restProps }: ItemRemoveProps = $props();
 
 	const rootState = getSortableListRootState();
 
@@ -50,7 +53,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button {...restProps} class={classes} onclick={handleClick}>
+<button bind:this={ref} {...restProps} class={classes} onclick={handleClick}>
 	{#if children}
 		{@render children()}
 	{:else}

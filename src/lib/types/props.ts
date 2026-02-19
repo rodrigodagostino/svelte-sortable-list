@@ -115,6 +115,8 @@ export interface SortableListItemHandleProps {
 }
 
 export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
+	/** Reference to the remove element. */
+	ref?: HTMLButtonElement | null;
 	/** Content to be rendered inside the remove button. */
 	children?: Snippet;
 }
