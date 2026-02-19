@@ -33,6 +33,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Root>` props](#sortablelistroot-props)
   - [`<SortableList.Root>` events](#sortablelistroot-events)
   - [`<SortableList.Item>` props](#sortablelistitem-props)
+  - [`<SortableList.ItemHandle>` props](#sortablelistitemhandle-props)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
 - [Types](#types)
@@ -270,6 +271,12 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | `isDisabled`    | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged and applies dimmed styling. |
 | `transitionIn`  | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is added to the list.                          |
 | `transitionOut` | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is removed from the list.                      |
+
+### `<SortableList.ItemHandle>` props
+
+| Prop  | Type                                   | Default | Possible values                        | Description                      |
+| ----- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
+| `ref` | `HTMLSpanElement \| null \| undefined` | `null`  | `HTMLSpanElement \| null \| undefined` | Reference to the handle element. |
 
 ## Utilities
 

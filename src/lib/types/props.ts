@@ -108,6 +108,8 @@ export interface SortableListGhostProps {
 }
 
 export interface SortableListItemHandleProps {
+	/** Reference to the handle element. */
+	ref?: HTMLSpanElement | null;
 	/** Content to be rendered inside the handle. */
 	children?: Snippet;
 }
