@@ -4,6 +4,7 @@
 Serves as the primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.
 
 ### Props
+- `ref`: reference to the list element (HTMLUListElement).
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
 - `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.
@@ -46,7 +47,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	import { BROWSER } from 'esm-env';
 	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import { setSortableListRootState } from '$lib/states/index.js';
-	import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
+	import type {
+		SortableListRootProps as RootProps,
+		SortableListGhostProps as GhostProps,
+	} from '$lib/types/index.js';
 	import {
 		announce,
 		areColliding,
@@ -64,10 +68,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
 
-	let rootRef: HTMLUListElement = $state()!;
-	let ghostRef: HTMLDivElement = $state()!;
+	let ghostRef: GhostProps['ref'] = $state(null);
 
 	let {
+		ref = $bindable(null),
 		gap = 12,
 		direction = 'vertical',
 		delay = 0,
@@ -130,8 +134,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	onMount(() => {
 		onmounted?.(null);
-		rootState.ref = rootRef;
-		rootState.isRTL = getTextDirection(rootRef) === 'rtl';
+		rootState.ref = ref;
+		rootState.isRTL = getTextDirection(ref!) === 'rtl';
 	});
 
 	onDestroy(() => {
@@ -153,7 +157,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	let scrollingSpeed = $state(0);
-	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(rootRef));
+	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(ref!));
 	let scrollableAncestorScrollTop: number | undefined = $state(0);
 	let scrollableAncestorScrollLeft: number | undefined = $state(0);
 	let isScrollingDocument = $derived(
@@ -240,17 +244,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.pointer = { x: e.clientX, y: e.clientY };
 		rootState.pointerOrigin = { x: e.clientX, y: e.clientY };
 		rootState.draggedItem = currItem;
-		rootState.itemRects = getItemRects(rootRef);
+		rootState.itemRects = getItemRects(ref!);
 
 		if (delay <= 0) await handlePointerDragStart(currItem);
 		else {
-			rootRef.addEventListener('pointermove', handlePointerMoveWithDelay);
+			ref!.addEventListener('pointermove', handlePointerMoveWithDelay);
 			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
 		}
 	}
 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
-		rootRef.removeEventListener('pointermove', handlePointerMoveWithDelay);
+		ref!.removeEventListener('pointermove', handlePointerMoveWithDelay);
 
 		await tick();
 		rootState.ghostState = 'ptr-drag-start';
@@ -266,29 +270,29 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		rootRef.addEventListener('pointermove', handlePointerMove);
-		rootRef.addEventListener(
+		ref!.addEventListener('pointermove', handlePointerMove);
+		ref!.addEventListener(
 			'pointerup',
 			() => {
-				rootRef.removeEventListener('pointermove', handlePointerMove);
+				ref!.removeEventListener('pointermove', handlePointerMove);
 				handlePointerUp();
 			},
 			{ once: true }
 		);
-		rootRef.addEventListener(
+		ref!.addEventListener(
 			'pointercancel',
 			() => {
-				rootRef.removeEventListener('pointermove', handlePointerMove);
+				ref!.removeEventListener('pointermove', handlePointerMove);
 				handlePointerCancel();
 			},
 			{ once: true }
 		);
 		// Provide a fallback for the pointerup event not firing on Webkit for iOS.
 		// This occurs when tapping an item to start dragging and releasing without movement.
-		rootRef.addEventListener(
+		ref!.addEventListener(
 			'lostpointercapture',
 			() => {
-				rootRef.removeEventListener('pointermove', handlePointerMove);
+				ref!.removeEventListener('pointermove', handlePointerMove);
 				if (rootState.dragState === 'ptr-drag-start') handlePointerCancel();
 			},
 			{ once: true }
@@ -304,7 +308,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (!rootState.draggedItem || !rootState.itemRects || !ghostRef) return;
 
-		const rootRect = rootRef.getBoundingClientRect();
+		const rootRect = ref!.getBoundingClientRect();
 		const ghostRect = ghostRef.getBoundingClientRect();
 		rootState.pointer = { x: clientX, y: clientY };
 		rootState.isBetweenBounds = areColliding(ghostRect, rootRect);
@@ -315,14 +319,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
 			scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
 		) {
-			rootState.itemRects = getItemRects(rootRef);
+			rootState.itemRects = getItemRects(ref!);
 			scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
 			scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
 		}
 		await tick();
 		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
 		if (collidingItemRect)
-			rootState.targetItem = rootRef.querySelector<HTMLLIElement>(
+			rootState.targetItem = ref!.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 			);
 		else if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isBetweenBounds))
@@ -357,11 +361,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	function handlePointerUp() {
-		handlePointerAndKeyboardDrop(ghostRef, 'ptr-drop');
+		handlePointerAndKeyboardDrop(ghostRef!, 'ptr-drop');
 	}
 
 	function handlePointerCancel() {
-		handlePointerAndKeyboardDrop(ghostRef, 'ptr-cancel');
+		handlePointerAndKeyboardDrop(ghostRef!, 'ptr-cancel');
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
@@ -373,7 +377,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const { key } = e;
 		const target = e.target as HTMLElement;
 
-		if (target === rootRef || target === rootState.focusedItem) {
+		if (target === ref || target === rootState.focusedItem) {
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
@@ -390,7 +394,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (rootState.dragState === 'idle') {
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
-					rootState.itemRects = getItemRects(rootRef);
+					rootState.itemRects = getItemRects(ref!);
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
@@ -423,7 +427,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
 					if (!rootState.focusedItem || focusedIndex === null) {
-						const firstItem = rootRef.querySelector<HTMLLIElement>('.ssl-item');
+						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
 						if (!firstItem) return;
 
 						firstItem.focus({ preventScroll: true });
@@ -435,7 +439,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
-					const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+					const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 					if (
 						(step === -1 && focusedIndex === 0) ||
 						(step === 1 && focusedIndex === items.length - 1)
@@ -525,7 +529,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === 'Home' || key === 'End') {
 				e.preventDefault();
 
-				const items = rootRef.querySelectorAll<HTMLLIElement>('.ssl-item');
+				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
 				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
@@ -593,7 +597,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			if (key === 'Escape' && rootState.draggedItem) {
 				// Prevent closing the <dialog> if the dragged item is inside one.
-				if (rootRef.closest<HTMLDialogElement>('dialog')) e.preventDefault();
+				if (ref!.closest<HTMLDialogElement>('dialog')) e.preventDefault();
 				handlePointerAndKeyboardDrop(rootState.draggedItem, 'kbd-cancel');
 			}
 		}
@@ -754,7 +758,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 <!-- svelte-ignore a11y_role_supports_aria_props -->
 <ul
-	bind:this={rootRef}
+	bind:this={ref}
 	class={classes}
 	style:pointer-events={rootState.focusedItem ? 'none' : 'auto'}
 	style:--ssl-gap="{gap}px"
@@ -793,7 +797,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		</p>
 	{/if}
 </ul>
-<SortableListGhost bind:ghostRef />
+<SortableListGhost bind:ref={ghostRef} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>

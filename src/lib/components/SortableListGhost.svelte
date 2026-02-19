@@ -4,11 +4,11 @@
 Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
 
 ### Props
-- `ghostRef`: reference to the Ghost used in its parent component.
+- `ref`: reference to the ghost element (HTMLDivElement).
 
 ### Usage
 ```svelte
-	<SortableListGhost bind:ghostRef />
+	<SortableListGhost bind:ref={ghostRef} />
 ```
 -->
 
@@ -26,7 +26,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		preserveFormFieldValues,
 	} from '$lib/utils/index.js';
 
-	let { ghostRef = $bindable() }: GhostProps = $props();
+	let { ref = $bindable(null) }: GhostProps = $props();
 
 	const rootState = getSortableListRootState();
 
@@ -45,13 +45,13 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	);
 
 	function cloneDraggedItemContent() {
-		if (!ghostRef || !rootState.draggedItem) return;
+		if (!ref || !rootState.draggedItem) return;
 
 		const clone = rootState.draggedItem.cloneNode(true) as HTMLLIElement;
 		preserveFormFieldValues(rootState.draggedItem, clone);
 		// `childNodes` is used to always preserve the dragged item’s content,
 		// even when only a text node is present inside.
-		ghostRef.children[0].replaceChildren(...clone.childNodes);
+		ref.children[0].replaceChildren(...clone.childNodes);
 	}
 	$effect.pre(() => {
 		if (rootState.ghostState === 'ptr-drag-start') untrack(() => cloneDraggedItemContent());
@@ -61,12 +61,13 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
+			!ref ||
 			!draggedRect ||
 			!rootState.itemRects
 		)
 			return '0';
 
-		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.left;
+		if (rootState.ghostState === 'ptr-remove') return ref.style.left;
 
 		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
 			return `${draggedRect.x}px`;
@@ -84,12 +85,13 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
+			!ref ||
 			!draggedRect ||
 			!rootState.itemRects
 		)
 			return '0';
 
-		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.top;
+		if (rootState.ghostState === 'ptr-remove') return ref.style.top;
 
 		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
 			return `${draggedRect.y}px`;
@@ -114,14 +116,14 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (
 			rootState.ghostState === 'idle' ||
 			rootState.ghostState === 'ptr-drop' ||
-			!ghostRef ||
+			!ref ||
 			!rootState ||
 			!rootState.pointer ||
 			!rootState.pointerOrigin
 		)
 			return 'translate3d(0, 0, 0)';
 
-		const ghostRect = ghostRef.getBoundingClientRect();
+		const ghostRect = ref.getBoundingClientRect();
 		const rootRect = rootState.ref?.getBoundingClientRect();
 
 		if (!rootRect) return 'translate3d(0, 0, 0)';
@@ -193,7 +195,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (rootState.ghostState === 'ptr-remove') return ghostRef.style.transform;
+		if (rootState.ghostState === 'ptr-remove') return ref.style.transform;
 	}
 
 	const styleLeft = $derived.by(() => {
@@ -217,7 +219,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 </script>
 
 <div
-	bind:this={ghostRef}
+	bind:this={ref}
 	class="ssl-ghost"
 	style:left={styleLeft}
 	style:top={styleTop}
