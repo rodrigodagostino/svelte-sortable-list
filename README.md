@@ -163,7 +163,7 @@ The following example demonstrates how to translate announcements to Spanish (ad
 
 ```svelte
 <script lang="ts">
-	...
+	import { SortableList } from '$lib/index.js';
 
 	const announcements: SortableList.RootProps['announcements'] = {
 		lifted: (_, draggedItemIndex) => {
@@ -196,11 +196,16 @@ The following example demonstrates how to translate announcements to Spanish (ad
 </script>
 
 <SortableList.Root
-	...
 	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
 	{announcements}
 >
-	...
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
 </SortableList.Root>
 ```
 
@@ -292,7 +297,6 @@ Utility functions to simplify common list operations:
 ```svelte
 <script lang="ts">
 	import { SortableList, removeItem, sortItems } from '@rodrigodagostino/svelte-sortable-list';
-	...
 
 	function handleDragEnd(e: SortableList.RootEvents['dragend']) {
 		const { draggedItemIndex, targetItemIndex, isCanceled } = e.detail;
@@ -309,7 +313,15 @@ Utility functions to simplify common list operations:
 	}
 </script>
 
-<SortableList.Root on:dragend={handleDragEnd}>...</SortableList.Root>
+<SortableList.Root on:dragend={handleDragEnd}>
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>
 ```
 
 ## Transitions
@@ -327,7 +339,6 @@ Built-in transition functions for smooth animations:
 ```svelte
 <script lang="ts">
 	import { SortableList, scaleFly } from '@rodrigodagostino/svelte-sortable-list';
-	...
 </script>
 
 <SortableList.Root>
@@ -338,8 +349,9 @@ Built-in transition functions for smooth animations:
 			transitionIn={(node) => scaleFly(node, { duration: 320, x: -200 })}
 			transitionOut={(node) => scaleFly(node, { duration: 320, x: 200 })}
 		>
-			...
-		</SortableList.Item>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
 	{/each}
 </SortableList.Root>
 ```
@@ -365,7 +377,6 @@ TypeScript definitions for type-safe development:
 ```svelte
 <script lang="ts">
 	import type { SortableList } from '@rodrigodagostino/svelte-sortable-list';
-	...
 
 	function handleDrop(e: SortableList.RootEvents['drop']) {
 		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e.detail;
