@@ -252,14 +252,15 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 ### `<SortableList.Item>` props
 
-| Prop            | Type                                                    | Default     | Possible values   | Description                                                                   |
-| --------------- | ------------------------------------------------------- | ----------- | ----------------- | ----------------------------------------------------------------------------- |
-| `id`            | `string`                                                | `undefined` | Unique string     | Unique identifier for each item.                                              |
-| `index`         | `number`                                                | `undefined` | Unique number     | Position of the item in the list.                                             |
-| `isLocked`      | `boolean \| undefined`                                  | `false`     | `true` \| `false` | When `true`, prevents the item from being dragged.                            |
-| `isDisabled`    | `boolean \| undefined`                                  | `false`     | `true` \| `false` | When `true`, prevents the item from being dragged and applies dimmed styling. |
-| `transitionIn`  | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function          | Animation played when the item is added to the list.                          |
-| `transitionOut` | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function          | Animation played when the item is removed from the list.                      |
+| Prop            | Type                                                    | Default     | Possible values                      | Description                                                                   |
+| --------------- | ------------------------------------------------------- | ----------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| `ref`           | `HTMLLIElement \| null \| undefined`                    | `null`      | `HTMLLIElement \| null \| undefined` | Reference to the item element.                                                |
+| `id`            | `string`                                                | `undefined` | Unique string                        | Unique identifier for each item.                                              |
+| `index`         | `number`                                                | `undefined` | Unique number                        | Position of the item in the list.                                             |
+| `isLocked`      | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged.                            |
+| `isDisabled`    | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged and applies dimmed styling. |
+| `transitionIn`  | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is added to the list.                          |
+| `transitionOut` | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is removed from the list.                      |
 
 ## Utilities
 
