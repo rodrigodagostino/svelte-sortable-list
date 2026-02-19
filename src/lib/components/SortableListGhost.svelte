@@ -4,12 +4,12 @@
 Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
 
 ### Props
-- `ghostRef`: reference to the Ghost used in its parent component.
-- `state`: state in which the Ghost is in.
+- `ref`: reference to the ghost element (HTMLDivElement).
+- `state`: state in which the ghost is in.
 
 ### Usage
 ```svelte
-	<SortableListGhost bind:ghostRef state={ghostState} />
+	<SortableListGhost bind:ref={ghostRef} state={ghostState} />
 ```
 -->
 
@@ -36,7 +36,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	type $$Props = GhostProps;
 
-	export let ghostRef: $$Props['ghostRef'];
+	export let ref: $$Props['ref'] = null;
 	export let state: $$Props['state'];
 
 	const rootProps = getRootProps();
@@ -58,22 +58,22 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function cloneDraggedItemContent(...args: unknown[]) {
-		if (!ghostRef || !$draggedItem) return;
+		if (!ref || !$draggedItem) return;
 
 		const clone = $draggedItem.cloneNode(true) as HTMLLIElement;
 		preserveFormFieldValues($draggedItem, clone);
 		// `childNodes` is used to always preserve the dragged item’s content,
 		// even when only a text node is present inside.
-		ghostRef.children[0].replaceChildren(...clone.childNodes);
+		ref.children[0].replaceChildren(...clone.childNodes);
 	}
 	$: if (state === 'ptr-drag-start') cloneDraggedItemContent(state);
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleLeft(...args: unknown[]) {
-		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'idle' || typeof draggedIndex !== 'number' || !ref || !draggedRect || !$itemRects)
 			return '0';
 
-		if (state === 'ptr-remove') return ghostRef.style.left;
+		if (state === 'ptr-remove') return ref.style.left;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.x}px`;
 
@@ -88,10 +88,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTop(...args: unknown[]) {
-		if (state === 'idle' || typeof draggedIndex !== 'number' || !draggedRect || !$itemRects)
+		if (state === 'idle' || typeof draggedIndex !== 'number' || !ref || !draggedRect || !$itemRects)
 			return '0';
 
-		if (state === 'ptr-remove') return ghostRef.style.top;
+		if (state === 'ptr-remove') return ref.style.top;
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
@@ -113,17 +113,10 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
-		if (
-			state === 'idle' ||
-			state === 'ptr-drop' ||
-			!ghostRef ||
-			!$root ||
-			!$pointer ||
-			!$pointerOrigin
-		)
+		if (state === 'idle' || state === 'ptr-drop' || !ref || !$root || !$pointer || !$pointerOrigin)
 			return 'translate3d(0, 0, 0)';
 
-		const ghostRect = ghostRef.getBoundingClientRect();
+		const ghostRect = ref.getBoundingClientRect();
 		const rootRect = $root.getBoundingClientRect();
 
 		if ((state === 'ptr-drag-start' || state === 'ptr-drag') && draggedRect) {
@@ -188,7 +181,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (state === 'ptr-remove') return ghostRef.style.transform;
+		if (state === 'ptr-remove') return ref.style.transform;
 	}
 
 	$: styleLeft = getStyleLeft(state);
@@ -202,7 +195,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 </script>
 
 <div
-	bind:this={ghostRef}
+	bind:this={ref}
 	class="ssl-ghost"
 	style:left={styleLeft}
 	style:top={styleTop}

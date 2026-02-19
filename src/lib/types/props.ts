@@ -10,6 +10,8 @@ export interface SortableListRootProps extends Pick<
 	},
 	'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
 > {
+	/** Reference to the list element (HTMLUListElement). */
+	ref?: HTMLUListElement | null;
 	/** Separation between items (in pixels). */
 	gap?: number;
 	/** Orientation in which items will be arranged. */
@@ -74,8 +76,8 @@ export interface SortableListItemProps extends Pick<
 }
 
 export interface SortableListGhostProps {
-	/** Reference to the Ghost used in its parent component. */
-	ghostRef: HTMLDivElement;
-	/** State in which the Ghost is in. */
+	/** Reference to the ghost element. */
+	ref?: HTMLDivElement | null;
+	/** State in which the ghost is in. */
 	state: 'idle' | 'ptr-drag-start' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 }
