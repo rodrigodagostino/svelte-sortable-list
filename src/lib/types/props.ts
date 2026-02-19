@@ -78,6 +78,8 @@ export interface SortableListItemProps extends Pick<
 	AriaAttributes,
 	'aria-label' | 'aria-labelledby'
 > {
+	/** Reference to the item element. */
+	ref?: HTMLLIElement | null;
 	/** Unique identifier for each item. */
 	id: string;
 	/** Position of the item in the list. */

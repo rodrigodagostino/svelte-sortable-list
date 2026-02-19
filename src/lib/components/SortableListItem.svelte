@@ -4,6 +4,7 @@
 Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
 
 ### Props
+- `ref`: reference to the item element (HTMLLIElement).
 - `id`: unique identifier for each item.
 - `index`: position of the item in the list.
 - `isLocked`: if `true`, will prevent the item from being dragged.
@@ -36,9 +37,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		isInSameRow,
 	} from '$lib/utils/index.js';
 
-	let itemRef: HTMLLIElement = $state()!;
-
 	let {
+		ref = $bindable(null),
 		id,
 		index,
 		isLocked = false,
@@ -63,13 +63,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const rootState = getSortableListRootState();
 
 	const classes = $derived(['ssl-item', restProps.class]);
-	const isGhost = $derived(!!itemRef?.parentElement?.classList.contains('ssl-ghost'));
+	const isGhost = $derived(!!ref?.parentElement?.classList.contains('ssl-ghost'));
 
 	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async function setInteractiveElementsTabIndex(...args: unknown[]) {
 		await tick();
-		itemRef
+		ref
 			?.querySelectorAll<HTMLElement>(selectors)
 			.forEach(
 				(el) =>
@@ -213,7 +213,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 
 		await tick();
-		rootState.focusedItem = itemRef;
+		rootState.focusedItem = ref;
 	}
 
 	// `focusout` is preferred over `blur` since it detects the loss of focus
@@ -222,7 +222,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
 		if (!relatedTarget || (relatedTarget && !relatedTarget.closest('.ssl-item'))) {
 			if (!rootState.focusedItem) return;
-			dispatch(itemRef, 'itemfocusout', { item: rootState.focusedItem });
+			dispatch(ref!, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
 			rootState.focusedItem = null;
 		}
@@ -230,7 +230,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 </script>
 
 <li
-	bind:this={itemRef}
+	bind:this={ref}
 	{id}
 	class={classes}
 	style:width={styleWidth}
