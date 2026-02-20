@@ -93,3 +93,8 @@ export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
 	/** Reference to the remove element. `[bindable]` */
 	ref?: HTMLButtonElement | null;
 }
+
+export interface IconProps {
+	/** Name of the icon to display. */
+	name: 'handle' | 'remove';
+}

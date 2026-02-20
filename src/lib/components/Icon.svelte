@@ -13,12 +13,15 @@ Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRem
 -->
 
 <script lang="ts">
-	export let name: 'handle' | 'remove';
+	import type { IconProps } from '$lib/types/props.js';
 
-	// Thank you, Lucide :)
-	// https://lucide.dev
+	type $$Props = IconProps & { class?: string };
+
+	export let name: $$Props['name'];
 </script>
 
+<!-- Thank you, Lucide :) -->
+<!-- https://lucide.dev -->
 <svg
 	xmlns="http://www.w3.org/2000/svg"
 	class="ssl-icon-{name}"
