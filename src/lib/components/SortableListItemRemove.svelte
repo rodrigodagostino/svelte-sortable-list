@@ -4,7 +4,7 @@
 Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
 
 ### Props
-- `ref`: reference to the remove element (HTMLButtonElement).
+- `ref`: reference to the remove element (HTMLButtonElement). `[bindable]`
 
 ### Usage
 ```svelte
