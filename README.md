@@ -234,7 +234,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 | Prop                 | Type                                    | Default                                                     | Possible values                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | -------------------- | --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ref`                | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `ref` `[$bindable]`  | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                                                                            |
 | `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for ghost (dropping) and item (translation, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects ghost drop transitions. |
@@ -266,27 +266,27 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 ### `<SortableList.Item>` props
 
-| Prop            | Type                                                    | Default     | Possible values                      | Description                                                                   |
-| --------------- | ------------------------------------------------------- | ----------- | ------------------------------------ | ----------------------------------------------------------------------------- |
-| `ref`           | `HTMLLIElement \| null \| undefined`                    | `null`      | `HTMLLIElement \| null \| undefined` | Reference to the item element.                                                |
-| `id`            | `string`                                                | `undefined` | Unique string                        | Unique identifier for each item.                                              |
-| `index`         | `number`                                                | `undefined` | Unique number                        | Position of the item in the list.                                             |
-| `isLocked`      | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged.                            |
-| `isDisabled`    | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged and applies dimmed styling. |
-| `transitionIn`  | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is added to the list.                          |
-| `transitionOut` | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is removed from the list.                      |
+| Prop                | Type                                                    | Default     | Possible values                      | Description                                                                   |
+| ------------------- | ------------------------------------------------------- | ----------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| `ref` `[$bindable]` | `HTMLLIElement \| null \| undefined`                    | `null`      | `HTMLLIElement \| null \| undefined` | Reference to the item element.                                                |
+| `id`                | `string`                                                | `undefined` | Unique string                        | Unique identifier for each item.                                              |
+| `index`             | `number`                                                | `undefined` | Unique number                        | Position of the item in the list.                                             |
+| `isLocked`          | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged.                            |
+| `isDisabled`        | `boolean \| undefined`                                  | `false`     | `true` \| `false`                    | When `true`, prevents the item from being dragged and applies dimmed styling. |
+| `transitionIn`      | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is added to the list.                          |
+| `transitionOut`     | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is removed from the list.                      |
 
 ### `<SortableList.ItemHandle>` props
 
-| Prop  | Type                                   | Default | Possible values                        | Description                      |
-| ----- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
-| `ref` | `HTMLSpanElement \| null \| undefined` | `null`  | `HTMLSpanElement \| null \| undefined` | Reference to the handle element. |
+| Prop                | Type                                   | Default | Possible values                        | Description                      |
+| ------------------- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
+| `ref` `[$bindable]` | `HTMLSpanElement \| null \| undefined` | `null`  | `HTMLSpanElement \| null \| undefined` | Reference to the handle element. |
 
 ### `<SortableList.ItemRemove>` props
 
-| Prop  | Type                                     | Default | Possible values                          | Description                      |
-| ----- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
-| `ref` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
+| Prop                | Type                                     | Default | Possible values                          | Description                      |
+| ------------------- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
+| `ref` `[$bindable]` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
 
 ## Utilities
 

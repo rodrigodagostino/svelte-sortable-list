@@ -4,7 +4,7 @@
 Serves as the primary container. Provides the main structure, the drag-and-drop interactions and emits the available events.
 
 ### Props
-- `ref`: reference to the list element (HTMLUListElement).
+- `ref`: reference to the list element (HTMLUListElement). `[$bindable]`
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
 - `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.

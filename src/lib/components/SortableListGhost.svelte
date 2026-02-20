@@ -4,7 +4,7 @@
 Serves as the dragged item placeholder during the drag-and-drop interactions triggered by a pointer device.
 
 ### Props
-- `ref`: reference to the ghost element (HTMLDivElement).
+- `ref`: reference to the ghost element (HTMLDivElement). `[$bindable]`
 
 ### Usage
 ```svelte

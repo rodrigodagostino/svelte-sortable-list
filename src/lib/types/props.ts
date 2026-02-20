@@ -19,7 +19,7 @@ export interface SortableListRootProps extends Pick<
 	},
 	'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
 > {
-	/** Reference to the list element. */
+	/** Reference to the list element. `[$bindable]` */
 	ref?: HTMLUListElement | null;
 	/** Separation between items (in pixels). */
 	gap?: number;
@@ -78,7 +78,7 @@ export interface SortableListItemProps extends Pick<
 	AriaAttributes,
 	'aria-label' | 'aria-labelledby'
 > {
-	/** Reference to the item element. */
+	/** Reference to the item element. `[$bindable]` */
 	ref?: HTMLLIElement | null;
 	/** Unique identifier for each item. */
 	id: string;
@@ -103,19 +103,19 @@ export interface SortableListItemProps extends Pick<
 }
 
 export interface SortableListGhostProps {
-	/** Reference to the ghost element. */
+	/** Reference to the ghost element. `[$bindable]` */
 	ref: HTMLDivElement | null;
 }
 
 export interface SortableListItemHandleProps {
-	/** Reference to the handle element. */
+	/** Reference to the handle element. `[$bindable]` */
 	ref?: HTMLSpanElement | null;
 	/** Content to be rendered inside the handle. */
 	children?: Snippet;
 }
 
 export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
-	/** Reference to the remove element. */
+	/** Reference to the remove element. `[$bindable]` */
 	ref?: HTMLButtonElement | null;
 	/** Content to be rendered inside the remove button. */
 	children?: Snippet;

@@ -16,11 +16,10 @@ Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRem
 	import type { IconProps } from '$lib/types/props.js';
 
 	let { name }: IconProps = $props();
-
-	// Thank you, Lucide :)
-	// https://lucide.dev
 </script>
 
+<!-- Thank you, Lucide :) -->
+<!-- https://lucide.dev -->
 <svg
 	xmlns="http://www.w3.org/2000/svg"
 	class="ssl-icon-{name}"

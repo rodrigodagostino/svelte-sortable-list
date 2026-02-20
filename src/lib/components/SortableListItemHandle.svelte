@@ -4,7 +4,7 @@
 Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.
 
 ### Props
-- `ref`: reference to the handle element (HTMLSpanElement).
+- `ref`: reference to the handle element (HTMLSpanElement). `[$bindable]`
 
 ### Usage
 ```svelte

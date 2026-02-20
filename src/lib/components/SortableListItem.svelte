@@ -4,7 +4,7 @@
 Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
 
 ### Props
-- `ref`: reference to the item element (HTMLLIElement).
+- `ref`: reference to the item element (HTMLLIElement). `[$bindable]`
 - `id`: unique identifier for each item.
 - `index`: position of the item in the list.
 - `isLocked`: if `true`, will prevent the item from being dragged.
