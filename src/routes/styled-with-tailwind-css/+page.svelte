@@ -40,7 +40,7 @@
 			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-[[data-drag-state*='kbd-drag']]:bg-indigo-400 group-[[data-drag-state*='kbd-drag']]:shadow-lg group-[[data-drag-state*='kbd-drag']]:shadow-indigo-900/72 group-[[data-drag-state*='ptr-drag']]:bg-indigo-400 group-[[data-drag-state*='ptr-drag']]:shadow-lg group-[[data-drag-state*='ptr-drag']]:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
 			>
 				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
 					{item.text}
