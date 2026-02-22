@@ -105,6 +105,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	$effect(() => {
 		rootState.props = {
+			ref,
 			gap,
 			direction,
 			delay,
@@ -134,7 +135,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	onMount(() => {
 		onmounted?.(null);
-		rootState.ref = ref;
 		rootState.isRTL = getTextDirection(ref!) === 'rtl';
 	});
 

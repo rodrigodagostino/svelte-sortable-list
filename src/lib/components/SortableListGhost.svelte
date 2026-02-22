@@ -96,7 +96,8 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
 			return `${draggedRect.y}px`;
 
-		const alignItems = rootState.ref && window.getComputedStyle(rootState.ref).alignItems;
+		const alignItems =
+			rootState.props.ref && window.getComputedStyle(rootState.props.ref).alignItems;
 		const top =
 			rootState.props.direction === 'vertical'
 				? draggedIndex < targetIndex
@@ -124,7 +125,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ref.getBoundingClientRect();
-		const rootRect = rootState.ref?.getBoundingClientRect();
+		const rootRect = rootState.props.ref?.getBoundingClientRect();
 
 		if (!rootRect) return 'translate3d(0, 0, 0)';
 
@@ -180,7 +181,12 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		}
 
 		if (rootState.ghostState === 'ptr-predrop' && typeof draggedIndex === 'number' && draggedRect) {
-			if (!rootState.ref || !rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
+			if (
+				!rootState.props.ref ||
+				!rootState.targetItem ||
+				typeof targetIndex !== 'number' ||
+				!targetRect
+			)
 				return 'translate3d(0, 0, 0)';
 
 			const x =
@@ -190,7 +196,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			const y =
 				rootState.props.direction === 'vertical'
 					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment(rootState.ref, ghostRect, targetRect);
+					: calculateTranslateWithAlignment(rootState.props.ref, ghostRect, targetRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
@@ -237,7 +243,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 >
 	<!-- The following if clause will prevent <SortableListItem> -->
 	<!-- from transitioning out on page navigation. -->
-	{#if rootState.ref}
+	{#if rootState.props.ref}
 		<SortableListItem
 			id={draggedId || 'ssl-ghost-item'}
 			index={draggedIndex ?? -1}

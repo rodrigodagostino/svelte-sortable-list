@@ -170,7 +170,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 						: isInSameRow(currentRect, rootState.itemRects[index + step])
 							? '0'
 							: calculateTranslateWithAlignment(
-									rootState.ref!,
+									rootState.props.ref!,
 									rootState.itemRects[index + step],
 									currentRect
 								);
@@ -189,7 +189,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 					: isInSameRow(draggedRect, targetRect)
 						? '0'
-						: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect);
+						: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

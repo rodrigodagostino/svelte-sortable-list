@@ -2,7 +2,6 @@ import { getContext, setContext } from 'svelte';
 import type { SortableListRootStateContext as Context } from '$lib/types/index.js';
 
 class SortableListRootState {
-	ref: Context['ref'] = $state(null);
 	props: Context['props'] = $state({});
 	dragState: Context['dragState'] = $state('idle');
 	ghostState: Context['ghostState'] = $state('idle');

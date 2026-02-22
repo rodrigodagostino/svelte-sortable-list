@@ -30,8 +30,8 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	const classes = $derived(['ssl-item-remove', restProps.class]);
 
 	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-		if (rootState.focusedItem && rootState.ref) {
-			const items = rootState.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
+		if (rootState.focusedItem && rootState.props.ref) {
+			const items = rootState.props.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex(rootState.focusedItem) !== items.length - 1 ? 1 : -1;
@@ -45,7 +45,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 					});
 			} else {
 				// Focus the root element (if there are no items left) before removing.
-				rootState.ref.focus();
+				rootState.props.ref.focus();
 			}
 		}
 
