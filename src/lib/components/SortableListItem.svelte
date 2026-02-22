@@ -31,7 +31,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		getIsBetweenBounds,
 		getIsRTL,
 		getItemRects,
-		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
@@ -71,7 +70,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	const rootProps = getRootProps();
 
-	const root = getRoot();
 	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
@@ -181,7 +179,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 						? `${operator}${draggedRect.height + $rootProps.gap!}px`
 						: isInSameRow(currentRect, $itemRects[index + step])
 							? '0'
-							: calculateTranslateWithAlignment($root!, $itemRects[index + step], currentRect);
+							: calculateTranslateWithAlignment(
+									$rootProps.ref!,
+									$itemRects[index + step],
+									currentRect
+								);
 
 				return `translate3d(${x}, ${y}, 0)`;
 			} else {
@@ -197,7 +199,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 					: isInSameRow(draggedRect, targetRect)
 						? '0'
-						: calculateTranslateWithAlignment($root!, targetRect, draggedRect);
+						: calculateTranslateWithAlignment($rootProps.ref!, targetRect, draggedRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

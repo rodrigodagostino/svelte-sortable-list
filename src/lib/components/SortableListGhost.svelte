@@ -21,7 +21,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		getItemRects,
 		getPointer,
 		getPointerOrigin,
-		getRoot,
 		getRootProps,
 		getTargetItem,
 	} from '$lib/stores/index.js';
@@ -41,7 +40,6 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	const rootProps = getRootProps();
 
-	const root = getRoot();
 	const pointer = getPointer();
 	const pointerOrigin = getPointerOrigin();
 	const itemRects = getItemRects();
@@ -95,7 +93,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 		if (!$targetItem || typeof targetIndex !== 'number' || !targetRect) return `${draggedRect.y}px`;
 
-		const alignItems = $root && window.getComputedStyle($root).alignItems;
+		const alignItems = $rootProps.ref && window.getComputedStyle($rootProps.ref).alignItems;
 		const top =
 			$rootProps.direction === 'vertical'
 				? draggedIndex < targetIndex
@@ -113,11 +111,18 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function getStyleTransform(...args: unknown[]) {
-		if (state === 'idle' || state === 'ptr-drop' || !ref || !$root || !$pointer || !$pointerOrigin)
+		if (
+			state === 'idle' ||
+			state === 'ptr-drop' ||
+			!ref ||
+			!$rootProps?.ref ||
+			!$pointer ||
+			!$pointerOrigin
+		)
 			return 'translate3d(0, 0, 0)';
 
 		const ghostRect = ref.getBoundingClientRect();
-		const rootRect = $root.getBoundingClientRect();
+		const rootRect = $rootProps.ref.getBoundingClientRect();
 
 		if ((state === 'ptr-drag-start' || state === 'ptr-drag') && draggedRect) {
 			if (!$rootProps.hasBoundaries) {
@@ -176,7 +181,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			const y =
 				$rootProps.direction === 'vertical'
 					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment($root, ghostRect, targetRect);
+					: calculateTranslateWithAlignment($rootProps.ref, ghostRect, targetRect);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}
@@ -213,7 +218,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 >
 	<!-- The following if clause will prevent <SortableListItem> -->
 	<!-- from transitioning out on page navigation. -->
-	{#if $root}
+	{#if $rootProps?.ref}
 		<SortableListItem
 			id={draggedId || 'ssl-ghost-item'}
 			index={draggedIndex ?? -1}

@@ -1,13 +1,6 @@
 import { getWritableContext, setWritableContext } from './index.js';
 import type { SortableListElements as Elements } from '$lib/types/index.js';
 
-export function setRoot(context: Elements['root']) {
-	return setWritableContext<Elements['root']>('root', context);
-}
-export function getRoot() {
-	return getWritableContext<Elements['root']>('root');
-}
-
 export function setDraggedItem(context: Elements['draggedItem']) {
 	return setWritableContext<Elements['draggedItem']>('draggedItem', context);
 }

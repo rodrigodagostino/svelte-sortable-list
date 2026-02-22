@@ -62,7 +62,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		setItemRects,
 		setPointer,
 		setPointerOrigin,
-		setRoot,
 		setRootProps,
 		setTargetItem,
 	} from '$lib/stores/index.js';
@@ -137,7 +136,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		announcements: _announcements,
 	};
 
-	const root = setRoot(null);
 	let pointerId: PointerEvent['pointerId'] | null = null;
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
@@ -163,7 +161,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	onMount(() => {
 		dispatch('mounted');
-		$root = ref;
 		$isRTL = getTextDirection(ref!) === 'rtl';
 	});
 

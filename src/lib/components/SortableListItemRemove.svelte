@@ -19,7 +19,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getFocusedItem, getRoot } from '$lib/stores/index.js';
+	import { getFocusedItem, getRootProps } from '$lib/stores/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/props.js';
 	import { getIndex, joinCSSClasses } from '$lib/utils/index.js';
 
@@ -29,12 +29,12 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 
 	$: classes = joinCSSClasses('ssl-item-remove', $$restProps.class);
 
-	const root = getRoot();
+	const rootProps = getRootProps();
 	const focusedItem = getFocusedItem();
 
 	function handleClick() {
-		if ($focusedItem && $root) {
-			const items = $root.querySelectorAll<HTMLLIElement>('.ssl-item');
+		if ($focusedItem && $rootProps?.ref) {
+			const items = $rootProps.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing.
 				const step = getIndex($focusedItem) !== items.length - 1 ? 1 : -1;
@@ -43,7 +43,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 				else ($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 			} else {
 				// Focus the root element (if there are no items left) before removing.
-				$root.focus();
+				$rootProps.ref.focus();
 			}
 		}
 	}
