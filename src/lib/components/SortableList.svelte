@@ -77,6 +77,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		SortableListRootProps as RootProps,
 	} from '$lib/types/index.js';
 	import {
+		afterPaint,
 		announce,
 		areColliding,
 		getClosestScrollableAncestor,
@@ -615,12 +616,19 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (action === 'ptr-drop') {
 			await tick();
-			ghostState = !$isBetweenBounds && canRemoveOnDropOut ? 'ptr-remove' : 'ptr-predrop';
-			// Use requestAnimationFrame() to wait until the CSS transform in <SortableListGhost>
-			// that depends on `ptr-predrop` has been set before continuing.
-			requestAnimationFrame(async () => {
-				await tick();
-				if (ghostState !== 'ptr-remove') ghostState = 'ptr-drop';
+			ghostState =
+				!$isBetweenBounds && canRemoveOnDropOut
+					? 'ptr-remove'
+					: _transition.duration > 0
+						? 'ptr-predrop'
+						: 'ptr-drop';
+			// Wait until the CSS transform in <SortableListGhost> that
+			// depends on `ptr-predrop` has been set before continuing.
+			afterPaint(_transition.duration, async () => {
+				if (ghostState === 'ptr-predrop') {
+					await tick();
+					ghostState = 'ptr-drop';
+				}
 				$dragState = 'ptr-drop';
 			});
 		} else if (action === 'ptr-cancel') {
@@ -642,9 +650,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 
 		if (action === 'ptr-drop') {
-			// Use requestAnimationFrame() to ensure finalizePointerAndKeyboardDrop()
-			// runs in the same frame as the `ptr-drop` state changes above.
-			requestAnimationFrame(() =>
+			// Ensure finalizePointerAndKeyboardDrop() runs in the
+			// same frame as the `ptr-drop` state changes above.
+			afterPaint(_transition.duration, () =>
 				finalizePointerAndKeyboardDrop(element, action, draggedIndex, targetIndex)
 			);
 		} else {

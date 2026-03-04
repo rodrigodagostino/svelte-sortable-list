@@ -5,5 +5,6 @@ export * from './data-extraction.js';
 export * from './events.js';
 export * from './exposed.js';
 export * from './styles.js';
+export * from './timing.js';
 export * from './visibility.js';
 export * from './whereabouts.js';
