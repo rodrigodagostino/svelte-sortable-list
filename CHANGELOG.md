@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.13] (2026-03-06)
+
+### Performance
+
+- Skip `ptr-predrop` state when transition duration is set to `0`.
+
+### Changed
+
+- Replace root `ref` state with root `ref` prop.
+
+### Fixed
+
+- Correct ghost misplacement on drop on mobile.
+- Prevent window drag during item drag on mobile Firefox.
+
+### Test
+
+- Reduce expected time difference in E2E test for **“No transitions”** page.
+
+### Chores
+
+- Remove Netlify configuration file.
+
+### Docs
+
+- Mark `ref` props as bindable.
+- Simplify Tailwind CSS classes.
+- Set background position as fixed in demo pages.
+
 ## [2.1.12] (2026-02-19)
 
 ### Added
@@ -1448,7 +1477,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.12...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.13...HEAD
+[2.1.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.12...v2.1.13
 [2.1.12]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.11...v2.1.12
 [2.1.11]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.10...v2.1.11
 [2.1.10]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.9...v2.1.10
