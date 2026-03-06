@@ -1,6 +1,0 @@
-[build]
-publish = "build"
-command = "pnpm vite build"
-
-[context.production.environment]
-NETLIFY = "true"
