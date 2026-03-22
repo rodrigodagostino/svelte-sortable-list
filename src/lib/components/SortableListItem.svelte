@@ -44,6 +44,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		INTERACTIVE_ELEMENTS,
 		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
+		isOrResidesInInteractiveElement,
 		joinCSSClasses,
 	} from '$lib/utils/index.js';
 
@@ -230,6 +231,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			$focusedItem = null;
 		}
 	}
+
+	// Prevent context menu from opening on long-press in Chrome for Android.
+	function handleTouchStart(e: TouchEvent) {
+		if (e.target && ref && !isOrResidesInInteractiveElement(e.target as HTMLElement, ref))
+			e.preventDefault();
+	}
 </script>
 
 <li
@@ -254,6 +261,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-selected={focusedId === String(id)}
 	on:focus={handleFocus}
 	on:focusout={handleFocusOut}
+	on:touchstart|nonpassive={handleTouchStart}
 	in:_transitionIn
 	out:_transitionOut
 >
