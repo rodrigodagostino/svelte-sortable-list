@@ -24,6 +24,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
+	import { on } from 'svelte/events';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
@@ -35,6 +37,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		INTERACTIVE_ELEMENTS,
 		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
+		isOrResidesInInteractiveElement,
 	} from '$lib/utils/index.js';
 
 	let {
@@ -227,6 +230,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.focusedItem = null;
 		}
 	}
+
+	// Prevent context menu from opening on long-press in Chrome for Android.
+	const ontouchstart: Attachment = (element) => {
+		return on(
+			element,
+			'touchstart',
+			(e) => {
+				if (e.target && ref && !isOrResidesInInteractiveElement(e.target as HTMLElement, ref))
+					e.preventDefault();
+			},
+			{ passive: false }
+		);
+	};
 </script>
 
 <li
@@ -252,6 +268,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-selected={focusedId === String(id)}
 	onfocus={handleFocus}
 	onfocusout={handleFocusOut}
+	{@attach ontouchstart}
 	in:_transitionIn
 	out:_transitionOut
 >
