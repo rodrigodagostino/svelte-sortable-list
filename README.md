@@ -1,6 +1,14 @@
+<div align="center">
+
+![Logo](https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/master/static/favicon.svg?raw=true)
+
 # Svelte Sortable List
 
 A comprehensive package for creating accessible, sortable lists in Svelte applications.
+
+[![NPM Version](https://img.shields.io/npm/v/@rodrigodagostino/svelte-sortable-list)](https://www.npmjs.com/package/@rodrigodagostino/svelte-sortable-list) [![Latest release](https://img.shields.io/github/release/rodrigodagostino/svelte-sortable-list.svg)](https://github.com/rodrigodagostino/svelte-sortable-list/releases/latest) [![License](https://img.shields.io/github/license/rodrigodagostino/svelte-sortable-list.svg)](LICENSE.md) [![Netlify Status](https://api.netlify.com/api/v1/badges/0062eb00-7ea7-4886-82a4-576bf477e919/deploy-status)](https://app.netlify.com/projects/svelte-sortable-list/deploys)
+
+</div>
 
 > [!IMPORTANT]
 > **Version Compatibility**
@@ -10,14 +18,20 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 >
 > Make sure to use the appropriate version for your Svelte project.
 
-[![NPM Version](https://img.shields.io/npm/v/@rodrigodagostino/svelte-sortable-list)](https://www.npmjs.com/package/@rodrigodagostino/svelte-sortable-list) [![Latest release](https://img.shields.io/github/release/rodrigodagostino/svelte-sortable-list.svg)](https://github.com/rodrigodagostino/svelte-sortable-list/releases/latest) [![License](https://img.shields.io/github/license/rodrigodagostino/svelte-sortable-list.svg)](LICENSE.md) [![Netlify Status](https://api.netlify.com/api/v1/badges/0062eb00-7ea7-4886-82a4-576bf477e919/deploy-status)](https://app.netlify.com/projects/svelte-sortable-list/deploys)
+<div align="center">
 
-![Preview](https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/master/static/preview.gif?raw=true)
+<img width="600" src="https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/master/static/preview.gif?raw=true)" alt="Svelte Sortable List preview" />
 
-**Live demos:**
+</div>
+
+---
+
+## Live demos
 
 - [Netlify](https://svelte-sortable-list.netlify.app)
 - [Cloudflare](https://svelte-sortable-list.pages.dev)
+
+---
 
 ## Table of contents
 
@@ -44,6 +58,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [CSS frameworks](#css-frameworks)
 - [Motivation](#motivation)
 
+---
+
 ## Features
 
 - **Multi-input support**: Mouse, keyboard, and touch interactions.
@@ -54,6 +70,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Integration**: Support for nested interactive elements and the `<dialog>` element.
 - **Internationalization**: RTL language support.
 - **Developer-friendly**: TypeScript definitions, unopinionated styling, and zero dependencies.
+
+---
 
 ## Get started
 
@@ -127,6 +145,8 @@ yarn add @rodrigodagostino/svelte-sortable-list
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Accessibility
 
@@ -216,6 +236,8 @@ The following example demonstrates how to translate announcements to Spanish (ad
 </SortableList.Root>
 ```
 
+---
+
 ## Components
 
 This package follows the [Compound Component Pattern](https://www.smashingmagazine.com/2021/08/compound-components-react/), inspired in the remarkable work of [Hunter Johnston](https://github.com/huntabyte) in [Bits UI](https://github.com/huntabyte/bits-ui). This pattern allows you to access modular components that work together seamlessly, all stemming from a single source.
@@ -288,6 +310,8 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | ------------------- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
 | `ref` `[$bindable]` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
 
+---
+
 ## Utilities
 
 Utility functions to simplify common list operations:
@@ -329,6 +353,8 @@ Utility functions to simplify common list operations:
 </SortableList.Root>
 ```
 
+---
+
 ## Transitions
 
 Built-in transition functions for smooth animations:
@@ -361,6 +387,8 @@ Built-in transition functions for smooth animations:
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Types
 
@@ -396,6 +424,8 @@ TypeScript definitions for type-safe development:
 	}
 </script>
 ```
+
+---
 
 ## Styles
 
@@ -515,6 +545,8 @@ Use your favorite CSS framework to style the SSL components.
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Motivation
 
