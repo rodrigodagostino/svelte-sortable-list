@@ -1,15 +1,25 @@
+<div align="center">
+
+![Logo](https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/v1/static/favicon.svg?raw=true)
+
 # Svelte Sortable List
 
 A comprehensive package for creating accessible, sortable lists in Svelte applications.
 
 [![NPM Version](https://img.shields.io/npm/v/@rodrigodagostino/svelte-sortable-list/legacy)](https://www.npmjs.com/package/@rodrigodagostino/svelte-sortable-list/legacy) [![Latest release](https://img.shields.io/github/v/release/rodrigodagostino/svelte-sortable-list?filter=v1*)](https://github.com/rodrigodagostino/svelte-sortable-list/releases?q=v1&expanded=true) [![License](https://img.shields.io/github/license/rodrigodagostino/svelte-sortable-list.svg)](LICENSE.md) [![Netlify Status](https://api.netlify.com/api/v1/badges/0062eb00-7ea7-4886-82a4-576bf477e919/deploy-status?branch=v1)](https://app.netlify.com/projects/svelte-sortable-list/deploys?branch=v1)
 
-![Preview](https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/master/static/preview.gif?raw=true)
+<img width="600" src="https://raw.githubusercontent.com/rodrigodagostino/svelte-sortable-list/v1/static/preview.gif?raw=true)" alt="Svelte Sortable List preview" />
 
-**Live demos:**
+</div>
+
+---
+
+## Live demos
 
 - [Netlify](https://v1--svelte-sortable-list.netlify.app)
 - [Cloudflare](https://v1.svelte-sortable-list.pages.dev)
+
+---
 
 ## Table of contents
 
@@ -36,6 +46,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [CSS frameworks](#css-frameworks)
 - [Motivation](#motivation)
 
+---
+
 ## Features
 
 - **Multi-input support**: Mouse, keyboard, and touch interactions.
@@ -46,6 +58,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Integration**: Support for nested interactive elements and `<dialog>` components.
 - **Internationalization**: RTL language support.
 - **Developer-friendly**: TypeScript definitions, unopinionated styling, and zero dependencies.
+
+---
 
 ## Get started
 
@@ -119,6 +133,8 @@ yarn add @rodrigodagostino/svelte-sortable-list
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Accessibility
 
@@ -209,6 +225,8 @@ The following example demonstrates how to translate announcements to Spanish (ad
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Components
 
@@ -325,6 +343,8 @@ Utility functions to simplify common list operations:
 </SortableList.Root>
 ```
 
+---
+
 ## Transitions
 
 Built-in transition functions for smooth animations:
@@ -356,6 +376,8 @@ Built-in transition functions for smooth animations:
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Types
 
@@ -391,6 +413,8 @@ TypeScript definitions for type-safe development:
 	}
 </script>
 ```
+
+---
 
 ## Styles
 
@@ -508,6 +532,8 @@ Use your favorite CSS framework to style the SSL components.
 	{/each}
 </SortableList.Root>
 ```
+
+---
 
 ## Motivation
 
