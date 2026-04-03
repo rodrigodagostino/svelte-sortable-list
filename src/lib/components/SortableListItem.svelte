@@ -256,8 +256,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
 	data-is-ghost={isGhost}
-	data-is-between-bounds={rootState.isBetweenBounds ||
-		(draggedId === String(id) && rootState.isBetweenBounds)}
+	data-is-between-bounds={!rootState.isBetweenBounds && draggedId === String(id) ? false : true}
 	data-is-locked={rootState.props.isLocked || isLocked}
 	data-is-disabled={rootState.props.isDisabled || isDisabled}
 	tabindex={focusedId === String(id) ? 0 : -1}
