@@ -250,7 +250,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? $dragState : 'idle'}
 	data-is-ghost={isGhost}
-	data-is-between-bounds={$isBetweenBounds || (draggedId === String(id) && $isBetweenBounds)}
+	data-is-between-bounds={!$isBetweenBounds && draggedId === String(id) ? false : true}
 	data-is-locked={$rootProps.isLocked || isLocked}
 	data-is-disabled={$rootProps.isDisabled || isDisabled}
 	tabindex={focusedId === String(id) ? 0 : -1}
