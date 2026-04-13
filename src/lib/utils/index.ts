@@ -1,6 +1,6 @@
 export * from './accessibility.js';
 export * from './auto-scroll.js';
-export * from './collision.js';
+export * from './collision-detection.js';
 export * from './data-extraction.js';
 export * from './events.js';
 export * from './exposed.js';
