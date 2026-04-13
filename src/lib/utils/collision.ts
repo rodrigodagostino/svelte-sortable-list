@@ -4,25 +4,31 @@ export function areColliding(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return a.right > b.x && a.x < b.right && a.bottom > b.y && a.y < b.bottom;
 }
 
-function getIntersectionRect(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
-	const x1 = Math.max(a.x, b.x);
-	const y1 = Math.max(a.y, b.y);
-	const x2 = Math.min(a.right, b.right);
-	const y2 = Math.min(a.bottom, b.bottom);
+function getDistanceBetweenCenters(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
+	const dx = a.x + a.width / 2 - (b.x + b.width / 2);
+	const dy = a.y + a.height / 2 - (b.y + b.height / 2);
 
-	return { x: x1, y: y1, width: x2 - x1, height: y2 - y1, area: (x2 - x1) * (y2 - y1) };
+	return Math.sqrt(dx * dx + dy * dy);
+}
+
+function isCenterCrossed(ghostRect: DOMRect, itemRect: ItemRect) {
+	const itemCenterX = itemRect.x + itemRect.width / 2;
+	const itemCenterY = itemRect.y + itemRect.height / 2;
+
+	const hasCrossedX = ghostRect.left < itemCenterX && ghostRect.right > itemCenterX;
+	const hasCrossedY = ghostRect.top < itemCenterY && ghostRect.bottom > itemCenterY;
+
+	return hasCrossedX && hasCrossedY;
 }
 
 export function getCollidingItem(ghostRect: DOMRect, itemRects: ItemRect[]) {
-	const collidingItems = itemRects.filter((targetRect) => areColliding(ghostRect, targetRect));
-	if (collidingItems.length > 1) {
-		collidingItems.sort((a, b) => {
-			const aIntersectionRect = getIntersectionRect(ghostRect, a);
-			const bIntersectionRect = getIntersectionRect(ghostRect, b);
+	const collidingItems = itemRects.filter((itemRect) => isCenterCrossed(ghostRect, itemRect));
 
-			return bIntersectionRect.area - aIntersectionRect.area;
-		});
-	}
+	if (collidingItems.length <= 1) return collidingItems[0];
 
-	return collidingItems[0];
+	return collidingItems.reduce((closest, current) => {
+		const closestDist = getDistanceBetweenCenters(ghostRect, closest);
+		const currentDist = getDistanceBetweenCenters(ghostRect, current);
+		return currentDist < closestDist ? current : closest;
+	});
 }
