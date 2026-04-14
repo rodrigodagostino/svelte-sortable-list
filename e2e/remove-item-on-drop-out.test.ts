@@ -73,6 +73,9 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Wait for the drag operation to complete by checking the ghost state returns to idle
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
 
+		// Wait for the DOM to reflect the removal before continuing
+		await expect(root.locator('.ssl-item')).toHaveCount(4);
+
 		// Verify the order after first removal
 		const itemsAfterFirstRemoval = await root
 			.locator('.ssl-item .ssl-item-content__text')
@@ -124,6 +127,9 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// Wait for the drag operation to complete by checking the ghost state returns to idle
 		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
+
+		// Wait for the DOM to reflect the removal before asserting
+		await expect(root.locator('.ssl-item')).toHaveCount(3);
 
 		// Verify the final order after both removals
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
