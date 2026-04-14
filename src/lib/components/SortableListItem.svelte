@@ -23,7 +23,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 -->
 
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import { getSortableListRootState } from '$lib/states/index.js';
@@ -52,16 +52,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		...restProps
 	}: ItemProps & { class?: string } = $props();
 
-	const _transitionIn = $derived(
-		transitionIn ||
-			((node: HTMLElement) =>
-				scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' }))
-	);
-	const _transitionOut = $derived(
-		transitionOut ||
-			((node: HTMLElement) =>
-				scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' }))
-	);
+	function defaultTransition(node: HTMLElement) {
+		return scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' });
+	}
+	const _transitionIn = untrack(() => transitionIn) || defaultTransition;
+	const _transitionOut = untrack(() => transitionOut) || defaultTransition;
 
 	const rootState = getSortableListRootState();
 
