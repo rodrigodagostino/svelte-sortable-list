@@ -1,6 +1,6 @@
 {
 	"name": "@rodrigodagostino/svelte-sortable-list",
-	"version": "2.1.14",
+	"version": "2.1.15",
 	"author": "Rodrigo D’Agostino <rodrigo.dagostino@proton.me>",
 	"keywords": [
 		"sort",

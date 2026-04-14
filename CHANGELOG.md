@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.15] (2026-04-13)
+
+### Added
+
+- Switch to edge-to-center collision detection to improve the predictability of the item swap triggering.
+
+### Fixed
+
+- Set `data-is-between-bounds` only on the dragged item.
+- Capture transition props at mount time to avoid a `derived_inert` error.
+
+### Test
+
+- Remove flakiness in the E2E test for the **“Remove item on drop out”** page.
+
 ## [2.1.14] (2026-04-02)
 
 ### Fixed
@@ -1487,7 +1502,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.14...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.15...HEAD
+[2.1.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.14...v2.1.15
 [2.1.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.13...v2.1.14
 [2.1.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.12...v2.1.13
 [2.1.12]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.11...v2.1.12
