@@ -327,51 +327,62 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		);
 	}
 
-	async function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (ghostState !== 'ptr-drag' || $dragState !== 'ptr-drag') {
-			await tick();
-			ghostState = 'ptr-drag';
-			$dragState = 'ptr-drag';
+	let rafId: number | null = null;
+	function handlePointerMove({ clientX, clientY }: PointerEvent) {
+		if (rafId) return;
+
+		if ($dragState !== 'ptr-drag-start' && $dragState !== 'ptr-drag') {
+			rafId = null;
+			return;
 		}
 
-		if (!$draggedItem || !$itemRects || !ghostRef) return;
+		rafId = requestAnimationFrame(() => {
+			if ($dragState === 'ptr-drag-start') {
+				ghostState = 'ptr-drag';
+				$dragState = 'ptr-drag';
+			}
 
-		const rootRect = ref!.getBoundingClientRect();
-		const ghostRect = ghostRef.getBoundingClientRect();
-		$pointer = { x: clientX, y: clientY };
-		$isBetweenBounds = areColliding(ghostRect, rootRect);
+			if (!$draggedItem || !$itemRects || !ghostRef) return;
 
-		// Re-set itemRects only during scrolling.
-		// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-		if (
-			scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
-			scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
-		) {
-			$itemRects = getItemRects(ref!);
-			scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
-			scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
-		}
-		await tick();
-		const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
-		if (collidingItemRect)
-			$targetItem = ref!.querySelector<HTMLLIElement>(
-				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
-			);
-		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+			const rootRect = ref!.getBoundingClientRect();
+			const ghostRect = ghostRef.getBoundingClientRect();
+			$pointer = { x: clientX, y: clientY };
+			$isBetweenBounds = areColliding(ghostRect, rootRect);
 
-		dispatch('drag', {
-			deviceType: 'pointer',
-			draggedItem: $draggedItem,
-			draggedItemId: $draggedItem.id,
-			draggedItemIndex: getIndex($draggedItem),
-			targetItem: $targetItem,
-			targetItemId: $targetItem ? $targetItem.id : null,
-			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
-			isBetweenBounds: $isBetweenBounds,
-			canRemoveOnDropOut: canRemoveOnDropOut || false,
+			// Re-set itemRects only during scrolling.
+			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
+			if (
+				scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
+				scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
+			) {
+				$itemRects = getItemRects(ref!);
+				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
+				scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
+			}
+
+			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
+			if (collidingItemRect)
+				$targetItem = ref!.querySelector<HTMLLIElement>(
+					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+				);
+			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+
+			dispatch('drag', {
+				deviceType: 'pointer',
+				draggedItem: $draggedItem,
+				draggedItemId: $draggedItem.id,
+				draggedItemIndex: getIndex($draggedItem),
+				targetItem: $targetItem,
+				targetItemId: $targetItem ? $targetItem.id : null,
+				targetItemIndex: $targetItem ? getIndex($targetItem) : null,
+				isBetweenBounds: $isBetweenBounds,
+				canRemoveOnDropOut: canRemoveOnDropOut || false,
+			});
+
+			if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
+
+			rafId = null;
 		});
-
-		if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
 	}
 
 	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
@@ -614,6 +625,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 
 		isPointerReleased = true;
+		if (rafId) cancelAnimationFrame(rafId);
 
 		if (action === 'ptr-drop') {
 			await tick();
@@ -743,6 +755,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$targetItem = null;
 		$itemRects = null;
 		$isBetweenBounds = true;
+		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		scrollingSpeed = 0;
 	}
 
