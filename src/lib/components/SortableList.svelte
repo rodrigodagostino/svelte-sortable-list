@@ -140,6 +140,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let pointerId: PointerEvent['pointerId'] | null = null;
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
+	let isPointerReleased = false;
 	const itemRects = setItemRects(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
@@ -226,6 +227,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			e.preventDefault();
 			return;
 		}
+
+		isPointerReleased = false;
 
 		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
@@ -318,7 +321,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				ref!.removeEventListener('pointermove', handlePointerMove);
-				if ($dragState === 'ptr-drag-start') handlePointerCancel();
+				if (!isPointerReleased) handlePointerCancel();
 			},
 			{ once: true }
 		);
@@ -609,6 +612,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			(action.includes('kbd') && $dragState === 'kbd-drop')
 		)
 			return;
+
+		isPointerReleased = true;
 
 		await tick();
 		const draggedIndex = getIndex($draggedItem);
