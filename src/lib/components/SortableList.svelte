@@ -620,10 +620,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		isPointerReleased = true;
 
-		await tick();
-		const draggedIndex = getIndex(rootState.draggedItem);
-		const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
-
 		if (action === 'ptr-drop') {
 			await tick();
 			rootState.ghostState =
@@ -643,9 +639,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			});
 		} else if (action === 'ptr-cancel') {
 			await tick();
+			rootState.targetItem = rootState.draggedItem;
 			if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 			rootState.dragState = 'ptr-cancel';
 		}
+
+		await tick();
+		const draggedIndex = getIndex(rootState.draggedItem);
+		const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
 		if (action === 'kbd-drop') {
 			await tick();
