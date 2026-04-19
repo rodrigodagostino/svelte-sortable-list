@@ -130,6 +130,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	const classes = $derived(['ssl-root', restProps.class]);
 	let pointerId: PointerEvent['pointerId'] | null = $state(null);
+	let isPointerReleased = $state(false);
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
 	let liveText = $state('');
@@ -200,6 +201,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			e.preventDefault();
 			return;
 		}
+
+		isPointerReleased = false;
 
 		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
@@ -294,7 +297,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				ref!.removeEventListener('pointermove', handlePointerMove);
-				if (rootState.dragState === 'ptr-drag-start') handlePointerCancel();
+				if (!isPointerReleased) handlePointerCancel();
 			},
 			{ once: true }
 		);
@@ -614,6 +617,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			(action.includes('kbd') && rootState.dragState === 'kbd-drop')
 		)
 			return;
+
+		isPointerReleased = true;
 
 		await tick();
 		const draggedIndex = getIndex(rootState.draggedItem);
