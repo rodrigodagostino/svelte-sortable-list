@@ -697,28 +697,26 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 
 		if (_transition.duration > 0) {
-			const transitionEnd = new Promise<void>((resolve) => {
-				function handleTransitionEnd({ propertyName }: TransitionEvent) {
-					if (propertyName === 'z-index') {
-						element?.removeEventListener('transitionend', handleTransitionEnd);
-						if (transitionTimeoutId) {
-							clearTimeout(transitionTimeoutId);
-							transitionTimeoutId = null;
-						}
-						resolve();
-					}
+			let isResolved = false;
+			function finalizeDrop() {
+				if (isResolved) return;
+
+				isResolved = true;
+				element?.removeEventListener('transitionend', handleTransitionEnd);
+				if (transitionTimeoutId) {
+					clearTimeout(transitionTimeoutId);
+					transitionTimeoutId = null;
 				}
-				element?.addEventListener('transitionend', handleTransitionEnd);
-			});
 
-			const transitionTimeout = new Promise<void>((resolve) => {
-				transitionTimeoutId = setTimeout(resolve, _transition.duration + 100);
-			});
+				handlePointerAndKeyboardDragEnd(action);
+			}
 
-			// Ensure the drag operation completes even if `transitionend` doesn’t fire.
-			Promise.race([transitionEnd, transitionTimeout]).then(() =>
-				handlePointerAndKeyboardDragEnd(action)
-			);
+			function handleTransitionEnd(e: TransitionEvent) {
+				if (e.propertyName === 'z-index') finalizeDrop();
+			}
+
+			element?.addEventListener('transitionend', handleTransitionEnd);
+			transitionTimeoutId = setTimeout(finalizeDrop, _transition.duration + 100);
 		} else {
 			handlePointerAndKeyboardDragEnd(action);
 		}
