@@ -129,10 +129,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	const classes = $derived(['ssl-root', restProps.class]);
-	let pointerId: PointerEvent['pointerId'] | null = $state(null);
-	let isPointerReleased = $state(false);
-	let delayTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
-	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = $state(null);
+	let pointerId: PointerEvent['pointerId'] | null = null;
+	let isPointerReleased = false;
+	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
+	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let liveText = $state('');
 
 	onMount(() => {
@@ -160,8 +160,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let scrollingSpeed = $state(0);
 	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(ref!));
-	let scrollableAncestorScrollTop: number | undefined = $state(0);
-	let scrollableAncestorScrollLeft: number | undefined = $state(0);
+	let scrollableAncestorScrollTop: number | undefined = 0;
+	let scrollableAncestorScrollLeft: number | undefined = 0;
 	let isScrollingDocument = $derived(
 		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : false
 	);
