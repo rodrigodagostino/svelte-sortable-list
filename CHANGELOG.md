@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.16] (2026-04-24)
+
+### Performance
+
+- Throttle `pointermove` handler to reduce its execution frequency.
+- Remove reactivity from the variables that don’t need it.
+
+### Fixed
+
+- Prevent ghost from freezing on drop (macOS Chromium).
+- Reset target item on `pointercancel`.
+- Ensure consistent event listener cleanup on drop.
+
 ## [2.1.15] (2026-04-13)
 
 ### Added
@@ -1502,7 +1515,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.15...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.16...HEAD
+[2.1.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.15...v2.1.16
 [2.1.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.14...v2.1.15
 [2.1.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.13...v2.1.14
 [2.1.13]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.12...v2.1.13
