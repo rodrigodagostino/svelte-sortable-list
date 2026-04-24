@@ -385,7 +385,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 	}
 
-	async function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
+	function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
 		if (delayTimeoutId !== null && $pointerOrigin) {
 			const threshold = 10;
 			const deltaX = Math.abs(clientX - $pointerOrigin.x);
