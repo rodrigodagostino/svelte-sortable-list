@@ -321,7 +321,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				ref!.removeEventListener('pointermove', handlePointerMove);
-				if (!isPointerReleased) handlePointerCancel();
+				// lostpointercapture can fire before pointerup in Chromium on macOS, causing valid
+				// drops to be canceled. Treating it as a drop instead means a genuine capture loss
+				// will drop rather than cancel, but that is preferable to silently broken drops.
+				if (!isPointerReleased) handlePointerUp();
 			},
 			{ once: true }
 		);
