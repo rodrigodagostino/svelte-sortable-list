@@ -252,13 +252,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (delay <= 0) await handlePointerDragStart(currItem);
 		else {
-			ref!.addEventListener('pointermove', handlePointerMoveWithDelay);
+			document.addEventListener('pointermove', handlePointerMoveWithDelay);
 			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
 		}
 	}
 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
-		ref!.removeEventListener('pointermove', handlePointerMoveWithDelay);
+		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
 
 		await tick();
 		rootState.ghostState = 'ptr-drag-start';
@@ -274,29 +274,29 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		ref!.addEventListener('pointermove', handlePointerMove);
-		ref!.addEventListener(
+		document.addEventListener('pointermove', handlePointerMove);
+		document.addEventListener(
 			'pointerup',
 			() => {
-				ref!.removeEventListener('pointermove', handlePointerMove);
+				document.removeEventListener('pointermove', handlePointerMove);
 				handlePointerUp();
 			},
 			{ once: true }
 		);
-		ref!.addEventListener(
+		document.addEventListener(
 			'pointercancel',
 			() => {
-				ref!.removeEventListener('pointermove', handlePointerMove);
+				document.removeEventListener('pointermove', handlePointerMove);
 				handlePointerCancel();
 			},
 			{ once: true }
 		);
 		// Provide a fallback for the pointerup event not firing on Webkit for iOS.
 		// This occurs when tapping an item to start dragging and releasing without movement.
-		ref!.addEventListener(
+		document.addEventListener(
 			'lostpointercapture',
 			() => {
-				ref!.removeEventListener('pointermove', handlePointerMove);
+				document.removeEventListener('pointermove', handlePointerMove);
 				// lostpointercapture can fire before pointerup in Chromium on macOS, causing valid
 				// drops to be canceled. Treating it as a drop instead means a genuine capture loss
 				// will drop rather than cancel, but that is preferable to silently broken drops.
