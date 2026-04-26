@@ -239,29 +239,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				:has([data-is-between-bounds='true'])
 			),
 		&[data-ghost-state='ptr-drop'] {
-			transition:
-				transform var(--ssl-transition-duration) var(--ssl-transition-easing),
-				z-index 0s var(--ssl-transition-duration);
-		}
-
-		&[data-ghost-state='ptr-remove'] {
-			transition: z-index 0s var(--ssl-transition-duration);
+			transition: transform var(--ssl-transition-duration) var(--ssl-transition-easing);
 		}
 
 		&:not([data-ghost-state='idle']) {
 			visibility: visible;
-		}
-
-		&[data-ghost-state*='ptr-drag'],
-		&[data-ghost-state='ptr-predrop'] {
-			z-index: 10000;
-		}
-
-		/* The z-index is different from the one in [data-ghost-state*='ptr-drag'] and [data-ghost-state='ptr-predrop'] just to force
-			 the «transitionend» event to be fired when the ghost is dragged and dropped without being moved. */
-		&[data-ghost-state='ptr-drop'],
-		&[data-ghost-state='ptr-remove'] {
-			z-index: 9999;
 		}
 	}
 </style>

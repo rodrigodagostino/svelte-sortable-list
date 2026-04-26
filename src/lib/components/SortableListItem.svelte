@@ -304,8 +304,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				width var(--ssl-transition-duration),
 				height var(--ssl-transition-duration),
 				margin var(--ssl-transition-duration),
-				transform var(--ssl-transition-duration),
-				z-index var(--ssl-transition-duration);
+				transform var(--ssl-transition-duration);
 		}
 
 		&[data-is-ghost='true'] {
@@ -317,17 +316,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		&:focus-visible,
 		&:focus-within {
 			z-index: 2;
-		}
-
-		&[data-drag-state*='kbd-drag'] {
-			z-index: 4;
-		}
-
-		/* The z-index is different from the one in [data-drag-state*='kbd-drag'] just to force
-			 the «transitionend» event to be fired when the item is dropped using the keyboard. */
-		&[data-drag-state='kbd-drop'],
-		&[data-drag-state='kbd-cancel'] {
-			z-index: 3;
 		}
 
 		&[data-drag-state*='ptr'] {
