@@ -731,7 +731,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			function handleTransitionEnd(e: TransitionEvent) {
-				if (e.propertyName === 'z-index') finalizeDrop();
+				if (e.propertyName === 'transform') finalizeDrop();
 			}
 
 			element?.addEventListener('transitionend', handleTransitionEnd);
