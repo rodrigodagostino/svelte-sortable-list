@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.17] (2026-05-02)
+
+### Changed
+
+- Attach drag event listeners to the document to prevent element-level constraints.
+- Track `transform` instead of `z-index` to check for the drop transition completion.
+
+### Fixed
+
+- Prevent `lostpointercapture` from canceling valid drops caused by a race condition in macOS Chromium.
+
 ## [1.1.16] (2026-04-24)
 
 ### Performance
@@ -1482,7 +1493,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.16...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.17...HEAD
+[1.1.17]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.16...v1.1.17
 [1.1.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.15...v1.1.16
 [1.1.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.14...v1.1.15
 [1.1.14]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.13...v1.1.14
