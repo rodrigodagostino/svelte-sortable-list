@@ -55,6 +55,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		afterPaint,
 		announce,
 		areColliding,
+		canScroll,
+		canScrollX,
+		canScrollY,
 		getClosestScrollableAncestor,
 		getCollidingItem,
 		getIndex,
@@ -64,7 +67,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
-		isScrollable,
 		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
@@ -158,7 +160,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 	});
 
-	let scrollingSpeed = $state(0);
+	let scrollingSpeedX = $state(0);
+	let scrollingSpeedY = $state(0);
 	let scrollableAncestor: HTMLElement | undefined = $derived(getClosestScrollableAncestor(ref!));
 	let scrollableAncestorScrollTop: number | undefined = 0;
 	let scrollableAncestorScrollLeft: number | undefined = 0;
@@ -166,7 +169,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : false
 	);
 	$effect(() => {
-		if (scrollingSpeed !== 0) untrack(() => scroll());
+		if (scrollingSpeedX !== 0 || scrollingSpeedY !== 0) untrack(() => scroll());
 	});
 
 	function scroll() {
@@ -174,26 +177,27 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (BROWSER)
 			requestAnimationFrame(() => {
-				if (!shouldAutoScroll(scrollableAncestor!, direction, scrollingSpeed)) return;
+				if (
+					!shouldAutoScroll(scrollableAncestor!, 'horizontal', scrollingSpeedX) &&
+					!shouldAutoScroll(scrollableAncestor!, 'vertical', scrollingSpeedY)
+				)
+					return;
 
-				const x = direction === 'horizontal' ? scrollingSpeed : 0;
-				const y = direction === 'vertical' ? scrollingSpeed : 0;
-				scrollableAncestor!.scrollBy(x, y);
+				scrollableAncestor!.scrollBy(scrollingSpeedX, scrollingSpeedY);
 
-				if (scrollingSpeed !== 0) scroll();
+				if (scrollingSpeedX !== 0 || scrollingSpeedY !== 0) scroll();
 			});
 	}
 
 	function autoScroll(clientX: PointerEvent['clientX'], clientY: PointerEvent['clientY']) {
 		if (!scrollableAncestor) return;
 
-		scrollingSpeed = getScrollingSpeed(
-			scrollableAncestor,
-			clientX,
-			clientY,
-			direction,
-			isScrollingDocument
-		);
+		scrollingSpeedX = canScrollX(scrollableAncestor)
+			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'horizontal', isScrollingDocument)
+			: 0;
+		scrollingSpeedY = canScrollY(scrollableAncestor)
+			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
+			: 0;
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
@@ -359,7 +363,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
 			});
 
-			if (isScrollable(scrollableAncestor, direction)) autoScroll(clientX, clientY);
+			if (canScroll(scrollableAncestor)) autoScroll(clientX, clientY);
 
 			rafId = null;
 		});
@@ -773,7 +777,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.itemRects = null;
 		rootState.isBetweenBounds = true;
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
-		scrollingSpeed = 0;
+		scrollingSpeedX = 0;
+		scrollingSpeedY = 0;
 	}
 
 	function handleContextMenu(e: MouseEvent) {

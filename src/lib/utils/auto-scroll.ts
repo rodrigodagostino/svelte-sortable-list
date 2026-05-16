@@ -31,12 +31,19 @@ export function isRootElement(element: HTMLElement, direction: RootProps['direct
 	);
 }
 
-export function isScrollable(element: HTMLElement | undefined, direction: RootProps['direction']) {
+export function canScroll(element: HTMLElement | undefined) {
 	return (
 		element &&
-		((direction === 'vertical' && element.scrollHeight > element.clientHeight) ||
-			(direction === 'horizontal' && element.scrollWidth > element.clientWidth))
+		(element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth)
 	);
+}
+
+export function canScrollX(element: HTMLElement | undefined) {
+	return element && element.scrollWidth > element.clientWidth;
+}
+
+export function canScrollY(element: HTMLElement | undefined) {
+	return element && element.scrollHeight > element.clientHeight;
 }
 
 export function shouldAutoScroll(
