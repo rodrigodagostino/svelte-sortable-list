@@ -42,7 +42,7 @@
 
 .ssl-root {
 	border-radius: 0.625rem;
-	outline-offset: calc(var(--ssl-gap) / 2 * -1);
+	outline-offset: calc(var(--ssl-gap) / 2 * -1 + 0.125rem);
 }
 
 .ssl-root:focus-visible,
@@ -52,6 +52,7 @@
 
 .ssl-item {
 	border-radius: 0.25rem;
+	outline-offset: 0.125rem;
 
 	&[data-is-ghost="false"][data-drag-state*="ptr"] .ssl-item-content {
 		opacity: 0.5;
