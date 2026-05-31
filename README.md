@@ -36,6 +36,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 ## Table of contents
 
 - [Features](#features)
+- [Limitations](#limitations)
 - [Get started](#get-started)
   - [Install it](#install-it)
   - [Import it](#import-it)
@@ -70,6 +71,14 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Integration**: Support for nested interactive elements and the `<dialog>` element.
 - **Internationalization**: RTL language support.
 - **Developer-friendly**: TypeScript definitions, unopinionated styling, and zero dependencies.
+
+---
+
+## Limitations
+
+- Nested lists are not supported.
+- Keyboard navigation works across the main axis only.
+- Wrapping (line breaks) is limited to horizontal lists with items of identical width and height.
 
 ---
 
