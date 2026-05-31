@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.18] (2026-05-31)
+
+### Changed
+
+- Increase visibility of the focused outline.
+
+### Fixed
+
+- Allow auto scroll on both axes simultaneously.
+
+### Docs
+
+- Update the README’s preview image.
+- Add a list of limitations to the README.
+
 ## [2.1.17] (2026-05-02)
 
 ### Changed
@@ -1526,7 +1541,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.17...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.18...HEAD
+[2.1.18]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.17...v2.1.18
 [2.1.17]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.16...v2.1.17
 [2.1.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.15...v2.1.16
 [2.1.15]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.14...v2.1.15
