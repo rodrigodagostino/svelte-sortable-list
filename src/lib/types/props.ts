@@ -104,7 +104,7 @@ export interface SortableListItemProps extends Pick<
 
 export interface SortableListGhostProps {
 	/** Reference to the ghost element. `[$bindable]` */
-	ref: HTMLDivElement | null;
+	ref?: HTMLDivElement | null;
 }
 
 export interface SortableListItemHandleProps {

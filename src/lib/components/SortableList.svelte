@@ -135,6 +135,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let isPointerReleased = false;
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
+	let skipDragEnd: (() => void) | null = null;
 	let liveText = $state('');
 
 	onMount(() => {
@@ -201,7 +202,21 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
-		if (e.button !== 0 || rootState.dragState !== 'idle' || rootState.focusedItem) {
+		if (e.button !== 0) {
+			e.preventDefault();
+			return;
+		}
+
+		// Interrupt any ongoing drop transition so the user can immediately start a new drag.
+		if (ghostRef && rootState.dragState === 'ptr-drop') {
+			e.preventDefault();
+			interruptDropTransition(ghostRef, 'ptr-drop');
+			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
+			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
+			await tick();
+		}
+
+		if (rootState.dragState !== 'idle' || rootState.focusedItem) {
 			e.preventDefault();
 			return;
 		}
@@ -391,9 +406,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
+		// Interrupt any ongoing drop transition so the user can immediately start a new drag.
 		if (rootState.dragState === 'kbd-drop') {
 			e.preventDefault();
-			return;
+			interruptDropTransition(rootState.focusedItem, 'kbd-drop');
+			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
+			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
+			await tick();
 		}
 
 		const { key } = e;
@@ -721,18 +740,21 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (_transition.duration > 0) {
 			let isResolved = false;
-			function finalizeDrop() {
+			function finalizeDrop(shouldHandleDragEnd = true) {
 				if (isResolved) return;
 
 				isResolved = true;
+				skipDragEnd = null;
 				element?.removeEventListener('transitionend', handleTransitionEnd);
 				if (transitionTimeoutId) {
 					clearTimeout(transitionTimeoutId);
 					transitionTimeoutId = null;
 				}
 
-				handlePointerAndKeyboardDragEnd(action);
+				if (shouldHandleDragEnd) handlePointerAndKeyboardDragEnd(action);
 			}
+
+			skipDragEnd = () => finalizeDrop(false);
 
 			function handleTransitionEnd(e: TransitionEvent) {
 				if (e.propertyName === 'transform') finalizeDrop();
@@ -750,25 +772,27 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	) {
 		if (!rootState.draggedItem) return;
 
-		await tick();
+		const draggedItem = rootState.draggedItem;
+		const targetItem = rootState.targetItem;
+
 		rootState.ghostState = 'idle';
 		rootState.dragState = 'idle';
 
 		ondragend?.({
 			deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
-			draggedItem: rootState.draggedItem,
-			draggedItemId: rootState.draggedItem.id,
-			draggedItemIndex: getIndex(rootState.draggedItem),
-			targetItem: rootState.targetItem,
-			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
-			targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
+			draggedItem,
+			draggedItemId: draggedItem.id,
+			draggedItemIndex: getIndex(draggedItem),
+			targetItem,
+			targetItemId: targetItem ? targetItem.id : null,
+			targetItemIndex: targetItem ? getIndex(targetItem) : null,
 			isBetweenBounds: rootState.isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			isCanceled: action.includes('cancel'),
 		});
 
-		if (typeof pointerId === 'number' && rootState.draggedItem?.hasPointerCapture(pointerId))
-			rootState.draggedItem?.releasePointerCapture(pointerId);
+		if (typeof pointerId === 'number' && draggedItem?.hasPointerCapture(pointerId))
+			draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;
 		rootState.pointer = null;
 		rootState.pointerOrigin = null;
@@ -779,6 +803,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		scrollingSpeedX = 0;
 		scrollingSpeedY = 0;
+	}
+
+	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {
+		// Prevent the pending `transitionend`/timeout from triggering handlePointerAndKeyboardDragEnd().
+		skipDragEnd?.();
+
+		element?.getAnimations().forEach((animation) => animation.finish());
+
+		handlePointerAndKeyboardDragEnd(action);
 	}
 
 	function handleContextMenu(e: MouseEvent) {
