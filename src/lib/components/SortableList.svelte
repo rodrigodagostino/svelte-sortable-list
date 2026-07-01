@@ -189,15 +189,31 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let skipDragEnd: (() => void) | null = null;
 
-	let scrollingSpeedX = 0;
-	let scrollingSpeedY = 0;
-	let scrollableAncestor: HTMLElement | undefined;
-	let scrollableAncestorScrollTop: number | undefined = 0;
-	let scrollableAncestorScrollLeft: number | undefined = 0;
-	let isScrollingDocument = true;
-	$: if (ref && $draggedItem) scrollableAncestor = getClosestScrollableAncestor(ref);
-	$: if (scrollableAncestor) isScrollingDocument = isRootElement(scrollableAncestor, direction);
-	$: if (scrollingSpeedX !== 0 || scrollingSpeedY !== 0) scroll();
+	$: scrollableAncestor = (() => {
+		if (ref && $draggedItem) return getClosestScrollableAncestor(ref);
+	})();
+	let scrollSpeedX = 0;
+	let scrollSpeedY = 0;
+	$: isScrollingDocument = (() =>
+		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : true)();
+	$: if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
+
+	function updateTargetItem(shouldUpdateItemRects = false) {
+		if (!ref || !ghostRef || !$itemRects) return;
+
+		if (shouldUpdateItemRects) $itemRects = getItemRects(ref);
+
+		const rootRect = ref.getBoundingClientRect();
+		const ghostRect = ghostRef.getBoundingClientRect();
+		$isBetweenBounds = areColliding(ghostRect, rootRect);
+
+		const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
+		if (collidingItemRect)
+			$targetItem = ref.querySelector<HTMLLIElement>(
+				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+			);
+		else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+	}
 
 	function scroll() {
 		if (!scrollableAncestor) return;
@@ -205,24 +221,28 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (BROWSER)
 			requestAnimationFrame(() => {
 				if (
-					!shouldAutoScroll(scrollableAncestor!, 'horizontal', scrollingSpeedX) &&
-					!shouldAutoScroll(scrollableAncestor!, 'vertical', scrollingSpeedY)
+					!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeedX) &&
+					!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeedY)
 				)
 					return;
 
-				scrollableAncestor!.scrollBy(scrollingSpeedX, scrollingSpeedY);
+				scrollableAncestor.scrollBy(scrollSpeedX, scrollSpeedY);
 
-				if (scrollingSpeedX !== 0 || scrollingSpeedY !== 0) scroll();
+				// Update itemRects and targetItem after each scroll step so that
+				// collision detection stays accurate when the pointer is stationary.
+				updateTargetItem(true);
+
+				if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
 			});
 	}
 
 	function autoScroll(clientX: PointerEvent['clientX'], clientY: PointerEvent['clientY']) {
 		if (!scrollableAncestor) return;
 
-		scrollingSpeedX = canScrollX(scrollableAncestor)
+		scrollSpeedX = canScrollX(scrollableAncestor)
 			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'horizontal', isScrollingDocument)
 			: 0;
-		scrollingSpeedY = canScrollY(scrollableAncestor)
+		scrollSpeedY = canScrollY(scrollableAncestor)
 			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
 			: 0;
 	}
@@ -364,30 +384,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				$dragState = 'ptr-drag';
 			}
 
-			if (!$draggedItem || !$itemRects || !ghostRef) return;
+			if (!$draggedItem) return;
 
-			const rootRect = ref!.getBoundingClientRect();
-			const ghostRect = ghostRef.getBoundingClientRect();
 			$pointer = { x: clientX, y: clientY };
-			$isBetweenBounds = areColliding(ghostRect, rootRect);
-
-			// Re-set itemRects only during scrolling.
-			// (setting it here instead of in the `scroll()` function to reduce the performance impact)
-			if (
-				scrollableAncestor?.scrollTop !== scrollableAncestorScrollTop ||
-				scrollableAncestor?.scrollLeft !== scrollableAncestorScrollLeft
-			) {
-				$itemRects = getItemRects(ref!);
-				scrollableAncestorScrollTop = scrollableAncestor?.scrollTop;
-				scrollableAncestorScrollLeft = scrollableAncestor?.scrollLeft;
-			}
-
-			const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
-			if (collidingItemRect)
-				$targetItem = ref!.querySelector<HTMLLIElement>(
-					`.ssl-item[data-item-id="${collidingItemRect.id}"]`
-				);
-			else if (canClearOnDragOut || (canRemoveOnDropOut && !$isBetweenBounds)) $targetItem = null;
+			updateTargetItem();
 
 			dispatch('drag', {
 				deviceType: 'pointer',
@@ -782,8 +782,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$itemRects = null;
 		$isBetweenBounds = true;
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
-		scrollingSpeedX = 0;
-		scrollingSpeedY = 0;
+		scrollSpeedX = 0;
+		scrollSpeedY = 0;
 	}
 
 	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {
