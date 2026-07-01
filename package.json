@@ -89,10 +89,5 @@
 		"vite": "8.0.13"
 	},
 	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	}
+	"types": "./dist/index.d.ts"
 }
