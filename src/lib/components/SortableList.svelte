@@ -191,9 +191,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let skipDragEnd: (() => void) | null = null;
 
-	$: scrollableAncestor = (() => {
-		if (ref && $draggedItem) return getClosestScrollableAncestor(ref);
-	})();
+	$: scrollableAncestor = (() => getClosestScrollableAncestor(ref!))();
 	const scrollOffsetX = setScrollOffsetX(0);
 	const scrollOffsetY = setScrollOffsetY(0);
 	let scrollSpeedX = 0;
