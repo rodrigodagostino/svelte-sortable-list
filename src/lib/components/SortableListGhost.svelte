@@ -22,6 +22,8 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		getPointer,
 		getPointerOrigin,
 		getRootProps,
+		getScrollOffsetX,
+		getScrollOffsetY,
 		getTargetItem,
 	} from '$lib/stores/index.js';
 	import type { SortableListGhostProps as GhostProps } from '$lib/types/index.js';
@@ -45,14 +47,28 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const itemRects = getItemRects();
 	const draggedItem = getDraggedItem();
 	const targetItem = getTargetItem();
+	const scrollOffsetX = getScrollOffsetX();
+	const scrollOffsetY = getScrollOffsetY();
 
 	$: draggedId = $draggedItem ? $draggedItem.id : null;
 	$: draggedIndex = $draggedItem ? getIndex($draggedItem) : null;
 	// $itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	$: draggedRect = $itemRects && typeof draggedIndex === 'number' ? $itemRects[draggedIndex] : null;
+	$: draggedRect = (() => {
+		if (!$itemRects || typeof draggedIndex !== 'number') return null;
+		const rect = $itemRects[draggedIndex];
+		return !$scrollOffsetX && !$scrollOffsetY
+			? rect
+			: new DOMRect(rect.x - $scrollOffsetX, rect.y - $scrollOffsetY, rect.width, rect.height);
+	})();
 	$: targetIndex = $targetItem ? getIndex($targetItem) : null;
-	$: targetRect = $itemRects && typeof targetIndex === 'number' ? $itemRects[targetIndex] : null;
+	$: targetRect = (() => {
+		if (!$itemRects || typeof targetIndex !== 'number') return null;
+		const rect = $itemRects[targetIndex];
+		return !$scrollOffsetX && !$scrollOffsetY
+			? rect
+			: new DOMRect(rect.x - $scrollOffsetX, rect.y - $scrollOffsetY, rect.width, rect.height);
+	})();
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function cloneDraggedItemContent(...args: unknown[]) {
