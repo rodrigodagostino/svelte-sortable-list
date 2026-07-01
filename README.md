@@ -66,7 +66,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Multi-input support**: Mouse, keyboard, and touch interactions.
 - **Accessibility-first**: Screen reader support with customizable announcements.
 - **Flexible layouts**: Vertical and horizontal orientations with varying item heights.
-- **Enhanced UX**: Drag handles, auto-scrolling, and customizable transitions.
+- **Enhanced UX**: Drop indicators, drag handles, auto-scrolling, and customizable transitions.
 - **Advanced options**: Axis locking, boundary constraints, and remove-on-drop-outside functionality.
 - **Integration**: Support for nested interactive elements and the `<dialog>` element.
 - **Internationalization**: RTL language support.
