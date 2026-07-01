@@ -85,10 +85,5 @@
 		"vite": "5.4.21"
 	},
 	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"esbuild"
-		]
-	}
+	"types": "./dist/index.d.ts"
 }
