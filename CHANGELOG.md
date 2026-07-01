@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] (2026-07-02)
+
+### Added
+
+- Allow interrupting any ongoing drop transition so a new drag can be started immediately.
+- Update the target item during auto-scroll.
+
+### Performance
+
+- Update the target item during auto-scroll without re-reading the DOM.
+
+### Changed
+
+- Clean up the keyboard events handling.
+
+### Fixed
+
+- Remove a faulty condition breaking `scrollableAncestor`.
+
+### Test
+
+- Add E2E tests for the **“Interactive items with handle”** page.
+
 ## [1.1.18] (2026-05-31)
 
 ### Changed
@@ -1508,7 +1531,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.18...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.18...v1.2.0
 [1.1.18]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.17...v1.1.18
 [1.1.17]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.16...v1.1.17
 [1.1.16]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.15...v1.1.16
