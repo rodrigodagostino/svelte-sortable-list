@@ -34,15 +34,23 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
 	// rootState.itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRect = $derived(
-		rootState.itemRects && typeof draggedIndex === 'number'
-			? rootState.itemRects[draggedIndex]
-			: null
-	);
+	const draggedRect = $derived.by(() => {
+		if (!rootState.itemRects || typeof draggedIndex !== 'number') return null;
+		const rect = rootState.itemRects[draggedIndex];
+		const { scrollOffsetX, scrollOffsetY } = rootState;
+		return !scrollOffsetX && !scrollOffsetY
+			? rect
+			: new DOMRect(rect.x - scrollOffsetX, rect.y - scrollOffsetY, rect.width, rect.height);
+	});
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
-	const targetRect = $derived(
-		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
-	);
+	const targetRect = $derived.by(() => {
+		if (!rootState.itemRects || typeof targetIndex !== 'number') return null;
+		const rect = rootState.itemRects[targetIndex];
+		const { scrollOffsetX, scrollOffsetY } = rootState;
+		return !scrollOffsetX && !scrollOffsetY
+			? rect
+			: new DOMRect(rect.x - scrollOffsetX, rect.y - scrollOffsetY, rect.width, rect.height);
+	});
 
 	function cloneDraggedItemContent() {
 		if (!ref || !rootState.draggedItem) return;

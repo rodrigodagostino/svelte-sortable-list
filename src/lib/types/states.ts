@@ -22,5 +22,7 @@ export interface SortableListRootStateContext {
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
 	isBetweenBounds: boolean;
+	scrollOffsetX: number;
+	scrollOffsetY: number;
 	isRTL: boolean;
 }

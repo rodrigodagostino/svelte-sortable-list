@@ -171,14 +171,23 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (scrollSpeedX !== 0 || scrollSpeedY !== 0) untrack(() => scroll());
 	});
 
-	function updateTargetItem(shouldUpdateItemRects = false) {
-		if (!ref || !ghostRef || !rootState.itemRects) return;
+	function updateTargetItem() {
+		if (!rootState.itemRects || !ref || !ghostRef) return;
 
-		if (shouldUpdateItemRects) rootState.itemRects = getItemRects(ref);
-
+		const rawGhostRect = ghostRef.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
-		const ghostRect = ghostRef.getBoundingClientRect();
-		rootState.isBetweenBounds = areColliding(ghostRect, rootRect);
+		rootState.isBetweenBounds = areColliding(rawGhostRect, rootRect);
+
+		// Offset the ghost rect by the accumulated scroll.
+		const ghostRect =
+			rootState.scrollOffsetX || rootState.scrollOffsetY
+				? new DOMRect(
+						rawGhostRect.x + rootState.scrollOffsetX,
+						rawGhostRect.y + rootState.scrollOffsetY,
+						rawGhostRect.width,
+						rawGhostRect.height
+					)
+				: rawGhostRect;
 
 		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
 		if (collidingItemRect)
@@ -200,11 +209,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				)
 					return;
 
+				const prevScrollTop = scrollableAncestor.scrollTop;
+				const prevScrollLeft = scrollableAncestor.scrollLeft;
+
 				scrollableAncestor.scrollBy(scrollSpeedX, scrollSpeedY);
 
-				// Update itemRects and targetItem after each scroll step so that
-				// collision detection stays accurate when the pointer is stationary.
-				updateTargetItem(true);
+				// Accumulate the actual scroll delta so updateTargetItem()
+				// can offset the ghost rect against the stored itemRects.
+				if (rootState.draggedItem && rootState.itemRects) {
+					rootState.scrollOffsetX += scrollableAncestor.scrollLeft - prevScrollLeft;
+					rootState.scrollOffsetY += scrollableAncestor.scrollTop - prevScrollTop;
+					updateTargetItem();
+				}
 
 				if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
 			});
@@ -288,6 +304,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.pointerOrigin = { x: e.clientX, y: e.clientY };
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(ref!);
+		rootState.scrollOffsetX = 0;
+		rootState.scrollOffsetY = 0;
 
 		if (delay <= 0) await handlePointerDragStart(currItem);
 		else {
