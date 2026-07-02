@@ -434,6 +434,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		const { key } = e;
 		const target = e.target as HTMLElement;
+		let step: -1 | 1 = -1;
+		let shouldScrollIntoView = false;
 
 		if (target === ref || target === rootState.focusedItem) {
 			if (key === ' ') {
@@ -468,6 +470,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					liveText = _announcements.lifted(rootState.draggedItem, draggedIndex);
 				} else {
+					if (!rootState.draggedItem) return;
+
+					const draggedIndex = getIndex(rootState.draggedItem);
+					const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
+					liveText = _announcements.dropped(
+						rootState.draggedItem,
+						draggedIndex,
+						rootState.targetItem,
+						targetIndex
+					);
+
 					handlePointerAndKeyboardDrop(rootState.focusedItem, 'kbd-drop');
 				}
 			}
@@ -475,43 +488,39 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'ArrowDown' || key === 'ArrowRight') {
 				e.preventDefault();
 
-				const step =
+				step =
 					key === 'ArrowUp' ||
 					(key === 'ArrowLeft' && !rootState.isRTL) ||
 					(key === 'ArrowRight' && rootState.isRTL)
 						? -1
 						: 1;
+				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
 
 				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
 					if (!rootState.focusedItem || focusedIndex === null) {
+						shouldScrollIntoView = true;
 						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
-						if (!firstItem) return;
+						firstItem?.focus({ preventScroll: true });
+					} else {
+						// Prevent focusing the previous item if the current one is the first,
+						// and focusing the next item if the current one is the last.
+						const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
+						if (
+							(step === -1 && focusedIndex === 0) ||
+							(step === 1 && focusedIndex === items.length - 1)
+						)
+							return;
 
-						firstItem.focus({ preventScroll: true });
-
-						if (scrollableAncestor && !isFullyVisible(firstItem, scrollableAncestor))
-							scrollIntoView(firstItem, scrollableAncestor, direction, -1, isScrollingDocument);
-						return;
+						if (step === 1)
+							(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
+								preventScroll: true,
+							});
+						else
+							(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
+								preventScroll: true,
+							});
 					}
-
-					// Prevent focusing the previous item if the current one is the first,
-					// and focusing the next item if the current one is the last.
-					const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
-					if (
-						(step === -1 && focusedIndex === 0) ||
-						(step === 1 && focusedIndex === items.length - 1)
-					)
-						return;
-
-					if (step === 1)
-						(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
-							preventScroll: true,
-						});
-					else
-						(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
-							preventScroll: true,
-						});
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
 
@@ -560,15 +569,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					if (scrollableAncestor && !isFullyVisible(rootState.targetItem, scrollableAncestor))
-						scrollIntoView(
-							rootState.targetItem,
-							scrollableAncestor,
-							direction,
-							step,
-							isScrollingDocument
-						);
-
 					liveText = _announcements.dragged(
 						rootState.draggedItem,
 						draggedIndex,
@@ -576,17 +576,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetIndex
 					);
 				}
-
-				await tick();
-				const scrollTarget =
-					rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
-				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Home' || key === 'End') {
 				e.preventDefault();
 
+				step = key === 'Home' ? -1 : 1;
+				shouldScrollIntoView = true;
 				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
@@ -644,20 +640,27 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetIndex
 					);
 				}
-
-				await tick();
-				const scrollTarget =
-					rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
-				const step = key === 'Home' ? -1 : 1;
-				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Escape' && rootState.draggedItem) {
 				// Prevent closing the <dialog> if the dragged item is inside one.
 				if (ref!.closest<HTMLDialogElement>('dialog')) e.preventDefault();
+
+				shouldScrollIntoView = true;
+
+				const draggedIndex = getIndex(rootState.draggedItem);
+				liveText = _announcements.canceled(rootState.draggedItem, draggedIndex);
+
 				handlePointerAndKeyboardDrop(rootState.draggedItem, 'kbd-cancel');
 			}
+
+			if (!shouldScrollIntoView) return;
+
+			await tick();
+			const scrollTarget =
+				rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
+			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
+				scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 		}
 	}
 
@@ -699,32 +702,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.dragState = 'ptr-cancel';
 		}
 
-		await tick();
-		const draggedIndex = getIndex(rootState.draggedItem);
-		const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
-
 		if (action === 'kbd-drop') {
 			await tick();
 			rootState.dragState = 'kbd-drop';
-			liveText = _announcements.dropped(
-				rootState.draggedItem,
-				draggedIndex,
-				rootState.targetItem,
-				targetIndex
-			);
 		} else if (action === 'kbd-cancel') {
 			await tick();
 			rootState.dragState = 'kbd-cancel';
-			if (scrollableAncestor)
-				scrollIntoView(
-					rootState.draggedItem,
-					scrollableAncestor,
-					direction,
-					-1,
-					isScrollingDocument
-				);
-			liveText = _announcements.canceled(rootState.draggedItem, draggedIndex);
 		}
+
+		const draggedIndex = getIndex(rootState.draggedItem);
+		const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
 		if (action === 'ptr-drop') {
 			// Ensure finalizePointerAndKeyboardDrop() runs in the
