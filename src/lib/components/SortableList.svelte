@@ -460,6 +460,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		const { key } = e;
 		const target = e.target as HTMLElement;
+		let step: -1 | 1 = -1;
+		let shouldScrollIntoView = false;
 
 		if (target === ref || target === $focusedItem) {
 			if (key === ' ') {
@@ -494,6 +496,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					liveText = _announcements.lifted($draggedItem, draggedIndex);
 				} else {
+					if (!$draggedItem) return;
+
+					const draggedIndex = getIndex($draggedItem);
+					const targetIndex = $targetItem ? getIndex($targetItem) : null;
+					liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
+
 					handlePointerAndKeyboardDrop($focusedItem, 'kbd-drop');
 				}
 			}
@@ -501,37 +509,34 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'ArrowDown' || key === 'ArrowRight') {
 				e.preventDefault();
 
-				const step =
+				step =
 					key === 'ArrowUp' || (key === 'ArrowLeft' && !$isRTL) || (key === 'ArrowRight' && $isRTL)
 						? -1
 						: 1;
+				shouldScrollIntoView = true;
 				const focusedIndex = $focusedItem ? getIndex($focusedItem) : null;
 
 				if ($dragState !== 'kbd-drag-start' && $dragState !== 'kbd-drag') {
 					if (!$focusedItem || focusedIndex === null) {
 						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
-						if (!firstItem) return;
+						firstItem?.focus({ preventScroll: true });
+					} else {
+						// Prevent focusing the previous item if the current one is the first,
+						// and focusing the next item if the current one is the last.
+						const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
+						if (
+							(step === -1 && focusedIndex === 0) ||
+							(step === 1 && focusedIndex === items.length - 1)
+						)
+							return;
 
-						firstItem.focus({ preventScroll: true });
-
-						if (scrollableAncestor && !isFullyVisible(firstItem, scrollableAncestor))
-							scrollIntoView(firstItem, scrollableAncestor, direction, -1, isScrollingDocument);
-						return;
+						if (step === 1)
+							($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+						else
+							($focusedItem.previousElementSibling as HTMLLIElement)?.focus({
+								preventScroll: true,
+							});
 					}
-
-					// Prevent focusing the previous item if the current one is the first,
-					// and focusing the next item if the current one is the last.
-					const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
-					if (
-						(step === -1 && focusedIndex === 0) ||
-						(step === 1 && focusedIndex === items.length - 1)
-					)
-						return;
-
-					if (step === 1)
-						($focusedItem.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
-					else
-						($focusedItem.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 				} else {
 					if (!$draggedItem || !$itemRects) return;
 
@@ -578,21 +583,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					if (scrollableAncestor && !isFullyVisible($targetItem, scrollableAncestor))
-						scrollIntoView($targetItem, scrollableAncestor, direction, step, isScrollingDocument);
-
 					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
 				}
-
-				await tick();
-				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
-				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Home' || key === 'End') {
 				e.preventDefault();
 
+				step = key === 'Home' ? -1 : 1;
+				shouldScrollIntoView = true;
 				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = ($focusedItem && getIndex($focusedItem)) ?? null;
 
@@ -643,19 +642,26 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					liveText = _announcements.dragged($draggedItem, draggedIndex, $targetItem, targetIndex);
 				}
-
-				await tick();
-				const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
-				const step = key === 'Home' ? -1 : 1;
-				if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-					scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 			}
 
 			if (key === 'Escape' && $draggedItem) {
 				// Prevent closing the <dialog> if the dragged item is inside one.
 				if (ref!.closest<HTMLDialogElement>('dialog')) e.preventDefault();
+
+				shouldScrollIntoView = true;
+
+				const draggedIndex = getIndex($draggedItem);
+				liveText = _announcements.canceled($draggedItem, draggedIndex);
+
 				handlePointerAndKeyboardDrop($draggedItem, 'kbd-cancel');
 			}
+
+			if (!shouldScrollIntoView) return;
+
+			await tick();
+			const scrollTarget = $dragState !== 'kbd-drag' ? $focusedItem : $targetItem;
+			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
+				scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 		}
 	}
 
@@ -697,21 +703,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			$dragState = 'ptr-cancel';
 		}
 
-		await tick();
-		const draggedIndex = getIndex($draggedItem);
-		const targetIndex = $targetItem ? getIndex($targetItem) : null;
-
 		if (action === 'kbd-drop') {
 			await tick();
 			$dragState = 'kbd-drop';
-			liveText = _announcements.dropped($draggedItem, draggedIndex, $targetItem, targetIndex);
 		} else if (action === 'kbd-cancel') {
 			await tick();
 			$dragState = 'kbd-cancel';
-			if (scrollableAncestor)
-				scrollIntoView($draggedItem, scrollableAncestor, direction, -1, isScrollingDocument);
-			liveText = _announcements.canceled($draggedItem, draggedIndex);
 		}
+
+		const draggedIndex = getIndex($draggedItem);
+		const targetIndex = $targetItem ? getIndex($targetItem) : null;
 
 		if (action === 'ptr-drop') {
 			// Ensure finalizePointerAndKeyboardDrop() runs in the
