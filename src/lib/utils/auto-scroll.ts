@@ -2,7 +2,8 @@ import { getTranslateValues } from './index.js';
 import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 
 export const getClosestScrollableAncestor = (element: HTMLElement) => {
-	if (!element) return undefined;
+	if (typeof document === 'undefined') return undefined;
+	if (!element) return document.documentElement;
 
 	let parent = element.parentElement;
 	while (parent) {
