@@ -12,8 +12,8 @@ class SortableListRootState {
 	pointer: Context['pointer'] = $state(null);
 	pointerOrigin: Context['pointerOrigin'] = $state(null);
 	isBetweenBounds: Context['isBetweenBounds'] = $state(true);
-	scrollOffsetX: Context['scrollOffsetX'] = $state(0);
-	scrollOffsetY: Context['scrollOffsetY'] = $state(0);
+	scrollOffsetLeft: Context['scrollOffsetLeft'] = $state(0);
+	scrollOffsetTop: Context['scrollOffsetTop'] = $state(0);
 	isRTL: Context['isRTL'] = $state(false);
 }
 

@@ -37,19 +37,19 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	const draggedRect = $derived.by(() => {
 		if (!rootState.itemRects || typeof draggedIndex !== 'number') return null;
 		const rect = rootState.itemRects[draggedIndex];
-		const { scrollOffsetX, scrollOffsetY } = rootState;
-		return !scrollOffsetX && !scrollOffsetY
+		const { scrollOffsetLeft, scrollOffsetTop } = rootState;
+		return !scrollOffsetLeft && !scrollOffsetTop
 			? rect
-			: new DOMRect(rect.x - scrollOffsetX, rect.y - scrollOffsetY, rect.width, rect.height);
+			: new DOMRect(rect.x - scrollOffsetLeft, rect.y - scrollOffsetTop, rect.width, rect.height);
 	});
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
 	const targetRect = $derived.by(() => {
 		if (!rootState.itemRects || typeof targetIndex !== 'number') return null;
 		const rect = rootState.itemRects[targetIndex];
-		const { scrollOffsetX, scrollOffsetY } = rootState;
-		return !scrollOffsetX && !scrollOffsetY
+		const { scrollOffsetLeft, scrollOffsetTop } = rootState;
+		return !scrollOffsetLeft && !scrollOffsetTop
 			? rect
-			: new DOMRect(rect.x - scrollOffsetX, rect.y - scrollOffsetY, rect.width, rect.height);
+			: new DOMRect(rect.x - scrollOffsetLeft, rect.y - scrollOffsetTop, rect.width, rect.height);
 	});
 
 	function cloneDraggedItemContent() {
