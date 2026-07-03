@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] (2026-07-03)
+
+### Fixed
+
+- Keep the target item updated during all scroll types.
+
+### Changed
+
+- Improve the `getClosestScrollableAncestor()` function guards.
+
 ## [1.2.0] (2026-07-02)
 
 ### Added
@@ -1531,7 +1541,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.18...v1.2.0
 [1.1.18]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.17...v1.1.18
 [1.1.17]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.1.16...v1.1.17
