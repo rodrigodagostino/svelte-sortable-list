@@ -136,7 +136,7 @@ export function getScrollingSpeed(
 	isScrollingDocument: boolean
 ) {
 	const offset = getScrollingOffset(container, direction);
-	const SPEED_RATIO = 32;
+	const SPEED_RATIO = 12;
 	// In those situations where the container is larger than the viewport,
 	// we want to use the document element as reference.
 	const rootElement = document.documentElement;

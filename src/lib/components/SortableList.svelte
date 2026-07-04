@@ -198,7 +198,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let scrollSpeedX = 0;
 	let scrollSpeedY = 0;
 	$: isScrollingDocument = scrollableAncestor ? isRootElement(scrollableAncestor, direction) : true;
-	$: if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
+	let isAutoScrolling = false;
+	$: if ((scrollSpeedX !== 0 || scrollSpeedY !== 0) && !isAutoScrolling) scroll();
 
 	function updateTargetItem() {
 		if (!$itemRects || !ref || !ghostRef) return;
@@ -233,16 +234,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	function scroll() {
 		if (!scrollableAncestor) return;
 
+		isAutoScrolling = true;
 		requestAnimationFrame(() => {
 			if (
 				!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeedX) &&
 				!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeedY)
-			)
+			) {
+				isAutoScrolling = false;
 				return;
+			}
 
 			scrollableAncestor.scrollBy(scrollSpeedX, scrollSpeedY);
 
 			if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
+			else isAutoScrolling = false;
 		});
 	}
 
