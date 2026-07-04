@@ -126,16 +126,11 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			rootState.ghostState === 'idle' ||
 			rootState.ghostState === 'ptr-drop' ||
 			!ref ||
-			!rootState ||
+			!rootState.props.ref ||
 			!rootState.pointer ||
 			!rootState.pointerOrigin
 		)
 			return 'translate3d(0, 0, 0)';
-
-		const ghostRect = ref.getBoundingClientRect();
-		const rootRect = rootState.props.ref?.getBoundingClientRect();
-
-		if (!rootRect) return 'translate3d(0, 0, 0)';
 
 		if (
 			(rootState.ghostState === 'ptr-drag-start' || rootState.ghostState === 'ptr-drag') &&
@@ -155,6 +150,8 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				return `translate3d(${x}, ${y}, 0)`;
 			}
 
+			const ghostRect = ref.getBoundingClientRect();
+			const rootRect = rootState.props.ref.getBoundingClientRect();
 			const x =
 				rootState.props.direction === 'horizontal' ||
 				(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
@@ -197,6 +194,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			)
 				return 'translate3d(0, 0, 0)';
 
+			const ghostRect = ref.getBoundingClientRect();
 			const x =
 				rootState.props.direction === 'vertical'
 					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
