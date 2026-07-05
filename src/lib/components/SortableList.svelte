@@ -235,8 +235,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isAutoScrolling = true;
 		requestAnimationFrame(() => {
 			if (
-				!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeed.x) &&
-				!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeed.y)
+				isPointerReleased ||
+				(!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeed.x) &&
+					!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeed.y))
 			) {
 				isAutoScrolling = false;
 				return;
@@ -705,6 +706,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 
 		isPointerReleased = true;
+		scrollSpeed = { x: 0, y: 0 };
 		if (rafId) cancelAnimationFrame(rafId);
 
 		if (action === 'ptr-drop') {
@@ -831,7 +833,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$itemRects = null;
 		$isBetweenBounds = true;
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
-		scrollSpeed = { x: 0, y: 0 };
 	}
 
 	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {
