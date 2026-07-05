@@ -50,6 +50,7 @@ export function scaleFly(
 	}: ScaleFlyParams = {}
 ): TransitionConfig {
 	const style = getComputedStyle(node);
+	const nodeRect = node.getBoundingClientRect();
 
 	const transform = style.transform === 'none' ? '' : style.transform;
 	const [x_value, x_unit] = split_css_unit(x);
@@ -57,9 +58,9 @@ export function scaleFly(
 	const opacity_target_value = +style.opacity;
 	const opacity_delta_value = opacity_target_value * (1 - opacity);
 	const primary_property = axis === 'y' ? 'height' : 'width';
-	const primary_property_value = node.getBoundingClientRect()[primary_property];
+	const primary_property_value = nodeRect[primary_property];
 	const primary_property_opposite = axis === 'y' ? 'width' : 'height';
-	const primary_property_opposite_value = node.getBoundingClientRect()[primary_property_opposite];
+	const primary_property_opposite_value = nodeRect[primary_property_opposite];
 	const secondary_properties = axis === 'y' ? ['top', 'bottom'] : ['left', 'right'];
 	const capitalized_secondary_properties = secondary_properties.map(
 		(e) => `${e[0].toUpperCase()}${e.slice(1)}` as 'Left' | 'Right' | 'Top' | 'Bottom'
