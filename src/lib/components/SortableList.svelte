@@ -707,7 +707,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		isPointerReleased = true;
 		scrollSpeed = { x: 0, y: 0 };
-		if (rafId) cancelAnimationFrame(rafId);
+		if (rafId) {
+			cancelAnimationFrame(rafId);
+			rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
+		}
 
 		if (action === 'ptr-drop') {
 			await tick();
@@ -832,13 +835,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$targetItem = null;
 		$itemRects = null;
 		$isBetweenBounds = true;
-		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 	}
 
 	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {
 		// Prevent the pending `transitionend`/timeout from triggering handlePointerAndKeyboardDragEnd().
 		skipDragEnd?.();
-
 		element?.getAnimations().forEach((animation) => animation.finish());
 
 		handlePointerAndKeyboardDragEnd(action);
