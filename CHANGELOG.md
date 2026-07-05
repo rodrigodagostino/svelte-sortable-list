@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] (2026-07-05)
+
+### Performance
+
+- Skip unnecessary layout reads when calculating ghost’s transform.
+- Use `$state.raw` for values that are always replaced, not mutated.
+- Avoid duplicate `getBoundingClientRect()` call in `scaleFly()`.
+
+### Changed
+
+- Unify paired scroll coordinates into objects.
+
+### Fixed
+
+- Prevent concurrent auto-scroll loops from stacking.
+- Guard against `null` parentElement in `isOrResidesInInteractiveElement()`.
+
 ## [2.2.1] (2026-07-03)
 
 ### Fixed
@@ -1570,7 +1587,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.18...v2.2.0
 [2.1.18]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.17...v2.1.18
