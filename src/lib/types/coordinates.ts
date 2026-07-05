@@ -4,4 +4,5 @@ export interface SortableListCoordinates {
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
 	itemRects: ItemRect[] | null;
+	scrollOffset: { left: number; top: number };
 }

@@ -62,8 +62,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		setPointer,
 		setPointerOrigin,
 		setRootProps,
-		setScrollOffsetLeft,
-		setScrollOffsetTop,
+		setScrollOffset,
 		setTargetItem,
 	} from '$lib/stores/index.js';
 	import type {
@@ -191,15 +190,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let skipDragEnd: (() => void) | null = null;
 
 	$: scrollableAncestor = ref ? getClosestScrollableAncestor(ref) : undefined;
-	let scrollLeft = 0;
-	let scrollTop = 0;
-	const scrollOffsetLeft = setScrollOffsetLeft(0);
-	const scrollOffsetTop = setScrollOffsetTop(0);
-	let scrollSpeedX = 0;
-	let scrollSpeedY = 0;
+	let scrollOrigin = { left: 0, top: 0 };
+	const scrollOffset = setScrollOffset({ left: 0, top: 0 });
+	let scrollSpeed = { x: 0, y: 0 };
 	$: isScrollingDocument = scrollableAncestor ? isRootElement(scrollableAncestor, direction) : true;
 	let isAutoScrolling = false;
-	$: if ((scrollSpeedX !== 0 || scrollSpeedY !== 0) && !isAutoScrolling) scroll();
+	$: if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) scroll();
 
 	function updateTargetItem() {
 		if (!$itemRects || !ref || !ghostRef) return;
@@ -208,16 +204,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const rootRect = ref.getBoundingClientRect();
 		$isBetweenBounds = areColliding(rawGhostRect, rootRect);
 		if (scrollableAncestor) {
-			$scrollOffsetLeft = scrollableAncestor.scrollLeft - scrollLeft;
-			$scrollOffsetTop = scrollableAncestor.scrollTop - scrollTop;
+			$scrollOffset = {
+				left: scrollableAncestor.scrollLeft - scrollOrigin.left,
+				top: scrollableAncestor.scrollTop - scrollOrigin.top,
+			};
 		}
 
 		// Offset the ghost rect by the current scroll.
 		const ghostRect =
-			$scrollOffsetLeft || $scrollOffsetTop
+			$scrollOffset.left || $scrollOffset.top
 				? new DOMRect(
-						rawGhostRect.x + $scrollOffsetLeft,
-						rawGhostRect.y + $scrollOffsetTop,
+						rawGhostRect.x + $scrollOffset.left,
+						rawGhostRect.y + $scrollOffset.top,
 						rawGhostRect.width,
 						rawGhostRect.height
 					)
@@ -237,16 +235,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isAutoScrolling = true;
 		requestAnimationFrame(() => {
 			if (
-				!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeedX) &&
-				!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeedY)
+				!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeed.x) &&
+				!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeed.y)
 			) {
 				isAutoScrolling = false;
 				return;
 			}
 
-			scrollableAncestor.scrollBy(scrollSpeedX, scrollSpeedY);
+			scrollableAncestor.scrollBy(scrollSpeed.x, scrollSpeed.y);
 
-			if (scrollSpeedX !== 0 || scrollSpeedY !== 0) scroll();
+			if (scrollSpeed.x !== 0 || scrollSpeed.y !== 0) scroll();
 			else isAutoScrolling = false;
 		});
 	}
@@ -254,12 +252,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	function autoScroll(clientX: PointerEvent['clientX'], clientY: PointerEvent['clientY']) {
 		if (!scrollableAncestor) return;
 
-		scrollSpeedX = canScrollX(scrollableAncestor)
-			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'horizontal', isScrollingDocument)
-			: 0;
-		scrollSpeedY = canScrollY(scrollableAncestor)
-			? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
-			: 0;
+		scrollSpeed = {
+			x: canScrollX(scrollableAncestor)
+				? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'horizontal', isScrollingDocument)
+				: 0,
+			y: canScrollY(scrollableAncestor)
+				? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
+				: 0,
+		};
 	}
 
 	let scrollRafId: number | null = null;
@@ -340,10 +340,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
 		$itemRects = getItemRects(ref!);
-		scrollLeft = scrollableAncestor?.scrollLeft ?? 0;
-		scrollTop = scrollableAncestor?.scrollTop ?? 0;
-		$scrollOffsetLeft = 0;
-		$scrollOffsetTop = 0;
+		scrollOrigin = {
+			left: scrollableAncestor?.scrollLeft ?? 0,
+			top: scrollableAncestor?.scrollTop ?? 0,
+		};
+		$scrollOffset = { left: 0, top: 0 };
 
 		if (typeof delay === 'number' && delay <= 0) await handlePointerDragStart(currItem);
 		else {
@@ -503,10 +504,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					$draggedItem = $focusedItem;
 					const draggedIndex = getIndex($focusedItem);
 					$itemRects = getItemRects(ref!);
-					scrollLeft = scrollableAncestor?.scrollLeft ?? 0;
-					scrollTop = scrollableAncestor?.scrollTop ?? 0;
-					$scrollOffsetLeft = 0;
-					$scrollOffsetTop = 0;
+					scrollOrigin = {
+						left: scrollableAncestor?.scrollLeft ?? 0,
+						top: scrollableAncestor?.scrollTop ?? 0,
+					};
+					$scrollOffset = { left: 0, top: 0 };
 
 					await tick();
 					$dragState = 'kbd-drag-start';
@@ -829,8 +831,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$itemRects = null;
 		$isBetweenBounds = true;
 		rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
-		scrollSpeedX = 0;
-		scrollSpeedY = 0;
+		scrollSpeed = { x: 0, y: 0 };
 	}
 
 	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {

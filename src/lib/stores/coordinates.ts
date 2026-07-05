@@ -21,3 +21,10 @@ export function setItemRects(context: Coordinates['itemRects']) {
 export function getItemRects() {
 	return getWritableContext<Coordinates['itemRects']>('itemRects');
 }
+
+export function setScrollOffset(context: Coordinates['scrollOffset']) {
+	return setWritableContext<Coordinates['scrollOffset']>('scrollOffset', context);
+}
+export function getScrollOffset() {
+	return getWritableContext<Coordinates['scrollOffset']>('scrollOffset');
+}

@@ -15,20 +15,6 @@ export function getIsBetweenBounds() {
 	return getWritableContext<boolean>('isBetweenBounds');
 }
 
-export function setScrollOffsetLeft(context: number) {
-	return setWritableContext<number>('scrollOffsetLeft', context);
-}
-export function getScrollOffsetLeft() {
-	return getWritableContext<number>('scrollOffsetLeft');
-}
-
-export function setScrollOffsetTop(context: number) {
-	return setWritableContext<number>('scrollOffsetTop', context);
-}
-export function getScrollOffsetTop() {
-	return getWritableContext<number>('scrollOffsetTop');
-}
-
 export function setIsRTL(context: boolean) {
 	return setWritableContext<boolean>('isRTL', context);
 }
