@@ -8,9 +8,9 @@ class SortableListRootState {
 	draggedItem: Context['draggedItem'] = $state(null);
 	targetItem: Context['targetItem'] = $state(null);
 	focusedItem: Context['focusedItem'] = $state(null);
-	itemRects: Context['itemRects'] = $state(null);
-	pointer: Context['pointer'] = $state(null);
-	pointerOrigin: Context['pointerOrigin'] = $state(null);
+	itemRects: Context['itemRects'] = $state.raw(null);
+	pointer: Context['pointer'] = $state.raw(null);
+	pointerOrigin: Context['pointerOrigin'] = $state.raw(null);
 	isBetweenBounds: Context['isBetweenBounds'] = $state(true);
 	scrollOffsetLeft: Context['scrollOffsetLeft'] = $state(0);
 	scrollOffsetTop: Context['scrollOffsetTop'] = $state(0);
