@@ -4,17 +4,20 @@
 	"version": "2.2.2",
 	"author": "Rodrigo D’Agostino <rodrigo.dagostino@proton.me>",
 	"keywords": [
-		"sort",
 		"sortable",
 		"list",
 		"drag",
 		"drop",
 		"dnd",
+		"touch",
+		"sort",
 		"reorder",
 		"reorderable",
 		"accessible",
+		"a11y",
 		"svelte",
-		"sveltekit"
+		"sveltekit",
+		"component"
 	],
 	"license": "MIT",
 	"type": "module",
@@ -24,10 +27,10 @@
 	},
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build && npm run package",
+		"build": "vite build && npm run prepack",
 		"preview": "vite preview",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
+		"prepare": "svelte-kit sync || echo ''",
+		"prepack": "svelte-kit sync && svelte-package && publint",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
@@ -39,6 +42,13 @@
 		"test:trace": "playwright test --trace on",
 		"test:trigger-flaky": "playwright test --repeat-each=20 --workers=4 -x"
 	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
@@ -48,17 +58,11 @@
 			"import": "./dist/*.css"
 		}
 	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
-	],
 	"peerDependencies": {
 		"esm-env": "^1.0.0",
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
-		"@eslint/compat": "2.1.0",
 		"@eslint/js": "10.0.1",
 		"@fontsource/jetbrains-mono": "5.2.8",
 		"@fontsource/rubik": "5.2.8",
@@ -69,12 +73,10 @@
 		"@sveltejs/vite-plugin-svelte": "7.1.2",
 		"@tailwindcss/postcss": "4.3.2",
 		"@tailwindcss/vite": "4.3.2",
-		"@types/eslint": "9.6.1",
-		"@types/node": "22.20.0",
+		"@types/node": "^22",
 		"autoprefixer": "10.5.2",
 		"eslint": "10.6.0",
 		"eslint-config-prettier": "10.1.8",
-		"eslint-plugin-prettier": "5.5.6",
 		"eslint-plugin-svelte": "3.20.0",
 		"globals": "17.7.0",
 		"postcss": "8.5.16",
@@ -88,7 +90,5 @@
 		"typescript": "6.0.3",
 		"typescript-eslint": "8.62.1",
 		"vite": "8.1.3"
-	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts"
+	}
 }
