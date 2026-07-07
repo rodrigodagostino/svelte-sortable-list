@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      esm-env:
-        specifier: ^1.0.0
-        version: 1.2.2
     devDependencies:
       '@eslint/js':
         specifier: 10.0.1
