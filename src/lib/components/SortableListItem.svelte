@@ -316,14 +316,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			transition: none;
 		}
 
-		&:focus,
-		&:focus-visible,
-		&:focus-within {
-			z-index: 2;
-		}
-
 		&[data-drag-state*='ptr'] {
 			z-index: 0;
+		}
+
+		/* fix: elevate SortableItem above siblings when focused */
+		&[data-drag-state*='kbd'] {
+			z-index: 2;
 		}
 	}
 </style>
