@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.3] (2026-07-07)
+
+### Fixed
+
+- Immediately stop auto-scroll on drop.
+- Allow interrupting drop transitions when switching input types (pointer vs. keyboard).
+- Clear stale pointermove animation frame before drag cleanup.
+- Elevate dragged item above siblings during all keyboard drag states.
+
 ## [2.2.2] (2026-07-05)
 
 ### Performance
@@ -1587,7 +1596,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.3...HEAD
+[2.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.1...v2.2.2
 [2.2.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.1.18...v2.2.0
