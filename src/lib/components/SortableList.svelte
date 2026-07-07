@@ -280,16 +280,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 		}
 
-		// Interrupt any ongoing drop transition so the user can immediately start a new drag.
-		if (ghostRef && $dragState === 'ptr-drop') {
+		// Interrupt any ongoing drop transition so the user can immediately start a new drag,
+		// regardless of whether it’s finishing a pointer or a keyboard interaction.
+		if (
+			$dragState === 'ptr-drop' ||
+			$dragState === 'ptr-cancel' ||
+			$dragState === 'kbd-drop' ||
+			$dragState === 'kbd-cancel'
+		) {
+			const isPtrState = $dragState.startsWith('ptr');
+			const element = isPtrState ? ghostRef : $focusedItem;
 			e.preventDefault();
-			interruptDropTransition(ghostRef, 'ptr-drop');
+			interruptDropTransition(element, $dragState);
 			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
 			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
 			await tick();
 		}
 
-		if ($dragState !== 'idle' || $focusedItem) {
+		if ($dragState !== 'idle') {
 			e.preventDefault();
 			return;
 		}
@@ -473,10 +481,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
-		// Interrupt any ongoing drop transition so the user can immediately start a new drag.
-		if ($dragState === 'kbd-drop') {
+		// Interrupt any ongoing drop transition so the user can immediately start a new drag,
+		// regardless of whether it’s finishing a pointer or a keyboard interaction.
+		if (
+			$dragState === 'ptr-drop' ||
+			$dragState === 'ptr-cancel' ||
+			$dragState === 'kbd-drop' ||
+			$dragState === 'kbd-cancel'
+		) {
+			const isPtrState = $dragState.startsWith('ptr');
+			const element = isPtrState ? ghostRef : $focusedItem;
 			e.preventDefault();
-			interruptDropTransition($focusedItem, 'kbd-drop');
+			interruptDropTransition(element, $dragState);
 			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
 			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
 			await tick();
@@ -837,7 +853,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$isBetweenBounds = true;
 	}
 
-	function interruptDropTransition(element: HTMLElement | null, action: 'ptr-drop' | 'kbd-drop') {
+	function interruptDropTransition(
+		element: HTMLElement | null | undefined,
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
+	) {
 		// Prevent the pending `transitionend`/timeout from triggering handlePointerAndKeyboardDragEnd().
 		skipDragEnd?.();
 		element?.getAnimations().forEach((animation) => animation.finish());
