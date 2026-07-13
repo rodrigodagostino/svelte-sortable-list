@@ -226,7 +226,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleTransform = getStyleTransform($draggedItem, $targetItem, $dragState, $isBetweenBounds);
+	$: styleTransform = getStyleTransform($dragState, $targetItem);
 
 	async function handleFocus(e: FocusEvent) {
 		if ($dragState.includes('ptr')) {
