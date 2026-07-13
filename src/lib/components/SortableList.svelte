@@ -201,7 +201,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 			);
-		else if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isBetweenBounds))
+		else if ((canClearOnDragOut || canRemoveOnDropOut) && !rootState.isBetweenBounds)
 			rootState.targetItem = null;
 	}
 
