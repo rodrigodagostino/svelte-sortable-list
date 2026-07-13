@@ -6,7 +6,7 @@
 	import type { SortableListRootProps as RootProps } from '$lib/types/props.js';
 	import '@fontsource/rubik/400.css';
 	import '@fontsource/rubik/600.css';
-	import '@fontsource/jetbrains-mono';
+	import '@fontsource/jetbrains-mono/400.css';
 	import './styles.css';
 
 	interface Props {
