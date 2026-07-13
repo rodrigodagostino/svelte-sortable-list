@@ -109,8 +109,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	);
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleWidth(...args: unknown[]) {
+	function getStyleWidth() {
 		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
@@ -122,8 +121,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `${rectSnapshot?.width}px`;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleHeight(...args: unknown[]) {
+	function getStyleHeight() {
 		if (draggedId !== String(id)) return undefined;
 		if (
 			!isGhost &&
@@ -135,8 +133,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `${rectSnapshot?.height}px`;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	function getStyleTransform(...args: unknown[]) {
+	function getStyleTransform() {
 		if (isGhost) return 'none';
 		if (
 			rootState.dragState === 'idle' ||
@@ -214,16 +211,21 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 	}
 
-	const styleWidth = $derived(getStyleWidth(rootState.draggedItem, rootState.isBetweenBounds));
-	const styleHeight = $derived(getStyleHeight(rootState.draggedItem, rootState.isBetweenBounds));
-	const styleTransform = $derived(
-		getStyleTransform(
-			rootState.draggedItem,
-			rootState.targetItem,
-			rootState.dragState,
-			rootState.isBetweenBounds
-		)
-	);
+	const styleWidth = $derived.by(() => {
+		void rootState.draggedItem;
+		void rootState.isBetweenBounds;
+		return untrack(() => getStyleWidth());
+	});
+	const styleHeight = $derived.by(() => {
+		void rootState.draggedItem;
+		void rootState.isBetweenBounds;
+		return untrack(() => getStyleHeight());
+	});
+	const styleTransform = $derived.by(() => {
+		void rootState.dragState;
+		void rootState.targetItem;
+		return untrack(() => getStyleTransform());
+	});
 
 	async function handleFocus(e: FocusEvent) {
 		if (rootState.dragState.includes('ptr')) {
