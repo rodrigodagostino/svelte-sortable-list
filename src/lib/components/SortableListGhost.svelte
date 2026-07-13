@@ -32,20 +32,20 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
-	// rootState.itemRects is used as a reliable reference to the item’s position in the list
+	// rootState.itemRectsSnapshot is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRect = $derived.by(() => {
-		if (!rootState.itemRects || typeof draggedIndex !== 'number') return null;
-		const rect = rootState.itemRects[draggedIndex];
+	const draggedRectSnapshot = $derived.by(() => {
+		if (!rootState.itemRectsSnapshot || typeof draggedIndex !== 'number') return null;
+		const rect = rootState.itemRectsSnapshot[draggedIndex];
 		const { scrollOffset } = rootState;
 		return !scrollOffset.left && !scrollOffset.top
 			? rect
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
-	const targetRect = $derived.by(() => {
-		if (!rootState.itemRects || typeof targetIndex !== 'number') return null;
-		const rect = rootState.itemRects[targetIndex];
+	const targetRectSnapshot = $derived.by(() => {
+		if (!rootState.itemRectsSnapshot || typeof targetIndex !== 'number') return null;
+		const rect = rootState.itemRectsSnapshot[targetIndex];
 		const { scrollOffset } = rootState;
 		return !scrollOffset.left && !scrollOffset.top
 			? rect
@@ -70,22 +70,22 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
 			!ref ||
-			!draggedRect ||
-			!rootState.itemRects
+			!draggedRectSnapshot ||
+			!rootState.itemRectsSnapshot
 		)
 			return '0';
 
 		if (rootState.ghostState === 'ptr-remove') return ref.style.left;
 
-		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
-			return `${draggedRect.x}px`;
+		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRectSnapshot)
+			return `${draggedRectSnapshot.x}px`;
 
 		const left =
 			rootState.props.direction === 'vertical'
-				? draggedRect.x
+				? draggedRectSnapshot.x
 				: draggedIndex < targetIndex
-					? targetRect.right - draggedRect.width
-					: targetRect.x;
+					? targetRectSnapshot.right - draggedRectSnapshot.width
+					: targetRectSnapshot.x;
 		return `${left}px`;
 	}
 
@@ -94,30 +94,30 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			rootState.ghostState === 'idle' ||
 			typeof draggedIndex !== 'number' ||
 			!ref ||
-			!draggedRect ||
-			!rootState.itemRects
+			!draggedRectSnapshot ||
+			!rootState.itemRectsSnapshot
 		)
 			return '0';
 
 		if (rootState.ghostState === 'ptr-remove') return ref.style.top;
 
-		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRect)
-			return `${draggedRect.y}px`;
+		if (!rootState.targetItem || typeof targetIndex !== 'number' || !targetRectSnapshot)
+			return `${draggedRectSnapshot.y}px`;
 
 		const alignItems =
 			rootState.props.ref && window.getComputedStyle(rootState.props.ref).alignItems;
 		const top =
 			rootState.props.direction === 'vertical'
 				? draggedIndex < targetIndex
-					? targetRect.bottom - draggedRect.height
-					: targetRect.y
-				: isInSameRow(draggedRect, targetRect)
-					? draggedRect.y
+					? targetRectSnapshot.bottom - draggedRectSnapshot.height
+					: targetRectSnapshot.y
+				: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+					? draggedRectSnapshot.y
 					: alignItems === 'center'
-						? targetRect.y + (targetRect.height - draggedRect.height) / 2
+						? targetRectSnapshot.y + (targetRectSnapshot.height - draggedRectSnapshot.height) / 2
 						: alignItems === 'end' || alignItems === 'flex-end'
-							? targetRect.bottom - draggedRect.height
-							: targetRect.y;
+							? targetRectSnapshot.bottom - draggedRectSnapshot.height
+							: targetRectSnapshot.y;
 		return `${top}px`;
 	}
 
@@ -134,7 +134,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 
 		if (
 			(rootState.ghostState === 'ptr-drag-start' || rootState.ghostState === 'ptr-drag') &&
-			draggedRect
+			draggedRectSnapshot
 		) {
 			if (!rootState.props.hasBoundaries) {
 				const x =
@@ -157,14 +157,16 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
 					? // If the ghost is dragged to the left of the list,
 						// place it to the right of the left edge of the list.
-						rootState.pointer.x - (rootState.pointerOrigin.x - draggedRect.x) <
+						rootState.pointer.x - (rootState.pointerOrigin.x - draggedRectSnapshot.x) <
 						rootRect.x + rootState.props.gap! / 2
-						? `${rootRect.x - draggedRect.x + rootState.props.gap! / 2}px`
+						? `${rootRect.x - draggedRectSnapshot.x + rootState.props.gap! / 2}px`
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
-							rootState.pointer.x + ghostRect.width - (rootState.pointerOrigin.x - draggedRect.x) >
+							rootState.pointer.x +
+									ghostRect.width -
+									(rootState.pointerOrigin.x - draggedRectSnapshot.x) >
 							  rootRect.right - rootState.props.gap! / 2
-							? `${rootRect.right - draggedRect.x - ghostRect.width - rootState.props.gap! / 2}px`
+							? `${rootRect.right - draggedRectSnapshot.x - ghostRect.width - rootState.props.gap! / 2}px`
 							: `${rootState.pointer.x - rootState.pointerOrigin.x}px`
 					: 0;
 			const y =
@@ -172,37 +174,43 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
 					? // If the ghost is dragged above the top of the list,
 						// place it right below the top edge of the list.
-						rootState.pointer.y - (rootState.pointerOrigin.y - draggedRect.y) <
+						rootState.pointer.y - (rootState.pointerOrigin.y - draggedRectSnapshot.y) <
 						rootRect.y + rootState.props.gap! / 2
-						? `${rootRect.y - draggedRect.y + rootState.props.gap! / 2}px`
+						? `${rootRect.y - draggedRectSnapshot.y + rootState.props.gap! / 2}px`
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
-							rootState.pointer.y + ghostRect.height - (rootState.pointerOrigin.y - draggedRect.y) >
+							rootState.pointer.y +
+									ghostRect.height -
+									(rootState.pointerOrigin.y - draggedRectSnapshot.y) >
 							  rootRect.bottom - rootState.props.gap! / 2
-							? `${rootRect.bottom - draggedRect.y - ghostRect.height - rootState.props.gap! / 2}px`
+							? `${rootRect.bottom - draggedRectSnapshot.y - ghostRect.height - rootState.props.gap! / 2}px`
 							: `${rootState.pointer.y - rootState.pointerOrigin.y}px`
 					: 0;
 			return `translate3d(${x}, ${y}, 0)`;
 		}
 
-		if (rootState.ghostState === 'ptr-predrop' && typeof draggedIndex === 'number' && draggedRect) {
+		if (
+			rootState.ghostState === 'ptr-predrop' &&
+			typeof draggedIndex === 'number' &&
+			draggedRectSnapshot
+		) {
 			if (
 				!rootState.props.ref ||
 				!rootState.targetItem ||
 				typeof targetIndex !== 'number' ||
-				!targetRect
+				!targetRectSnapshot
 			)
 				return 'translate3d(0, 0, 0)';
 
 			const ghostRect = ref.getBoundingClientRect();
 			const x =
 				rootState.props.direction === 'vertical'
-					? `${ghostRect.x - targetRect.x + (ghostRect.width - targetRect.width) / 2}px`
-					: calculateTranslate('x', ghostRect, targetRect, draggedIndex, targetIndex);
+					? `${ghostRect.x - targetRectSnapshot.x + (ghostRect.width - targetRectSnapshot.width) / 2}px`
+					: calculateTranslate('x', ghostRect, targetRectSnapshot, draggedIndex, targetIndex);
 			const y =
 				rootState.props.direction === 'vertical'
-					? calculateTranslate('y', ghostRect, targetRect, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment(rootState.props.ref, ghostRect, targetRect);
+					? calculateTranslate('y', ghostRect, targetRectSnapshot, draggedIndex, targetIndex)
+					: calculateTranslateWithAlignment(rootState.props.ref, ghostRect, targetRectSnapshot);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

@@ -89,19 +89,23 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		setInteractiveElementsTabIndex();
 	});
 
-	const currentRect = $derived(rootState.itemRects ? rootState.itemRects[index] : null);
+	const rectSnapshot = $derived(
+		rootState.itemRectsSnapshot ? rootState.itemRectsSnapshot[index] : null
+	);
 	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
-	// rootState.itemRects is used as a reliable reference to the item’s position in the list
+	// rootState.itemRectsSnapshot is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRect = $derived(
-		rootState.itemRects && typeof draggedIndex === 'number'
-			? rootState.itemRects[draggedIndex]
+	const draggedRectSnapshot = $derived(
+		rootState.itemRectsSnapshot && typeof draggedIndex === 'number'
+			? rootState.itemRectsSnapshot[draggedIndex]
 			: null
 	);
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
-	const targetRect = $derived(
-		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
+	const targetRectSnapshot = $derived(
+		rootState.itemRectsSnapshot && typeof targetIndex === 'number'
+			? rootState.itemRectsSnapshot[targetIndex]
+			: null
 	);
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
@@ -115,7 +119,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
-		return `${currentRect?.width}px`;
+		return `${rectSnapshot?.width}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -128,7 +132,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
-		return `${currentRect?.height}px`;
+		return `${rectSnapshot?.height}px`;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -138,14 +142,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.dragState === 'idle' ||
 			rootState.dragState === 'ptr-cancel' ||
 			rootState.dragState === 'kbd-cancel' ||
-			!rootState.itemRects ||
+			!rootState.itemRectsSnapshot ||
 			!rootState.draggedItem ||
 			!rootState.targetItem ||
-			currentRect === null ||
+			rectSnapshot === null ||
 			draggedIndex === null ||
-			draggedRect === null ||
+			draggedRectSnapshot === null ||
 			targetIndex === null ||
-			targetRect === null
+			targetRectSnapshot === null
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -159,18 +163,18 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				const x =
 					rootState.props.direction === 'vertical'
 						? '0'
-						: isInSameRow(currentRect, rootState.itemRects[index + step])
-							? `${operator}${draggedRect.width + rootState.props.gap!}px`
-							: `${rootState.itemRects[index + step].right - currentRect.right}px`;
+						: isInSameRow(rectSnapshot, rootState.itemRectsSnapshot[index + step])
+							? `${operator}${draggedRectSnapshot.width + rootState.props.gap!}px`
+							: `${rootState.itemRectsSnapshot[index + step].right - rectSnapshot.right}px`;
 				const y =
 					rootState.props.direction === 'vertical'
-						? `${operator}${draggedRect.height + rootState.props.gap!}px`
-						: isInSameRow(currentRect, rootState.itemRects[index + step])
+						? `${operator}${draggedRectSnapshot.height + rootState.props.gap!}px`
+						: isInSameRow(rectSnapshot, rootState.itemRectsSnapshot[index + step])
 							? '0'
 							: calculateTranslateWithAlignment(
 									rootState.props.ref!,
-									rootState.itemRects[index + step],
-									currentRect
+									rootState.itemRectsSnapshot[index + step],
+									rectSnapshot
 								);
 
 				return `translate3d(${x}, ${y}, 0)`;
@@ -181,13 +185,29 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			const x =
 				rootState.props.direction === 'vertical'
 					? '0'
-					: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
+					: calculateTranslate(
+							'x',
+							targetRectSnapshot,
+							draggedRectSnapshot,
+							draggedIndex,
+							targetIndex
+						);
 			const y =
 				rootState.props.direction === 'vertical'
-					? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
-					: isInSameRow(draggedRect, targetRect)
+					? calculateTranslate(
+							'y',
+							targetRectSnapshot,
+							draggedRectSnapshot,
+							draggedIndex,
+							targetIndex
+						)
+					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
 						? '0'
-						: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
+						: calculateTranslateWithAlignment(
+								rootState.props.ref!,
+								targetRectSnapshot,
+								draggedRectSnapshot
+							);
 
 			return `translate3d(${x}, ${y}, 0)`;
 		}

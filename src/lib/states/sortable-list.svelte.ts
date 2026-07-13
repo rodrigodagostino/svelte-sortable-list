@@ -8,7 +8,7 @@ class SortableListRootState {
 	draggedItem: Context['draggedItem'] = $state(null);
 	targetItem: Context['targetItem'] = $state(null);
 	focusedItem: Context['focusedItem'] = $state(null);
-	itemRects: Context['itemRects'] = $state.raw(null);
+	itemRectsSnapshot: Context['itemRectsSnapshot'] = $state.raw(null);
 	pointer: Context['pointer'] = $state.raw(null);
 	pointerOrigin: Context['pointerOrigin'] = $state.raw(null);
 	isBetweenBounds: Context['isBetweenBounds'] = $state(true);

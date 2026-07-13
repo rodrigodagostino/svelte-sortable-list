@@ -18,7 +18,7 @@ export interface SortableListRootStateContext {
 	draggedItem: HTMLLIElement | null;
 	targetItem: HTMLLIElement | null;
 	focusedItem: HTMLLIElement | null;
-	itemRects: ItemRect[] | null;
+	itemRectsSnapshot: ItemRect[] | null;
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
 	isBetweenBounds: boolean;

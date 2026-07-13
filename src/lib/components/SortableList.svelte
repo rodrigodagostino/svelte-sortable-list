@@ -173,7 +173,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	function updateTargetItem() {
-		if (!rootState.itemRects || !ref || !ghostRef) return;
+		if (!rootState.itemRectsSnapshot || !ref || !ghostRef) return;
 
 		const rawGhostRect = ghostRef.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
@@ -196,7 +196,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					)
 				: rawGhostRect;
 
-		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRects);
+		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRectsSnapshot);
 		if (collidingItemRect)
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
@@ -324,7 +324,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.pointer = { x: e.clientX, y: e.clientY };
 		rootState.pointerOrigin = { x: e.clientX, y: e.clientY };
 		rootState.draggedItem = currItem;
-		rootState.itemRects = getItemRects(ref!);
+		rootState.itemRectsSnapshot = getItemRects(ref!);
 		scrollOrigin = {
 			left: scrollableAncestor?.scrollLeft ?? 0,
 			top: scrollableAncestor?.scrollTop ?? 0,
@@ -498,7 +498,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (rootState.dragState === 'idle') {
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
-					rootState.itemRects = getItemRects(ref!);
+					rootState.itemRectsSnapshot = getItemRects(ref!);
 					scrollOrigin = {
 						left: scrollableAncestor?.scrollLeft ?? 0,
 						top: scrollableAncestor?.scrollTop ?? 0,
@@ -571,7 +571,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							});
 					}
 				} else {
-					if (!rootState.draggedItem || !rootState.itemRects) return;
+					if (!rootState.draggedItem || !rootState.itemRectsSnapshot) return;
 
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
@@ -581,9 +581,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						(step === -1 && draggedIndex === 0 && !rootState.targetItem) ||
 						(step === -1 && targetIndex === 0) ||
 						(step === 1 &&
-							draggedIndex === rootState.itemRects.length - 1 &&
+							draggedIndex === rootState.itemRectsSnapshot.length - 1 &&
 							!rootState.targetItem) ||
-						(step === 1 && targetIndex === rootState.itemRects.length - 1)
+						(step === 1 && targetIndex === rootState.itemRectsSnapshot.length - 1)
 					)
 						return;
 
@@ -647,7 +647,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (key === 'Home') items[0]?.focus({ preventScroll: true });
 					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
-					if (!rootState.draggedItem || !rootState.itemRects) return;
+					if (!rootState.draggedItem || !rootState.itemRectsSnapshot) return;
 
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
@@ -657,9 +657,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						(key === 'Home' && draggedIndex === 0 && !rootState.targetItem) ||
 						(key === 'Home' && targetIndex === 0) ||
 						(key === 'End' &&
-							draggedIndex === rootState.itemRects.length - 1 &&
+							draggedIndex === rootState.itemRectsSnapshot.length - 1 &&
 							!rootState.targetItem) ||
-						(key === 'End' && targetIndex === rootState.itemRects.length - 1)
+						(key === 'End' && targetIndex === rootState.itemRectsSnapshot.length - 1)
 					)
 						return;
 
@@ -855,7 +855,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.pointerOrigin = null;
 		rootState.draggedItem = null;
 		rootState.targetItem = null;
-		rootState.itemRects = null;
+		rootState.itemRectsSnapshot = null;
 		rootState.isBetweenBounds = true;
 	}
 
