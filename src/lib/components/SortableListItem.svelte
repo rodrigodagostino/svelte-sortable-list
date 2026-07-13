@@ -170,20 +170,21 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			) {
 				const step = index > draggedIndex ? -1 : 1;
 				const operator = index > draggedIndex === !$isRTL ? '-' : '';
+				const neighborRectSnapshot = $itemRectsSnapshot[index + step];
 				const x =
 					$rootProps.direction === 'vertical'
 						? '0'
-						: isInSameRow(rectSnapshot, $itemRectsSnapshot[index + step])
+						: isInSameRow(rectSnapshot, neighborRectSnapshot)
 							? `${operator}${draggedRectSnapshot.width + $rootProps.gap!}px`
-							: `${$itemRectsSnapshot[index + step].right - rectSnapshot.right}px`;
+							: `${neighborRectSnapshot.right - rectSnapshot.right}px`;
 				const y =
 					$rootProps.direction === 'vertical'
 						? `${operator}${draggedRectSnapshot.height + $rootProps.gap!}px`
-						: isInSameRow(rectSnapshot, $itemRectsSnapshot[index + step])
+						: isInSameRow(rectSnapshot, neighborRectSnapshot)
 							? '0'
 							: calculateTranslateWithAlignment(
 									$rootProps.ref!,
-									$itemRectsSnapshot[index + step],
+									neighborRectSnapshot,
 									rectSnapshot
 								);
 
