@@ -15,11 +15,11 @@ export function getPointerOrigin() {
 	return getWritableContext<Coordinates['pointerOrigin']>('pointerOrigin');
 }
 
-export function setItemRects(context: Coordinates['itemRects']) {
-	return setWritableContext<Coordinates['itemRects']>('itemRects', context);
+export function setItemRectsSnapshot(context: Coordinates['itemRectsSnapshot']) {
+	return setWritableContext<Coordinates['itemRectsSnapshot']>('itemRectsSnapshot', context);
 }
-export function getItemRects() {
-	return getWritableContext<Coordinates['itemRects']>('itemRects');
+export function getItemRectsSnapshot() {
+	return getWritableContext<Coordinates['itemRectsSnapshot']>('itemRectsSnapshot');
 }
 
 export function setScrollOffset(context: Coordinates['scrollOffset']) {

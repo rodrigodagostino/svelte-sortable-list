@@ -58,7 +58,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		setFocusedItem,
 		setIsBetweenBounds,
 		setIsRTL,
-		setItemRects,
+		setItemRectsSnapshot,
 		setPointer,
 		setPointerOrigin,
 		setRootProps,
@@ -143,7 +143,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const pointer = setPointer(null);
 	const pointerOrigin = setPointerOrigin(null);
 	let isPointerReleased = false;
-	const itemRects = setItemRects(null);
+	const itemRectsSnapshot = setItemRectsSnapshot(null);
 	const draggedItem = setDraggedItem(null);
 	const targetItem = setTargetItem(null);
 	const focusedItem = setFocusedItem(null);
@@ -198,7 +198,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	$: if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) scroll();
 
 	function updateTargetItem() {
-		if (!$itemRects || !ref || !ghostRef) return;
+		if (!$itemRectsSnapshot || !ref || !ghostRef) return;
 
 		const rawGhostRect = ghostRef.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
@@ -221,7 +221,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					)
 				: rawGhostRect;
 
-		const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
+		const collidingItemRect = getCollidingItem(ghostRect, $itemRectsSnapshot);
 		if (collidingItemRect)
 			$targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
@@ -348,7 +348,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointer = { x: e.clientX, y: e.clientY };
 		$pointerOrigin = { x: e.clientX, y: e.clientY };
 		$draggedItem = currItem;
-		$itemRects = getItemRects(ref!);
+		$itemRectsSnapshot = getItemRects(ref!);
 		scrollOrigin = {
 			left: scrollableAncestor?.scrollLeft ?? 0,
 			top: scrollableAncestor?.scrollTop ?? 0,
@@ -520,7 +520,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if ($dragState === 'idle') {
 					$draggedItem = $focusedItem;
 					const draggedIndex = getIndex($focusedItem);
-					$itemRects = getItemRects(ref!);
+					$itemRectsSnapshot = getItemRects(ref!);
 					scrollOrigin = {
 						left: scrollableAncestor?.scrollLeft ?? 0,
 						top: scrollableAncestor?.scrollTop ?? 0,
@@ -583,7 +583,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							});
 					}
 				} else {
-					if (!$draggedItem || !$itemRects) return;
+					if (!$draggedItem || !$itemRectsSnapshot) return;
 
 					const draggedIndex = getIndex($draggedItem);
 					let targetIndex = $targetItem ? getIndex($targetItem) : null;
@@ -592,8 +592,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (
 						(step === -1 && draggedIndex === 0 && !$targetItem) ||
 						(step === -1 && targetIndex === 0) ||
-						(step === 1 && draggedIndex === $itemRects.length - 1 && !$targetItem) ||
-						(step === 1 && targetIndex === $itemRects.length - 1)
+						(step === 1 && draggedIndex === $itemRectsSnapshot.length - 1 && !$targetItem) ||
+						(step === 1 && targetIndex === $itemRectsSnapshot.length - 1)
 					)
 						return;
 
@@ -652,7 +652,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (key === 'Home') items[0]?.focus({ preventScroll: true });
 					else items[items.length - 1]?.focus({ preventScroll: true });
 				} else {
-					if (!$draggedItem || !$itemRects) return;
+					if (!$draggedItem || !$itemRectsSnapshot) return;
 
 					const draggedIndex = getIndex($draggedItem);
 					let targetIndex = $targetItem ? getIndex($targetItem) : null;
@@ -661,8 +661,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (
 						(key === 'Home' && draggedIndex === 0 && !$targetItem) ||
 						(key === 'Home' && targetIndex === 0) ||
-						(key === 'End' && draggedIndex === $itemRects.length - 1 && !$targetItem) ||
-						(key === 'End' && targetIndex === $itemRects.length - 1)
+						(key === 'End' && draggedIndex === $itemRectsSnapshot.length - 1 && !$targetItem) ||
+						(key === 'End' && targetIndex === $itemRectsSnapshot.length - 1)
 					)
 						return;
 
@@ -849,7 +849,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$pointerOrigin = null;
 		$draggedItem = null;
 		$targetItem = null;
-		$itemRects = null;
+		$itemRectsSnapshot = null;
 		$isBetweenBounds = true;
 	}
 
