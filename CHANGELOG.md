@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.4] (2026-07-16)
+
+### Changed
+
+- Distinguish frozen rects from live ones with `Snapshot` suffix.
+- Avoid repetition in item translation calculations.
+- Simplify translate calculations.
+
+### Fixed
+
+- Recalculate item styles only when necessary.
+- Clear target only when dragging outside of the list limits.
+
+### Docs
+
+- Correctly set select default value in **“Interactive elements”** page.
+
 ## [1.2.3] (2026-07-07)
 
 ### Fixed
@@ -1566,7 +1583,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.0...v1.2.1
