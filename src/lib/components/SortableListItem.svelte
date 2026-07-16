@@ -156,33 +156,35 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				(index < draggedIndex && index >= targetIndex)
 			) {
 				const step = index > draggedIndex ? -1 : 1;
-				const operator = index > draggedIndex === !rootState.isRTL ? '-' : '';
+				const direction = index > draggedIndex === !rootState.isRTL ? -1 : 1;
 				const neighborRectSnapshot = rootState.itemRectsSnapshot[index + step];
+				const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
+
 				const x =
 					rootState.props.direction === 'vertical'
-						? '0'
-						: isInSameRow(rectSnapshot, neighborRectSnapshot)
-							? `${operator}${draggedRectSnapshot.width + rootState.props.gap!}px`
-							: `${neighborRectSnapshot.right - rectSnapshot.right}px`;
+						? 0
+						: isSameRow
+							? direction * (draggedRectSnapshot.width + rootState.props.gap!)
+							: neighborRectSnapshot.right - rectSnapshot.right;
 				const y =
 					rootState.props.direction === 'vertical'
-						? `${operator}${draggedRectSnapshot.height + rootState.props.gap!}px`
-						: isInSameRow(rectSnapshot, neighborRectSnapshot)
-							? '0'
+						? direction * (draggedRectSnapshot.height + rootState.props.gap!)
+						: isSameRow
+							? 0
 							: calculateTranslateWithAlignment(
 									rootState.props.ref!,
 									neighborRectSnapshot,
 									rectSnapshot
 								);
 
-				return `translate3d(${x}, ${y}, 0)`;
+				return `translate3d(${x}px, ${y}px, 0)`;
 			} else {
 				return 'translate3d(0, 0, 0)';
 			}
 		} else {
 			const x =
 				rootState.props.direction === 'vertical'
-					? '0'
+					? 0
 					: calculateTranslate(
 							'x',
 							targetRectSnapshot,
@@ -200,14 +202,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							targetIndex
 						)
 					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
-						? '0'
+						? 0
 						: calculateTranslateWithAlignment(
 								rootState.props.ref!,
 								targetRectSnapshot,
 								draggedRectSnapshot
 							);
 
-			return `translate3d(${x}, ${y}, 0)`;
+			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 	}
 

@@ -140,14 +140,14 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				const x =
 					rootState.props.direction === 'horizontal' ||
 					(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
-						? `${rootState.pointer.x - rootState.pointerOrigin.x}px`
+						? rootState.pointer.x - rootState.pointerOrigin.x
 						: 0;
 				const y =
 					rootState.props.direction === 'vertical' ||
 					(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
-						? `${rootState.pointer.y - rootState.pointerOrigin.y}px`
+						? rootState.pointer.y - rootState.pointerOrigin.y
 						: 0;
-				return `translate3d(${x}, ${y}, 0)`;
+				return `translate3d(${x}px, ${y}px, 0)`;
 			}
 
 			const ghostRect = ref.getBoundingClientRect();
@@ -159,15 +159,15 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 						// place it to the right of the left edge of the list.
 						rootState.pointer.x - (rootState.pointerOrigin.x - draggedRectSnapshot.x) <
 						rootRect.x + rootState.props.gap! / 2
-						? `${rootRect.x - draggedRectSnapshot.x + rootState.props.gap! / 2}px`
+						? rootRect.x - draggedRectSnapshot.x + rootState.props.gap! / 2
 						: // If the ghost is dragged to the right of the list,
 							// place it to the left of the right edge of the list.
 							rootState.pointer.x +
 									ghostRect.width -
 									(rootState.pointerOrigin.x - draggedRectSnapshot.x) >
 							  rootRect.right - rootState.props.gap! / 2
-							? `${rootRect.right - draggedRectSnapshot.x - ghostRect.width - rootState.props.gap! / 2}px`
-							: `${rootState.pointer.x - rootState.pointerOrigin.x}px`
+							? rootRect.right - draggedRectSnapshot.x - ghostRect.width - rootState.props.gap! / 2
+							: rootState.pointer.x - rootState.pointerOrigin.x
 					: 0;
 			const y =
 				rootState.props.direction === 'vertical' ||
@@ -176,17 +176,20 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 						// place it right below the top edge of the list.
 						rootState.pointer.y - (rootState.pointerOrigin.y - draggedRectSnapshot.y) <
 						rootRect.y + rootState.props.gap! / 2
-						? `${rootRect.y - draggedRectSnapshot.y + rootState.props.gap! / 2}px`
+						? rootRect.y - draggedRectSnapshot.y + rootState.props.gap! / 2
 						: // If the ghost is dragged below the bottom of the list,
 							// place it right above the bottom edge of the list.
 							rootState.pointer.y +
 									ghostRect.height -
 									(rootState.pointerOrigin.y - draggedRectSnapshot.y) >
 							  rootRect.bottom - rootState.props.gap! / 2
-							? `${rootRect.bottom - draggedRectSnapshot.y - ghostRect.height - rootState.props.gap! / 2}px`
-							: `${rootState.pointer.y - rootState.pointerOrigin.y}px`
+							? rootRect.bottom -
+								draggedRectSnapshot.y -
+								ghostRect.height -
+								rootState.props.gap! / 2
+							: rootState.pointer.y - rootState.pointerOrigin.y
 					: 0;
-			return `translate3d(${x}, ${y}, 0)`;
+			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 
 		if (
@@ -205,14 +208,14 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 			const ghostRect = ref.getBoundingClientRect();
 			const x =
 				rootState.props.direction === 'vertical'
-					? `${ghostRect.x - targetRectSnapshot.x + (ghostRect.width - targetRectSnapshot.width) / 2}px`
+					? ghostRect.x - targetRectSnapshot.x + (ghostRect.width - targetRectSnapshot.width) / 2
 					: calculateTranslate('x', ghostRect, targetRectSnapshot, draggedIndex, targetIndex);
 			const y =
 				rootState.props.direction === 'vertical'
 					? calculateTranslate('y', ghostRect, targetRectSnapshot, draggedIndex, targetIndex)
 					: calculateTranslateWithAlignment(rootState.props.ref, ghostRect, targetRectSnapshot);
 
-			return `translate3d(${x}, ${y}, 0)`;
+			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 
 		if (rootState.ghostState === 'ptr-remove') return ref.style.transform;
