@@ -22,9 +22,7 @@ export function calculateTranslate(
 	bIndex: number
 ) {
 	const dimension = axis === 'x' ? 'width' : 'height';
-	return aIndex < bIndex
-		? `${a[axis] - b[axis] + a[dimension] - b[dimension]}px`
-		: `${a[axis] - b[axis]}px`;
+	return aIndex < bIndex ? a[axis] - b[axis] + a[dimension] - b[dimension] : a[axis] - b[axis];
 }
 
 export function calculateTranslateWithAlignment(
@@ -34,10 +32,10 @@ export function calculateTranslateWithAlignment(
 ) {
 	const alignItems = window.getComputedStyle(root).alignItems;
 	return alignItems === 'center'
-		? `${a.y - b.y + (a.height - b.height) / 2}px`
+		? a.y - b.y + (a.height - b.height) / 2
 		: alignItems === 'end' || alignItems === 'flex-end'
-			? `${a.bottom - b.bottom}px`
-			: `${a.y - b.y}px`;
+			? a.bottom - b.bottom
+			: a.y - b.y;
 }
 
 export function joinCSSClasses(classes: string, restClasses: string | undefined) {

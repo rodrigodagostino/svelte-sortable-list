@@ -169,33 +169,35 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				(index < draggedIndex && index >= targetIndex)
 			) {
 				const step = index > draggedIndex ? -1 : 1;
-				const operator = index > draggedIndex === !$isRTL ? '-' : '';
+				const direction = index > draggedIndex === !$isRTL ? -1 : 1;
 				const neighborRectSnapshot = $itemRectsSnapshot[index + step];
+				const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
+
 				const x =
 					$rootProps.direction === 'vertical'
-						? '0'
-						: isInSameRow(rectSnapshot, neighborRectSnapshot)
-							? `${operator}${draggedRectSnapshot.width + $rootProps.gap!}px`
-							: `${neighborRectSnapshot.right - rectSnapshot.right}px`;
+						? 0
+						: isSameRow
+							? direction * (draggedRectSnapshot.width + $rootProps.gap!)
+							: neighborRectSnapshot.right - rectSnapshot.right;
 				const y =
 					$rootProps.direction === 'vertical'
-						? `${operator}${draggedRectSnapshot.height + $rootProps.gap!}px`
-						: isInSameRow(rectSnapshot, neighborRectSnapshot)
-							? '0'
+						? direction * (draggedRectSnapshot.height + $rootProps.gap!)
+						: isSameRow
+							? 0
 							: calculateTranslateWithAlignment(
 									$rootProps.ref!,
 									neighborRectSnapshot,
 									rectSnapshot
 								);
 
-				return `translate3d(${x}, ${y}, 0)`;
+				return `translate3d(${x}px, ${y}px, 0)`;
 			} else {
 				return 'translate3d(0, 0, 0)';
 			}
 		} else {
 			const x =
 				$rootProps.direction === 'vertical'
-					? '0'
+					? 0
 					: calculateTranslate(
 							'x',
 							targetRectSnapshot,
@@ -213,14 +215,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							targetIndex
 						)
 					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
-						? '0'
+						? 0
 						: calculateTranslateWithAlignment(
 								$rootProps.ref!,
 								targetRectSnapshot,
 								draggedRectSnapshot
 							);
 
-			return `translate3d(${x}, ${y}, 0)`;
+			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 	}
 
