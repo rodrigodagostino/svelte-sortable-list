@@ -44,10 +44,10 @@
 				{:else if item.type === 'select'}
 					<div class="form-field">
 						<label for="form-field-{item.id}">{item.text}</label>
-						<select id="form-field-{item.id}" name="form-field-{item.id}" value="option-2">
+						<select id="form-field-{item.id}" name="form-field-{item.id}">
 							<option value="">--Choose an option--</option>
 							<option value="option-1">Option 1</option>
-							<option value="option-2">Option 2</option>
+							<option value="option-2" selected>Option 2</option>
 							<option value="option-3">Option 3</option>
 						</select>
 					</div>
