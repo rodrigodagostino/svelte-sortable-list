@@ -31,6 +31,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 		calculateTranslateWithAlignment,
 		getIndex,
 		isInSameRow,
+		keepWithinBounds,
 		preserveFormFieldValues,
 	} from '$lib/utils/index.js';
 
@@ -174,37 +175,30 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 				return `translate3d(${x}px, ${y}px, 0)`;
 			}
 
-			const ghostRect = ref.getBoundingClientRect();
 			const rootRect = $rootProps.ref.getBoundingClientRect();
 			const x =
 				$rootProps.direction === 'horizontal' ||
 				($rootProps.direction === 'vertical' && !$rootProps.hasLockedAxis)
-					? // If the ghost is dragged to the left of the list,
-						// place it to the right of the left edge of the list.
-						$pointer.x - ($pointerOrigin.x - draggedRectSnapshot.x) <
-						rootRect.x + $rootProps.gap! / 2
-						? rootRect.x - draggedRectSnapshot.x + $rootProps.gap! / 2
-						: // If the ghost is dragged to the right of the list,
-							// place it to the left of the right edge of the list.
-							$pointer.x + ghostRect.width - ($pointerOrigin.x - draggedRectSnapshot.x) >
-							  rootRect.right - $rootProps.gap! / 2
-							? rootRect.right - draggedRectSnapshot.x - ghostRect.width - $rootProps.gap! / 2
-							: $pointer.x - $pointerOrigin.x
+					? keepWithinBounds(
+							'x',
+							$pointer.x,
+							$pointerOrigin.x,
+							rootRect,
+							draggedRectSnapshot,
+							$rootProps.gap!
+						)
 					: 0;
 			const y =
 				$rootProps.direction === 'vertical' ||
 				($rootProps.direction === 'horizontal' && !$rootProps.hasLockedAxis)
-					? // If the ghost is dragged above the top of the list,
-						// place it right below the top edge of the list.
-						$pointer.y - ($pointerOrigin.y - draggedRectSnapshot.y) <
-						rootRect.y + $rootProps.gap! / 2
-						? rootRect.y - draggedRectSnapshot.y + $rootProps.gap! / 2
-						: // If the ghost is dragged below the bottom of the list,
-							// place it right above the bottom edge of the list.
-							$pointer.y + ghostRect.height - ($pointerOrigin.y - draggedRectSnapshot.y) >
-							  rootRect.bottom - $rootProps.gap! / 2
-							? rootRect.bottom - draggedRectSnapshot.y - ghostRect.height - $rootProps.gap! / 2
-							: $pointer.y - $pointerOrigin.y
+					? keepWithinBounds(
+							'y',
+							$pointer.y,
+							$pointerOrigin.y,
+							rootRect,
+							draggedRectSnapshot,
+							$rootProps.gap!
+						)
 					: 0;
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}

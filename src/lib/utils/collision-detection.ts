@@ -32,3 +32,27 @@ export function getCollidingItem(ghostRect: DOMRect, itemRects: ItemRect[]) {
 		return currentDist < closestDist ? current : closest;
 	});
 }
+
+export function keepWithinBounds(
+	axis: 'x' | 'y',
+	pointer: number,
+	pointerOrigin: number,
+	rootRect: DOMRect,
+	draggedRectSnapshot: DOMRect | ItemRect,
+	gap: number
+) {
+	const rootStart = rootRect[axis];
+	const rootEnd = axis === 'x' ? rootRect.right : rootRect.bottom;
+	const draggedStart = draggedRectSnapshot[axis];
+	const draggedSize = axis === 'x' ? draggedRectSnapshot.width : draggedRectSnapshot.height;
+	const offset = pointerOrigin - draggedStart;
+	// If the dragged item moves before the start edge of the list,
+	// place it right after the start edge of the list.
+	if (pointer - offset < rootStart + gap / 2) return rootStart - draggedStart + gap / 2;
+	// If the dragged item moves past the end edge of the list,
+	// place it right before the end edge of the list.
+	if (pointer + draggedSize - offset > rootEnd - gap / 2)
+		return rootEnd - draggedStart - draggedSize - gap / 2;
+	// Otherwise, follow the pointer freely.
+	return pointer - pointerOrigin;
+}
