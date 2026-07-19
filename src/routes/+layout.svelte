@@ -499,13 +499,13 @@
 	:global(.ssl-root[data-has-locked-axis='true']) {
 		position: relative;
 
-		&::after {
+		&::before {
 			content: '';
 			position: absolute;
 			z-index: -1;
 		}
 
-		&[aria-orientation='vertical']::after {
+		&[aria-orientation='vertical']::before {
 			top: -8rem;
 			bottom: -8rem;
 			left: calc(50% - 0.125rem);
@@ -527,7 +527,7 @@
 			);
 		}
 
-		&[aria-orientation='horizontal']::after {
+		&[aria-orientation='horizontal']::before {
 			top: calc(50% - 0.125rem);
 			bottom: calc(50% - 0.125rem);
 			left: -8rem;
