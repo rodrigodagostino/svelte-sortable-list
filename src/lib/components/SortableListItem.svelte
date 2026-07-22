@@ -164,6 +164,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return 'translate3d(0, 0, 0)';
 
 		if (draggedId !== String(id)) {
+			if ($rootProps.canRemoveOnDropOut && !$isBetweenBounds) return 'translate3d(0, 0, 0)';
+
 			if (
 				(index > draggedIndex && index <= targetIndex) ||
 				(index < draggedIndex && index >= targetIndex)
@@ -228,7 +230,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
 	$: styleHeight = getStyleHeight($draggedItem, $isBetweenBounds);
-	$: styleTransform = getStyleTransform($dragState, $targetItem);
+	$: styleTransform = getStyleTransform($dragState, $targetItem, $isBetweenBounds);
 
 	async function handleFocus(e: FocusEvent) {
 		if ($dragState.includes('ptr')) {
