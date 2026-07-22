@@ -201,7 +201,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 			);
-		else if (canClearOnDragOut && !rootState.isBetweenBounds) rootState.targetItem = null;
+		else if (canClearOnDragOut && !rootState.isBetweenBounds)
+			rootState.targetItem = rootState.draggedItem;
 	}
 
 	function scroll() {
@@ -731,6 +732,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 
 		if (action === 'ptr-drop') {
+			if (!rootState.isBetweenBounds && canRemoveOnDropOut) rootState.targetItem = null;
 			await tick();
 			rootState.ghostState =
 				!rootState.isBetweenBounds && canRemoveOnDropOut
