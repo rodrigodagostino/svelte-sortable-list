@@ -125,6 +125,22 @@
 /**
  * canRemoveOnDropOut
  */
+.ssl-root[data-can-remove-on-drop-out="true"] {
+	& .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="true"] .ssl-item-content {
+		transition:
+			box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
+			opacity calc(var(--ssl-transition-duration) / 3 * 2) ease-out
+				calc(var(--ssl-transition-duration) / 3);
+	}
+
+	& .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="false"] .ssl-item-content {
+		opacity: 0;
+		transition:
+			box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
+			opacity calc(var(--ssl-transition-duration) / 3 * 2) ease-in;
+	}
+}
+
 .ssl-ghost[data-can-remove-on-drop-out="true"] .ssl-item-content {
 	transition:
 		background-color calc(var(--ssl-transition-duration) / 3 * 2),
