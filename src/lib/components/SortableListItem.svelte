@@ -151,6 +151,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return 'translate3d(0, 0, 0)';
 
 		if (draggedId !== String(id)) {
+			if (rootState.props.canRemoveOnDropOut && !rootState.isBetweenBounds)
+				return 'translate3d(0, 0, 0)';
+
 			if (
 				(index > draggedIndex && index <= targetIndex) ||
 				(index < draggedIndex && index >= targetIndex)
@@ -226,6 +229,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.targetItem;
+		void rootState.isBetweenBounds;
 		return untrack(() => getStyleTransform());
 	});
 
