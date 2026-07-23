@@ -236,7 +236,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 
 	async function handleFocus(e: FocusEvent) {
-		if (rootState.dragState.includes('ptr')) {
+		if (rootState.dragState.startsWith('ptr')) {
 			e.preventDefault();
 			return;
 		}
