@@ -716,8 +716,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	) {
 		if (
 			!$draggedItem ||
-			(action.includes('ptr') && $dragState === 'ptr-drop') ||
-			(action.includes('kbd') && $dragState === 'kbd-drop')
+			(action.startsWith('ptr') && $dragState === 'ptr-drop') ||
+			(action.startsWith('kbd') && $dragState === 'kbd-drop')
 		)
 			return;
 
@@ -831,7 +831,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		$dragState = 'idle';
 
 		dispatch('dragend', {
-			deviceType: action.includes('ptr') ? 'pointer' : 'keyboard',
+			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
 			draggedItem: $draggedItem,
 			draggedItemId: $draggedItem.id,
 			draggedItemIndex: getIndex($draggedItem),
@@ -840,7 +840,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			targetItemIndex: $targetItem ? getIndex($targetItem) : null,
 			isBetweenBounds: $isBetweenBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
-			isCanceled: action.includes('cancel'),
+			isCanceled: action.endsWith('cancel'),
 		});
 
 		if (typeof pointerId === 'number' && $draggedItem?.hasPointerCapture(pointerId))
