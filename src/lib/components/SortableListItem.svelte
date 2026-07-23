@@ -155,11 +155,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			!$itemRectsSnapshot ||
 			!$draggedItem ||
 			!$targetItem ||
-			rectSnapshot === null ||
+			!rectSnapshot ||
 			draggedIndex === null ||
-			draggedRectSnapshot === null ||
+			!draggedRectSnapshot ||
 			targetIndex === null ||
-			targetRectSnapshot === null
+			!targetRectSnapshot
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -167,65 +167,63 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			if ($rootProps.canRemoveOnDropOut && !$isBetweenBounds) return 'translate3d(0, 0, 0)';
 
 			if (
-				(index > draggedIndex && index <= targetIndex) ||
-				(index < draggedIndex && index >= targetIndex)
-			) {
-				const step = index > draggedIndex ? -1 : 1;
-				const direction = index > draggedIndex === !$isRTL ? -1 : 1;
-				const neighborRectSnapshot = $itemRectsSnapshot[index + step];
-				const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
-
-				const x =
-					$rootProps.direction === 'vertical'
-						? 0
-						: isSameRow
-							? direction * (draggedRectSnapshot.width + $rootProps.gap!)
-							: neighborRectSnapshot.right - rectSnapshot.right;
-				const y =
-					$rootProps.direction === 'vertical'
-						? direction * (draggedRectSnapshot.height + $rootProps.gap!)
-						: isSameRow
-							? 0
-							: calculateTranslateWithAlignment(
-									$rootProps.ref!,
-									neighborRectSnapshot,
-									rectSnapshot
-								);
-
-				return `translate3d(${x}px, ${y}px, 0)`;
-			} else {
+				targetIndex === null ||
+				// Check if the item is outside the range between
+				// the dragged item’s origin and the target item.
+				index < Math.min(draggedIndex, targetIndex) ||
+				index > Math.max(draggedIndex, targetIndex)
+			)
 				return 'translate3d(0, 0, 0)';
-			}
-		} else {
+
+			const step = index > draggedIndex ? -1 : 1;
+			const direction = index > draggedIndex === !$isRTL ? -1 : 1;
+			const neighborRectSnapshot = $itemRectsSnapshot[index + step];
+			const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
+
 			const x =
 				$rootProps.direction === 'vertical'
 					? 0
-					: calculateTranslate(
-							'x',
-							targetRectSnapshot,
-							draggedRectSnapshot,
-							draggedIndex,
-							targetIndex
-						);
+					: isSameRow
+						? direction * (draggedRectSnapshot.width + $rootProps.gap!)
+						: neighborRectSnapshot.right - rectSnapshot.right;
 			const y =
 				$rootProps.direction === 'vertical'
-					? calculateTranslate(
-							'y',
-							targetRectSnapshot,
-							draggedRectSnapshot,
-							draggedIndex,
-							targetIndex
-						)
-					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+					? direction * (draggedRectSnapshot.height + $rootProps.gap!)
+					: isSameRow
 						? 0
-						: calculateTranslateWithAlignment(
-								$rootProps.ref!,
-								targetRectSnapshot,
-								draggedRectSnapshot
-							);
+						: calculateTranslateWithAlignment($rootProps.ref!, neighborRectSnapshot, rectSnapshot);
 
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}
+
+		const x =
+			$rootProps.direction === 'vertical'
+				? 0
+				: calculateTranslate(
+						'x',
+						targetRectSnapshot,
+						draggedRectSnapshot,
+						draggedIndex,
+						targetIndex
+					);
+		const y =
+			$rootProps.direction === 'vertical'
+				? calculateTranslate(
+						'y',
+						targetRectSnapshot,
+						draggedRectSnapshot,
+						draggedIndex,
+						targetIndex
+					)
+				: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+					? 0
+					: calculateTranslateWithAlignment(
+							$rootProps.ref!,
+							targetRectSnapshot,
+							draggedRectSnapshot
+						);
+
+		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
 	$: styleWidth = getStyleWidth($draggedItem, $isBetweenBounds);
