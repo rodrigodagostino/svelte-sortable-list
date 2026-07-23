@@ -785,7 +785,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		targetIndex: number | null
 	) {
 		ondrop?.({
-			deviceType: action.includes('pointer') ? 'pointer' : 'keyboard',
+			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
 			draggedItem: rootState.draggedItem!,
 			draggedItemId: rootState.draggedItem!.id,
 			draggedItemIndex: draggedIndex,
