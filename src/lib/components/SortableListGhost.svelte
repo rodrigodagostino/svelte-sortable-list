@@ -15,7 +15,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import SortableListItem from './SortableListItem.svelte';
-	import { portal } from '$lib/actions/index.js';
+	import { portal } from '$lib/attachments/index.js';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListGhostProps as GhostProps } from '$lib/types/index.js';
 	import {
@@ -243,7 +243,7 @@ Serves as the dragged item placeholder during the drag-and-drop interactions tri
 	data-can-remove-on-drop-out={rootState.props.canRemoveOnDropOut}
 	aria-hidden="true"
 	onpointerdown={handlePointerDown}
-	use:portal
+	{@attach portal}
 >
 	<!-- The following if clause will prevent <SortableListItem> -->
 	<!-- from transitioning out on page navigation. -->
