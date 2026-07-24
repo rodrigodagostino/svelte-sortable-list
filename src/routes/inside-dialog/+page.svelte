@@ -150,7 +150,11 @@
 		position: absolute;
 		top: 1rem;
 		right: 1rem;
-		font-size: 0.875rem;
+
+		@media (min-width: 48em) {
+			top: 1.5rem;
+			right: 1.5rem;
+		}
 	}
 
 	@keyframes fade-in {
