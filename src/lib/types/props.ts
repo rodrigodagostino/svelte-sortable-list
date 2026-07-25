@@ -102,6 +102,15 @@ export interface SortableListItemProps extends Pick<
 	children?: Snippet;
 }
 
+export interface SortableListPlaceholderProps {
+	/** Reference to the placeholder element. `[$bindable]` */
+	ref?: HTMLLIElement | null;
+	/** Unique identifier of the item being replaced by the placeholder. */
+	id: string;
+	/** Position of the placeholder in the list. */
+	index: number;
+}
+
 export interface SortableListGhostProps {
 	/** Reference to the ghost element. `[$bindable]` */
 	ref?: HTMLDivElement | null;
