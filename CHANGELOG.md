@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.5] (2026-07-25)
+
+### Added
+
+- Fade dragged item out of bounds when `canRemoveOnDropOut` is on in base styles.
+
+### Changed
+
+- Replace duplicated drag-boundary calculations with `keepWithinBounds`.
+- Simplify `<SortableListItem>` `getStyleTransform()` guards.
+- Prefer `startsWith`/`endsWith` over includes for prefix/suffix checks.
+- Convert `portal` action into attachment.
+
+### Fixed
+
+- Stop `canRemoveOnDropOut` from triggering target clear on drag out.
+- Stop `targetItem`/`draggedItem` flicker loop on drag out.
+- Correct `deviceType` detection on drop.
+
+### Chore
+
+- Bump svelte peer dependency to `^5.29.0`, version which introduced attachments.
+
+### Docs
+
+- Avoid conflict between bounds and axis decoration in demo pages.
+- Align dialog close button with menu button in demo pages.
+
 ## [2.2.4] (2026-07-16)
 
 ### Changed
@@ -1614,7 +1642,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.5...HEAD
+[2.2.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.4...v2.2.5
 [2.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.3...v2.2.4
 [2.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.2...v2.2.3
 [2.2.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.1...v2.2.2
