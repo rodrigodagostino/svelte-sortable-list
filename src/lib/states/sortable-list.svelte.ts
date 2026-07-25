@@ -4,7 +4,6 @@ import type { SortableListRootStateContext as Context } from '$lib/types/index.j
 class SortableListRootState {
 	props: Context['props'] = $state({});
 	dragState: Context['dragState'] = $state('idle');
-	ghostState: Context['ghostState'] = $state('idle');
 	draggedItem: Context['draggedItem'] = $state(null);
 	targetItem: Context['targetItem'] = $state(null);
 	focusedItem: Context['focusedItem'] = $state(null);

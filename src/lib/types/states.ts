@@ -8,13 +8,14 @@ export interface SortableListRootStateContext {
 		| 'idle'
 		| 'ptr-drag-start'
 		| 'ptr-drag'
+		| 'ptr-predrop'
 		| 'ptr-drop'
 		| 'ptr-cancel'
+		| 'ptr-remove'
 		| 'kbd-drag-start'
 		| 'kbd-drag'
 		| 'kbd-drop'
 		| 'kbd-cancel';
-	ghostState: 'idle' | 'ptr-drag-start' | 'ptr-drag' | 'ptr-predrop' | 'ptr-drop' | 'ptr-remove';
 	draggedItem: HTMLLIElement | null;
 	targetItem: HTMLLIElement | null;
 	focusedItem: HTMLLIElement | null;

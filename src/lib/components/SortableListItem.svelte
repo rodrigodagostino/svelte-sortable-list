@@ -26,6 +26,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	import { onMount, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
+	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import { getSortableListRootState } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
@@ -38,6 +39,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
 		isOrResidesInInteractiveElement,
+		keepWithinBounds,
 	} from '$lib/utils/index.js';
 
 	let {
@@ -61,7 +63,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const rootState = getSortableListRootState();
 
 	const classes = $derived(['ssl-item', restProps.class]);
-	const isGhost = $derived(!!ref?.parentElement?.classList.contains('ssl-ghost'));
 
 	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -96,57 +97,104 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
 	// rootState.itemRectsSnapshot is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof draggedIndex === 'number'
-			? rootState.itemRectsSnapshot[draggedIndex]
-			: null
-	);
+	const draggedRectSnapshot = $derived.by(() => {
+		if (!rootState.itemRectsSnapshot || typeof draggedIndex !== 'number') return null;
+		const rect = rootState.itemRectsSnapshot[draggedIndex];
+		const { scrollOffset } = rootState;
+		return !scrollOffset.left && !scrollOffset.top
+			? rect
+			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
+	});
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
-	const targetRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof targetIndex === 'number'
-			? rootState.itemRectsSnapshot[targetIndex]
-			: null
-	);
+	const targetRectSnapshot = $derived.by(() => {
+		if (!rootState.itemRectsSnapshot || typeof targetIndex !== 'number') return null;
+		const rect = rootState.itemRectsSnapshot[targetIndex];
+		const { scrollOffset } = rootState;
+		return !scrollOffset.left && !scrollOffset.top
+			? rect
+			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
+	});
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
+
+	function getStylePosition() {
+		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr')) return undefined;
+		return 'fixed';
+	}
+
+	function getStyleLeft() {
+		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot)
+			return undefined;
+
+		if (
+			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
+			draggedRectSnapshot &&
+			targetRectSnapshot &&
+			typeof draggedIndex === 'number' &&
+			typeof targetIndex === 'number'
+		) {
+			const left =
+				rootState.props.direction === 'vertical'
+					? draggedRectSnapshot.x
+					: draggedIndex < targetIndex
+						? targetRectSnapshot.right - draggedRectSnapshot.width
+						: targetRectSnapshot.x;
+			return `${left}px`;
+		}
+
+		return `${rectSnapshot.x}px`;
+	}
+
+	function getStyleTop() {
+		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot || !ref)
+			return undefined;
+
+		if (
+			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
+			draggedRectSnapshot &&
+			targetRectSnapshot &&
+			typeof draggedIndex === 'number' &&
+			typeof targetIndex === 'number'
+		) {
+			const alignItems =
+				rootState.props.ref && window.getComputedStyle(rootState.props.ref).alignItems;
+			const top =
+				rootState.props.direction === 'vertical'
+					? draggedIndex < targetIndex
+						? targetRectSnapshot.bottom - draggedRectSnapshot.height
+						: targetRectSnapshot.y
+					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+						? draggedRectSnapshot.y
+						: alignItems === 'center'
+							? targetRectSnapshot.y + (targetRectSnapshot.height - draggedRectSnapshot.height) / 2
+							: alignItems === 'end' || alignItems === 'flex-end'
+								? targetRectSnapshot.bottom - draggedRectSnapshot.height
+								: targetRectSnapshot.y;
+			return `${top}px`;
+		}
+
+		return `${rectSnapshot.y}px`;
+	}
 
 	function getStyleWidth() {
 		if (draggedId !== String(id)) return undefined;
-		if (
-			!isGhost &&
-			rootState.props.direction === 'horizontal' &&
-			!rootState.isBetweenBounds &&
-			rootState.props.canRemoveOnDropOut
-		)
-			return '0';
 		return `${rectSnapshot?.width}px`;
 	}
 
 	function getStyleHeight() {
 		if (draggedId !== String(id)) return undefined;
-		if (
-			!isGhost &&
-			rootState.props.direction === 'vertical' &&
-			!rootState.isBetweenBounds &&
-			rootState.props.canRemoveOnDropOut
-		)
-			return '0';
 		return `${rectSnapshot?.height}px`;
 	}
 
 	function getStyleTransform() {
-		if (isGhost) return 'none';
 		if (
 			rootState.dragState === 'idle' ||
 			rootState.dragState === 'ptr-cancel' ||
 			rootState.dragState === 'kbd-cancel' ||
 			!rootState.itemRectsSnapshot ||
 			!rootState.draggedItem ||
-			!rootState.targetItem ||
 			!rectSnapshot ||
 			draggedIndex === null ||
-			!draggedRectSnapshot ||
-			targetIndex === null ||
-			!targetRectSnapshot
+			!draggedRectSnapshot
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -188,48 +236,123 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 
-		const x =
-			rootState.props.direction === 'vertical'
-				? 0
-				: calculateTranslate(
-						'x',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					);
-		const y =
-			rootState.props.direction === 'vertical'
-				? calculateTranslate(
-						'y',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					)
-				: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+		if (rootState.dragState.startsWith('kbd')) {
+			if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
+
+			const x =
+				rootState.props.direction === 'vertical'
 					? 0
-					: calculateTranslateWithAlignment(
-							rootState.props.ref!,
+					: calculateTranslate(
+							'x',
 							targetRectSnapshot,
-							draggedRectSnapshot
+							draggedRectSnapshot,
+							draggedIndex,
+							targetIndex
 						);
+			const y =
+				rootState.props.direction === 'vertical'
+					? calculateTranslate(
+							'y',
+							targetRectSnapshot,
+							draggedRectSnapshot,
+							draggedIndex,
+							targetIndex
+						)
+					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+						? 0
+						: calculateTranslateWithAlignment(
+								rootState.props.ref!,
+								targetRectSnapshot,
+								draggedRectSnapshot
+							);
+
+			return `translate3d(${x}px, ${y}px, 0)`;
+		}
+
+		if (rootState.dragState === 'ptr-remove') return ref?.style.transform;
+
+		if (rootState.dragState === 'ptr-drop') return 'translate3d(0, 0, 0)';
+
+		const rootRect = rootState.props.ref!.getBoundingClientRect();
+		// Take a live read of the dragged item’s rect to avoid stale values.
+		const draggedRect = rootState.draggedItem.getBoundingClientRect();
+
+		if (
+			rootState.dragState === 'ptr-predrop' &&
+			targetRectSnapshot &&
+			typeof targetIndex === 'number'
+		) {
+			const x =
+				rootState.props.direction === 'vertical'
+					? draggedRect.x -
+						targetRectSnapshot.x +
+						(draggedRect.width - targetRectSnapshot.width) / 2
+					: calculateTranslate('x', draggedRect, targetRectSnapshot, draggedIndex, targetIndex);
+			const y =
+				rootState.props.direction === 'vertical'
+					? calculateTranslate('y', draggedRect, targetRectSnapshot, draggedIndex, targetIndex)
+					: calculateTranslateWithAlignment(rootState.props.ref!, draggedRect, targetRectSnapshot);
+
+			return `translate3d(${x}px, ${y}px, 0)`;
+		}
+
+		if (!rootState.pointer || !rootState.pointerOrigin) return 'translate3d(0, 0, 0)';
+
+		const x =
+			rootState.props.direction === 'horizontal' ||
+			(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
+				? rootState.props.hasBoundaries
+					? keepWithinBounds(
+							'x',
+							rootState.pointer.x,
+							rootState.pointerOrigin.x,
+							rootRect,
+							draggedRectSnapshot,
+							rootState.props.gap!
+						)
+					: rootState.pointer.x - rootState.pointerOrigin.x
+				: 0;
+		const y =
+			rootState.props.direction === 'vertical' ||
+			(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
+				? rootState.props.hasBoundaries
+					? keepWithinBounds(
+							'y',
+							rootState.pointer.y,
+							rootState.pointerOrigin.y,
+							rootRect,
+							draggedRectSnapshot,
+							rootState.props.gap!
+						)
+					: rootState.pointer.y - rootState.pointerOrigin.y
+				: 0;
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
+	const stylePosition = $derived.by(() => {
+		void rootState.dragState;
+		return untrack(() => getStylePosition());
+	});
+	const styleLeft = $derived.by(() => {
+		void rootState.dragState;
+		return untrack(() => getStyleLeft());
+	});
+	const styleTop = $derived.by(() => {
+		void rootState.dragState;
+		return untrack(() => getStyleTop());
+	});
 	const styleWidth = $derived.by(() => {
 		void rootState.draggedItem;
-		void rootState.isBetweenBounds;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.draggedItem;
-		void rootState.isBetweenBounds;
 		return untrack(() => getStyleHeight());
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
+		void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isBetweenBounds;
 		return untrack(() => getStyleTransform());
@@ -271,17 +394,24 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	};
 </script>
 
+{#if draggedId === String(id) && rootState.dragState.startsWith('ptr')}
+	<SortableListPlaceholder {id} {index} />
+{/if}
 <li
 	bind:this={ref}
 	{id}
 	class={classes}
+	style:position={stylePosition}
+	style:left={styleLeft}
+	style:top={styleTop}
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:transform={styleTransform}
+	style:--ssl-transition-duration="{rootState.props?.transition?.duration}ms"
+	style:--ssl-transition-easing={rootState.props?.transition?.easing}
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
-	data-is-ghost={isGhost}
 	data-is-between-bounds={!rootState.isBetweenBounds && draggedId === String(id) ? false : true}
 	data-is-locked={rootState.props.isLocked || isLocked}
 	data-is-disabled={rootState.props.isDisabled || isDisabled}
@@ -332,23 +462,20 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			}
 		}
 
-		&:not([data-drag-state='idle']),
-		&:has(:global(~ *:not([data-drag-state='idle']))),
+		&[data-drag-state='ptr-drop'],
+		&[data-drag-state*='kbd'],
+		&:has(~ :global(*:not([data-drag-state='idle']))),
 		&:not([data-drag-state='idle']) ~ :global(*) {
-			transition:
-				width var(--ssl-transition-duration),
-				height var(--ssl-transition-duration),
-				margin var(--ssl-transition-duration),
-				transform var(--ssl-transition-duration);
+			transition: transform var(--ssl-transition-duration);
 		}
 
-		&[data-is-ghost='true'] {
-			margin: 0;
-			transition: none;
+		&[data-drag-state='ptr-drop'] {
+			transition-timing-function: var(--ssl-transition-easing);
 		}
 
 		&[data-drag-state*='ptr'] {
-			z-index: 0;
+			margin: 0;
+			z-index: 9999;
 		}
 
 		&[data-drag-state*='kbd'] {

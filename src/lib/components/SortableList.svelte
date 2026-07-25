@@ -9,8 +9,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `direction`: orientation in which items will be arranged.
 - `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.
 - `transition`:
-		- `duration`: time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.
-		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the ghost drop transition.
+		- `duration`: time the transitions for the items (dropping, translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations.
+		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the dragged item drop transition.
 - `hasWrapping`: if `true`, items can wrap onto multiple lines.
 - `hasLockedAxis`: if `true`, prevents the dragged item from moving away from the main axis.
 - `hasBoundaries`: if `true`, items will only be draggable inside the list limits.
@@ -44,12 +44,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 <script lang="ts">
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
-	import SortableListGhost from '$lib/components/SortableListGhost.svelte';
 	import { setSortableListRootState } from '$lib/states/index.js';
-	import type {
-		SortableListRootProps as RootProps,
-		SortableListGhostProps as GhostProps,
-	} from '$lib/types/index.js';
+	import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
 		afterPaint,
 		announce,
@@ -69,8 +65,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		scrollIntoView,
 		shouldAutoScroll,
 	} from '$lib/utils/index.js';
-
-	let ghostRef: GhostProps['ref'] = $state(null);
 
 	let {
 		ref = $bindable(null),
@@ -173,11 +167,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	function updateTargetItem() {
-		if (!rootState.itemRectsSnapshot || !ref || !ghostRef) return;
+		if (!rootState.itemRectsSnapshot || !ref || !rootState.draggedItem) return;
 
-		const rawGhostRect = ghostRef.getBoundingClientRect();
+		const draggedRect = rootState.draggedItem.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
-		rootState.isBetweenBounds = areColliding(rawGhostRect, rootRect);
+		rootState.isBetweenBounds = areColliding(draggedRect, rootRect);
 		if (scrollableAncestor) {
 			rootState.scrollOffset = {
 				left: scrollableAncestor.scrollLeft - scrollOrigin.left,
@@ -185,18 +179,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			};
 		}
 
-		// Offset the ghost rect by the current scroll.
-		const ghostRect =
+		// Offset the dragged rect by the current scroll.
+		const draggedRectWithOffset =
 			rootState.scrollOffset?.left || rootState.scrollOffset?.top
 				? new DOMRect(
-						rawGhostRect.x + rootState.scrollOffset.left,
-						rawGhostRect.y + rootState.scrollOffset.top,
-						rawGhostRect.width,
-						rawGhostRect.height
+						draggedRect.x + rootState.scrollOffset.left,
+						draggedRect.y + rootState.scrollOffset.top,
+						draggedRect.width,
+						draggedRect.height
 					)
-				: rawGhostRect;
+				: draggedRect;
 
-		const collidingItemRect = getCollidingItem(ghostRect, rootState.itemRectsSnapshot);
+		const collidingItemRect = getCollidingItem(draggedRectWithOffset, rootState.itemRectsSnapshot);
 		if (collidingItemRect)
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
@@ -265,7 +259,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.dragState === 'kbd-cancel'
 		) {
 			const isPtrState = rootState.dragState.startsWith('ptr');
-			const element = isPtrState ? ghostRef : rootState.focusedItem;
+			const element = isPtrState ? rootState.draggedItem : rootState.focusedItem;
 			e.preventDefault();
 			interruptDropTransition(element, rootState.dragState);
 			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
@@ -342,8 +336,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
 
 		await tick();
-		rootState.ghostState = 'ptr-drag-start';
-		await tick();
 		rootState.dragState = 'ptr-drag-start';
 
 		ondragstart?.({
@@ -409,10 +401,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 
 		rafId = requestAnimationFrame(() => {
-			if (rootState.dragState === 'ptr-drag-start') {
-				rootState.ghostState = 'ptr-drag';
-				rootState.dragState = 'ptr-drag';
-			}
+			if (rootState.dragState === 'ptr-drag-start') rootState.dragState = 'ptr-drag';
 
 			if (!rootState.draggedItem) return;
 
@@ -451,11 +440,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	function handlePointerUp() {
-		handlePointerAndKeyboardDrop(ghostRef!, 'ptr-drop');
+		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-drop');
 	}
 
 	function handlePointerCancel() {
-		handlePointerAndKeyboardDrop(ghostRef!, 'ptr-cancel');
+		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-cancel');
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
@@ -468,7 +457,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.dragState === 'kbd-cancel'
 		) {
 			const isPtrState = rootState.dragState.startsWith('ptr');
-			const element = isPtrState ? ghostRef : rootState.focusedItem;
+			const element = isPtrState ? rootState.draggedItem : rootState.focusedItem;
 			e.preventDefault();
 			interruptDropTransition(element, rootState.dragState);
 			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
@@ -734,25 +723,23 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (action === 'ptr-drop') {
 			if (!rootState.isBetweenBounds && canRemoveOnDropOut) rootState.targetItem = null;
 			await tick();
-			rootState.ghostState =
+			rootState.dragState =
 				!rootState.isBetweenBounds && canRemoveOnDropOut
 					? 'ptr-remove'
 					: _transition.duration > 0
 						? 'ptr-predrop'
 						: 'ptr-drop';
-			// Wait until the CSS transform in <SortableListGhost> that
-			// depends on `ptr-predrop` has been set before continuing.
-			afterPaint(_transition.duration, async () => {
-				if (rootState.ghostState === 'ptr-predrop') {
+			if (rootState.dragState === 'ptr-predrop') {
+				// Wait until the CSS transform in <SortableListItem> that
+				// depends on `ptr-predrop` has been set before continuing.
+				afterPaint(_transition.duration, async () => {
 					await tick();
-					rootState.ghostState = 'ptr-drop';
-				}
-				rootState.dragState = 'ptr-drop';
-			});
+					rootState.dragState = 'ptr-drop';
+				});
+			}
 		} else if (action === 'ptr-cancel') {
 			await tick();
 			rootState.targetItem = rootState.draggedItem;
-			if (rootState.ghostState !== 'ptr-remove') rootState.ghostState = 'ptr-drop';
 			rootState.dragState = 'ptr-cancel';
 		}
 
@@ -833,7 +820,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const draggedItem = rootState.draggedItem;
 		const targetItem = rootState.targetItem;
 
-		rootState.ghostState = 'idle';
 		rootState.dragState = 'idle';
 
 		ondragend?.({
@@ -919,7 +905,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		</p>
 	{/if}
 </ul>
-<SortableListGhost bind:ref={ghostRef} />
 <div class="ssl-live-region" aria-live="assertive" aria-atomic="true">{liveText}</div>
 
 <style>
@@ -950,11 +935,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			&[data-can-remove-on-drop-out='true'] :global(.ssl-item[data-is-between-bounds='false']) {
 				margin: calc(var(--ssl-gap) / 2) 0;
 			}
-		}
-
-		&[data-can-remove-on-drop-out='true']
-			:global(.ssl-item[data-is-ghost='false'][data-drag-state*='ptr']) {
-			overflow: hidden;
 		}
 	}
 

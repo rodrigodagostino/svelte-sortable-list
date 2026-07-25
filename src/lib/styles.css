@@ -54,12 +54,22 @@
 	border-radius: 0.25rem;
 	outline-offset: 0.125rem;
 
-	&[data-is-ghost="false"][data-drag-state*="ptr"] .ssl-item-content {
-		opacity: 0.5;
+	&[data-drag-state*="drag"] .ssl-item-content {
+		box-shadow:
+			inset 0 0 0 0.0625rem var(--ssl-gray-300),
+			var(--ssl-box-shadow-1);
+	}
 
-		& > * {
-			opacity: 0;
-		}
+	&[aria-disabled="true"] .ssl-item-content {
+		opacity: 0.5;
+	}
+}
+
+.ssl-placeholder .ssl-item-content {
+	opacity: 0.5;
+
+	& > * {
+		opacity: 0;
 	}
 }
 
@@ -78,22 +88,13 @@
 	text-transform: uppercase;
 	box-shadow: inset 0 0 0 0.0625rem var(--ssl-gray-300);
 	opacity: 1;
-	transition: box-shadow calc(var(--ssl-transition-duration) / 3 * 2);
+	transition:
+		background-color calc(var(--ssl-transition-duration) / 3 * 2),
+		box-shadow calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
 .ssl-item-content__text {
 	margin: 0.625rem auto;
-}
-
-.ssl-item[aria-disabled="true"] .ssl-item-content {
-	opacity: 0.5;
-}
-
-.ssl-item[data-drag-state*="ptr-drag"][data-is-ghost="true"] .ssl-item-content,
-.ssl-item[data-drag-state*="kbd-drag"] .ssl-item-content {
-	box-shadow:
-		inset 0 0 0 0.0625rem var(--ssl-gray-300),
-		var(--ssl-box-shadow-1);
 }
 
 .ssl-item-handle,
@@ -107,11 +108,10 @@
 	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
-.ssl-item[data-is-ghost="false"] .ssl-item-handle:hover,
+.ssl-item-handle:hover,
+.ssl-item[data-drag-state*="ptr"] .ssl-item-handle,
 .ssl-item-remove:focus,
-.ssl-item-remove:hover,
-.ssl-item[data-is-ghost="true"][data-drag-state="idle"] .ssl-item-handle,
-.ssl-item[data-is-ghost="true"][data-drag-state*="ptr-drag"] .ssl-item-handle {
+.ssl-item-remove:hover {
 	background-color: var(--ssl-gray-150);
 	color: var(--ssl-gray-700);
 }
@@ -128,35 +128,24 @@
  * canRemoveOnDropOut
  */
 .ssl-root[data-can-remove-on-drop-out="true"] {
-	& .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="true"] .ssl-item-content {
+	&
+		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="true"])
+		.ssl-item-content {
 		transition: opacity calc(var(--ssl-transition-duration) / 3 * 2) ease-out
 			calc(var(--ssl-transition-duration) / 3);
 	}
 
-	& .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="false"] .ssl-item-content {
+	&
+		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="false"])
+		.ssl-item-content {
 		opacity: 0;
 		transition: opacity calc(var(--ssl-transition-duration) / 3) ease-in;
 	}
-}
 
-.ssl-ghost[data-can-remove-on-drop-out="true"] .ssl-item-content {
-	transition:
-		background-color calc(var(--ssl-transition-duration) / 3 * 2),
-		box-shadow calc(var(--ssl-transition-duration) / 3 * 2),
-		opacity var(--ssl-transition-duration);
-}
-
-.ssl-ghost[data-can-remove-on-drop-out="true"]
-	.ssl-item[data-drag-state="ptr-drop"][data-is-between-bounds="false"]
-	.ssl-item-content {
-	opacity: 0;
-}
-
-.ssl-ghost[data-can-remove-on-drop-out="true"]
-	.ssl-item[data-is-between-bounds="false"]
-	.ssl-item-content {
-	background-color: var(--ssl-rose-300);
-	box-shadow:
-		inset 0 0 0 0.0625rem var(--ssl-rose-400),
-		var(--ssl-box-shadow-1);
+	& .ssl-item[data-is-between-bounds="false"] .ssl-item-content {
+		background-color: var(--ssl-rose-300);
+		box-shadow:
+			inset 0 0 0 0.0625rem var(--ssl-rose-400),
+			var(--ssl-box-shadow-1);
+	}
 }

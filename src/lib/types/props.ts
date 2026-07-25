@@ -29,9 +29,9 @@ export interface SortableListRootProps extends Pick<
 	delay?: number;
 	/** Object containing `transition` and `duration` properties. */
 	transition?: {
-		/** Time the transitions for the ghost (dropping) and items (translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations. */
+		/** Time the transitions for the items (dropping, translation, addition, removal) take to complete (in milliseconds). Assign it a value of `0` to remove animations. */
 		duration?: number;
-		/** Mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the ghost drop transition. */
+		/** Mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the dragged item drop transition. */
 		easing?:
 			| 'ease'
 			| 'ease-in'
@@ -109,11 +109,6 @@ export interface SortableListPlaceholderProps {
 	id: string;
 	/** Position of the placeholder in the list. */
 	index: number;
-}
-
-export interface SortableListGhostProps {
-	/** Reference to the ghost element. `[$bindable]` */
-	ref?: HTMLDivElement | null;
 }
 
 export interface SortableListItemHandleProps {
