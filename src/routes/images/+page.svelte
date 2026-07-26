@@ -156,13 +156,12 @@
 			align-items: center;
 		}
 
-		& .ssl-item[data-drag-state*='ptr-drag'] .ssl-item-image {
+		& .ssl-placeholder .ssl-item-image {
 			opacity: 0.5;
 		}
 	}
 
-	:global(.ssl-item[data-drag-state*='ptr-drag'][data-is-ghost='true'] .ssl-item-image),
-	:global(.ssl-item[data-drag-state*='kbd-drag'] .ssl-item-image) {
+	:global(.ssl-item[data-drag-state*='drag'] .ssl-item-image) {
 		box-shadow: var(--ssl-box-shadow-2);
 		transform: rotate3d(0, 0, 1, -10deg);
 	}
