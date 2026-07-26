@@ -91,7 +91,6 @@ export function scaleFly(
 			`margin-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * margin_end_value : margin_end_value}px;` +
 			`border-${secondary_properties[0]}-width: ${t <= 0.5 ? t * 2 * border_width_start_value : border_width_start_value}px;` +
 			`border-${secondary_properties[1]}-width: ${t <= 0.5 ? t * 2 * border_width_end_value : border_width_end_value}px;` +
-			`min-${primary_property}: 0;` +
-			'overflow: hidden;',
+			`min-${primary_property}: 0;`,
 	};
 }
