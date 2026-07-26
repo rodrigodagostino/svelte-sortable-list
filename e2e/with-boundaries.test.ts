@@ -13,10 +13,7 @@ test.describe('Sortable List - With Boundaries', () => {
 	test('should prevent dragging items outside boundaries', async ({ page }) => {
 		// Find the dragged item (List Item 1) and its initial position
 		const root = page.locator('.ssl-root');
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
-
-		// Find the ghost element
-		const ghost = page.locator('.ssl-ghost');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 
 		// Get the viewport size
 		const viewport = page.viewportSize();
@@ -24,7 +21,7 @@ test.describe('Sortable List - With Boundaries', () => {
 
 		// Get the bounding boxes for a precise drag operation
 		const rootBox = await root.boundingBox();
-		const draggedBox = await draggedItem.boundingBox();
+		let draggedBox = await draggedItem.boundingBox();
 		if (!rootBox || !draggedBox)
 			throw new Error('Could not get Root element or List Item 1 bounding box');
 
@@ -47,11 +44,11 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The item should be constrained by the left and top boundaries
-		let ghostBox = await ghost.boundingBox();
-		if (!ghostBox) throw new Error('Could not get ghost bounding box');
-		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(ghostBox.x);
-		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(ghostBox.y);
+		// The dragged item should be constrained by the left and top boundaries
+		draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get ghost bounding box');
+		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(draggedBox.x);
+		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(draggedBox.y);
 
 		// Try to drag way outside the list (right and up)
 		await page.mouse.move(
@@ -60,13 +57,13 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The item should be constrained by the right and top boundaries
-		ghostBox = await ghost.boundingBox();
-		if (!ghostBox) throw new Error('Could not get ghost bounding box');
+		// The dragged item should be constrained by the right and top boundaries
+		draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
-			ghostBox.x + ghostBox.width
+			draggedBox.x + draggedBox.width
 		);
-		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(ghostBox.y);
+		expect(rootBox.y + defaultRootProps.gap / 2).toEqual(draggedBox.y);
 
 		// Try to drag way outside the list (right and down)
 		await page.mouse.move(
@@ -75,14 +72,14 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The item should be constrained by the right and bottom boundaries
-		ghostBox = await ghost.boundingBox();
-		if (!ghostBox) throw new Error('Could not get ghost bounding box');
+		// The dragged item should be constrained by the right and bottom boundaries
+		draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
-			ghostBox.x + ghostBox.width
+			draggedBox.x + draggedBox.width
 		);
 		expect(rootBox.y + rootBox.height - defaultRootProps.gap / 2).toEqual(
-			ghostBox.y + ghostBox.height
+			draggedBox.y + draggedBox.height
 		);
 
 		// Try to drag way outside the list (left and down)
@@ -92,12 +89,12 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The item should be constrained by the left and bottom boundaries
-		ghostBox = await ghost.boundingBox();
-		if (!ghostBox) throw new Error('Could not get ghost bounding box');
-		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(ghostBox.x);
+		// The dragged item should be constrained by the left and bottom boundaries
+		draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get ghost bounding box');
+		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(draggedBox.x);
 		expect(rootBox.y + rootBox.height - defaultRootProps.gap / 2).toEqual(
-			ghostBox.y + ghostBox.height
+			draggedBox.y + draggedBox.height
 		);
 
 		// Release the mouse to drop

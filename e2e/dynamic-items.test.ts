@@ -23,7 +23,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 
 		// === FIRST REMOVAL OPERATION ===
 		// Click the remove button for List Item 3
-		const listItem3 = root.locator('[data-item-id="list-item-3"]');
+		const listItem3 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 		await listItem3.locator('.ssl-item-remove').click();
 
 		// Verify List Item 3 has been removed
@@ -38,7 +38,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 
 		// === SECOND REMOVAL OPERATION ===
 		// Click the remove button for List Item 2
-		const listItem2 = root.locator('[data-item-id="list-item-2"]');
+		const listItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
 		await listItem2.locator('.ssl-item-remove').click();
 
 		// Verify List Item 2 has been removed

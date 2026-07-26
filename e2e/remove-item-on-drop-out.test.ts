@@ -27,9 +27,8 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// === FIRST REMOVAL OPERATION ===
 		// Find the dragged item (List Item 2), the ghost element and its content
-		const draggedItem1 = root.locator('[data-item-id="list-item-2"]');
-		const ghost = page.locator('.ssl-ghost');
-		const ghostItemContent = ghost.locator('.ssl-item-content');
+		const draggedItem1 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const draggedItem1Content = draggedItem1.locator('.ssl-item-content');
 
 		// Get the bounding box for a precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
@@ -54,12 +53,13 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// Verify the dragged item has no height
-		await expect(draggedItem1).toHaveCSS('height', '0px');
+		// Verify the placeholder item has no height
+		const placeholderItem = root.locator('.ssl-placeholder');
+		await expect(placeholderItem).toHaveCSS('height', '0px');
 
 		// Verify the ghost item content has the correct background color and border
-		await expect(ghostItemContent).toHaveCSS('background-color', 'rgb(253, 164, 175)');
-		await expect(ghostItemContent).toHaveCSS(
+		await expect(draggedItem1Content).toHaveCSS('background-color', 'rgb(253, 164, 175)');
+		await expect(draggedItem1Content).toHaveCSS(
 			'box-shadow',
 			'rgb(251, 113, 133) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
@@ -67,11 +67,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		// Wait for the removal to start by checking the ghost state changes to ptr-remove
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-remove');
+		// Wait for the removal to start by checking the placeholder item state changes to ptr-remove
+		await expect(placeholderItem).toHaveAttribute('data-drag-state', 'ptr-remove');
 
-		// Wait for the drag operation to complete by checking the ghost state returns to idle
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
+		// Wait for the drag operation to complete by checking the dragged item state changes to ptr-remove
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'ptr-remove');
+
+		// Wait for the dragged item to be removed from the viewport
+		await expect(draggedItem1).not.toBeInViewport();
 
 		// Wait for the DOM to reflect the removal before continuing
 		await expect(root.locator('.ssl-item')).toHaveCount(4);
@@ -84,7 +87,8 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// === SECOND REMOVAL OPERATION ===
 		// Find the dragged item (List Item 3)
-		const draggedItem2 = root.locator('[data-item-id="list-item-3"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+		const draggedItem2Content = draggedItem2.locator('.ssl-item-content');
 
 		// Get the bounding box for a precise drag operation
 		draggedBox = await draggedItem2.boundingBox();
@@ -109,12 +113,12 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// Verify the dragged item has no height
-		await expect(draggedItem2).toHaveCSS('height', '0px');
+		// Verify the placeholder item has no height
+		await expect(placeholderItem).toHaveCSS('height', '0px');
 
 		// Verify the ghost item content has the correct background color and border
-		await expect(ghostItemContent).toHaveCSS('background-color', 'rgb(253, 164, 175)');
-		await expect(ghostItemContent).toHaveCSS(
+		await expect(draggedItem2Content).toHaveCSS('background-color', 'rgb(253, 164, 175)');
+		await expect(draggedItem2Content).toHaveCSS(
 			'box-shadow',
 			'rgb(251, 113, 133) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
@@ -122,11 +126,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		// Wait for the removal to start by checking the ghost state changes to ptr-remove
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-remove');
+		// Wait for the removal to start by checking the placeholder item state changes to ptr-remove
+		await expect(placeholderItem).toHaveAttribute('data-drag-state', 'ptr-remove');
 
-		// Wait for the drag operation to complete by checking the ghost state returns to idle
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
+		// Wait for the drag operation to complete by checking the dragged item state changes to ptr-remove
+		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'ptr-remove');
+
+		// Wait for the dragged item to be removed from the viewport
+		await expect(draggedItem2).not.toBeInViewport();
 
 		// Wait for the DOM to reflect the removal before asserting
 		await expect(root.locator('.ssl-item')).toHaveCount(3);

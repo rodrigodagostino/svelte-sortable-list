@@ -26,7 +26,7 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 
 		// Get the bounding box for a precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
@@ -68,7 +68,7 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
 
 		// Get the bounding box for a precise drag operation
 		draggedBox = await draggedItem2.boundingBox();

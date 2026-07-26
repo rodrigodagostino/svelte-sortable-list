@@ -26,7 +26,7 @@ test.describe('Sortable List - With Handle', () => {
 	test('should only allow dragging from handle', async ({ page }) => {
 		// Find the dragged item (List Item 1)
 		const root = page.locator('.ssl-root');
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 		const initialBox = await draggedItem.boundingBox();
 
 		if (!initialBox) throw new Error('Could not get item bounding box');
@@ -64,9 +64,9 @@ test.describe('Sortable List - With Handle', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1), its handle and the target item (List Item 3)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 		const draggedHandle1 = draggedItem1.locator('.ssl-item-handle');
-		const targetItem1 = root.locator('[data-item-id="list-item-3"]');
+		const targetItem1 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// Verify elements exist
 		await expect(draggedItem1).toBeVisible();
@@ -108,9 +108,9 @@ test.describe('Sortable List - With Handle', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2), its handle and the target item (List Item 4)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
 		const draggedHandle2 = draggedItem2.locator('.ssl-item-handle');
-		const targetItem2 = root.locator('[data-item-id="list-item-4"]');
+		const targetItem2 = root.locator('[data-item-id="list-item-4"]:not(.ssl-placeholder)');
 
 		// Verify elements exist
 		await expect(draggedItem2).toBeVisible();
@@ -152,9 +152,9 @@ test.describe('Sortable List - With Handle', () => {
 	test('should show correct cursor when interacting with handle', async ({ page }) => {
 		// Find the dragged item (List Item 1) and its handle
 		const root = page.locator('.ssl-root');
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 		const draggedHandle = draggedItem.locator('.ssl-item-handle');
-		const targetItem = root.locator('[data-item-id="list-item-3"]');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// When dragging, should show grabbing cursor
 		const targetBox = await targetItem.boundingBox();

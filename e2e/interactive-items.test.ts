@@ -47,9 +47,9 @@ test.describe('Sortable List - Interactive Items', () => {
 		const items = await root.locator('.ssl-item').all();
 
 		for (let i = 0; i < items.length - 1; i++) {
-			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]`);
+			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]:not(.ssl-placeholder)`);
 			const initialBox = await draggedItem.boundingBox();
-			const targetItem = root.locator(`[data-item-id="list-item-${i + 2}"]`);
+			const targetItem = root.locator(`[data-item-id="list-item-${i + 2}"]:not(.ssl-placeholder)`);
 			const targetBox = await targetItem.boundingBox();
 
 			if (!initialBox || !targetBox) throw new Error('Could not get item bounding box');
@@ -90,11 +90,8 @@ test.describe('Sortable List - Interactive Items', () => {
 		const root = page.locator('.ssl-root');
 		const items = await root.locator('.ssl-item').all();
 
-		// Find the ghost element
-		const ghost = page.locator('.ssl-ghost');
-
 		for (let i = 0; i < items.length - 2; i++) {
-			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]`);
+			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]:not(.ssl-placeholder)`);
 			const draggedBox = await draggedItem.boundingBox();
 
 			if (!draggedBox) throw new Error('Could not get item bounding box');
@@ -112,23 +109,23 @@ test.describe('Sortable List - Interactive Items', () => {
 			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
 			// Verify the form elements retained their values
-			const ghostFormField = ghost
+			const draggedFormField = draggedItem
 				.locator('input')
 				.or(
-					ghost
+					draggedItem
 						.locator('textarea')
-						.or(ghost.locator('select').or(ghost.locator('input[type="checkbox"]')))
+						.or(draggedItem.locator('select').or(draggedItem.locator('input[type="checkbox"]')))
 				);
-			const ghostText = await ghost.textContent();
+			const draggedText = await draggedItem.textContent();
 
-			if (ghostText?.includes('List Item 1'))
-				await expect(ghostFormField).toHaveValue('Input field');
-			else if (ghostText?.includes('List Item 2'))
-				await expect(ghostFormField).toHaveValue('Textarea field');
-			else if (ghostText?.includes('List Item 3'))
-				await expect(ghostFormField).toHaveValue('option-2');
-			else if (ghostText?.includes('List Item 4'))
-				await expect(ghostFormField.nth(1)).toBeChecked();
+			if (draggedText?.includes('List Item 1'))
+				await expect(draggedFormField).toHaveValue('Input field');
+			else if (draggedText?.includes('List Item 2'))
+				await expect(draggedFormField).toHaveValue('Textarea field');
+			else if (draggedText?.includes('List Item 3'))
+				await expect(draggedFormField).toHaveValue('option-2');
+			else if (draggedText?.includes('List Item 4'))
+				await expect(draggedFormField.nth(1)).toBeChecked();
 
 			// Release the mouse to drop
 			await page.mouse.up();

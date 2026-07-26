@@ -28,8 +28,8 @@ test.describe('Sortable List - Inside Dialog', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1) and target item (List Item 3)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
-		const targetItem1 = root.locator('[data-item-id="list-item-3"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem1 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
@@ -69,8 +69,8 @@ test.describe('Sortable List - Inside Dialog', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2) and target item (List Item 4)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
-		const targetItem2 = root.locator('[data-item-id="list-item-4"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const targetItem2 = root.locator('[data-item-id="list-item-4"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for precise drag operation
 		draggedBox = await draggedItem2.boundingBox();

@@ -49,11 +49,11 @@ test.describe('Sortable List - Interactive Items with Handle', () => {
 		const items = await root.locator('.ssl-item').all();
 
 		for (let i = 0; i < items.length - 1; i++) {
-			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]`);
+			const draggedItem = root.locator(`[data-item-id="list-item-${i + 1}"]:not(.ssl-placeholder)`);
 			const initialBox = await draggedItem.boundingBox();
 			const draggedHandle = draggedItem.locator('.ssl-item-handle');
 			const handleBox = await draggedHandle.boundingBox();
-			const targetItem = root.locator(`[data-item-id="list-item-${i + 2}"]`);
+			const targetItem = root.locator(`[data-item-id="list-item-${i + 2}"]:not(.ssl-placeholder)`);
 			const targetBox = await targetItem.boundingBox();
 
 			if (!initialBox || !handleBox || !targetBox)

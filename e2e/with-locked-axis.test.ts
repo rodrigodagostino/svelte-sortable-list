@@ -12,7 +12,7 @@ test.describe('Sortable List - With Locked Axis', () => {
 	test('should only allow vertical movement when axis is locked', async ({ page }) => {
 		// Find the dragged item (List Item 1) and its initial position
 		const root = page.locator('.ssl-root');
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for precise drag operation
 		const initialBox = await draggedItem.boundingBox();

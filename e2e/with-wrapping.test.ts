@@ -23,8 +23,8 @@ test.describe('Sortable List - With Wrapping', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1) and the target item (List Item 7)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
-		const targetItem1 = root.locator('[data-item-id="list-item-7"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem1 = root.locator('[data-item-id="list-item-7"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for a precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
@@ -70,8 +70,8 @@ test.describe('Sortable List - With Wrapping', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2) and the target item (List Item 8)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
-		const targetItem2 = root.locator('[data-item-id="list-item-8"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const targetItem2 = root.locator('[data-item-id="list-item-8"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for the second drag operation
 		draggedBox = await draggedItem2.boundingBox();

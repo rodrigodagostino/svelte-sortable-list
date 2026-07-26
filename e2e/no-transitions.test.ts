@@ -21,8 +21,8 @@ test.describe('Sortable List - No Transitions', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1) and the target item (List Item 3)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
-		const targetItem1 = root.locator('[data-item-id="list-item-3"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem1 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// Verify both items exist
 		await expect(draggedItem1).toBeVisible();
@@ -76,8 +76,8 @@ test.describe('Sortable List - No Transitions', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2) and the target item (List Item 4)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
-		const targetItem2 = root.locator('[data-item-id="list-item-4"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const targetItem2 = root.locator('[data-item-id="list-item-4"]:not(.ssl-placeholder)');
 
 		// Verify both items exist
 		await expect(draggedItem2).toBeVisible();

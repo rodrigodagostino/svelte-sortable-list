@@ -23,17 +23,16 @@ test.describe('Sortable List - Basic', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Find the dragged item (List Item 1) and the target item (List Item 3)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
-		const targetItem1 = root.locator('[data-item-id="list-item-3"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem1 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for a precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
 		let targetBox = await targetItem1.boundingBox();
-
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
 
-		// Start drag from the center of the dragged item
+		// Start the drag from the center of the dragged item
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			draggedBox.y + draggedBox.height / 2
@@ -66,13 +65,12 @@ test.describe('Sortable List - Basic', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Find the dragged item (List Item 2) and the target item (List Item 4)
-		const draggedItem2 = root.locator('[data-item-id="list-item-2"]');
-		const targetItem2 = root.locator('[data-item-id="list-item-4"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const targetItem2 = root.locator('[data-item-id="list-item-4"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for the second drag operation
 		draggedBox = await draggedItem2.boundingBox();
 		targetBox = await targetItem2.boundingBox();
-
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 2 or List Item 4 bounding box');
 
@@ -107,23 +105,17 @@ test.describe('Sortable List - Basic', () => {
 		expect(finalItems).toEqual(expectedItems);
 	});
 
-	test('should switch through drag and ghost states when dragging using mouse', async ({
-		page,
-	}) => {
+	test('should switch through drag states when dragging using mouse', async ({ page }) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
 		// Find the dragged item (List Item 1), its content and the target item (List Item 3)
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
-		const targetItem = root.locator('[data-item-id="list-item-3"]');
-
-		// Find the ghost element and its content
-		const ghost = page.locator('.ssl-ghost');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
 
 		// Get the bounding boxes for a precise drag operation
 		const draggedBox = await draggedItem.boundingBox();
 		const targetBox = await targetItem.boundingBox();
-
 		if (!draggedBox || !targetBox)
 			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
 
@@ -136,9 +128,6 @@ test.describe('Sortable List - Basic', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
-
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
@@ -149,22 +138,14 @@ test.describe('Sortable List - Basic', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// Wait for the dragged item to move by checking the ghost state changes to ptr-drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag');
-
 		// Wait for the dragged item to move by checking the drag state changes to ptr-drag
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
 
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drop');
-
 		// Wait for the drop to start by checking the drag state changes to ptr-drop
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drop');
-
-		// Verify the ghost element disappears after drag completes
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
@@ -173,18 +154,18 @@ test.describe('Sortable List - Basic', () => {
 	test('should show correct appearance when dragging using mouse', async ({ page }) => {
 		// Find the dragged item (List Item 1) and its content
 		const root = page.locator('.ssl-root');
-		const draggedItem = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 		const draggedItemContent = draggedItem.locator('.ssl-item-content');
 
-		// Find the ghost element and its content
-		const ghost = page.locator('.ssl-ghost');
-		const ghostItemContent = ghost.locator('.ssl-item-content');
+		// Find the placeholder element and its content
+		const placeholder = page.locator('.ssl-placeholder');
+		const placeholderItemContent = placeholder.locator('.ssl-item-content');
 
 		// Verify the dragged item is visible
 		await expect(draggedItem).toBeVisible();
 
-		// Verify the ghost element is hidden
-		await expect(ghost).toBeHidden();
+		// Verify the placeholder element is hidden
+		await expect(placeholder).toBeHidden();
 
 		// Verify the cursor is the grab cursor
 		expect(draggedItem).toHaveCSS('cursor', 'grab');
@@ -192,9 +173,6 @@ test.describe('Sortable List - Basic', () => {
 		// When dragging, should show grabbing cursor
 		const draggedBox = await draggedItem.boundingBox();
 		if (!draggedBox) throw new Error('Could not get item bounding box');
-
-		// Verify the dragged item content has full opacity
-		await expect(draggedItemContent).toHaveCSS('opacity', '1');
 
 		// Start drag from the center of the dragged item
 		await page.mouse.move(
@@ -205,9 +183,9 @@ test.describe('Sortable List - Basic', () => {
 		// Press the mouse down to start dragging
 		await page.mouse.down();
 
-		// Verify the ghost element appears during drag
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'ptr-drag-start');
-		await expect(ghost).toBeVisible();
+		// Verify the placeholder element appears during drag
+		await expect(placeholder).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		await expect(placeholder).toBeVisible();
 
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
@@ -215,11 +193,11 @@ test.describe('Sortable List - Basic', () => {
 		// Check cursor changes to grabbing during drag
 		expect(draggedItem).toHaveCSS('cursor', 'grabbing');
 
-		// Verify the dragged item content has reduced opacity
-		await expect(draggedItemContent).toHaveCSS('opacity', '0.5');
+		// Verify the placeholder item content has reduced opacity
+		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
 
-		// Verify the ghost item content has the correct box-shadow
-		await expect(ghostItemContent).toHaveCSS(
+		// Verify the placeholder item content has the correct box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
@@ -227,21 +205,17 @@ test.describe('Sortable List - Basic', () => {
 		// Release the mouse to drop
 		await page.mouse.up();
 
-		// Verify the ghost element disappears after drag completes
-		await expect(ghost).toHaveAttribute('data-ghost-state', 'idle');
-		await expect(ghost).toBeHidden();
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the ghost item content has no outer box-shadow
-		await expect(ghostItemContent).toHaveCSS(
+		// Verify the placeholder item content has no outer box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
 		);
 
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
-
-		// Verify the dragged item content has full opacity
-		await expect(draggedItemContent).toHaveCSS('opacity', '1');
+		// Verify the placeholder element disappears after drag completes
+		await expect(placeholder).toBeHidden();
 	});
 
 	test('should drag List Item 1 to List Item 3 position and List Item 2 to List Item 4 position using keyboard', async ({
@@ -331,7 +305,7 @@ test.describe('Sortable List - Basic', () => {
 		// Verify the focused item has the correct outline
 		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
 
-		// Verify the ghost item content has no outer box-shadow
+		// Verify the focused item content has no outer box-shadow
 		await expect(focusedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
@@ -362,7 +336,7 @@ test.describe('Sortable List - Basic', () => {
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the ghost item content has no outer box-shadow
+		// Verify the focused item content has no outer box-shadow
 		await expect(focusedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset'

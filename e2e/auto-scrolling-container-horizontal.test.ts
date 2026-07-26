@@ -19,7 +19,7 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 
 		// === FIRST DRAG OPERATION - SCROLL RIGHT ===
 		// Find the dragged item (List Item 1)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 
 		// Get the bounding box for a precise drag operation
 		let draggedBox = await draggedItem1.boundingBox();
@@ -72,7 +72,7 @@ test.describe('Sortable List - Auto Scrolling Container Horizontal', () => {
 		await wrapper.evaluate((el) => el.scrollTo(el.scrollWidth, 0));
 
 		// Find the dragged item (List Item 100)
-		const draggedItem2 = root.locator('[data-item-id="list-item-100"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-100"]:not(.ssl-placeholder)');
 
 		// Get the bounding box for a precise drag operation
 		draggedBox = await draggedItem2.boundingBox();

@@ -18,7 +18,7 @@ test.describe('Sortable List - Auto Scrolling Window', () => {
 
 		// === FIRST DRAG OPERATION - SCROLL DOWN ===
 		// Find the dragged item (List Item 1)
-		const draggedItem1 = root.locator('[data-item-id="list-item-1"]');
+		const draggedItem1 = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
 		let draggedBox = await draggedItem1.boundingBox();
 		if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
 
@@ -69,7 +69,7 @@ test.describe('Sortable List - Auto Scrolling Window', () => {
 		await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 
 		// Find the dragged item (List Item 100)
-		const draggedItem2 = root.locator('[data-item-id="list-item-100"]');
+		const draggedItem2 = root.locator('[data-item-id="list-item-100"]:not(.ssl-placeholder)');
 		draggedBox = await draggedItem2.boundingBox();
 		if (!draggedBox) throw new Error('Could not get List Item 100 bounding box');
 
