@@ -80,6 +80,8 @@
 	}
 
 	.dialog {
+		display: grid;
+		place-items: center;
 		position: fixed;
 		inset: 0;
 		visibility: hidden;
@@ -113,10 +115,6 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
 		width: 40rem;
 		max-width: 90vw;
 		max-width: 90dvw;
