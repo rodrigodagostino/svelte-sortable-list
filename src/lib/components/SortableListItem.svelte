@@ -198,105 +198,109 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		)
 			return 'translate3d(0, 0, 0)';
 
-		if (draggedId !== String(id)) {
-			if (rootState.props.canRemoveOnDropOut && !rootState.isBetweenBounds)
-				return 'translate3d(0, 0, 0)';
+		if (draggedId !== String(id)) return getNeighborTransform();
 
-			if (
-				targetIndex === null ||
-				// Check if the item is outside the range between
-				// the dragged item’s origin and the target item.
-				index < Math.min(draggedIndex, targetIndex) ||
-				index > Math.max(draggedIndex, targetIndex)
-			)
-				return 'translate3d(0, 0, 0)';
-
-			const step = index > draggedIndex ? -1 : 1;
-			const direction = index > draggedIndex === !rootState.isRTL ? -1 : 1;
-			const neighborRectSnapshot = rootState.itemRectsSnapshot[index + step];
-			const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
-
-			const x =
-				rootState.props.direction === 'vertical'
-					? 0
-					: isSameRow
-						? direction * (draggedRectSnapshot.width + rootState.props.gap!)
-						: neighborRectSnapshot.right - rectSnapshot.right;
-			const y =
-				rootState.props.direction === 'vertical'
-					? direction * (draggedRectSnapshot.height + rootState.props.gap!)
-					: isSameRow
-						? 0
-						: calculateTranslateWithAlignment(
-								rootState.props.ref!,
-								neighborRectSnapshot,
-								rectSnapshot
-							);
-
-			return `translate3d(${x}px, ${y}px, 0)`;
-		}
-
-		if (rootState.dragState.startsWith('kbd')) {
-			if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
-
-			const x =
-				rootState.props.direction === 'vertical'
-					? 0
-					: calculateTranslate(
-							'x',
-							targetRectSnapshot,
-							draggedRectSnapshot,
-							draggedIndex,
-							targetIndex
-						);
-			const y =
-				rootState.props.direction === 'vertical'
-					? calculateTranslate(
-							'y',
-							targetRectSnapshot,
-							draggedRectSnapshot,
-							draggedIndex,
-							targetIndex
-						)
-					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
-						? 0
-						: calculateTranslateWithAlignment(
-								rootState.props.ref!,
-								targetRectSnapshot,
-								draggedRectSnapshot
-							);
-
-			return `translate3d(${x}px, ${y}px, 0)`;
-		}
-
+		if (rootState.dragState.startsWith('kbd')) return getKeyboardTransform();
 		if (rootState.dragState === 'ptr-remove') return ref?.style.transform;
-
 		if (rootState.dragState === 'ptr-drop') return 'translate3d(0, 0, 0)';
+		if (rootState.dragState === 'ptr-predrop') return getPredropTransform();
 
-		const rootRect = rootState.props.ref!.getBoundingClientRect();
-		// Take a live read of the dragged item’s rect to avoid stale values.
-		const draggedRect = rootState.draggedItem.getBoundingClientRect();
+		return getPointerTransform();
+	}
+
+	function getNeighborTransform() {
+		if (rootState.props.canRemoveOnDropOut && !rootState.isBetweenBounds)
+			return 'translate3d(0, 0, 0)';
 
 		if (
-			rootState.dragState === 'ptr-predrop' &&
-			targetRectSnapshot &&
-			typeof targetIndex === 'number'
-		) {
-			const x =
-				rootState.props.direction === 'vertical'
-					? draggedRect.x -
-						targetRectSnapshot.x +
-						(draggedRect.width - targetRectSnapshot.width) / 2
-					: calculateTranslate('x', draggedRect, targetRectSnapshot, draggedIndex, targetIndex);
-			const y =
-				rootState.props.direction === 'vertical'
-					? calculateTranslate('y', draggedRect, targetRectSnapshot, draggedIndex, targetIndex)
-					: calculateTranslateWithAlignment(rootState.props.ref!, draggedRect, targetRectSnapshot);
+			targetIndex === null ||
+			// Check if the item is outside the range between
+			// the dragged item’s origin and the target item.
+			index < Math.min(draggedIndex!, targetIndex) ||
+			index > Math.max(draggedIndex!, targetIndex)
+		)
+			return 'translate3d(0, 0, 0)';
 
-			return `translate3d(${x}px, ${y}px, 0)`;
-		}
+		const step = index > draggedIndex! ? -1 : 1;
+		const direction = index > draggedIndex! === !rootState.isRTL ? -1 : 1;
+		const neighborRectSnapshot = rootState.itemRectsSnapshot![index + step];
+		const isSameRow = isInSameRow(rectSnapshot!, neighborRectSnapshot);
 
+		const x =
+			rootState.props.direction === 'vertical'
+				? 0
+				: isSameRow
+					? direction * (draggedRectSnapshot!.width + rootState.props.gap!)
+					: neighborRectSnapshot.right - rectSnapshot!.right;
+		const y =
+			rootState.props.direction === 'vertical'
+				? direction * (draggedRectSnapshot!.height + rootState.props.gap!)
+				: isSameRow
+					? 0
+					: calculateTranslateWithAlignment(
+							rootState.props.ref!,
+							neighborRectSnapshot,
+							rectSnapshot!
+						);
+
+		return `translate3d(${x}px, ${y}px, 0)`;
+	}
+
+	function getKeyboardTransform() {
+		if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
+
+		const x =
+			rootState.props.direction === 'vertical'
+				? 0
+				: calculateTranslate(
+						'x',
+						targetRectSnapshot,
+						draggedRectSnapshot!,
+						draggedIndex!,
+						targetIndex
+					);
+		const y =
+			rootState.props.direction === 'vertical'
+				? calculateTranslate(
+						'y',
+						targetRectSnapshot,
+						draggedRectSnapshot!,
+						draggedIndex!,
+						targetIndex
+					)
+				: isInSameRow(draggedRectSnapshot!, targetRectSnapshot)
+					? 0
+					: calculateTranslateWithAlignment(
+							rootState.props.ref!,
+							targetRectSnapshot,
+							draggedRectSnapshot!
+						);
+
+		return `translate3d(${x}px, ${y}px, 0)`;
+	}
+
+	function getPredropTransform() {
+		if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
+
+		// Take a live read of the dragged item’s rect to avoid stale values.
+		const draggedRect = rootState.draggedItem!.getBoundingClientRect();
+
+		const x =
+			rootState.props.direction === 'vertical'
+				? draggedRect.x - targetRectSnapshot.x + (draggedRect.width - targetRectSnapshot.width) / 2
+				: calculateTranslate('x', draggedRect, targetRectSnapshot, draggedIndex!, targetIndex);
+		const y =
+			rootState.props.direction === 'vertical'
+				? calculateTranslate('y', draggedRect, targetRectSnapshot, draggedIndex!, targetIndex)
+				: calculateTranslateWithAlignment(rootState.props.ref!, draggedRect, targetRectSnapshot);
+
+		return `translate3d(${x}px, ${y}px, 0)`;
+	}
+
+	function getPointerTransform() {
 		if (!rootState.pointer || !rootState.pointerOrigin) return 'translate3d(0, 0, 0)';
+
+		const rootRect = rootState.props.ref!.getBoundingClientRect();
 
 		const x =
 			rootState.props.direction === 'horizontal' ||
@@ -307,7 +311,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							rootState.pointer.x,
 							rootState.pointerOrigin.x,
 							rootRect,
-							draggedRectSnapshot,
+							draggedRectSnapshot!,
 							rootState.props.gap!
 						)
 					: rootState.pointer.x - rootState.pointerOrigin.x
@@ -321,7 +325,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							rootState.pointer.y,
 							rootState.pointerOrigin.y,
 							rootRect,
-							draggedRectSnapshot,
+							draggedRectSnapshot!,
 							rootState.props.gap!
 						)
 					: rootState.pointer.y - rootState.pointerOrigin.y
