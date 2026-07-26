@@ -255,6 +255,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (
 			rootState.dragState === 'ptr-drop' ||
 			rootState.dragState === 'ptr-cancel' ||
+			rootState.dragState === 'ptr-remove' ||
 			rootState.dragState === 'kbd-drop' ||
 			rootState.dragState === 'kbd-cancel'
 		) {
@@ -453,6 +454,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (
 			rootState.dragState === 'ptr-drop' ||
 			rootState.dragState === 'ptr-cancel' ||
+			rootState.dragState === 'ptr-remove' ||
 			rootState.dragState === 'kbd-drop' ||
 			rootState.dragState === 'kbd-cancel'
 		) {
@@ -813,7 +815,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerAndKeyboardDragEnd(
-		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
+		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		if (!rootState.draggedItem) return;
 
@@ -848,7 +850,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	function interruptDropTransition(
 		element: HTMLElement | null | undefined,
-		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
+		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		// Prevent the pending `transitionend`/timeout from triggering handlePointerAndKeyboardDragEnd().
 		skipDragEnd?.();
