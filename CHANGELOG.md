@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.1] (2026-07-26)
+
+### BREAKING
+
+- Replace ghost with fixed-position dragged item and placeholder.
+
+### Added
+
+- Create `SortableListPlaceholder` component.
+
+### Changed
+
+- Split getStyleTransform into per-drag-state functions
+
+### Fixed
+
+- Allow overflow in scaleFly transition.
+- Allow interrupting drop transitions on drop remove.
+
+### Test
+
+- Align E2E tests with ghost replacement refactor.
+
+### Docs
+
+- Align demo pages with ghost replacement refactor.
+- Avoid messing with dragged item fixed position in **“Inside custom dialog”** demo page.
+
 ## [2.2.5] (2026-07-25)
 
 ### Added
@@ -1642,7 +1670,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...HEAD
+[3.0.0-next.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.5...v3.0.0-next.1
 [2.2.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.4...v2.2.5
 [2.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.3...v2.2.4
 [2.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.2...v2.2.3
