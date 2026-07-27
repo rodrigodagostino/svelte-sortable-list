@@ -14,7 +14,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 > **Version Compatibility**
 >
 > - **v2.x.x** (current): Compatible with **Svelte 5**
-> - **v1.x.x**: Compatible with **Svelte 4 and 5** (available on the [v1 branch](https://github.com/rodrigodagostino/svelte-sortable-list/tree/v1))
+> - **v1.x.x**: Compatible with **Svelte 4** (available on the [v1 branch](https://github.com/rodrigodagostino/svelte-sortable-list/tree/v1))
 >
 > Make sure to use the appropriate version for your Svelte project.
 
@@ -544,7 +544,7 @@ Use your favorite CSS framework to style the SSL components.
 			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] duration-(--ssl-transition-duration) group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
 			>
 				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
 					{item.text}
