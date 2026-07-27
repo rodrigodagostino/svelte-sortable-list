@@ -5,6 +5,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 ### Props
 - `ref`: reference to the list element (HTMLUListElement). `[$bindable]`
+- `group`: group this list belongs to.
 - `gap`: separation between items (in pixels).
 - `direction`: orientation in which items will be arranged.
 - `delay`: time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.
@@ -44,7 +45,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 <script lang="ts">
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
-	import { setSortableListRootState } from '$lib/states/index.js';
+	import { registry, setSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
 		afterPaint,
@@ -68,6 +69,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let {
 		ref = $bindable(null),
+		group = undefined,
 		gap = 12,
 		direction = 'vertical',
 		delay = 0,
@@ -132,11 +134,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let liveText = $state('');
 
 	onMount(() => {
+		if (group) unregister = registry.register({ rootState, ref: ref!, group });
 		onmounted?.(null);
 		rootState.isRTL = getTextDirection(ref!) === 'rtl';
 	});
 
+	let unregister: (() => void) | null = null;
 	onDestroy(() => {
+		unregister?.();
 		ondestroyed?.(null);
 	});
 

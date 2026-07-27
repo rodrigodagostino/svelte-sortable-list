@@ -21,6 +21,8 @@ export interface SortableListRootProps extends Pick<
 > {
 	/** Reference to the list element. `[$bindable]` */
 	ref?: HTMLUListElement | null;
+	/** Group this list belongs to. */
+	group?: string;
 	/** Separation between items (in pixels). */
 	gap?: number;
 	/** Orientation in which items will be arranged. */
