@@ -533,7 +533,7 @@ Use your favorite CSS framework to style the SSL components.
 			class="group rounded-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 [&[data-drag-state*='kbd-drag']]:shadow-md [&[data-drag-state*='ptr-drag']]:shadow-md [&[data-is-ghost='false'][data-drag-state*='ptr-drag']]:opacity-0 [&[data-is-ghost='false'][data-drag-state='ptr-drop']]:opacity-0"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors group-focus-within:bg-indigo-800 group-[[data-drag-state*='kbd-drag']]:bg-indigo-500 group-[[data-drag-state*='ptr-drag']]:bg-indigo-500 group-[[data-is-ghost='false']:hover]:bg-indigo-800"
+				class="flex items-center justify-center rounded-md bg-indigo-600 px-8 py-4 transition-colors duration-[var(--ssl-transition-duration)] group-focus-within:bg-indigo-800 group-[[data-drag-state*='kbd-drag']]:bg-indigo-500 group-[[data-drag-state*='ptr-drag']]:bg-indigo-500 group-[[data-is-ghost='false']:hover]:bg-indigo-800"
 			>
 				<span class="text-base font-medium uppercase text-white">{item.text}</span>
 			</div>
