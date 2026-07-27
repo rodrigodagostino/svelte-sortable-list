@@ -196,11 +196,54 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				: draggedRect;
 
 		const collidingItemRect = getCollidingItem(draggedRectWithOffset, rootState.itemRectsSnapshot);
-		if (collidingItemRect)
+		if (collidingItemRect) {
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 			);
-		else if (canClearOnDragOut && !rootState.isBetweenBounds)
+			if (group) registry.targetRoot = null;
+			return;
+		}
+
+		if (group) {
+			const peer = registry
+				.getPeers(group, rootState)
+				.find((p) => areColliding(draggedRect, p.ref.getBoundingClientRect()));
+
+			if (peer) {
+				const peerItemRects = getItemRects(peer.ref);
+				const peerCollidingItemRect = getCollidingItem(draggedRect, peerItemRects);
+				if (peerCollidingItemRect) {
+					if (
+						registry.targetRoot?.state !== peer.rootState ||
+						registry.targetRoot.targetItemId !== peerCollidingItemRect.id
+					) {
+						registry.targetRoot = {
+							group,
+							state: peer.rootState,
+							targetItemId: peerCollidingItemRect?.id ?? null,
+							targetItemIndex: peerCollidingItemRect?.index ?? null,
+						};
+					}
+					return;
+				}
+
+				// Mark the peer list as a target root when hovering a gap in the list,
+				// but retain the last know target item if it exists.
+				if (registry.targetRoot?.state !== peer.rootState) {
+					registry.targetRoot = {
+						group,
+						state: peer.rootState,
+						targetItemId: registry.targetRoot?.targetItemId ?? null,
+						targetItemIndex: registry.targetRoot?.targetItemIndex ?? null,
+					};
+				}
+				return;
+			}
+
+			if (canClearOnDragOut) registry.targetRoot = null;
+		}
+
+		if (canClearOnDragOut && !rootState.isBetweenBounds)
 			rootState.targetItem = rootState.draggedItem;
 	}
 
@@ -842,6 +885,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			isCanceled: action.endsWith('cancel'),
 		});
 
+		if (group) registry.targetRoot = null;
 		if (typeof pointerId === 'number' && draggedItem?.hasPointerCapture(pointerId))
 			draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;

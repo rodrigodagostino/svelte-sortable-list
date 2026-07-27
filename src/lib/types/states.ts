@@ -8,6 +8,13 @@ export interface RegistryEntry {
 	group: string;
 }
 
+export interface TargetRoot {
+	group: string;
+	state: RootState;
+	targetItemId: string | null;
+	targetItemIndex: number | null;
+}
+
 export interface SortableListRootStateContext {
 	ref: HTMLUListElement | null;
 	props: RootProps;

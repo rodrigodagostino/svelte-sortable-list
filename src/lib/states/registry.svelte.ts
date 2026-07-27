@@ -1,8 +1,9 @@
-import type { RegistryEntry } from '$lib/types/states.js';
+import type { TargetRoot, RegistryEntry } from '$lib/types/states.js';
 import type { SortableListRootState as RootState } from './sortable-list.svelte.ts';
 
 class SortableListRegistry {
 	entries: RegistryEntry[] = $state.raw([]);
+	targetRoot: TargetRoot | null = $state.raw(null);
 
 	register(entry: RegistryEntry) {
 		this.entries = [...this.entries, entry];
