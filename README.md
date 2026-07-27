@@ -13,7 +13,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 > [!IMPORTANT]
 > **Version Compatibility**
 >
-> - **v2.x.x** (current): Compatible with **Svelte 5**
+> - **v3.x.x** (current): Compatible with **Svelte 5**
+> - **v2.x.x**: Compatible with **Svelte 5** (available on the [v2 branch](https://github.com/rodrigodagostino/svelte-sortable-list/tree/v2))
 > - **v1.x.x**: Compatible with **Svelte 4** (available on the [v1 branch](https://github.com/rodrigodagostino/svelte-sortable-list/tree/v1))
 >
 > Make sure to use the appropriate version for your Svelte project.
@@ -263,20 +264,20 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 ### `<SortableList.Root>` props
 
-| Prop                 | Type                                    | Default                                                     | Possible values                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| -------------------- | --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ref` `[$bindable]`  | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                                                                            |
-| `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for ghost (dropping) and item (translation, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects ghost drop transitions. |
-| `hasWrapping`        | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows items to wrap onto multiple lines.                                                                                                                                                                                                                                                                                                                                                                         |
-| `hasLockedAxis`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, constrains dragged items to the main axis only.                                                                                                                                                                                                                                                                                                                                                                   |
-| `hasBoundaries`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, restricts item dragging to within list boundaries.                                                                                                                                                                                                                                                                                                                                                                |
-| `canClearOnDragOut`  | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, clears the target item when a dragged item (via pointing device) doesn't collide with any list items. This causes the dragged item to return to its initial position when dropped, rather than taking the position of the last item it collided with.                                                                                                                                                             |
-| `canRemoveOnDropOut` | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, removes items that are dragged and dropped outside list boundaries. Must be used with the `on:remove` event handler to complete the removal process.                                                                                                                                                                                                                                                              |
-| `isLocked`           | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows list items to be focused but prevents dragging (both pointer and keyboard). Interactive elements within items continue to function normally.                                                                                                                                                                                                                                                               |
-| `isDisabled`         | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows list items to be focused but prevents dragging (both pointer and keyboard) and applies dimmed styling. Interactive elements within items are disabled.                                                                                                                                                                                                                                                     |
-| `announcements`      | `function \| undefined`                 | `undefined`                                                 | Object                                                | Custom announcements for screen readers during drag-and-drop operations.                                                                                                                                                                                                                                                                                                                                                       |
+| Prop                 | Type                                    | Default                                                     | Possible values                                       | Description                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------- | --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ref` `[$bindable]`  | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                       |
+| `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                  |
+| `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                   |
+| `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for item (translation, dropping, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. |
+| `hasWrapping`        | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows items to wrap onto multiple lines.                                                                                                                                                                                                                                                                                                               |
+| `hasLockedAxis`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, constrains dragged items to the main axis only.                                                                                                                                                                                                                                                                                                         |
+| `hasBoundaries`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, restricts item dragging to within list boundaries.                                                                                                                                                                                                                                                                                                      |
+| `canClearOnDragOut`  | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, clears the target item when a dragged item (via pointing device) doesn't collide with any list items. This causes the dragged item to return to its initial position when dropped, rather than taking the position of the last item it collided with.                                                                                                   |
+| `canRemoveOnDropOut` | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, removes items that are dragged and dropped outside list boundaries. Must be used with the `on:remove` event handler to complete the removal process.                                                                                                                                                                                                    |
+| `isLocked`           | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows list items to be focused but prevents dragging (both pointer and keyboard). Interactive elements within items continue to function normally.                                                                                                                                                                                                     |
+| `isDisabled`         | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows list items to be focused but prevents dragging (both pointer and keyboard) and applies dimmed styling. Interactive elements within items are disabled.                                                                                                                                                                                           |
+| `announcements`      | `function \| undefined`                 | `undefined`                                                 | Object                                                | Custom announcements for screen readers during drag-and-drop operations.                                                                                                                                                                                                                                                                                             |
 
 > [!WARNING]
 > **Wrapping limitations**: Currently, wrapping support is limited to horizontal lists with items of identical width and height. Other variations may produce unexpected results.
@@ -455,57 +456,56 @@ To use the demo page styles in your project:
 Use these CSS selectors to customize the appearance of list components:
 
 > [!IMPORTANT]
-> **Styling best practices**: To prevent conflicts with core styles and transitions, avoid applying transitions directly through the `.ssl-item` and `.ssl-ghost` selectors. Instead, create a content wrapper element (like `.ssl-item-content`) as a child of `.ssl-item`. The ghost element will automatically mirror the list item’s content and appearance.
+> **Styling best practices**: To prevent conflicts with core styles and transitions, avoid applying transitions directly through the `.ssl-item` and `.ssl-placeholder` selectors. Instead, create a content wrapper element (like `.ssl-item-content`) as a child of `.ssl-item`. The placeholder element will automatically mirror the list item’s content and appearance.
 
-| Selector                                         | Description                                                                                     |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| `.ssl-root`                                      | List element inside `<SortableList.Root>`.                                                      |
-| `.ssl-root[aria-orientation="vertical"]`         | Vertically oriented list.                                                                       |
-| `.ssl-root[aria-orientation="horizontal"]`       | Horizontally oriented list.                                                                     |
-| `.ssl-root[data-has-locked-axis="true"]`         | List with movement restricted to main axis.                                                     |
-| `.ssl-root[data-has-boundaries="true"]`          | List with boundary-constrained movement.                                                        |
-| `.ssl-root[data-can-clear-on-drag-out="true"]`   | List that clears target item when dragged outside boundaries.                                   |
-| `.ssl-root[data-can-remove-on-drop-out="true"]`  | List that removes items when dropped outside boundaries.                                        |
-| `.ssl-root[data-is-locked="true"]`               | List with dragging disabled for all items.                                                      |
-| `.ssl-root[data-is-disabled="true"]`             | List with dragging and interactivity disabled for all items.                                    |
-| `.ssl-root[aria-disabled="true"]`                | List with dragging and interactivity disabled for all items.                                    |
-| `.ssl-item`                                      | Individual list item inside `<SortableList.Item>`.                                              |
-| `.ssl-item[data-drag-state="idle"]`              | Item in default, inactive state.                                                                |
-| `.ssl-item[data-drag-state="ptr-drag-start"]`    | Item starting pointer drag.                                                                     |
-| `.ssl-item[data-drag-state="ptr-drag"]`          | Item during pointer drag.                                                                       |
-| `.ssl-item[data-drag-state="ptr-drop"]`          | Item during pointer drop.                                                                       |
-| `.ssl-item[data-drag-state="ptr-cancel"]`        | Item during canceled pointer drag.                                                              |
-| `.ssl-item[data-drag-state="kbd-drag-start"]`    | Item starting keyboard drag.                                                                    |
-| `.ssl-item[data-drag-state="kbd-drag"]`          | Item during keyboard drag.                                                                      |
-| `.ssl-item[data-drag-state="kbd-drop"]`          | Item during keyboard drop.                                                                      |
-| `.ssl-item[data-drag-state="kbd-cancel"]`        | Item during keyboard canceled drag.                                                             |
-| `.ssl-item[data-is-ghost="true"]`                | Item displayed as placeholder inside shadow element during drag.                                |
-| `.ssl-item[data-is-between-bounds="true"]`       | Item positioned within list boundaries.                                                         |
-| `.ssl-item[data-is-locked="true"]`               | Item that cannot be dragged.                                                                    |
-| `.ssl-item[data-is-disabled="true"]`             | Item that cannot be dragged or interacted with.                                                 |
-| `.ssl-item[aria-disabled="true"]`                | Item that cannot be dragged or interacted with.                                                 |
-| `.ssl-ghost`                                     | Shadow element displayed under pointer during drag operations.                                  |
-| `.ssl-ghost[data-ghost-state="idle"]`            | Shadow element in default, inactive state.                                                      |
-| `.ssl-ghost[data-ghost-state="ptr-drag-start"]`  | Shadow element starting pointer drag.                                                           |
-| `.ssl-ghost[data-ghost-state="ptr-drag"]`        | Shadow element during pointer drag.                                                             |
-| `.ssl-ghost[data-ghost-state="ptr-predrop"]`     | Shadow element repositioned for pointer drop.                                                   |
-| `.ssl-ghost[data-ghost-state="ptr-drop"]`        | Shadow element during pointer drop.                                                             |
-| `.ssl-ghost[data-ghost-state="ptr-remove"]`      | Shadow element during pointer drop outside list boundaries (with `canRemoveOnDropOut` enabled). |
-| `.ssl-ghost[data-can-clear-on-drop-out="true"]`  | Shadow element with `canClearOnDropOut` enabled.                                                |
-| `.ssl-ghost[data-can-remove-on-drop-out="true"]` | Shadow element with `canRemoveOnDropOut` enabled.                                               |
-| `.ssl-item-handle`                               | Handle element inside `<SortableList.ItemHandle>`.                                              |
-| `.ssl-item-remove`                               | Remove button element inside `<SortableList.ItemRemove>`.                                       |
+| Selector                                             | Description                                                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `.ssl-root`                                          | List element inside `<SortableList.Root>`.                                                                         |
+| `.ssl-root[aria-orientation="vertical"]`             | Vertically oriented list.                                                                                          |
+| `.ssl-root[aria-orientation="horizontal"]`           | Horizontally oriented list.                                                                                        |
+| `.ssl-root[data-has-locked-axis="true"]`             | List with movement restricted to main axis.                                                                        |
+| `.ssl-root[data-has-boundaries="true"]`              | List with boundary-constrained movement.                                                                           |
+| `.ssl-root[data-can-clear-on-drag-out="true"]`       | List that clears target item when dragged outside boundaries.                                                      |
+| `.ssl-root[data-can-remove-on-drop-out="true"]`      | List that removes items when dropped outside boundaries.                                                           |
+| `.ssl-root[data-is-locked="true"]`                   | List with dragging disabled for all items.                                                                         |
+| `.ssl-root[data-is-disabled="true"]`                 | List with dragging and interactivity disabled for all items.                                                       |
+| `.ssl-root[aria-disabled="true"]`                    | List with dragging and interactivity disabled for all items.                                                       |
+| `.ssl-item`                                          | Individual list item inside `<SortableList.Item>`.                                                                 |
+| `.ssl-item[data-drag-state="idle"]`                  | Item in default, inactive state.                                                                                   |
+| `.ssl-item[data-drag-state="ptr-drag-start"]`        | Item starting pointer drag.                                                                                        |
+| `.ssl-item[data-drag-state="ptr-drag"]`              | Item during pointer drag.                                                                                          |
+| `.ssl-item[data-drag-state="ptr-drop"]`              | Item during pointer drop.                                                                                          |
+| `.ssl-item[data-drag-state="ptr-cancel"]`            | Item during canceled pointer drag.                                                                                 |
+| `.ssl-item[data-drag-state="ptr-remove"]`            | Item during pointer drop outside list boundaries (with `canRemoveOnDropOut` enabled).                              |
+| `.ssl-item[data-drag-state="kbd-drag-start"]`        | Item starting keyboard drag.                                                                                       |
+| `.ssl-item[data-drag-state="kbd-drag"]`              | Item during keyboard drag.                                                                                         |
+| `.ssl-item[data-drag-state="kbd-drop"]`              | Item during keyboard drop.                                                                                         |
+| `.ssl-item[data-drag-state="kbd-cancel"]`            | Item during keyboard canceled drag.                                                                                |
+| `.ssl-item[data-is-between-bounds="true"]`           | Item positioned within list boundaries.                                                                            |
+| `.ssl-item[data-is-locked="true"]`                   | Item that cannot be dragged.                                                                                       |
+| `.ssl-item[data-is-disabled="true"]`                 | Item that cannot be dragged or interacted with.                                                                    |
+| `.ssl-item[aria-disabled="true"]`                    | Item that cannot be dragged or interacted with.                                                                    |
+| `.ssl-placeholder`                                   | Placeholder marking the dragged item's vacated slot during a pointer drag.                                         |
+| `.ssl-placeholder[data-drag-state="ptr-drag-start"]` | Placeholder present as a pointer drag starts.                                                                      |
+| `.ssl-placeholder[data-drag-state="ptr-drag"]`       | Placeholder present during a pointer drag.                                                                         |
+| `.ssl-placeholder[data-drag-state="ptr-predrop"]`    | Placeholder present while the dragged item settles into its dropped position.                                      |
+| `.ssl-placeholder[data-drag-state="ptr-drop"]`       | Placeholder present during a pointer drop.                                                                         |
+| `.ssl-placeholder[data-drag-state="ptr-cancel"]`     | Placeholder present during a canceled pointer drag.                                                                |
+| `.ssl-placeholder[data-drag-state="ptr-remove"]`     | Placeholder present while the dragged item is dropped outside list boundaries (with `canRemoveOnDropOut` enabled). |     | `.ssl-item-handle` | Handle element inside `<SortableList.ItemHandle>`. |
+| `.ssl-item-remove`                                   | Remove button element inside `<SortableList.ItemRemove>`.                                                          |
 
 > [!TIP]
 > **Advanced selector combinations**: Combine the available selectors to target specific states.
 > For example, to style the content of an item that is being dragged outside the list when `canRemoveOnDropOut` is enabled:
 >
 > ```css
-> .ssl-ghost[data-can-remove-on-drop-out='true']
+> .ssl-root[data-can-remove-on-drop-out='true']
 > 	.ssl-item[data-is-between-bounds='false']
 > 	.ssl-item-content {
 > 	background-color: var(--ssl-rose-300);
-> 	border-color: var(--ssl-rose-400);
+> 	box-shadow:
+> 		inset 0 0 0 0.0625rem var(--ssl-rose-400),
+> 		var(--ssl-box-shadow-1);
 > }
 > ```
 >
@@ -515,12 +515,12 @@ Use these CSS selectors to customize the appearance of list components:
 
 CSS custom properties for global styling control:
 
-| Custom property             | Description                                                                                                                                                                                                                                                           |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--ssl-gap`                 | Separation between items (in pixels).                                                                                                                                                                                                                                 |
-| `--ssl-wrap`                | Whether list items are forced onto one line (`nowrap`) or can wrap onto multiple lines (`wrap`).                                                                                                                                                                      |
-| `--ssl-transition-duration` | Time it takes for ghost (dropping) and item (translation, addition, removal) transitions to complete (in milliseconds).                                                                                                                                               |
-| `--ssl-transition-easing`   | Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects the ghost drop transition. |
+| Custom property             | Description                                                                                                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--ssl-gap`                 | Separation between items (in pixels).                                                                                                                                                                               |
+| `--ssl-wrap`                | Whether list items are forced onto one line (`nowrap`) or can wrap onto multiple lines (`wrap`).                                                                                                                    |
+| `--ssl-transition-duration` | Time it takes for item (dropping, translation, addition, removal) transitions to complete (in milliseconds).                                                                                                        |
+| `--ssl-transition-easing`   | Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. |
 
 ### CSS frameworks
 
@@ -535,7 +535,7 @@ Use your favorite CSS framework to style the SSL components.
 
 ```svelte
 <SortableList.Root
-	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800!"
+	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800! [&_.ssl-placeholder]:opacity-0"
 >
 	{#each items as item, index (item.id)}
 		<SortableList.Item
@@ -544,7 +544,7 @@ Use your favorite CSS framework to style the SSL components.
 			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] duration-(--ssl-transition-duration) group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-[[data-is-ghost='false']:hover]:bg-indigo-600 group-[[data-is-ghost='false'][data-drag-state*='ptr']]:opacity-0"
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] duration-(--ssl-transition-duration) group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-data-[drag-state='idle']:hover:bg-indigo-600"
 			>
 				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
 					{item.text}
