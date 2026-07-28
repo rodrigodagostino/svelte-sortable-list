@@ -53,7 +53,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}: ItemProps & { class?: string } = $props();
 
 	function defaultTransition(node: HTMLElement) {
-		return scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' });
+		return scaleFly(node, {
+			duration: rootState.props.transition?.duration,
+			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
+		});
 	}
 	const _transitionIn = untrack(() => transitionIn) || defaultTransition;
 	const _transitionOut = untrack(() => transitionOut) || defaultTransition;
