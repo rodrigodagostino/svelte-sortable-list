@@ -59,7 +59,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	export let transitionOut: $$Props['transitionOut'] = undefined;
 
 	function defaultTransition(node: HTMLElement) {
-		return scaleFly(node, { axis: $rootProps.direction === 'vertical' ? 'y' : 'x' });
+		return scaleFly(node, {
+			duration: $rootProps.transition?.duration,
+			axis: $rootProps.direction === 'vertical' ? 'y' : 'x',
+		});
 	}
 	const _transitionIn = transitionIn || defaultTransition;
 	const _transitionOut = transitionOut || defaultTransition;
