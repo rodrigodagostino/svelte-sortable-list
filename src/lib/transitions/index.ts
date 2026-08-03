@@ -76,13 +76,16 @@ export function scaleFly(
 		style[`border${capitalized_secondary_properties[1]}Width`]
 	);
 
+	const has_translate = x_value !== 0 || y_value !== 0;
+	const has_opacity_delta = opacity_delta_value !== 0;
+
 	return {
 		delay,
 		duration,
 		easing,
 		css: (t, u) =>
-			`transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * x_value}${x_unit}` : x}, ${t <= 0.5 ? `${(1 - t) * y_value}${y_unit}` : y}, 0);` +
-			`opacity: ${t > 0.5 ? opacity_target_value - opacity_delta_value * u * 2 : 0};` +
+			`${has_translate ? `transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * x_value}${x_unit}` : x}, ${t <= 0.5 ? `${(1 - t) * y_value}${y_unit}` : y}, 0);` : ''}` +
+			`${has_opacity_delta ? `opacity: ${t > 0.5 ? opacity_target_value - opacity_delta_value * u * 2 : 0};` : ''}` +
 			`${primary_property}: ${t <= 0.5 ? t * 2 * primary_property_value : primary_property_value}px;` +
 			`${primary_property_opposite}: ${primary_property_opposite_value}px;` +
 			`padding-${secondary_properties[0]}: ${t <= 0.5 ? t * 2 * padding_start_value : padding_start_value}px;` +
