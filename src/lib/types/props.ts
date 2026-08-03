@@ -111,6 +111,8 @@ export interface SortableListPlaceholderProps {
 	id: string;
 	/** Position of the placeholder in the list. */
 	index: number;
+	/** If `true`, will transition the placeholder when added or removed from the list. */
+	shouldTransition?: boolean;
 }
 
 export interface SortableListItemHandleProps {

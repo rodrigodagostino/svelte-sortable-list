@@ -45,6 +45,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 <script lang="ts">
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
+	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import { registry, setSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
@@ -57,6 +58,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getClosestScrollableAncestor,
 		getCollidingItem,
 		getIndex,
+		getItemRect,
 		getItemRects,
 		getScrollingSpeed,
 		getTextDirection,
@@ -210,6 +212,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				.find((p) => areColliding(draggedRect, p.ref.getBoundingClientRect()));
 
 			if (peer) {
+				rootState.targetItem = null;
+
 				const peerItemRects = getItemRects(peer.ref);
 				const peerCollidingItemRect = getCollidingItem(draggedRect, peerItemRects);
 				if (peerCollidingItemRect) {
@@ -227,16 +231,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					return;
 				}
 
-				// Mark the peer list as a target root when hovering a gap in the list,
-				// but retain the last know target item if it exists.
-				if (registry.targetRoot?.state !== peer.rootState) {
+				// Use the placeholder to let the dragged item be dropped at the end of the peer list.
+				const peerPlaceholder = peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+				if (
+					peerPlaceholder &&
+					registry.targetRoot?.targetItemIndex !== peerItemRects.length &&
+					getCollidingItem(draggedRect, [getItemRect(peerPlaceholder)])
+				) {
 					registry.targetRoot = {
 						group,
 						state: peer.rootState,
-						targetItemId: registry.targetRoot?.targetItemId ?? null,
-						targetItemIndex: registry.targetRoot?.targetItemIndex ?? null,
+						targetItemId: null,
+						targetItemIndex: peerItemRects.length,
 					};
+					return;
 				}
+
 				return;
 			}
 
@@ -386,6 +396,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
+		if (group && rootState.itemRectsSnapshot) {
+			registry.sourceRoot = {
+				group,
+				state: rootState,
+				draggedItem: currItem,
+				draggedItemRect: rootState.itemRectsSnapshot[getIndex(currItem)],
+			};
+		}
 
 		ondragstart?.({
 			deviceType: 'pointer',
@@ -885,7 +903,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			isCanceled: action.endsWith('cancel'),
 		});
 
-		if (group) registry.targetRoot = null;
+		if (group) {
+			registry.sourceRoot = null;
+			registry.targetRoot = null;
+		}
 		if (typeof pointerId === 'number' && draggedItem?.hasPointerCapture(pointerId))
 			draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;
@@ -949,6 +970,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 >
 	{#if children}
 		{@render children()}
+		{#if registry.isTargetRootState(rootState) && registry.sourceRoot?.state.draggedItem}
+			<SortableListPlaceholder
+				id={registry.sourceRoot.state.draggedItem.id}
+				index={ref.querySelectorAll('.ssl-item').length ?? 0}
+				shouldTransition
+			/>
+		{/if}
 	{:else}
 		<p>
 			To display your list, put a few <code>&lt;SortableList.Item&gt;</code> inside your

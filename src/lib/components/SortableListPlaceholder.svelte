@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { getSortableListRootState } from '$lib/states/index.js';
+	import { getSortableListRootState, registry } from '$lib/states/index.js';
+	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListPlaceholderProps as PlaceholderProps } from '$lib/types/props.js';
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
 		getIndex,
+		getItemRect,
 		isInSameRow,
 	} from '$lib/utils/index.js';
 
@@ -13,25 +15,38 @@
 		ref = $bindable(null),
 		id,
 		index,
+		shouldTransition = false,
 		...restProps
 	}: PlaceholderProps & { class?: string } = $props();
 
+	function conditionalTransition(node: HTMLElement) {
+		if (!shouldTransition) return {};
+		return scaleFly(node, {
+			duration: rootState.props.transition?.duration,
+			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
+		});
+	}
+
 	const rootState = getSortableListRootState();
+	const sourceState = $derived(
+		rootState.draggedItem ? rootState : (registry.sourceRoot?.state ?? rootState)
+	);
 
 	const classes = $derived(['ssl-placeholder', restProps.class]);
 
-	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
+	const draggedIndex = $derived(sourceState.draggedItem ? getIndex(sourceState.draggedItem) : null);
 	const draggedRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof draggedIndex === 'number'
-			? rootState.itemRectsSnapshot[draggedIndex]
+		sourceState.itemRectsSnapshot && typeof draggedIndex === 'number'
+			? sourceState.itemRectsSnapshot[draggedIndex]
 			: null
 	);
-	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
+	const targetIndex = $derived(sourceState.targetItem ? getIndex(sourceState.targetItem) : null);
 	const targetRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof targetIndex === 'number'
-			? rootState.itemRectsSnapshot[targetIndex]
+		sourceState.itemRectsSnapshot && typeof targetIndex === 'number'
+			? sourceState.itemRectsSnapshot[targetIndex]
 			: null
 	);
+	let isPositioned = $state(!registry.isTargetRootState(rootState));
 
 	function getStyleWidth() {
 		if (
@@ -63,6 +78,8 @@
 	}
 
 	function getStyleTransform() {
+		if (registry.isTargetRootState(rootState)) return getPeerTransform();
+
 		if (
 			!draggedRectSnapshot ||
 			!targetRectSnapshot ||
@@ -101,28 +118,45 @@
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
+	function getPeerTransform() {
+		const targetItemId = registry.targetRoot?.targetItemId;
+		if (!ref || targetItemId == null) return 'translate3d(0, 0, 0)';
+
+		const targetItem = rootState.props.ref?.querySelector<HTMLLIElement>(
+			`.ssl-item[data-item-id="${targetItemId}"]`
+		);
+		if (!targetItem) return 'translate3d(0, 0, 0)';
+
+		const targetRect = getItemRect(targetItem);
+		const placeholderRect = getItemRect(ref);
+
+		return `translate3d(${targetRect.x - placeholderRect.x}px, ${targetRect.y - placeholderRect.y}px, 0)`;
+	}
+
 	function getStyleOverflow() {
 		if (rootState.props.canRemoveOnDropOut) return 'hidden';
 		return undefined;
 	}
 
 	const styleWidth = $derived.by(() => {
-		void rootState.draggedItem;
+		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
-		void rootState.draggedItem;
+		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
 		return untrack(() => getStyleHeight());
 	});
 	const styleMargin = $derived.by(() => {
-		void rootState.draggedItem;
+		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
 		return untrack(() => getStyleMargin());
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.targetItem;
+		void registry.targetRoot;
+		void ref;
 		return untrack(() => getStyleTransform());
 	});
 	const styleOverflow = $derived.by(() => {
@@ -139,14 +173,17 @@
 	style:height={styleHeight}
 	style:margin={styleMargin}
 	style:transform={styleTransform}
+	style:transition={isPositioned ? undefined : 'none'}
 	style:overflow={styleOverflow}
 	data-item-id={id}
 	data-item-index={index}
-	data-drag-state={rootState.dragState}
+	data-drag-state={sourceState.dragState}
 	aria-hidden="true"
+	onintroend={() => (isPositioned = true)}
+	transition:conditionalTransition
 >
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html rootState.draggedItem?.innerHTML}
+	{@html sourceState.draggedItem?.innerHTML}
 </li>
 
 <style>

@@ -8,6 +8,13 @@ export interface RegistryEntry {
 	group: string;
 }
 
+export interface SourceRoot {
+	group: string;
+	state: RootState;
+	draggedItem: HTMLLIElement;
+	draggedItemRect: ItemRect;
+}
+
 export interface TargetRoot {
 	group: string;
 	state: RootState;

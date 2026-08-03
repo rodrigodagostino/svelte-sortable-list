@@ -27,7 +27,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
-	import { getSortableListRootState } from '$lib/states/index.js';
+	import { getSortableListRootState, registry } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
 	import {
@@ -55,7 +55,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}: ItemProps & { class?: string } = $props();
 
 	function defaultTransition(node: HTMLElement) {
-		return scaleFly(node, { axis: rootState.props.direction === 'vertical' ? 'y' : 'x' });
+		return scaleFly(node, {
+			duration: rootState.props.transition?.duration,
+			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
+		});
 	}
 	const _transitionIn = untrack(() => transitionIn) || defaultTransition;
 	const _transitionOut = untrack(() => transitionOut) || defaultTransition;
@@ -186,6 +189,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getStyleTransform() {
+		if (registry.isTargetRootState(rootState)) return getForeignNeighborTransform();
+
 		if (
 			rootState.dragState === 'idle' ||
 			rootState.dragState === 'ptr-cancel' ||
@@ -206,6 +211,28 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (rootState.dragState === 'ptr-predrop') return getPredropTransform();
 
 		return getPointerTransform();
+	}
+
+	function getForeignNeighborTransform() {
+		const { sourceRoot, targetRoot } = registry;
+		if (
+			!targetRoot ||
+			!sourceRoot ||
+			typeof targetRoot.targetItemIndex !== 'number' ||
+			index < targetRoot.targetItemIndex
+		)
+			return 'translate3d(0, 0, 0)';
+
+		const x =
+			rootState.props.direction === 'vertical'
+				? 0
+				: (rootState.isRTL ? -1 : 1) * (sourceRoot.draggedItemRect.width + rootState.props.gap!);
+		const y =
+			rootState.props.direction === 'vertical'
+				? sourceRoot.draggedItemRect.height + rootState.props.gap!
+				: 0;
+
+		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
 	function getNeighborTransform() {
@@ -359,6 +386,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isBetweenBounds;
+		void registry.sourceRoot;
+		void registry.targetRoot;
 		return untrack(() => getStyleTransform());
 	});
 
@@ -468,8 +497,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		&[data-drag-state='ptr-drop'],
 		&[data-drag-state*='kbd'],
-		&:has(~ :global(*:not([data-drag-state='idle']))),
-		&:not([data-drag-state='idle']) ~ :global(*) {
+		&:has(~ :global(.ssl-item[data-drag-state='ptr-drag'])),
+		&[data-drag-state='ptr-drag'] ~ :global(.ssl-item),
+		&:has(~ :global(.ssl-placeholder[data-drag-state='ptr-drag'])),
+		& ~ :global(.ssl-placeholder[data-drag-state='ptr-drag']) {
 			transition: transform var(--ssl-transition-duration);
 		}
 
