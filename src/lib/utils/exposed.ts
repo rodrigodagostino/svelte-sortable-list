@@ -1,5 +1,6 @@
 /**
- * Provides an easy mechanism to reorder items (should be used in combination with the `dragend`).
+ * Provides an easy mechanism to reorder items in a list
+ * (should be used in combination with the `dragend` event).
  *
  * @param items List of items from which the item will be moved.
  * @param from Start position of the item to be moved.
@@ -17,7 +18,8 @@ export function sortItems<T>(items: T[], from: number, to: number) {
 }
 
 /**
- * Provides an easy mechanism to remove an item from your list (should be used in combination with the `drop` event).
+ * Provides an easy mechanism to remove an item from a list
+ * (should be used in combination with the `drop` event).
  *
  * @param items List of items from which the item will be removed.
  * @param index Position of the item to be removed.
