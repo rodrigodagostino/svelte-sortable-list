@@ -38,13 +38,13 @@ export function keepWithinBounds(
 	pointer: number,
 	pointerOrigin: number,
 	rootRect: DOMRect,
-	draggedRectSnapshot: DOMRect | ItemRect,
+	draggedRect: DOMRect | ItemRect,
 	gap: number
 ) {
 	const rootStart = rootRect[axis];
 	const rootEnd = axis === 'x' ? rootRect.right : rootRect.bottom;
-	const draggedStart = draggedRectSnapshot[axis];
-	const draggedSize = axis === 'x' ? draggedRectSnapshot.width : draggedRectSnapshot.height;
+	const draggedStart = draggedRect[axis];
+	const draggedSize = axis === 'x' ? draggedRect.width : draggedRect.height;
 	const offset = pointerOrigin - draggedStart;
 	// If the dragged item moves before the start edge of the list,
 	// place it right after the start edge of the list.
