@@ -2,7 +2,6 @@ import type { ItemRect } from './data-extraction.js';
 import type { SortableListRootProps as RootProps } from './props.js';
 
 export interface SortableListRootStateContext {
-	ref: HTMLUListElement | null;
 	props: RootProps;
 	dragState:
 		| 'idle'
