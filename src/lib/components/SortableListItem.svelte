@@ -92,23 +92,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		setInteractiveElementsTabIndex();
 	});
 
-	const rectSnapshot = $derived(
-		rootState.itemRectsSnapshot ? rootState.itemRectsSnapshot[index] : null
-	);
+	const rect = $derived(rootState.itemRects ? rootState.itemRects[index] : null);
 	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
-	// rootState.itemRectsSnapshot is used as a reliable reference to the item’s position in the list
+	// rootState.itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof draggedIndex === 'number'
-			? rootState.itemRectsSnapshot[draggedIndex]
+	const draggedRect = $derived(
+		rootState.itemRects && typeof draggedIndex === 'number'
+			? rootState.itemRects[draggedIndex]
 			: null
 	);
 	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
-	const targetRectSnapshot = $derived(
-		rootState.itemRectsSnapshot && typeof targetIndex === 'number'
-			? rootState.itemRectsSnapshot[targetIndex]
-			: null
+	const targetRect = $derived(
+		rootState.itemRects && typeof targetIndex === 'number' ? rootState.itemRects[targetIndex] : null
 	);
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
@@ -121,7 +117,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
-		return `${rectSnapshot?.width}px`;
+		return `${rect?.width}px`;
 	}
 
 	function getStyleHeight() {
@@ -133,7 +129,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.props.canRemoveOnDropOut
 		)
 			return '0';
-		return `${rectSnapshot?.height}px`;
+		return `${rect?.height}px`;
 	}
 
 	function getStyleTransform() {
@@ -142,14 +138,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.dragState === 'idle' ||
 			rootState.dragState === 'ptr-cancel' ||
 			rootState.dragState === 'kbd-cancel' ||
-			!rootState.itemRectsSnapshot ||
+			!rootState.itemRects ||
 			!rootState.draggedItem ||
 			!rootState.targetItem ||
-			!rectSnapshot ||
+			!rect ||
 			draggedIndex === null ||
-			!draggedRectSnapshot ||
+			!draggedRect ||
 			targetIndex === null ||
-			!targetRectSnapshot
+			!targetRect
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -168,25 +164,21 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 			const step = index > draggedIndex ? -1 : 1;
 			const direction = index > draggedIndex === !rootState.isRTL ? -1 : 1;
-			const neighborRectSnapshot = rootState.itemRectsSnapshot[index + step];
-			const isSameRow = isInSameRow(rectSnapshot, neighborRectSnapshot);
+			const neighborRect = rootState.itemRects[index + step];
+			const isSameRow = isInSameRow(rect, neighborRect);
 
 			const x =
 				rootState.props.direction === 'vertical'
 					? 0
 					: isSameRow
-						? direction * (draggedRectSnapshot.width + rootState.props.gap!)
-						: neighborRectSnapshot.right - rectSnapshot.right;
+						? direction * (draggedRect.width + rootState.props.gap!)
+						: neighborRect.right - rect.right;
 			const y =
 				rootState.props.direction === 'vertical'
-					? direction * (draggedRectSnapshot.height + rootState.props.gap!)
+					? direction * (draggedRect.height + rootState.props.gap!)
 					: isSameRow
 						? 0
-						: calculateTranslateWithAlignment(
-								rootState.props.ref!,
-								neighborRectSnapshot,
-								rectSnapshot
-							);
+						: calculateTranslateWithAlignment(rootState.props.ref!, neighborRect, rect);
 
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}
@@ -194,29 +186,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
-				: calculateTranslate(
-						'x',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					);
+				: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
 		const y =
 			rootState.props.direction === 'vertical'
-				? calculateTranslate(
-						'y',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					)
-				: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+				? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
+				: isInSameRow(draggedRect, targetRect)
 					? 0
-					: calculateTranslateWithAlignment(
-							rootState.props.ref!,
-							targetRectSnapshot,
-							draggedRectSnapshot
-						);
+					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
