@@ -21,7 +21,7 @@ function isCenterCrossed(ghostRect: DOMRect, itemRect: ItemRect) {
 	return hasCrossedX && hasCrossedY;
 }
 
-export function getCollidingItem(ghostRect: DOMRect, itemRects: ItemRect[]) {
+export function getCollidingItemRect(ghostRect: DOMRect, itemRects: ItemRect[]) {
 	const collidingItems = itemRects.filter((itemRect) => isCenterCrossed(ghostRect, itemRect));
 
 	if (collidingItems.length <= 1) return collidingItems[0];
