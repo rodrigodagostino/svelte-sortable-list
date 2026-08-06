@@ -84,7 +84,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		canScrollX,
 		canScrollY,
 		getClosestScrollableAncestor,
-		getCollidingItem,
+		getCollidingItemRect,
 		getIndex,
 		getItemRects,
 		getScrollingSpeed,
@@ -221,7 +221,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					)
 				: rawGhostRect;
 
-		const collidingItemRect = getCollidingItem(ghostRect, $itemRects);
+		const collidingItemRect = getCollidingItemRect(ghostRect, $itemRects);
 		if (collidingItemRect)
 			$targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
