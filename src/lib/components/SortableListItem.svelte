@@ -110,7 +110,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const targetIndex = $derived(
-		registry.targetRoot && registry.isSourceRootState(rootState)
+		registry.targetList && registry.isSourceList(rootState)
 			? null
 			: rootState.targetItem
 				? getIndex(rootState.targetItem)
@@ -136,7 +136,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
-			const peerTargetRect = registry.targetRoot?.targetItemRect;
+			const peerTargetRect = registry.targetList?.targetItemRect;
 			if (peerTargetRect) return `${peerTargetRect.x}px`;
 		}
 
@@ -164,7 +164,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
-			const peerTargetRect = registry.targetRoot?.targetItemRect;
+			const peerTargetRect = registry.targetList?.targetItemRect;
 			if (peerTargetRect) return `${peerTargetRect.y}px`;
 		}
 
@@ -206,7 +206,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getStyleTransform() {
-		if (registry.isTargetRootState(rootState)) return getForeignNeighborTransform();
+		if (registry.isTargetList(rootState)) return getForeignNeighborTransform();
 
 		if (
 			rootState.dragState === 'idle' ||
@@ -231,22 +231,22 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getForeignNeighborTransform() {
-		const { sourceRoot, targetRoot } = registry;
+		const { sourceList, targetList } = registry;
 		if (
-			!targetRoot ||
-			!sourceRoot ||
-			typeof targetRoot.targetItemIndex !== 'number' ||
-			index < targetRoot.targetItemIndex
+			!targetList ||
+			!sourceList ||
+			typeof targetList.targetItemIndex !== 'number' ||
+			index < targetList.targetItemIndex
 		)
 			return 'translate3d(0, 0, 0)';
 
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
-				: (rootState.isRTL ? -1 : 1) * (sourceRoot.draggedItemRect.width + rootState.props.gap!);
+				: (rootState.isRTL ? -1 : 1) * (sourceList.draggedItemRect.width + rootState.props.gap!);
 		const y =
 			rootState.props.direction === 'vertical'
-				? sourceRoot.draggedItemRect.height + rootState.props.gap!
+				? sourceList.draggedItemRect.height + rootState.props.gap!
 				: 0;
 
 		return `translate3d(${x}px, ${y}px, 0)`;
@@ -324,7 +324,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getPredropTransform() {
-		const peerTargetRect = registry.targetRoot?.targetItemRect;
+		const peerTargetRect = registry.targetList?.targetItemRect;
 		if (peerTargetRect) {
 			// Take a live read of the dragged item’s rect to avoid stale values.
 			const draggedRect = rootState.draggedItem!.getBoundingClientRect();
@@ -415,8 +415,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isBetweenBounds;
-		void registry.sourceRoot;
-		void registry.targetRoot;
+		void registry.sourceList;
+		void registry.targetList;
 		return untrack(() => getStyleTransform());
 	});
 

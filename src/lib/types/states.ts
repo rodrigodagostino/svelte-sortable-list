@@ -2,25 +2,22 @@ import type { ItemRect } from './data-extraction.js';
 import type { SortableListRootProps as RootProps } from './props.js';
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
 
-export interface RegistryEntry {
-	rootState: RootState;
+export interface RegistryList {
+	group: string;
 	ref: HTMLUListElement;
-	group: string;
-	id: string | null;
-}
-
-export interface SourceRoot {
-	group: string;
 	state: RootState;
 	id: string | null;
+	index: number | null;
+}
+
+export interface SourceList extends RegistryList {
 	draggedItem: HTMLLIElement;
+	draggedItemId: string | null;
+	draggedItemIndex: number | null;
 	draggedItemRect: ItemRect;
 }
 
-export interface TargetRoot {
-	group: string;
-	state: RootState;
-	id: string | null;
+export interface TargetList extends RegistryList {
 	targetItem: HTMLLIElement | null;
 	targetItemId: string | null;
 	targetItemIndex: number | null;

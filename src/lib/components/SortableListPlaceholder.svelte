@@ -29,7 +29,7 @@
 
 	const rootState = getSortableListRootState();
 	const sourceState = $derived(
-		rootState.draggedItem ? rootState : (registry.sourceRoot?.state ?? rootState)
+		rootState.draggedItem ? rootState : (registry.sourceList?.state ?? rootState)
 	);
 
 	const classes = $derived(['ssl-placeholder', restProps.class]);
@@ -41,7 +41,7 @@
 			: null
 	);
 	const targetIndex = $derived(
-		registry.targetRoot && registry.isSourceRootState(rootState)
+		registry.targetList && registry.isSourceList(rootState)
 			? null
 			: sourceState.targetItem
 				? getIndex(sourceState.targetItem)
@@ -53,13 +53,13 @@
 			: null
 	);
 
-	const isPeerPlaceholder = registry.isTargetRootState(rootState);
+	const isPeerPlaceholder = registry.isTargetList(rootState);
 	let isPositioned = $state(!isPeerPlaceholder);
 
 	function isSlotClosing() {
 		return (
-			registry.isSourceRootState(rootState) &&
-			!!registry.targetRoot &&
+			registry.isSourceList(rootState) &&
+			!!registry.targetList &&
 			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop')
 		);
 	}
@@ -92,7 +92,7 @@
 	}
 
 	function getStyleTransform() {
-		if (registry.isTargetRootState(rootState)) return getPeerTransform();
+		if (registry.isTargetList(rootState)) return getPeerTransform();
 
 		if (
 			!draggedRectSnapshot ||
@@ -133,7 +133,7 @@
 	}
 
 	function getPeerTransform() {
-		const targetItemId = registry.targetRoot?.targetItemId;
+		const targetItemId = registry.targetList?.targetItemId;
 		if (!ref || targetItemId == null) return 'translate3d(0, 0, 0)';
 
 		const targetItem = rootState.props.ref?.querySelector<HTMLLIElement>(
@@ -156,33 +156,33 @@
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
-		void registry.targetRoot;
+		void registry.targetList;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
-		void registry.targetRoot;
+		void registry.targetList;
 		return untrack(() => getStyleHeight());
 	});
 	const styleMargin = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
-		void registry.targetRoot;
+		void registry.targetList;
 		return untrack(() => getStyleMargin());
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.targetItem;
-		void registry.targetRoot;
+		void registry.targetList;
 		void ref;
 		return untrack(() => getStyleTransform());
 	});
 	const styleOverflow = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.isBetweenBounds;
-		void registry.targetRoot;
+		void registry.targetList;
 		return untrack(() => getStyleOverflow());
 	});
 </script>

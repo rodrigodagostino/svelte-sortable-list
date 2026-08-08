@@ -41,21 +41,21 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 export function getPeerTargetFields(
 	registry: Registry,
 	group: string | undefined,
-	rootState: RootState
+	state: RootState
 ) {
-	if (!group || !registry.targetRoot || !registry.isSourceRootState(rootState))
+	if (!group || !registry.targetList || !registry.isSourceList(state))
 		return {
 			targetList: null,
 			targetListId: null,
 			targetListIndex: null,
 		};
 
-	const { targetItem, targetItemId, targetItemIndex } = registry.targetRoot;
+	const { targetItem, targetItemId, targetItemIndex } = registry.targetList;
 
 	return {
-		targetList: registry.targetRoot?.state.props.ref ?? null,
-		targetListId: registry.targetRoot?.state.props.id ?? null,
-		targetListIndex: registry.targetRoot?.state.props.index ?? null,
+		targetList: registry.targetList?.ref ?? null,
+		targetListId: registry.targetList?.id ?? null,
+		targetListIndex: registry.targetList?.index ?? null,
 		targetItem,
 		targetItemId,
 		targetItemIndex,

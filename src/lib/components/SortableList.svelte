@@ -49,7 +49,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import { registry, setSortableListRootState } from '$lib/states/index.js';
-	import type { RegistryEntry, SortableListRootProps as RootProps } from '$lib/types/index.js';
+	import type { RegistryList, SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
 		afterPaint,
 		announce,
@@ -142,10 +142,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let skipDragEnd: (() => void) | null = null;
 	let liveText = $state('');
 
-	let registryEntry: RegistryEntry | null = null;
+	let registryEntry: RegistryList | null = null;
 	onMount(() => {
 		if (group) {
-			registryEntry = { rootState, ref: ref!, group, id: id ?? null };
+			registryEntry = { group, ref: ref!, state: rootState, id: id ?? null, index: index ?? null };
 			unregister = registry.register(registryEntry);
 		}
 		onmounted?.(null);
@@ -213,7 +213,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
 				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
 			);
-			if (group) registry.targetRoot = null;
+			if (group) registry.targetList = null;
 			return;
 		} else if (canClearOnDragOut && !rootState.isBetweenBounds)
 			rootState.targetItem = rootState.draggedItem;
@@ -231,13 +231,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const peerCollidingItemRect = getCollidingItem(draggedRect, peerItemRects);
 				if (peerCollidingItemRect) {
 					if (
-						registry.targetRoot?.state !== peer.rootState ||
-						registry.targetRoot.targetItemId !== peerCollidingItemRect.id
+						registry.targetList?.state !== peer.state ||
+						registry.targetList.targetItemId !== peerCollidingItemRect.id
 					) {
-						registry.targetRoot = {
-							group,
-							state: peer.rootState,
-							id: peer.rootState.props.id ?? null,
+						registry.targetList = {
+							...peer,
 							targetItem:
 								peer.ref.querySelector<HTMLLIElement>(
 									`.ssl-item[data-item-id="${peerCollidingItemRect.id}"]`
@@ -252,24 +250,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				// If the peer list is empty, place the dragged item in its first position.
 				if (!peerItemRects.length) {
-					if (registry.targetRoot?.state !== peer.rootState) {
-						registry.targetRoot = {
-							group,
-							state: peer.rootState,
-							id: peer.rootState.props.id ?? null,
+					if (registry.targetList?.state !== peer.state) {
+						registry.targetList = {
+							...peer,
 							targetItem: null,
 							targetItemId: null,
 							targetItemIndex: 0,
 							targetItemRect: null,
 						};
 
-						// Wait until `targetRoot` is set and the placeholder element
+						// Wait until `targetList` is set and the placeholder element
 						// is appended before setting `targetItemRect`.
 						tick().then(() => {
-							if (!registry.targetRoot) return;
+							if (!registry.targetList) return;
 
 							const peerPlaceholder = peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
-							registry.targetRoot.targetItemRect = peerPlaceholder
+							registry.targetList.targetItemRect = peerPlaceholder
 								? getItemRect(peerPlaceholder)
 								: null;
 						});
@@ -281,13 +277,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const peerPlaceholder = peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
 				if (
 					peerPlaceholder &&
-					registry.targetRoot?.targetItemIndex !== peerItemRects.length &&
+					registry.targetList?.targetItemIndex !== peerItemRects.length &&
 					getCollidingItem(draggedRect, [getItemRect(peerPlaceholder)])
 				) {
-					registry.targetRoot = {
-						group,
-						state: peer.rootState,
-						id: peer.rootState.props.id ?? null,
+					registry.targetList = {
+						...peer,
 						targetItem: peerPlaceholder,
 						targetItemId: null,
 						targetItemIndex: peerItemRects.length,
@@ -297,7 +291,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				return;
 			}
 
-			if (canClearOnDragOut) registry.targetRoot = null;
+			if (canClearOnDragOut) registry.targetList = null;
 		}
 	}
 
@@ -441,11 +435,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
 		if (group && rootState.itemRectsSnapshot) {
-			registry.sourceRoot = {
+			registry.sourceList = {
 				group,
+				ref: ref!,
 				state: rootState,
 				id: rootState.props.id ?? null,
+				index: rootState.props.index ?? null,
 				draggedItem: currItem,
+				draggedItemId: currItem.id,
+				draggedItemIndex: getIndex(currItem),
 				draggedItemRect: rootState.itemRectsSnapshot[getIndex(currItem)],
 			};
 		}
@@ -723,9 +721,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceList: ref!,
 						sourceListId: ref!.id,
 						sourceListIndex: getIndex(ref!),
-						targetList: registry.targetRoot?.state.props.ref ?? null,
-						targetListId: registry.targetRoot?.state.props.id ?? null,
-						targetListIndex: registry.targetRoot?.state.props.index ?? null,
+						targetList: registry.targetList?.ref ?? null,
+						targetListId: registry.targetList?.id ?? null,
+						targetListIndex: registry.targetList?.index ?? null,
 						draggedItem: rootState.draggedItem,
 						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
@@ -872,7 +870,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 		} else if (action === 'ptr-cancel') {
 			// Release the peer list so the dragged item returns to its list.
-			registry.targetRoot = null;
+			registry.targetList = null;
 			await tick();
 			rootState.targetItem = rootState.draggedItem;
 			rootState.dragState = 'ptr-cancel';
@@ -984,8 +982,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 
 		if (group) {
-			registry.sourceRoot = null;
-			registry.targetRoot = null;
+			registry.sourceList = null;
+			registry.targetList = null;
 		}
 		if (typeof pointerId === 'number' && draggedItem?.hasPointerCapture(pointerId))
 			draggedItem?.releasePointerCapture(pointerId);
@@ -1053,9 +1051,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 >
 	{#if children}
 		{@render children()}
-		{#if registry.isTargetRootState(rootState) && registry.sourceRoot?.state.draggedItem}
+		{#if registry.isTargetList(rootState) && registry.sourceList?.draggedItemId}
 			<SortableListPlaceholder
-				id={registry.sourceRoot.state.draggedItem.id}
+				id={registry.sourceList.draggedItemId}
 				index={ref.querySelectorAll('.ssl-item').length ?? 0}
 			/>
 		{/if}
