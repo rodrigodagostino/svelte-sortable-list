@@ -6,11 +6,13 @@ export interface RegistryEntry {
 	rootState: RootState;
 	ref: HTMLUListElement;
 	group: string;
+	id: string | null;
 }
 
 export interface SourceRoot {
 	group: string;
 	state: RootState;
+	id: string | null;
 	draggedItem: HTMLLIElement;
 	draggedItemRect: ItemRect;
 }
@@ -18,8 +20,11 @@ export interface SourceRoot {
 export interface TargetRoot {
 	group: string;
 	state: RootState;
+	id: string | null;
+	targetItem: HTMLLIElement | null;
 	targetItemId: string | null;
 	targetItemIndex: number | null;
+	targetItemRect: ItemRect | null;
 }
 
 export interface SortableListRootStateContext {

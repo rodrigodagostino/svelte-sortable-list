@@ -55,6 +55,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}: ItemProps & { class?: string } = $props();
 
 	function defaultTransition(node: HTMLElement) {
+		if (registry.crossingItemId === node.id) return {};
 		return scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
@@ -108,7 +109,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			? rect
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
-	const targetIndex = $derived(rootState.targetItem ? getIndex(rootState.targetItem) : null);
+	const targetIndex = $derived(
+		registry.targetRoot && registry.isSourceRootState(rootState)
+			? null
+			: rootState.targetItem
+				? getIndex(rootState.targetItem)
+				: null
+	);
 	const targetRectSnapshot = $derived.by(() => {
 		if (!rootState.itemRectsSnapshot || typeof targetIndex !== 'number') return null;
 		const rect = rootState.itemRectsSnapshot[targetIndex];
@@ -127,6 +134,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	function getStyleLeft() {
 		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot)
 			return undefined;
+
+		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
+			const peerTargetRect = registry.targetRoot?.targetItemRect;
+			if (peerTargetRect) return `${peerTargetRect.x}px`;
+		}
 
 		if (
 			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
@@ -150,6 +162,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	function getStyleTop() {
 		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot || !ref)
 			return undefined;
+
+		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
+			const peerTargetRect = registry.targetRoot?.targetItemRect;
+			if (peerTargetRect) return `${peerTargetRect.y}px`;
+		}
 
 		if (
 			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
@@ -307,6 +324,16 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getPredropTransform() {
+		const peerTargetRect = registry.targetRoot?.targetItemRect;
+		if (peerTargetRect) {
+			// Take a live read of the dragged item’s rect to avoid stale values.
+			const draggedRect = rootState.draggedItem!.getBoundingClientRect();
+			const x = draggedRect.x - peerTargetRect.x;
+			const y = draggedRect.y - peerTargetRect.y;
+
+			return `translate3d(${x}px, ${y}px, 0)`;
+		}
+
 		if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
 
 		// Take a live read of the dragged item’s rect to avoid stale values.
@@ -375,10 +402,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const styleWidth = $derived.by(() => {
 		void rootState.draggedItem;
+		void rootState.isBetweenBounds;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.draggedItem;
+		void rootState.isBetweenBounds;
 		return untrack(() => getStyleHeight());
 	});
 	const styleTransform = $derived.by(() => {

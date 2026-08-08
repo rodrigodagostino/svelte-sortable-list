@@ -15,12 +15,12 @@
 		ref = $bindable(null),
 		id,
 		index,
-		shouldTransition = false,
 		...restProps
 	}: PlaceholderProps & { class?: string } = $props();
 
 	function conditionalTransition(node: HTMLElement) {
-		if (!shouldTransition) return {};
+		if (!isPeerPlaceholder) return {};
+		if (registry.crossingItemId === node.id) return {};
 		return scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
@@ -40,19 +40,34 @@
 			? sourceState.itemRectsSnapshot[draggedIndex]
 			: null
 	);
-	const targetIndex = $derived(sourceState.targetItem ? getIndex(sourceState.targetItem) : null);
+	const targetIndex = $derived(
+		registry.targetRoot && registry.isSourceRootState(rootState)
+			? null
+			: sourceState.targetItem
+				? getIndex(sourceState.targetItem)
+				: null
+	);
 	const targetRectSnapshot = $derived(
 		sourceState.itemRectsSnapshot && typeof targetIndex === 'number'
 			? sourceState.itemRectsSnapshot[targetIndex]
 			: null
 	);
-	let isPositioned = $state(!registry.isTargetRootState(rootState));
+
+	const isPeerPlaceholder = registry.isTargetRootState(rootState);
+	let isPositioned = $state(!isPeerPlaceholder);
+
+	function isSlotClosing() {
+		return (
+			registry.isSourceRootState(rootState) &&
+			!!registry.targetRoot &&
+			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop')
+		);
+	}
 
 	function getStyleWidth() {
 		if (
 			rootState.props.direction === 'horizontal' &&
-			!rootState.isBetweenBounds &&
-			rootState.props.canRemoveOnDropOut
+			((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
 		return `${draggedRectSnapshot?.width}px`;
@@ -61,15 +76,14 @@
 	function getStyleHeight() {
 		if (
 			rootState.props.direction === 'vertical' &&
-			!rootState.isBetweenBounds &&
-			rootState.props.canRemoveOnDropOut
+			((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
 		return `${draggedRectSnapshot?.height}px`;
 	}
 
 	function getStyleMargin() {
-		if (!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) {
+		if ((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing()) {
 			return rootState.props.direction === 'vertical'
 				? `0 calc(var(--ssl-gap) / 2)`
 				: 'calc(var(--ssl-gap) / 2) 0';
@@ -134,23 +148,29 @@
 	}
 
 	function getStyleOverflow() {
-		if (rootState.props.canRemoveOnDropOut) return 'hidden';
+		if (rootState.props.canRemoveOnDropOut || isSlotClosing()) return 'hidden';
 		return undefined;
 	}
 
 	const styleWidth = $derived.by(() => {
+		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
+		void registry.targetRoot;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
+		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
+		void registry.targetRoot;
 		return untrack(() => getStyleHeight());
 	});
 	const styleMargin = $derived.by(() => {
+		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isBetweenBounds;
+		void registry.targetRoot;
 		return untrack(() => getStyleMargin());
 	});
 	const styleTransform = $derived.by(() => {
@@ -160,7 +180,9 @@
 		return untrack(() => getStyleTransform());
 	});
 	const styleOverflow = $derived.by(() => {
+		void rootState.dragState;
 		void rootState.isBetweenBounds;
+		void registry.targetRoot;
 		return untrack(() => getStyleOverflow());
 	});
 </script>

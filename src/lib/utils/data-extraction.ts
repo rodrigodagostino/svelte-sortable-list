@@ -1,11 +1,15 @@
+import type {
+	SortableListRegistry as Registry,
+	SortableListRootState as RootState,
+} from '$lib/states/index.js';
 import type { ItemRect } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
-export function getId(element: HTMLLIElement): string {
+export function getId(element: HTMLUListElement | HTMLLIElement): string {
 	return String(element.dataset.itemId);
 }
 
-export function getIndex(element: HTMLLIElement): number {
+export function getIndex(element: HTMLUListElement | HTMLLIElement): number {
 	return Number(element.dataset.itemIndex);
 }
 
@@ -32,6 +36,30 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemRect(item)
 	);
+}
+
+export function getPeerTargetFields(
+	registry: Registry,
+	group: string | undefined,
+	rootState: RootState
+) {
+	if (!group || !registry.targetRoot || !registry.isSourceRootState(rootState))
+		return {
+			targetList: null,
+			targetListId: null,
+			targetListIndex: null,
+		};
+
+	const { targetItem, targetItemId, targetItemIndex } = registry.targetRoot;
+
+	return {
+		targetList: registry.targetRoot?.state.props.ref ?? null,
+		targetListId: registry.targetRoot?.state.props.id ?? null,
+		targetListIndex: registry.targetRoot?.state.props.index ?? null,
+		targetItem,
+		targetItemId,
+		targetItemIndex,
+	};
 }
 
 export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {

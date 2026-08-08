@@ -1,36 +1,52 @@
 interface Event {
 	/** The device type that triggered the event. */
 	deviceType: 'pointer' | 'keyboard';
+	/** The source list element. */
+	sourceList: HTMLUListElement;
+	/** The id of the source list element. */
+	sourceListId?: string;
+	/** The index of the source item element. */
+	sourceListIndex?: number;
 	/** The dragged item element. */
 	draggedItem: HTMLLIElement;
 	/** The id of the dragged item element. */
 	draggedItemId: string;
 	/** The index of the dragged item element. */
 	draggedItemIndex: number;
-	/** The target item element. */
-	targetItem: HTMLLIElement | null;
-	/** The id of the target item element. */
-	targetItemId: string | null;
-	/** The index of the target item element. */
-	targetItemIndex: number | null;
 	/** Whether the target item element is between the bounds of the root element. */
 	isBetweenBounds?: boolean;
 	/** Whether the target item element can be removed on drop out. */
 	canRemoveOnDropOut: boolean;
 }
 
+type TargetListFields = {
+	/** The target list element. */
+	targetList: HTMLUListElement | null;
+	/** The id of the target list element. */
+	targetListId: string | null;
+	/** The index of the target item element. */
+	targetListIndex: number | null;
+	/** The target item element. */
+	targetItem: HTMLLIElement | null;
+	/** The id of the target item element. */
+	targetItemId: string | null;
+	/** The index of the target item element. */
+	targetItemIndex: number | null;
+};
+
 export type MountedEvent = null;
 
-export type DragStartEvent = Omit<Event, 'targetItem' | 'targetItemId' | 'targetItemIndex'>;
+export type DragStartEvent = Event;
 
-export type DragEvent = Event;
+export type DragEvent = Event & TargetListFields;
 
-export type DropEvent = Event;
+export type DropEvent = Event & TargetListFields;
 
-export type DragEndEvent = Event & {
-	/** Whether the drag operation was canceled */
-	isCanceled: boolean;
-};
+export type DragEndEvent = Event &
+	TargetListFields & {
+		/** Whether the drag operation was canceled */
+		isCanceled: boolean;
+	};
 
 export type DestroyedEvent = null;
 

@@ -23,6 +23,10 @@ export interface SortableListRootProps extends Pick<
 	ref?: HTMLUListElement | null;
 	/** Group this list belongs to. */
 	group?: string;
+	/** Unique identifier for the list. */
+	id?: string;
+	/** Position of the list in the group. */
+	index?: number;
 	/** Separation between items (in pixels). */
 	gap?: number;
 	/** Orientation in which items will be arranged. */
@@ -111,8 +115,6 @@ export interface SortableListPlaceholderProps {
 	id: string;
 	/** Position of the placeholder in the list. */
 	index: number;
-	/** If `true`, will transition the placeholder when added or removed from the list. */
-	shouldTransition?: boolean;
 }
 
 export interface SortableListItemHandleProps {
