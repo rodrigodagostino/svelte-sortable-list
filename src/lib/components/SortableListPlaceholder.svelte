@@ -67,7 +67,7 @@
 	function getStyleWidth() {
 		if (
 			rootState.props.direction === 'horizontal' &&
-			((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
+			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
 		return `${draggedRectSnapshot?.width}px`;
@@ -76,14 +76,14 @@
 	function getStyleHeight() {
 		if (
 			rootState.props.direction === 'vertical' &&
-			((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
+			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
 		return `${draggedRectSnapshot?.height}px`;
 	}
 
 	function getStyleMargin() {
-		if ((!rootState.isBetweenBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing()) {
+		if ((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing()) {
 			return rootState.props.direction === 'vertical'
 				? `0 calc(var(--ssl-gap) / 2)`
 				: 'calc(var(--ssl-gap) / 2) 0';
@@ -155,21 +155,21 @@
 	const styleWidth = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		void registry.targetList;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		void registry.targetList;
 		return untrack(() => getStyleHeight());
 	});
 	const styleMargin = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		void registry.targetList;
 		return untrack(() => getStyleMargin());
 	});
@@ -181,7 +181,7 @@
 	});
 	const styleOverflow = $derived.by(() => {
 		void rootState.dragState;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		void registry.targetList;
 		return untrack(() => getStyleOverflow());
 	});

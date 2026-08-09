@@ -137,20 +137,20 @@
  */
 .ssl-root[data-can-remove-on-drop-out="true"] {
 	&
-		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="true"])
+		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-within-bounds="true"])
 		.ssl-item-content {
 		transition: opacity calc(var(--ssl-transition-duration) / 2) ease-out
 			calc(var(--ssl-transition-duration) / 2);
 	}
 
 	&
-		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-between-bounds="false"])
+		.ssl-placeholder:has(+ .ssl-item[data-drag-state*="ptr"][data-is-within-bounds="false"])
 		.ssl-item-content {
 		opacity: 0;
 		transition: opacity calc(var(--ssl-transition-duration) / 3) ease-in;
 	}
 
-	& .ssl-item[data-is-between-bounds="false"] .ssl-item-content {
+	& .ssl-item[data-is-within-bounds="false"] .ssl-item-content {
 		background-color: var(--ssl-rose-300);
 		box-shadow:
 			inset 0 0 0 0.0625rem var(--ssl-rose-400),

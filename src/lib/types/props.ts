@@ -53,10 +53,10 @@ export interface SortableListRootProps extends Pick<
 	/** Prevents the dragged item from moving away from the main axis. */
 	hasLockedAxis?: boolean;
 	/** Items will only be draggable inside the list limits. */
-	hasBoundaries?: boolean;
+	hasBounds?: boolean;
 	/** The target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list. */
 	canClearOnDragOut?: boolean;
-	/** Items will be removed when dragged and dropped outside of the list boundaries. */
+	/** Items will be removed when dragged and dropped outside of the list bounds. */
 	canRemoveOnDropOut?: boolean;
 	/** Allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally. */
 	isLocked?: boolean;

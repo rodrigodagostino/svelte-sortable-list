@@ -253,7 +253,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getNeighborTransform() {
-		if (rootState.props.canRemoveOnDropOut && !rootState.isBetweenBounds)
+		if (rootState.props.canRemoveOnDropOut && !rootState.isWithinBounds)
 			return 'translate3d(0, 0, 0)';
 
 		if (
@@ -359,7 +359,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const x =
 			rootState.props.direction === 'horizontal' ||
 			(rootState.props.direction === 'vertical' && !rootState.props.hasLockedAxis)
-				? rootState.props.hasBoundaries
+				? rootState.props.hasBounds
 					? keepWithinBounds(
 							'x',
 							rootState.pointer.x,
@@ -373,7 +373,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const y =
 			rootState.props.direction === 'vertical' ||
 			(rootState.props.direction === 'horizontal' && !rootState.props.hasLockedAxis)
-				? rootState.props.hasBoundaries
+				? rootState.props.hasBounds
 					? keepWithinBounds(
 							'y',
 							rootState.pointer.y,
@@ -402,19 +402,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const styleWidth = $derived.by(() => {
 		void rootState.draggedItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.draggedItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		return untrack(() => getStyleHeight());
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.pointer;
 		void rootState.targetItem;
-		void rootState.isBetweenBounds;
+		void rootState.isWithinBounds;
 		void registry.sourceList;
 		void registry.targetList;
 		return untrack(() => getStyleTransform());
@@ -474,7 +474,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
-	data-is-between-bounds={!rootState.isBetweenBounds && draggedId === String(id) ? false : true}
+	data-is-within-bounds={!rootState.isWithinBounds && draggedId === String(id) ? false : true}
 	data-is-locked={rootState.props.isLocked || isLocked}
 	data-is-disabled={rootState.props.isDisabled || isDisabled}
 	tabindex={focusedId === String(id) ? 0 : -1}

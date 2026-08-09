@@ -14,7 +14,7 @@ interface Event {
 	/** The index of the dragged item element. */
 	draggedItemIndex: number;
 	/** Whether the target item element is between the bounds of the root element. */
-	isBetweenBounds?: boolean;
+	isWithinBounds?: boolean;
 	/** Whether the target item element can be removed on drop out. */
 	canRemoveOnDropOut: boolean;
 }

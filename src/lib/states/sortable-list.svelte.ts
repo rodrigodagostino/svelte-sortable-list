@@ -10,7 +10,7 @@ export class SortableListRootState {
 	itemRectsSnapshot: Context['itemRectsSnapshot'] = $state.raw(null);
 	pointer: Context['pointer'] = $state.raw(null);
 	pointerOrigin: Context['pointerOrigin'] = $state.raw(null);
-	isBetweenBounds: Context['isBetweenBounds'] = $state(true);
+	isWithinBounds: Context['isWithinBounds'] = $state(true);
 	scrollOffset: Context['scrollOffset'] = $state.raw({ left: 0, top: 0 });
 	isRTL: Context['isRTL'] = $state(false);
 }

@@ -16,9 +16,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		- `easing`: mathematical function that describes the rate at which the transitioning value changes. It receives any of the values accepted by the CSS `transition-timing-function` property. Currently it only affects the dragged item drop transition.
 - `hasWrapping`: if `true`, items can wrap onto multiple lines.
 - `hasLockedAxis`: if `true`, prevents the dragged item from moving away from the main axis.
-- `hasBoundaries`: if `true`, items will only be draggable inside the list limits.
+- `hasBounds`: if `true`, items will only be draggable inside the list limits.
 - `canClearOnDragOut`: if `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
-- `canRemoveOnDropOut`: if `true`, items will be removed when dragged and dropped outside of the list boundaries.
+- `canRemoveOnDropOut`: if `true`, items will be removed when dragged and dropped outside of the list bounds.
 - `isLocked`: if `true`, allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally.
 - `isDisabled`: if `true`, allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled.
 - `announcements`: announcements to be read out by the screen reader during drag and drop operations.
@@ -83,7 +83,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		transition = undefined,
 		hasWrapping = false,
 		hasLockedAxis = false,
-		hasBoundaries = false,
+		hasBounds = false,
 		canClearOnDragOut = false,
 		canRemoveOnDropOut = false,
 		isLocked = false,
@@ -119,7 +119,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			transition: _transition,
 			hasWrapping,
 			hasLockedAxis,
-			hasBoundaries,
+			hasBounds,
 			canClearOnDragOut,
 			canRemoveOnDropOut,
 			isLocked,
@@ -189,7 +189,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		const draggedRect = rootState.draggedItem.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
-		rootState.isBetweenBounds = areColliding(draggedRect, rootRect);
+		rootState.isWithinBounds = areColliding(draggedRect, rootRect);
 		if (scrollableAncestor) {
 			rootState.scrollOffset = {
 				left: scrollableAncestor.scrollLeft - scrollOrigin.left,
@@ -215,7 +215,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			);
 			if (group) registry.targetList = null;
 			return;
-		} else if (canClearOnDragOut && !rootState.isBetweenBounds)
+		} else if (canClearOnDragOut && !rootState.isWithinBounds)
 			rootState.targetItem = rootState.draggedItem;
 
 		if (group) {
@@ -225,7 +225,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			if (peer) {
 				// Dragging over a peer list counts as being between bounds.
-				rootState.isBetweenBounds = true;
+				rootState.isWithinBounds = true;
 
 				const peerItemRects = getItemRects(peer.ref);
 				const peerCollidingItemRect = getCollidingItem(draggedRect, peerItemRects);
@@ -456,7 +456,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			draggedItem: currItem,
 			draggedItemId: currItem.id,
 			draggedItemIndex: getIndex(currItem),
-			isBetweenBounds: rootState.isBetweenBounds,
+			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
@@ -532,7 +532,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				targetItem: rootState.targetItem,
 				targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
 				targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
-				isBetweenBounds: rootState.isBetweenBounds,
+				isWithinBounds: rootState.isWithinBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
 				...getPeerTargetFields(registry, group, rootState),
 			});
@@ -623,7 +623,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItem: rootState.focusedItem,
 						draggedItemId: rootState.focusedItem.id,
 						draggedItemIndex: draggedIndex,
-						isBetweenBounds: rootState.isBetweenBounds,
+						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
@@ -730,7 +730,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetItem: rootState.targetItem,
 						targetItemId: targetId,
 						targetItemIndex: targetIndex,
-						isBetweenBounds: rootState.isBetweenBounds,
+						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
@@ -797,7 +797,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetItem: rootState.targetItem,
 						targetItemId: rootState.targetItem.id,
 						targetItemIndex: targetIndex,
-						isBetweenBounds: rootState.isBetweenBounds,
+						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 						...getPeerTargetFields(registry, group, rootState),
 					});
@@ -852,10 +852,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 
 		if (action === 'ptr-drop') {
-			if (!rootState.isBetweenBounds && canRemoveOnDropOut) rootState.targetItem = null;
+			if (!rootState.isWithinBounds && canRemoveOnDropOut) rootState.targetItem = null;
 			await tick();
 			rootState.dragState =
-				!rootState.isBetweenBounds && canRemoveOnDropOut
+				!rootState.isWithinBounds && canRemoveOnDropOut
 					? 'ptr-remove'
 					: _transition.duration > 0
 						? 'ptr-predrop'
@@ -915,7 +915,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			targetItem: rootState.targetItem,
 			targetItemId: rootState.targetItem ? rootState.targetItem.id : null,
 			targetItemIndex: targetIndex,
-			isBetweenBounds: rootState.isBetweenBounds,
+			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			...getPeerTargetFields(registry, group, rootState),
 		});
@@ -975,7 +975,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			targetItem,
 			targetItemId: targetItem ? targetItem.id : null,
 			targetItemIndex: targetItem ? getIndex(targetItem) : null,
-			isBetweenBounds: rootState.isBetweenBounds,
+			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			isCanceled: action.endsWith('cancel'),
 			...getPeerTargetFields(registry, group, rootState),
@@ -993,7 +993,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.draggedItem = null;
 		rootState.targetItem = null;
 		rootState.itemRectsSnapshot = null;
-		rootState.isBetweenBounds = true;
+		rootState.isWithinBounds = true;
 	}
 
 	function interruptDropTransition(
@@ -1027,7 +1027,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	data-list-id={id}
 	data-list-index={index}
 	data-has-locked-axis={hasLockedAxis}
-	data-has-boundaries={hasBoundaries}
+	data-has-bounds={hasBounds}
 	data-can-clear-on-drag-out={canClearOnDragOut}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
 	data-is-locked={isLocked}
@@ -1083,7 +1083,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			flex-direction: column;
 
 			&[data-can-remove-on-drop-out='true']
-				:global(.ssl-item[data-drag-state*='ptr'][data-is-between-bounds='false']) {
+				:global(.ssl-item[data-drag-state*='ptr'][data-is-within-bounds='false']) {
 				margin: 0 calc(var(--ssl-gap) / 2);
 			}
 		}
@@ -1091,7 +1091,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
 
-			&[data-can-remove-on-drop-out='true'] :global(.ssl-item[data-is-between-bounds='false']) {
+			&[data-can-remove-on-drop-out='true'] :global(.ssl-item[data-is-within-bounds='false']) {
 				margin: calc(var(--ssl-gap) / 2) 0;
 			}
 		}

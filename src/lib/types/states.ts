@@ -45,7 +45,7 @@ export interface SortableListRootStateContext {
 	itemRectsSnapshot: ItemRect[] | null;
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
-	isBetweenBounds: boolean;
+	isWithinBounds: boolean;
 	scrollOffset: { left: number; top: number };
 	isRTL: boolean;
 }
