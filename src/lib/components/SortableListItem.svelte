@@ -525,6 +525,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		}
 
 		&[data-drag-state='ptr-drop'],
+		&[data-drag-state='ptr-cancel'],
 		&[data-drag-state*='kbd'],
 		&:has(~ :global(.ssl-item[data-drag-state='ptr-drag'])),
 		&[data-drag-state='ptr-drag'] ~ :global(.ssl-item),
