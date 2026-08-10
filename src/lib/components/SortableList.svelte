@@ -1075,6 +1075,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	.ssl-root {
 		display: flex;
 		flex-wrap: var(--ssl-wrap);
+		/* WCAG 2.5.5 minimum touch target size. */
+		min-height: var(--ssl-min-height, 44px);
 		padding-inline-start: 0;
 		margin: calc(var(--ssl-gap) / 2 * -1);
 		touch-action: none;
