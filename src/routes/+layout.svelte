@@ -25,6 +25,7 @@
 		{ text: 'Custom transitions', path: '/custom-transitions' },
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
 		{ text: 'Varying heights', path: '/varying-heights' },
+		{ text: 'Multiple lists', path: '/multiple-lists' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With delay', path: '/with-delay' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
