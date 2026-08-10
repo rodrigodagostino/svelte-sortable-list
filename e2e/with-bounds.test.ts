@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
 import { defaultRootProps } from '../src/routes/fixtures';
 
-test.describe('Sortable List - With Boundaries', () => {
+test.describe('Sortable List - With Bounds', () => {
 	test.beforeEach(async ({ page }) => {
-		// Navigate to the With Boundaries page
-		await page.goto('/with-boundaries');
+		// Navigate to the With Bounds page
+		await page.goto('/with-bounds');
 
 		// Wait for the root element to be loaded
 		await page.locator('.ssl-root').waitFor();
 	});
 
-	test('should prevent dragging items outside boundaries', async ({ page }) => {
+	test('should prevent dragging items outside bounds', async ({ page }) => {
 		// Find the dragged item (List Item 1) and its initial position
 		const root = page.locator('.ssl-root');
 		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
@@ -44,7 +44,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The dragged item should be constrained by the left and top boundaries
+		// The dragged item should be constrained by the left and top bounds
 		draggedBox = await draggedItem.boundingBox();
 		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(draggedBox.x);
@@ -57,7 +57,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The dragged item should be constrained by the right and top boundaries
+		// The dragged item should be constrained by the right and top bounds
 		draggedBox = await draggedItem.boundingBox();
 		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
@@ -72,7 +72,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The dragged item should be constrained by the right and bottom boundaries
+		// The dragged item should be constrained by the right and bottom bounds
 		draggedBox = await draggedItem.boundingBox();
 		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + rootBox.width - defaultRootProps.gap / 2).toEqual(
@@ -89,7 +89,7 @@ test.describe('Sortable List - With Boundaries', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
-		// The dragged item should be constrained by the left and bottom boundaries
+		// The dragged item should be constrained by the left and bottom bounds
 		draggedBox = await draggedItem.boundingBox();
 		if (!draggedBox) throw new Error('Could not get ghost bounding box');
 		expect(rootBox.x + defaultRootProps.gap / 2).toEqual(draggedBox.x);

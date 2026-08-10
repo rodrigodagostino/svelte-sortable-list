@@ -46,7 +46,7 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Drag outside the list boundaries
+		// Drag outside the list bounds
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
@@ -106,7 +106,7 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Drag outside the list boundaries
+		// Drag outside the list bounds
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,

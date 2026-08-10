@@ -44,7 +44,7 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Move outside the list boundaries
+		// Move outside the list bounds
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
@@ -86,7 +86,7 @@ test.describe('Sortable List - Clear Target On Drag Out', () => {
 		// Wait for the drag operation to start by checking the drag state
 		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 
-		// Move outside the list boundaries
+		// Move outside the list bounds
 		await page.mouse.move(
 			draggedBox.x + draggedBox.width / 2,
 			viewport.height - 80,
