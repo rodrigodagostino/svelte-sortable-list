@@ -17,6 +17,24 @@ export function sortItems<T>(items: T[], from: number, to: number) {
 }
 
 /**
+ * Provides an easy mechanism to insert an item coming from a peer list into a list
+ * (should be used in combination with the `dropin` event).
+ *
+ * @param items List of items into which the item will be inserted.
+ * @param item The item to insert.
+ * @param index Position at which the item will be inserted.
+ * @returns List of items with the inserted item.
+ *
+ * @example
+ * ```ts
+ * const itemsWithInsertedItem = insertItem(items, item, index);
+ * ```
+ */
+export function insertItem<T>(items: T[], item: T, index: number) {
+	return items.toSpliced(index, 0, item);
+}
+
+/**
  * Provides an easy mechanism to remove an item from your list (should be used in combination with the `drop` event).
  *
  * @param items List of items from which the item will be removed.
