@@ -11,22 +11,14 @@ import type {
 	DestroyedEvent,
 } from './events.js';
 
-export interface SortableListRootProps extends Pick<
+interface SortableListRootBaseProps extends Pick<
 	AriaAttributes & {
-		// `aria-description` is still in W3C Editor's Draft for ARIA 1.3,
-		// but it is already correctly interpreted by screen readers.
 		'aria-description'?: string | undefined | null;
 	},
 	'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby'
 > {
 	/** Reference to the list element. `[$bindable]` */
 	ref?: HTMLUListElement | null;
-	/** Group this list belongs to. */
-	group?: string;
-	/** Unique identifier for the list. */
-	id?: string;
-	/** Position of the list in the group. */
-	index?: number;
 	/** Separation between items (in pixels). */
 	gap?: number;
 	/** Orientation in which items will be arranged. */
@@ -79,6 +71,26 @@ export interface SortableListRootProps extends Pick<
 	/** Callback fired when the component is destroyed. */
 	ondestroyed?: (event: DestroyedEvent) => void;
 }
+
+interface SortableListRootUngroupedProps extends SortableListRootBaseProps {
+	/** Group this list belongs to. */
+	group?: undefined;
+	/** Unique identifier for each list. */
+	id?: string;
+	/** Position of the list in the group. */
+	index?: number;
+}
+
+interface SortableListRootGroupedProps extends SortableListRootBaseProps {
+	/** Group this list belongs to. */
+	group: string;
+	/** Unique identifier for each list. */
+	id: string;
+	/** Position of the list in the group. */
+	index: number;
+}
+
+export type SortableListRootProps = SortableListRootUngroupedProps | SortableListRootGroupedProps;
 
 export interface SortableListItemProps extends Pick<
 	AriaAttributes,
