@@ -28,7 +28,7 @@
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With delay', path: '/with-delay' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
-		{ text: 'With boundaries', path: '/with-boundaries' },
+		{ text: 'With bounds', path: '/with-bounds' },
 		{ text: 'With locked axis', path: '/with-locked-axis' },
 		{ text: 'Images', path: '/images' },
 		{ text: 'Dynamic items', path: '/dynamic-items' },
@@ -550,7 +550,7 @@
 		}
 	}
 
-	:global(.ssl-root[data-has-boundaries='true']) {
+	:global(.ssl-root[data-has-bounds='true']) {
 		position: relative;
 
 		&::after {

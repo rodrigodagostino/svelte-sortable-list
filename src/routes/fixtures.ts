@@ -10,7 +10,7 @@ export const defaultRootProps: SortableList.RootProps = {
 	},
 	hasWrapping: false,
 	hasLockedAxis: false,
-	hasBoundaries: false,
+	hasBounds: false,
 	canClearOnDragOut: false,
 	canRemoveOnDropOut: false,
 	isLocked: false,

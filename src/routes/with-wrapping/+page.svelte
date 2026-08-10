@@ -16,8 +16,8 @@
 	});
 
 	function handleDrop(e: SortableList.RootEvents['ondrop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e;
-		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
+		const { draggedItemIndex, isWithinBounds, canRemoveOnDropOut } = e;
+		if (!isWithinBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
 	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {

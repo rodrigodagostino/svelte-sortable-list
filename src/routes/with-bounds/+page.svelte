@@ -10,13 +10,13 @@
 	onMount(() => {
 		layoutState.props = {
 			...defaultRootProps,
-			hasBoundaries: true,
+			hasBounds: true,
 		};
 	});
 
 	function handleDrop(e: SortableList.RootEvents['ondrop']) {
-		const { draggedItemIndex, isBetweenBounds, canRemoveOnDropOut } = e;
-		if (!isBetweenBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
+		const { draggedItemIndex, isWithinBounds, canRemoveOnDropOut } = e;
+		if (!isWithinBounds && canRemoveOnDropOut) items = removeItem(items, draggedItemIndex);
 	}
 
 	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
@@ -27,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<title>With boundaries — Svelte Sortable List</title>
+	<title>With bounds — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...layoutState.props} ondrop={handleDrop} ondragend={handleDragEnd}>
@@ -41,7 +41,7 @@
 </SortableList.Root>
 
 <style>
-	:global([data-page-pathname='with-boundaries'] .ssl-root) {
+	:global([data-page-pathname='with-bounds'] .ssl-root) {
 		justify-content: center;
 		align-items: center;
 	}
