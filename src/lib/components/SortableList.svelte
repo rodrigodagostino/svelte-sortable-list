@@ -291,7 +291,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				return;
 			}
 
-			if (canClearOnDragOut) registry.targetList = null;
+			if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isWithinBounds))
+				registry.targetList = null;
 		}
 	}
 
