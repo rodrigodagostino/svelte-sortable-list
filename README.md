@@ -69,6 +69,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Flexible layouts**: Vertical and horizontal orientations with varying item heights.
 - **Enhanced UX**: Drop indicators, drag handles, auto-scrolling, and customizable transitions.
 - **Advanced options**: Axis locking, boundary constraints, and remove-on-drop-outside functionality.
+- **Multiple lists**: Drag items between grouped lists.
 - **Integration**: Support for nested interactive elements and the `<dialog>` element.
 - **Internationalization**: RTL language support.
 - **Developer-friendly**: TypeScript definitions, unopinionated styling, and zero dependencies.
@@ -267,12 +268,15 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Prop                 | Type                                    | Default                                                     | Possible values                                       | Description                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------- | --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ref` `[$bindable]`  | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                       |
+| `group`              | `string \| undefined`                   | `undefined`                                                 | Any string                                            | Group this list belongs to. Lists sharing the same `group` value can have items dragged between them. When set, `id` and `index` become required.                                                                                                                                                                                                                    |
+| `id`                 | `string \| undefined`                   | `undefined`                                                 | Unique string                                         | Unique identifier for the list. Required when `group` is set.                                                                                                                                                                                                                                                                                                        |
+| `index`              | `number \| undefined`                   | `undefined`                                                 | Unique number                                         | Position of the list within its `group`. Required when `group` is set.                                                                                                                                                                                                                                                                                               |
 | `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                  |
 | `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                   |
 | `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for item (translation, dropping, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. |
 | `hasWrapping`        | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows items to wrap onto multiple lines.                                                                                                                                                                                                                                                                                                               |
 | `hasLockedAxis`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, constrains dragged items to the main axis only.                                                                                                                                                                                                                                                                                                         |
-| `hasBoundaries`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, restricts item dragging to within list boundaries.                                                                                                                                                                                                                                                                                                      |
+| `hasBounds`          | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, restricts item dragging to within list boundaries.                                                                                                                                                                                                                                                                                                      |
 | `canClearOnDragOut`  | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, clears the target item when a dragged item (via pointing device) doesn't collide with any list items. This causes the dragged item to return to its initial position when dropped, rather than taking the position of the last item it collided with.                                                                                                   |
 | `canRemoveOnDropOut` | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, removes items that are dragged and dropped outside list boundaries. Must be used with the `on:remove` event handler to complete the removal process.                                                                                                                                                                                                    |
 | `isLocked`           | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows list items to be focused but prevents dragging (both pointer and keyboard). Interactive elements within items continue to function normally.                                                                                                                                                                                                     |
@@ -287,14 +291,14 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 > [!NOTE]
 > Events fire in the order listed below.
 
-| Event         | Type                                     | Trigger                                                                                    | Returns                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `onmounted`   | `SortableList.RootEvents['onmounted']`   | Component is mounted                                                                       | <pre>event: {<br>&nbsp;&nbsp;detail: null<br>}</pre>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `ondragstart` | `SortableList.RootEvents['ondragstart']` | Item begins being dragged by pointer device or keyboard                                    | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                                                                                                                                                                                                    |
-| `ondrag`      | `SortableList.RootEvents['ondrag']`      | Dragged item is moved by pointer device or keyboard (fires every few hundred milliseconds) | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
-| `ondrop`      | `SortableList.RootEvents['ondrop']`      | Dragged item is released by pointer device or keyboard                                     | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>&nbsp;&nbsp;}<br>}</pre>                                                 |
-| `ondragend`   | `SortableList.RootEvents['ondragend']`   | Dragged item reaches its final destination after being released                            | <pre>event: {<br>&nbsp;&nbsp;detail: {<br>&nbsp;&nbsp;&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;&nbsp;&nbsp;isBetweenBounds: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;canRemoveOnDropOut: boolean,<br>&nbsp;&nbsp;&nbsp;&nbsp;isCanceled: boolean<br>&nbsp;&nbsp;}<br>}</pre> |
-| `ondestroyed` | `SortableList.RootEvents['ondestroyed']` | Component is destroyed                                                                     | <pre>event: {<br>&nbsp;&nbsp;detail: null<br>}</pre>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Event         | Type                                     | Trigger                                                                                    | Returns                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onmounted`   | `SortableList.RootEvents['onmounted']`   | Component is mounted                                                                       | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `ondragstart` | `SortableList.RootEvents['ondragstart']` | Item begins being dragged by pointer device or keyboard                                    | <pre>{<br>&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;sourceList: HTMLUListElement,<br>&nbsp;&nbsp;sourceListId?: string,<br>&nbsp;&nbsp;sourceListIndex?: number,<br>&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;isWithinBounds: boolean,<br>&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>}</pre>                                                                                                                                                                                                                                                                                                                                      |
+| `ondrag`      | `SortableList.RootEvents['ondrag']`      | Dragged item is moved by pointer device or keyboard (fires every few hundred milliseconds) | <pre>{<br>&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;sourceList: HTMLUListElement,<br>&nbsp;&nbsp;sourceListId?: string,<br>&nbsp;&nbsp;sourceListIndex?: number,<br>&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;targetList: HTMLUListElement \| null,<br>&nbsp;&nbsp;targetListId: string \| null,<br>&nbsp;&nbsp;targetListIndex: number \| null,<br>&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;isWithinBounds: boolean,<br>&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>}</pre>                                     |
+| `ondrop`      | `SortableList.RootEvents['ondrop']`      | Dragged item is released by pointer device or keyboard                                     | <pre>{<br>&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;sourceList: HTMLUListElement,<br>&nbsp;&nbsp;sourceListId?: string,<br>&nbsp;&nbsp;sourceListIndex?: number,<br>&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;targetList: HTMLUListElement \| null,<br>&nbsp;&nbsp;targetListId: string \| null,<br>&nbsp;&nbsp;targetListIndex: number \| null,<br>&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;isWithinBounds: boolean,<br>&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>}</pre>                                     |
+| `ondragend`   | `SortableList.RootEvents['ondragend']`   | Dragged item reaches its final destination after being released                            | <pre>{<br>&nbsp;&nbsp;deviceType: 'pointer' \| 'keyboard',<br>&nbsp;&nbsp;sourceList: HTMLUListElement,<br>&nbsp;&nbsp;sourceListId?: string,<br>&nbsp;&nbsp;sourceListIndex?: number,<br>&nbsp;&nbsp;draggedItem: HTMLLIElement,<br>&nbsp;&nbsp;draggedItemId: string,<br>&nbsp;&nbsp;draggedItemIndex: number,<br>&nbsp;&nbsp;targetList: HTMLUListElement \| null,<br>&nbsp;&nbsp;targetListId: string \| null,<br>&nbsp;&nbsp;targetListIndex: number \| null,<br>&nbsp;&nbsp;targetItem: HTMLLIElement \| null,<br>&nbsp;&nbsp;targetItemId: string \| null,<br>&nbsp;&nbsp;targetItemIndex: number \| null,<br>&nbsp;&nbsp;isCanceled: boolean,<br>&nbsp;&nbsp;isWithinBounds: boolean,<br>&nbsp;&nbsp;canRemoveOnDropOut: boolean<br>}</pre> |
+| `ondestroyed` | `SortableList.RootEvents['ondestroyed']` | Component is destroyed                                                                     | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ### `<SortableList.Item>` props
 
@@ -326,10 +330,11 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 Utility functions to simplify common list operations:
 
-| Function                     | Description                                                                                             |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `sortItems(items, from, to)` | Reorders items in your list. Use in combination with the [`ondragend` event](#sortablelistroot-events). |
-| `removeItem(items, index)`   | Removes an item from your list. Use in combination with the [`ondrop` event](#sortablelistroot-events). |
+| Function                         | Description                                                                                                                                                 |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sortItems(items, from, to)`     | Reorders items in your list. Use in combination with the [`ondragend` event](#sortablelistroot-events).                                                     |
+| `insertItem(items, item, index)` | Inserts an item coming from a peer list into your list. Use in combination with the [`ondragend` event](#sortablelistroot-events) when using grouped lists. |
+| `removeItem(items, index)`       | Removes an item from your list. Use in combination with the [`ondrop`](#sortablelistroot-events) or [`ondragend` event](#sortablelistroot-events).          |
 
 **Example:**
 
@@ -362,6 +367,66 @@ Utility functions to simplify common list operations:
 	</SortableList.Item>
 </SortableList.Root>
 ```
+
+**Multiple lists example:**
+
+To drag items between lists, give each `<SortableList.Root>` the same `group` value, along with a unique `id` and its `index` within the group. Use `sourceListId`/`targetListId` from the `ondragend` event to figure out which lists were involved, and `insertItem`/`removeItem` to move the item across your data:
+
+```svelte
+<script lang="ts">
+	import {
+		SortableList,
+		insertItem,
+		removeItem,
+		sortItems,
+	} from '@rodrigodagostino/svelte-sortable-list';
+
+	let lists = $state([
+		{ id: 'to-do', items: [/* ... */] },
+		{ id: 'doing', items: [/* ... */] },
+	]);
+
+	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
+		const {
+			sourceListId,
+			targetListId,
+			draggedItemId,
+			draggedItemIndex,
+			targetItemIndex,
+			isCanceled,
+		} = e;
+		if (isCanceled || typeof targetItemIndex !== 'number') return;
+
+		if (!targetListId || targetListId === sourceListId) {
+			const list = lists.find((l) => l.id === sourceListId);
+			if (!list) return;
+			list.items = sortItems(list.items, draggedItemIndex, targetItemIndex);
+		} else {
+			const sourceList = lists.find((l) => l.id === sourceListId);
+			const targetList = lists.find((l) => l.id === targetListId);
+			const draggedItem = sourceList?.items.find((item) => item.id === draggedItemId);
+			if (!sourceList || !targetList || !draggedItem) return;
+
+			targetList.items = insertItem(targetList.items, draggedItem, targetItemIndex);
+			sourceList.items = removeItem(sourceList.items, draggedItemIndex);
+		}
+	}
+</script>
+
+{#each lists as { id, items }, index (id)}
+	<SortableList.Root group="my-group" {id} {index} ondragend={handleDragEnd}>
+		{#each items as item, itemIndex (item.id)}
+			<SortableList.Item {...item} index={itemIndex}>
+				<div class="ssl-item-content">
+					<span class="ssl-item-content__text">{item.text}</span>
+				</div>
+			</SortableList.Item>
+		{/each}
+	</SortableList.Root>
+{/each}
+```
+
+See the [“Multiple lists” live demo](https://svelte-sortable-list.netlify.app/multiple-lists) for a complete, working example.
 
 ---
 
@@ -464,9 +529,10 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-root[aria-orientation="vertical"]`             | Vertically oriented list.                                                                                          |
 | `.ssl-root[aria-orientation="horizontal"]`           | Horizontally oriented list.                                                                                        |
 | `.ssl-root[data-has-locked-axis="true"]`             | List with movement restricted to main axis.                                                                        |
-| `.ssl-root[data-has-boundaries="true"]`              | List with boundary-constrained movement.                                                                           |
+| `.ssl-root[data-has-bounds="true"]`                  | List with boundary-constrained movement.                                                                           |
 | `.ssl-root[data-can-clear-on-drag-out="true"]`       | List that clears target item when dragged outside boundaries.                                                      |
 | `.ssl-root[data-can-remove-on-drop-out="true"]`      | List that removes items when dropped outside boundaries.                                                           |
+| `.ssl-root[data-is-target="true"]`                   | Grouped list currently being targeted by an item dragged from a peer list.                                         |
 | `.ssl-root[data-is-locked="true"]`                   | List with dragging disabled for all items.                                                                         |
 | `.ssl-root[data-is-disabled="true"]`                 | List with dragging and interactivity disabled for all items.                                                       |
 | `.ssl-root[aria-disabled="true"]`                    | List with dragging and interactivity disabled for all items.                                                       |
@@ -481,7 +547,7 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-item[data-drag-state="kbd-drag"]`              | Item during keyboard drag.                                                                                         |
 | `.ssl-item[data-drag-state="kbd-drop"]`              | Item during keyboard drop.                                                                                         |
 | `.ssl-item[data-drag-state="kbd-cancel"]`            | Item during keyboard canceled drag.                                                                                |
-| `.ssl-item[data-is-between-bounds="true"]`           | Item positioned within list boundaries.                                                                            |
+| `.ssl-item[data-is-within-bounds="true"]`            | Item positioned within list boundaries.                                                                            |
 | `.ssl-item[data-is-locked="true"]`                   | Item that cannot be dragged.                                                                                       |
 | `.ssl-item[data-is-disabled="true"]`                 | Item that cannot be dragged or interacted with.                                                                    |
 | `.ssl-item[aria-disabled="true"]`                    | Item that cannot be dragged or interacted with.                                                                    |
@@ -500,7 +566,7 @@ Use these CSS selectors to customize the appearance of list components:
 >
 > ```css
 > .ssl-root[data-can-remove-on-drop-out='true']
-> 	.ssl-item[data-is-between-bounds='false']
+> 	.ssl-item[data-is-within-bounds='false']
 > 	.ssl-item-content {
 > 	background-color: var(--ssl-rose-300);
 > 	box-shadow:
