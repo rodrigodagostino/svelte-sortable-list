@@ -35,6 +35,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		calculateTranslateWithAlignment,
 		dispatch,
 		getIndex,
+		getItemRect,
 		INTERACTIVE_ELEMENTS,
 		INTERACTIVE_ROLE_ATTRIBUTES,
 		isInSameRow,
@@ -136,8 +137,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
-			const peerTargetRect = registry.targetList?.targetItemRect;
-			if (peerTargetRect) return `${peerTargetRect.x}px`;
+			const peerTarget = registry.targetList?.targetItem;
+			if (peerTarget) return `${getItemRect(peerTarget).x}px`;
 		}
 
 		if (
@@ -164,8 +165,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
-			const peerTargetRect = registry.targetList?.targetItemRect;
-			if (peerTargetRect) return `${peerTargetRect.y}px`;
+			const peerTarget = registry.targetList?.targetItem;
+			if (peerTarget) return `${getItemRect(peerTarget).y}px`;
 		}
 
 		if (
@@ -236,17 +237,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			!targetList ||
 			!sourceList ||
 			typeof targetList.targetItemIndex !== 'number' ||
-			index < targetList.targetItemIndex
+			index < targetList.targetItemIndex ||
+			!sourceList.state.itemRectsSnapshot
 		)
 			return 'translate3d(0, 0, 0)';
 
+		const sourceDraggedRect = sourceList.state.itemRectsSnapshot[getIndex(sourceList.draggedItem)];
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
-				: (rootState.isRTL ? -1 : 1) * (sourceList.draggedItemRect.width + rootState.props.gap!);
+				: (rootState.isRTL ? -1 : 1) * (sourceDraggedRect.width + rootState.props.gap!);
 		const y =
 			rootState.props.direction === 'vertical'
-				? sourceList.draggedItemRect.height + rootState.props.gap!
+				? sourceDraggedRect.height + rootState.props.gap!
 				: 0;
 
 		return `translate3d(${x}px, ${y}px, 0)`;
@@ -324,10 +327,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getPredropTransform() {
-		const peerTargetRect = registry.targetList?.targetItemRect;
-		if (peerTargetRect) {
+		const peerTarget = registry.targetList?.targetItem;
+		if (peerTarget) {
 			// Take a live read of the dragged item’s rect to avoid stale values.
 			const draggedRect = rootState.draggedItem!.getBoundingClientRect();
+			const peerTargetRect = getItemRect(peerTarget);
 			const x = draggedRect.x - peerTargetRect.x;
 			const y = draggedRect.y - peerTargetRect.y;
 

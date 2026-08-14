@@ -14,14 +14,12 @@ export interface SourceList extends RegistryList {
 	draggedItem: HTMLLIElement;
 	draggedItemId: string | null;
 	draggedItemIndex: number | null;
-	draggedItemRect: ItemRect;
 }
 
 export interface TargetList extends RegistryList {
 	targetItem: HTMLLIElement | null;
 	targetItemId: string | null;
 	targetItemIndex: number | null;
-	targetItemRect: ItemRect | null;
 }
 
 export interface SortableListRootStateContext {

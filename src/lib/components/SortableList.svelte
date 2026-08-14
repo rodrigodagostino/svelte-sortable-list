@@ -242,7 +242,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								) ?? null,
 							targetItemId: peerCollidingItemRect?.id ?? null,
 							targetItemIndex: peerCollidingItemRect?.index ?? null,
-							targetItemRect: peerCollidingItemRect,
 						};
 					}
 					return;
@@ -256,18 +255,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							targetItem: null,
 							targetItemId: null,
 							targetItemIndex: 0,
-							targetItemRect: null,
 						};
 
 						// Wait until `targetList` is set and the placeholder element
-						// is appended before setting `targetItemRect`.
+						// is appended before setting `targetItem`.
 						tick().then(() => {
 							if (!registry.targetList) return;
-
-							const peerPlaceholder = peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
-							registry.targetList.targetItemRect = peerPlaceholder
-								? getItemRect(peerPlaceholder)
-								: null;
+							registry.targetList.targetItem =
+								peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
 						});
 					}
 					return;
@@ -285,7 +280,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetItem: peerPlaceholder,
 						targetItemId: null,
 						targetItemIndex: peerItemRects.length,
-						targetItemRect: getItemRect(peerPlaceholder),
 					};
 				}
 				return;
@@ -445,7 +439,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				draggedItem: currItem,
 				draggedItemId: currItem.id,
 				draggedItemIndex: getIndex(currItem),
-				draggedItemRect: rootState.itemRectsSnapshot[getIndex(currItem)],
 			};
 		}
 
