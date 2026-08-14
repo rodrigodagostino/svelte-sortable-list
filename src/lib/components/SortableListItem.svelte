@@ -95,16 +95,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		setInteractiveElementsTabIndex();
 	});
 
-	const rectSnapshot = $derived(
-		rootState.itemRectsSnapshot ? rootState.itemRectsSnapshot[index] : null
-	);
+	const rect = $derived(rootState.itemRects ? rootState.itemRects[index] : null);
 	const draggedId = $derived(rootState.draggedItem ? rootState.draggedItem.id : null);
 	const draggedIndex = $derived(rootState.draggedItem ? getIndex(rootState.draggedItem) : null);
-	// rootState.itemRectsSnapshot is used as a reliable reference to the item’s position in the list
+	// rootState.itemRects is used as a reliable reference to the item’s position in the list
 	// without the risk of catching in-between values while an item is translating.
-	const draggedRectSnapshot = $derived.by(() => {
-		if (!rootState.itemRectsSnapshot || typeof draggedIndex !== 'number') return null;
-		const rect = rootState.itemRectsSnapshot[draggedIndex];
+	const draggedRect = $derived.by(() => {
+		if (!rootState.itemRects || typeof draggedIndex !== 'number') return null;
+		const rect = rootState.itemRects[draggedIndex];
 		const { scrollOffset } = rootState;
 		return !scrollOffset.left && !scrollOffset.top
 			? rect
@@ -117,9 +115,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				? getIndex(rootState.targetItem)
 				: null
 	);
-	const targetRectSnapshot = $derived.by(() => {
-		if (!rootState.itemRectsSnapshot || typeof targetIndex !== 'number') return null;
-		const rect = rootState.itemRectsSnapshot[targetIndex];
+	const targetRect = $derived.by(() => {
+		if (!rootState.itemRects || typeof targetIndex !== 'number') return null;
+		const rect = rootState.itemRects[targetIndex];
 		const { scrollOffset } = rootState;
 		return !scrollOffset.left && !scrollOffset.top
 			? rect
@@ -133,7 +131,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getStyleLeft() {
-		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot)
+		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rect)
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
@@ -143,25 +141,25 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		if (
 			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
-			draggedRectSnapshot &&
-			targetRectSnapshot &&
+			draggedRect &&
+			targetRect &&
 			typeof draggedIndex === 'number' &&
 			typeof targetIndex === 'number'
 		) {
 			const left =
 				rootState.props.direction === 'vertical'
-					? draggedRectSnapshot.x
+					? draggedRect.x
 					: draggedIndex < targetIndex
-						? targetRectSnapshot.right - draggedRectSnapshot.width
-						: targetRectSnapshot.x;
+						? targetRect.right - draggedRect.width
+						: targetRect.x;
 			return `${left}px`;
 		}
 
-		return `${rectSnapshot.x}px`;
+		return `${rect.x}px`;
 	}
 
 	function getStyleTop() {
-		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rectSnapshot || !ref)
+		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rect || !ref)
 			return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
@@ -171,8 +169,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		if (
 			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
-			draggedRectSnapshot &&
-			targetRectSnapshot &&
+			draggedRect &&
+			targetRect &&
 			typeof draggedIndex === 'number' &&
 			typeof targetIndex === 'number'
 		) {
@@ -181,29 +179,29 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			const top =
 				rootState.props.direction === 'vertical'
 					? draggedIndex < targetIndex
-						? targetRectSnapshot.bottom - draggedRectSnapshot.height
-						: targetRectSnapshot.y
-					: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
-						? draggedRectSnapshot.y
+						? targetRect.bottom - draggedRect.height
+						: targetRect.y
+					: isInSameRow(draggedRect, targetRect)
+						? draggedRect.y
 						: alignItems === 'center'
-							? targetRectSnapshot.y + (targetRectSnapshot.height - draggedRectSnapshot.height) / 2
+							? targetRect.y + (targetRect.height - draggedRect.height) / 2
 							: alignItems === 'end' || alignItems === 'flex-end'
-								? targetRectSnapshot.bottom - draggedRectSnapshot.height
-								: targetRectSnapshot.y;
+								? targetRect.bottom - draggedRect.height
+								: targetRect.y;
 			return `${top}px`;
 		}
 
-		return `${rectSnapshot.y}px`;
+		return `${rect.y}px`;
 	}
 
 	function getStyleWidth() {
 		if (draggedId !== String(id)) return undefined;
-		return `${rectSnapshot?.width}px`;
+		return `${rect?.width}px`;
 	}
 
 	function getStyleHeight() {
 		if (draggedId !== String(id)) return undefined;
-		return `${rectSnapshot?.height}px`;
+		return `${rect?.height}px`;
 	}
 
 	function getStyleTransform() {
@@ -213,11 +211,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			rootState.dragState === 'idle' ||
 			rootState.dragState === 'ptr-cancel' ||
 			rootState.dragState === 'kbd-cancel' ||
-			!rootState.itemRectsSnapshot ||
+			!rootState.itemRects ||
 			!rootState.draggedItem ||
-			!rectSnapshot ||
+			!rect ||
 			draggedIndex === null ||
-			!draggedRectSnapshot
+			!draggedRect
 		)
 			return 'translate3d(0, 0, 0)';
 
@@ -238,11 +236,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			!sourceList ||
 			typeof targetList.targetItemIndex !== 'number' ||
 			index < targetList.targetItemIndex ||
-			!sourceList.state.itemRectsSnapshot
+			!sourceList.state.itemRects
 		)
 			return 'translate3d(0, 0, 0)';
 
-		const sourceDraggedRect = sourceList.state.itemRectsSnapshot[getIndex(sourceList.draggedItem)];
+		const sourceDraggedRect = sourceList.state.itemRects[getIndex(sourceList.draggedItem)];
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
@@ -270,58 +268,38 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		const step = index > draggedIndex! ? -1 : 1;
 		const direction = index > draggedIndex! === !rootState.isRTL ? -1 : 1;
-		const neighborRectSnapshot = rootState.itemRectsSnapshot![index + step];
-		const isSameRow = isInSameRow(rectSnapshot!, neighborRectSnapshot);
+		const neighborRect = rootState.itemRects![index + step];
+		const isSameRow = isInSameRow(rect!, neighborRect);
 
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
 				: isSameRow
-					? direction * (draggedRectSnapshot!.width + rootState.props.gap!)
-					: neighborRectSnapshot.right - rectSnapshot!.right;
+					? direction * (draggedRect!.width + rootState.props.gap!)
+					: neighborRect.right - rect!.right;
 		const y =
 			rootState.props.direction === 'vertical'
-				? direction * (draggedRectSnapshot!.height + rootState.props.gap!)
+				? direction * (draggedRect!.height + rootState.props.gap!)
 				: isSameRow
 					? 0
-					: calculateTranslateWithAlignment(
-							rootState.props.ref!,
-							neighborRectSnapshot,
-							rectSnapshot!
-						);
+					: calculateTranslateWithAlignment(rootState.props.ref!, neighborRect, rect!);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
 	function getKeyboardTransform() {
-		if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
+		if (!targetRect || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
 
 		const x =
 			rootState.props.direction === 'vertical'
 				? 0
-				: calculateTranslate(
-						'x',
-						targetRectSnapshot,
-						draggedRectSnapshot!,
-						draggedIndex!,
-						targetIndex
-					);
+				: calculateTranslate('x', targetRect, draggedRect!, draggedIndex!, targetIndex);
 		const y =
 			rootState.props.direction === 'vertical'
-				? calculateTranslate(
-						'y',
-						targetRectSnapshot,
-						draggedRectSnapshot!,
-						draggedIndex!,
-						targetIndex
-					)
-				: isInSameRow(draggedRectSnapshot!, targetRectSnapshot)
+				? calculateTranslate('y', targetRect, draggedRect!, draggedIndex!, targetIndex)
+				: isInSameRow(draggedRect!, targetRect)
 					? 0
-					: calculateTranslateWithAlignment(
-							rootState.props.ref!,
-							targetRectSnapshot,
-							draggedRectSnapshot!
-						);
+					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect!);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -330,27 +308,27 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const peerTarget = registry.targetList?.targetItem;
 		if (peerTarget) {
 			// Take a live read of the dragged item’s rect to avoid stale values.
-			const draggedRect = rootState.draggedItem!.getBoundingClientRect();
+			const draggedRectLive = rootState.draggedItem!.getBoundingClientRect();
 			const peerTargetRect = getItemRect(peerTarget);
-			const x = draggedRect.x - peerTargetRect.x;
-			const y = draggedRect.y - peerTargetRect.y;
+			const x = draggedRectLive.x - peerTargetRect.x;
+			const y = draggedRectLive.y - peerTargetRect.y;
 
 			return `translate3d(${x}px, ${y}px, 0)`;
 		}
 
-		if (!targetRectSnapshot || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
+		if (!targetRect || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
 
 		// Take a live read of the dragged item’s rect to avoid stale values.
-		const draggedRect = rootState.draggedItem!.getBoundingClientRect();
+		const draggedRectLive = rootState.draggedItem!.getBoundingClientRect();
 
 		const x =
 			rootState.props.direction === 'vertical'
-				? draggedRect.x - targetRectSnapshot.x + (draggedRect.width - targetRectSnapshot.width) / 2
-				: calculateTranslate('x', draggedRect, targetRectSnapshot, draggedIndex!, targetIndex);
+				? draggedRectLive.x - targetRect.x + (draggedRectLive.width - targetRect.width) / 2
+				: calculateTranslate('x', draggedRectLive, targetRect, draggedIndex!, targetIndex);
 		const y =
 			rootState.props.direction === 'vertical'
-				? calculateTranslate('y', draggedRect, targetRectSnapshot, draggedIndex!, targetIndex)
-				: calculateTranslateWithAlignment(rootState.props.ref!, draggedRect, targetRectSnapshot);
+				? calculateTranslate('y', draggedRectLive, targetRect, draggedIndex!, targetIndex)
+				: calculateTranslateWithAlignment(rootState.props.ref!, draggedRectLive, targetRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -369,7 +347,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							rootState.pointer.x,
 							rootState.pointerOrigin.x,
 							rootRect,
-							draggedRectSnapshot!,
+							draggedRect!,
 							rootState.props.gap!
 						)
 					: rootState.pointer.x - rootState.pointerOrigin.x
@@ -383,7 +361,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							rootState.pointer.y,
 							rootState.pointerOrigin.y,
 							rootRect,
-							draggedRectSnapshot!,
+							draggedRect!,
 							rootState.props.gap!
 						)
 					: rootState.pointer.y - rootState.pointerOrigin.y

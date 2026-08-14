@@ -35,9 +35,9 @@
 	const classes = $derived(['ssl-placeholder', restProps.class]);
 
 	const draggedIndex = $derived(sourceState.draggedItem ? getIndex(sourceState.draggedItem) : null);
-	const draggedRectSnapshot = $derived(
-		sourceState.itemRectsSnapshot && typeof draggedIndex === 'number'
-			? sourceState.itemRectsSnapshot[draggedIndex]
+	const draggedRect = $derived(
+		sourceState.itemRects && typeof draggedIndex === 'number'
+			? sourceState.itemRects[draggedIndex]
 			: null
 	);
 	const targetIndex = $derived(
@@ -47,9 +47,9 @@
 				? getIndex(sourceState.targetItem)
 				: null
 	);
-	const targetRectSnapshot = $derived(
-		sourceState.itemRectsSnapshot && typeof targetIndex === 'number'
-			? sourceState.itemRectsSnapshot[targetIndex]
+	const targetRect = $derived(
+		sourceState.itemRects && typeof targetIndex === 'number'
+			? sourceState.itemRects[targetIndex]
 			: null
 	);
 
@@ -70,7 +70,7 @@
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
-		return `${draggedRectSnapshot?.width}px`;
+		return `${draggedRect?.width}px`;
 	}
 
 	function getStyleHeight() {
@@ -79,7 +79,7 @@
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return '0';
-		return `${draggedRectSnapshot?.height}px`;
+		return `${draggedRect?.height}px`;
 	}
 
 	function getStyleMargin() {
@@ -94,40 +94,19 @@
 	function getStyleTransform() {
 		if (registry.isTargetList(rootState)) return getPeerTransform();
 
-		if (
-			!draggedRectSnapshot ||
-			!targetRectSnapshot ||
-			draggedIndex === null ||
-			targetIndex === null
-		)
+		if (!draggedRect || !targetRect || draggedIndex === null || targetIndex === null)
 			return 'translate3d(0, 0, 0)';
 
 		const x =
 			rootState.props.direction === 'vertical'
 				? '0'
-				: calculateTranslate(
-						'x',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					);
+				: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
 		const y =
 			rootState.props.direction === 'vertical'
-				? calculateTranslate(
-						'y',
-						targetRectSnapshot,
-						draggedRectSnapshot,
-						draggedIndex,
-						targetIndex
-					)
-				: isInSameRow(draggedRectSnapshot, targetRectSnapshot)
+				? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
+				: isInSameRow(draggedRect, targetRect)
 					? '0'
-					: calculateTranslateWithAlignment(
-							rootState.props.ref!,
-							targetRectSnapshot,
-							draggedRectSnapshot
-						);
+					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}

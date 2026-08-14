@@ -78,7 +78,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 
 ## Limitations
 
-- Nested lists are not supported.
+- Multiple and nested lists are not supported.
 - Keyboard navigation works across the main axis only.
 - Wrapping (line breaks) is limited to horizontal lists with items of identical width and height.
 
@@ -273,6 +273,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | `index`              | `number \| undefined`                   | `undefined`                                                 | Unique number                                         | Position of the list within its `group`. Required when `group` is set.                                                                                                                                                                                                                                                                                               |
 | `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                  |
 | `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                   |
+| `delay`              | `number \| undefined`                   | `undefined`                                                 | Number ≥ `0`                                          | Time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.                                                                                                                                                                                                                                                                       |
 | `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for item (translation, dropping, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. |
 | `hasWrapping`        | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows items to wrap onto multiple lines.                                                                                                                                                                                                                                                                                                               |
 | `hasLockedAxis`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, constrains dragged items to the main axis only.                                                                                                                                                                                                                                                                                                         |
@@ -344,8 +345,8 @@ Utility functions to simplify common list operations:
 <script lang="ts">
 	import { SortableList, removeItem, sortItems } from '@rodrigodagostino/svelte-sortable-list';
 
-	function handleDragEnd(event: SortableList.RootEvents['dragend']) {
-		const { draggedItemIndex, targetItemIndex, isCanceled } = event.detail;
+	function handleDragEnd(event: SortableList.RootEvents['ondragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = event;
 		if (!isCanceled && typeof targetItemIndex === 'number' && draggedItemIndex !== targetItemIndex)
 			items = sortItems(items, draggedItemIndex, targetItemIndex);
 	}
@@ -359,12 +360,14 @@ Utility functions to simplify common list operations:
 	}
 </script>
 
-<SortableList.Root on:dragend={handleDragEnd}>
-	<SortableList.Item {...item} {index}>
-		<div class="ssl-item-content">
-			<span class="ssl-item-content__text">{item.text}</span>
-		</div>
-	</SortableList.Item>
+<SortableList.Root ondragend={handleDragEnd}>
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
 </SortableList.Root>
 ```
 
@@ -601,18 +604,18 @@ Use your favorite CSS framework to style the SSL components.
 
 ```svelte
 <SortableList.Root
-	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800! [&_.ssl-placeholder]:opacity-0"
+	class="focus-visible:-outline-offset-2! focus-visible:outline-indigo-800! rounded-[0.625rem] focus-visible:outline-2 [&_.ssl-placeholder]:opacity-0"
 >
 	{#each items as item, index (item.id)}
 		<SortableList.Item
 			{...item}
 			{index}
-			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
+			class="focus-within:outline-indigo-800! group rounded-md focus-within:outline-2 focus-within:outline-offset-2"
 		>
 			<div
-				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] duration-(--ssl-transition-duration) group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-data-[drag-state='idle']:hover:bg-indigo-600"
+				class="inset-ring inset-ring-indigo-800 duration-(--ssl-transition-duration) group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state='idle']:hover:bg-indigo-600"
 			>
-				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
+				<span class="my-2.5 text-base font-medium uppercase leading-tight text-white">
 					{item.text}
 				</span>
 			</div>

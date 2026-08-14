@@ -7,7 +7,7 @@ export class SortableListRootState {
 	draggedItem: Context['draggedItem'] = $state(null);
 	targetItem: Context['targetItem'] = $state(null);
 	focusedItem: Context['focusedItem'] = $state(null);
-	itemRectsSnapshot: Context['itemRectsSnapshot'] = $state.raw(null);
+	itemRects: Context['itemRects'] = $state.raw(null);
 	pointer: Context['pointer'] = $state.raw(null);
 	pointerOrigin: Context['pointerOrigin'] = $state.raw(null);
 	isWithinBounds: Context['isWithinBounds'] = $state(true);
