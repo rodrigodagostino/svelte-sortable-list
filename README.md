@@ -64,7 +64,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 
 ## Limitations
 
-- Nested lists are not supported.
+- Multiple and nested lists are not supported.
 - Keyboard navigation works across the main axis only.
 - Wrapping (line breaks) is limited to horizontal lists with items of identical width and height.
 
@@ -258,6 +258,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | `ref` `[bindable]`   | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                                                                            |
 | `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `delay`              | `number \| undefined`                   | `undefined`                                                 | Number ≥ `0`                                          | Time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.                                                                                                                                                                                                                                                                                                                                 |
 | `transition`         | `object \| undefined`                   | `{ duration: 320, easing: 'cubic-bezier(0.2, 1, 0.1, 1)' }` | `duration`: number ≥ `0`<br>`easing`: easing function | `duration`: Time in milliseconds for ghost (dropping) and item (translation, addition, removal) transitions. Set to `0` to disable animations.<br>`easing`: Mathematical function describing transition rate changes. Accepts any value valid for the CSS [`transition-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function) property. Currently only affects ghost drop transitions. |
 | `hasWrapping`        | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, allows items to wrap onto multiple lines.                                                                                                                                                                                                                                                                                                                                                                         |
 | `hasLockedAxis`      | `boolean \| undefined`                  | `false`                                                     | `true` \| `false`                                     | When `true`, constrains dragged items to the main axis only.                                                                                                                                                                                                                                                                                                                                                                   |
@@ -313,10 +314,10 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 Utility functions to simplify common list operations:
 
-| Function                     | Description                                                                                           |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `sortItems(items, from, to)` | Reorders items in your list. Use in combination with the [`dragend` event](#sortablelistroot-events). |
-| `removeItem(items, index)`   | Removes an item from your list. Use in combination with the [`drop` event](#sortablelistroot-events). |
+| Function                     | Description                                                                                                                                          |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sortItems(items, from, to)` | Reorders items in your list. Use in combination with the [`dragend` event](#sortablelistroot-events).                                                |
+| `removeItem(items, index)`   | Removes an item from your list. Use in combination with the [`drop` event](#sortablelistroot-events) or [`dragend` event](#sortablelistroot-events). |
 
 **Example:**
 
