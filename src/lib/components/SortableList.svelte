@@ -1031,6 +1031,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	data-has-bounds={hasBounds}
 	data-can-clear-on-drag-out={canClearOnDragOut}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
+	data-is-target={id === registry.targetList?.id}
 	data-is-locked={isLocked}
 	data-is-disabled={isDisabled}
 	tabindex="0"
