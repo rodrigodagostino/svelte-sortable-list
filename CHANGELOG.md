@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.2] (2026-08-14)
+
+### BREAKING
+
+- Unify bounds/boundaries naming inconsistency.
+
+### Added
+
+- Register lists in a shared registry via `group` prop.
+- Detect peer list targets during drag.
+- Add peer list reaction to cross-list dragging.
+- Apply cross-list item placement on drop.
+- Fade placeholder out through base styles.
+- Add and expose the `insertItem()` utility.
+- Add the `data-is-target` attribute to the `<SortableList.Root>` component.
+
+### Changed
+
+- Simplify registry structure.
+- Prevent grouped lists from omitting `id` or `index` props in `<SortableList.Root>`.
+
+### Performance
+
+- Skip redundant transform/opacity declarations in `scaleFly()`.
+
+### Fixed
+
+- Keep leading edge still during `scaleFly()` custom transition.
+- Transition the dragged item back into place when a drag is canceled.
+- Prevent an empty list from collapsing by adding a default `min-height`.
+- Clear target list when dragging out of bounds with `canRemoveOnDropOut`.
+- Place dragged item correctly when dropping in peer list.
+
+### Test
+
+- Update E2E tests to reflect the latest changes.
+- Add E2E tests for the **“Multiple lists”** page.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Add the **“Multiple lists”** demo page.
+- Update the README to reflect the latest changes.
+
 ## [3.0.0-next.1] (2026-07-26)
 
 ### BREAKING
@@ -15,15 +59,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Create `SortableListPlaceholder` component.
+- Create `<SortableListPlaceholder>` component.
 
 ### Changed
 
-- Split getStyleTransform into per-drag-state functions
+- Split `getStyleTransform()` into per-drag-state functions.
 
 ### Fixed
 
-- Allow overflow in scaleFly transition.
+- Allow overflow in `scaleFly()` transition.
 - Allow interrupting drop transitions on drop remove.
 
 ### Test
@@ -72,7 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Replace duplicated drag-boundary calculations with `keepWithinBounds`.
 - Simplify `<SortableListItem>` `getStyleTransform()` guards.
-- Prefer `startsWith`/`endsWith` over includes for prefix/suffix checks.
+- Prefer `startsWith()`/`endsWith()` over includes for prefix/suffix checks.
 - Convert `portal` action into attachment.
 
 ### Fixed
@@ -1697,7 +1741,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...HEAD
+[3.0.0-next.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...v3.0.0-next.2
 [3.0.0-next.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.6...v3.0.0-next.1
 [2.2.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.5...v2.2.6
 [2.2.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.4...v2.2.5
