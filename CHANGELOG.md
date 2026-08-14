@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.6] (2026-08-14)
+
+### Added
+
+- Apply `transition` prop to default `scaleFly()` transition.
+
+### Performance
+
+- Skip redundant transform/opacity declarations in `scaleFly()`.
+
+### Fixed
+
+- Keep leading edge still during `scaleFly()` custom transition.
+
+### Style
+
+- Rename `getCollidingItem()` to `getCollidingItemRect()` for accuracy.
+
+### Reverted
+
+- Distinguish frozen rects from live ones with `Snapshot` suffix.
+
+### Docs
+
+- Add missing transition duration in **“Styled with Tailwind”** demo page.
+- Updated outdated content in the README.
+
 ## [1.2.5] (2026-07-25)
 
 ### Added
@@ -1606,7 +1633,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.6...HEAD
+[1.2.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.5...v1.2.6
 [1.2.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v1.2.2...v1.2.3
