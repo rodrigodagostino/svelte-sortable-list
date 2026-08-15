@@ -62,6 +62,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getIndex,
 		getItemRect,
 		getItemRects,
+		getItemSibling,
 		getPeerTargetFields,
 		getScrollingSpeed,
 		getTextDirection,
@@ -665,14 +666,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						)
 							return;
 
-						if (step === 1)
-							(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
-								preventScroll: true,
-							});
-						else
-							(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
-								preventScroll: true,
-							});
+						getItemSibling(rootState.focusedItem, step)?.focus({ preventScroll: true });
 					}
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
@@ -691,17 +685,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					)
 						return;
 
-					if (!rootState.targetItem) {
-						rootState.targetItem =
-							step === 1
-								? (rootState.draggedItem.nextElementSibling as HTMLLIElement)
-								: (rootState.draggedItem.previousElementSibling as HTMLLIElement);
-					} else {
-						rootState.targetItem =
-							step === 1
-								? (rootState.targetItem.nextElementSibling as HTMLLIElement)
-								: (rootState.targetItem.previousElementSibling as HTMLLIElement);
-					}
+					rootState.targetItem = getItemSibling(
+						rootState.targetItem || rootState.draggedItem,
+						step
+					);
 
 					await tick();
 					const targetId = rootState.targetItem.id;

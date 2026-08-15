@@ -1,5 +1,15 @@
 import type { ItemRect } from '$lib/types/data-extraction.js';
 
+export function getItemSibling(item: HTMLLIElement, step: -1 | 1) {
+	let sibling = item[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];
+	if (!sibling) return item;
+
+	while (sibling && !sibling.classList.contains('ssl-item'))
+		sibling = sibling[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];
+
+	return sibling as HTMLLIElement;
+}
+
 export function isInSameRow(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return (a.y >= b.y && a.bottom <= b.bottom) || (a.y <= b.y && a.bottom >= b.bottom);
 }
