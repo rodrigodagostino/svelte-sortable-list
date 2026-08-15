@@ -509,14 +509,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		&[data-drag-state='ptr-drop'],
 		&[data-drag-state='ptr-cancel'],
 		&[data-drag-state*='kbd'],
-		&:has(~ :global(.ssl-item[data-drag-state='ptr-drag'])),
-		&[data-drag-state='ptr-drag'] ~ :global(.ssl-item),
-		&:has(~ :global(.ssl-placeholder[data-drag-state='ptr-drag'])),
-		& ~ :global(.ssl-placeholder[data-drag-state='ptr-drag']) {
+		&:has(~ :global(.ssl-placeholder:not([data-drag-state='idle']))),
+		:global(.ssl-placeholder:not([data-drag-state='idle'])) ~ &[data-drag-state='idle'] {
 			transition: transform var(--ssl-transition-duration);
 		}
 
-		&[data-drag-state='ptr-drop'] {
+		&[data-drag-state='ptr-drop'],
+		&[data-drag-state='ptr-cancel'] {
 			transition-timing-function: var(--ssl-transition-easing);
 		}
 
