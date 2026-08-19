@@ -5,12 +5,12 @@ import type {
 import type { ItemRect } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
-export function getId(element: HTMLUListElement | HTMLLIElement): string {
-	return String(element.dataset.itemId);
+export function getId(element: HTMLUListElement | HTMLLIElement) {
+	return String(element.dataset.listId ?? element.dataset.itemId);
 }
 
-export function getIndex(element: HTMLUListElement | HTMLLIElement): number {
-	return Number(element.dataset.itemIndex);
+export function getIndex(element: HTMLUListElement | HTMLLIElement) {
+	return Number(element.dataset.listIndex ?? element.dataset.itemIndex);
 }
 
 export function getItemRect(item: HTMLLIElement): ItemRect {
