@@ -435,8 +435,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				group,
 				ref: ref!,
 				state: rootState,
-				id: rootState.props.id ?? null,
-				index: rootState.props.index ?? null,
+				id: id ?? null,
+				index: index ?? null,
 				draggedItem: currItem,
 				draggedItemId: currItem.id,
 				draggedItemIndex: getIndex(currItem),
@@ -609,6 +609,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
+					if (group && rootState.itemRects) {
+						registry.sourceList = {
+							group,
+							ref: ref!,
+							state: rootState,
+							id: id ?? null,
+							index: index ?? null,
+							draggedItem: rootState.focusedItem,
+							draggedItemId: rootState.focusedItem.id,
+							draggedItemIndex: draggedIndex,
+						};
+					}
 
 					ondragstart?.({
 						deviceType: 'keyboard',
@@ -651,7 +663,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
 
-				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
+				if (!rootState.dragState.startsWith('kbd-drag')) {
+					if (
+						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'vertical') ||
+						((key === 'ArrowUp' || key === 'ArrowDown') && direction === 'horizontal')
+					)
+						return;
+
 					if (!rootState.focusedItem || focusedIndex === null) {
 						shouldScrollIntoView = true;
 						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
@@ -671,28 +689,114 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
 
+					const { lists, sourceList, targetList } = registry;
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
-					// Prevent moving the selected item if it’s the first or last item,
-					// or is at the top or bottom of the list.
-					if (
-						(step === -1 && draggedIndex === 0 && !rootState.targetItem) ||
-						(step === -1 && targetIndex === 0) ||
-						(step === 1 &&
-							draggedIndex === rootState.itemRects.length - 1 &&
-							!rootState.targetItem) ||
-						(step === 1 && targetIndex === rootState.itemRects.length - 1)
-					)
-						return;
 
-					rootState.targetItem = getItemSibling(
-						rootState.targetItem || rootState.draggedItem,
-						step
-					);
+					if (
+						((key === 'ArrowUp' || key === 'ArrowDown') && direction === 'vertical') ||
+						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'horizontal')
+					) {
+						if (targetList?.targetItem) {
+							const targetListChildren = targetList.ref.querySelectorAll<HTMLLIElement>(
+								'.ssl-item, .ssl-placeholder'
+							);
+							// Prevent moving the selected item if it’s at the top or bottom of the list.
+							if (
+								(step === -1 && targetList.targetItemIndex === 0) ||
+								(step === 1 && targetList.targetItemIndex === targetListChildren?.length - 1)
+							)
+								return;
+
+							const targetItemSibling = getItemSibling(targetList.targetItem, step, false);
+							registry.targetList = {
+								...targetList,
+								targetItem: targetItemSibling,
+								targetItemId: targetItemSibling?.classList.contains('ssl-placeholder')
+									? null
+									: (targetItemSibling?.id ?? null),
+								targetItemIndex: targetItemSibling ? getIndex(targetItemSibling) : null,
+							};
+						} else {
+							// Prevent moving the selected item if it’s the first or last item,
+							// or is at the top or bottom of the list.
+							if (
+								(step === -1 && draggedIndex === 0 && !rootState.targetItem) ||
+								(step === -1 && targetIndex === 0) ||
+								(step === 1 &&
+									draggedIndex === rootState.itemRects.length - 1 &&
+									!rootState.targetItem) ||
+								(step === 1 && targetIndex === rootState.itemRects.length - 1)
+							)
+								return;
+
+							rootState.targetItem = getItemSibling(
+								rootState.targetItem || rootState.draggedItem,
+								step
+							);
+						}
+					} else {
+						if (!group) return;
+
+						if (
+							(step === -1 && sourceList?.index === 0 && !targetList) ||
+							(step === -1 && targetList?.index === 0) ||
+							(step === 1 && sourceList?.index === lists.length - 1 && !targetList?.targetItem) ||
+							(step === 1 && targetList?.index === lists.length - 1)
+						)
+							return;
+
+						if (!rootState.targetItem) rootState.targetItem = rootState.draggedItem;
+
+						const nextIndex = targetList ? targetList.index! + step : index! + step;
+						const peer = registry.getPeers(group, rootState).find((p) => p.index === nextIndex);
+						if (peer && index !== nextIndex) {
+							const peerTargetItem = peer.ref.querySelector<HTMLLIElement>('.ssl-item');
+							if (peerTargetItem) {
+								if (
+									registry.targetList?.state !== peer.state ||
+									registry.targetList.targetItemId !== peerTargetItem.id
+								) {
+									registry.targetList = {
+										...peer,
+										targetItem: peerTargetItem ?? null,
+										targetItemId: peerTargetItem?.id ?? null,
+										targetItemIndex: peerTargetItem ? getIndex(peerTargetItem) : null,
+									};
+								}
+								return;
+							}
+
+							// If the peer list is empty, place the dragged item in its first position.
+							if (!peerTargetItem) {
+								if (registry.targetList?.state !== peer.state) {
+									registry.targetList = {
+										...peer,
+										targetItem: null,
+										targetItemId: null,
+										targetItemIndex: 0,
+									};
+
+									// Wait until `targetList` is set and the placeholder element
+									// is appended before setting `targetItem`.
+									tick().then(() => {
+										if (!registry.targetList) return;
+										registry.targetList = {
+											...registry.targetList,
+											targetItem: peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
+										};
+									});
+								}
+								return;
+							}
+						} else {
+							registry.targetList = null;
+						}
+					}
 
 					await tick();
-					const targetId = rootState.targetItem.id;
-					targetIndex = getIndex(rootState.targetItem);
+					const targetId = rootState.targetItem!.id;
+					targetIndex = getIndex(rootState.targetItem!);
 
 					await tick();
 					rootState.dragState = 'kbd-drag';
@@ -718,7 +822,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					liveText = _announcements.dragged(
 						rootState.draggedItem,
 						draggedIndex,
-						rootState.targetItem,
+						rootState.targetItem!,
 						targetIndex
 					);
 				}
@@ -732,7 +836,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
-				if (rootState.dragState !== 'kbd-drag-start' && rootState.dragState !== 'kbd-drag') {
+				if (!rootState.dragState.startsWith('kbd-drag')) {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -746,23 +850,49 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
 
+					const { targetList } = registry;
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
-					// Prevent moving the selected item if it’s the first or last item,
-					// or is at the top or bottom of the list.
-					if (
-						(key === 'Home' && draggedIndex === 0 && !rootState.targetItem) ||
-						(key === 'Home' && targetIndex === 0) ||
-						(key === 'End' &&
-							draggedIndex === rootState.itemRects.length - 1 &&
-							!rootState.targetItem) ||
-						(key === 'End' && targetIndex === rootState.itemRects.length - 1)
-					)
-						return;
 
-					rootState.targetItem = key === 'Home' ? items[0] : items[items.length - 1];
+					if (targetList?.targetItem) {
+						const targetListChildren = targetList.ref.querySelectorAll<HTMLLIElement>(
+							'.ssl-item, .ssl-placeholder'
+						);
+						// Prevent moving the selected item if it’s at the top or bottom of the list.
+						if (
+							(step === -1 && targetList.targetItemIndex === 0) ||
+							(step === 1 && targetList.targetItemIndex === targetListChildren?.length - 1)
+						)
+							return;
+
+						const peerTargetItem =
+							key === 'Home'
+								? targetListChildren[0]
+								: targetListChildren[targetListChildren.length - 1];
+						registry.targetList = {
+							...targetList,
+							targetItem: peerTargetItem,
+							targetItemId: peerTargetItem.id,
+							targetItemIndex: getIndex(peerTargetItem),
+						};
+					} else {
+						// Prevent moving the selected item if it’s the first or last item,
+						// or is at the top or bottom of the list.
+						if (
+							(key === 'Home' && draggedIndex === 0 && !rootState.targetItem) ||
+							(key === 'Home' && targetIndex === 0) ||
+							(key === 'End' &&
+								draggedIndex === rootState.itemRects.length - 1 &&
+								!rootState.targetItem) ||
+							(key === 'End' && targetIndex === rootState.itemRects.length - 1)
+						)
+							return;
+
+						rootState.targetItem = key === 'Home' ? items[0] : items[items.length - 1];
+					}
+
 					await tick();
-					targetIndex = getIndex(rootState.targetItem);
+					targetIndex = getIndex(rootState.targetItem!);
 
 					await tick();
 					rootState.dragState = 'kbd-drag';
@@ -776,7 +906,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
 						targetItem: rootState.targetItem,
-						targetItemId: rootState.targetItem.id,
+						targetItemId: rootState.targetItem!.id,
 						targetItemIndex: targetIndex,
 						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
@@ -786,7 +916,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					liveText = _announcements.dragged(
 						rootState.draggedItem,
 						draggedIndex,
-						rootState.targetItem,
+						rootState.targetItem!,
 						targetIndex
 					);
 				}
