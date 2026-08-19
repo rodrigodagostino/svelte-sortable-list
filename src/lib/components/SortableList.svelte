@@ -262,8 +262,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						// is appended before setting `targetItem`.
 						tick().then(() => {
 							if (!registry.targetList) return;
-							registry.targetList.targetItem =
-								peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+							registry.targetList = {
+								...registry.targetList,
+								targetItem: peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
+							};
 						});
 					}
 					return;
