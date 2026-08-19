@@ -797,7 +797,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					}
 
 					await tick();
-					const targetId = rootState.targetItem!.id;
 					targetIndex = getIndex(rootState.targetItem!);
 
 					await tick();
@@ -808,17 +807,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceList: ref!,
 						sourceListId: ref!.id,
 						sourceListIndex: getIndex(ref!),
-						targetList: registry.targetList?.ref ?? null,
-						targetListId: registry.targetList?.id ?? null,
-						targetListIndex: registry.targetList?.index ?? null,
 						draggedItem: rootState.draggedItem,
 						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
 						targetItem: rootState.targetItem,
-						targetItemId: targetId,
+						targetItemId: rootState.targetItem?.id ?? null,
 						targetItemIndex: targetIndex,
 						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
+						...getPeerTargetFields(registry, group, rootState),
 					});
 
 					liveText = _announcements.dragged(

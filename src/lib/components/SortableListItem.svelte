@@ -126,13 +126,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
 	function getStylePosition() {
-		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr')) return undefined;
+		if (draggedId !== String(id)) return undefined;
 		return 'fixed';
 	}
 
 	function getStyleLeft() {
-		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rect)
-			return undefined;
+		if (draggedId !== String(id) || !rect) return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
 			const peerTarget = registry.targetList?.targetItem;
@@ -155,12 +154,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `${left}px`;
 		}
 
+		if (rootState.dragState.startsWith('kbd')) return `${rect.x - rootState.props.gap! / 2}px`;
+
 		return `${rect.x}px`;
 	}
 
 	function getStyleTop() {
-		if (draggedId !== String(id) || !rootState.dragState.startsWith('ptr') || !rect || !ref)
-			return undefined;
+		if (draggedId !== String(id) || !rect || !ref) return undefined;
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
 			const peerTarget = registry.targetList?.targetItem;
@@ -190,6 +190,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 								: targetRect.y;
 			return `${top}px`;
 		}
+
+		if (rootState.dragState.startsWith('kbd')) return `${rect.y - rootState.props.gap! / 2}px`;
 
 		return `${rect.y}px`;
 	}
@@ -288,6 +290,18 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getKeyboardTransform() {
+		if (registry.targetList) {
+			const peerTargetRect = registry.targetList?.targetItem
+				? getItemRect(registry.targetList.targetItem)
+				: null;
+
+			if (!peerTargetRect) return 'translate3d(0, 0, 0)';
+
+			const x = peerTargetRect.x - draggedRect!.x;
+			const y = peerTargetRect.y - draggedRect!.y;
+			return `translate3d(${x}px, ${y}px, 0)`;
+		}
+
 		if (!targetRect || typeof targetIndex !== 'number') return 'translate3d(0, 0, 0)';
 
 		const x =
@@ -438,7 +452,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	};
 </script>
 
-{#if draggedId === String(id) && rootState.dragState.startsWith('ptr')}
+{#if draggedId === String(id)}
 	<SortableListPlaceholder {id} {index} />
 {/if}
 <li

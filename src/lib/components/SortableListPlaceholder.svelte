@@ -60,7 +60,9 @@
 		return (
 			registry.isSourceList(rootState) &&
 			!!registry.targetList &&
-			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop')
+			(rootState.dragState === 'ptr-predrop' ||
+				rootState.dragState === 'ptr-drop' ||
+				rootState.dragState === 'kbd-drop')
 		);
 	}
 
@@ -69,7 +71,7 @@
 			rootState.props.direction === 'horizontal' &&
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
-			return '0';
+			return 0;
 		return `${draggedRect?.width}px`;
 	}
 
@@ -78,7 +80,7 @@
 			rootState.props.direction === 'vertical' &&
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
-			return '0';
+			return 0;
 		return `${draggedRect?.height}px`;
 	}
 
@@ -99,13 +101,13 @@
 
 		const x =
 			rootState.props.direction === 'vertical'
-				? '0'
+				? 0
 				: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
 		const y =
 			rootState.props.direction === 'vertical'
 				? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 				: isInSameRow(draggedRect, targetRect)
-					? '0'
+					? 0
 					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
