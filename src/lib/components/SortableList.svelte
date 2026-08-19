@@ -168,7 +168,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		untrack(() => {
 			if (activeElement && activeElement !== document.activeElement) {
-				activeElement.focus({ preventScroll: true });
+				const crossingItem = registry.crossingItemId
+					? document.querySelector<HTMLLIElement>(
+							`.ssl-item[data-item-id="${registry.crossingItemId}"]`
+						)
+					: null;
+				(crossingItem || activeElement).focus({ preventScroll: true });
 			}
 		});
 	});
