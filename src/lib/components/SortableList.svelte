@@ -694,7 +694,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						return;
 
 					if (!rootState.focusedItem || focusedIndex === null) {
-						shouldScrollIntoView = true;
 						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
 						firstItem?.focus({ preventScroll: true });
 					} else {
@@ -958,7 +957,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			await tick();
 			const scrollTarget =
-				rootState.dragState !== 'kbd-drag' ? rootState.focusedItem : rootState.targetItem;
+				rootState.dragState !== 'kbd-drag'
+					? rootState.focusedItem
+					: registry.targetList
+						? registry.targetList.targetItem
+						: rootState.targetItem;
+
 			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 				scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
 		}
