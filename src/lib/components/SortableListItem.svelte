@@ -154,7 +154,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `${left}px`;
 		}
 
-		if (rootState.dragState.startsWith('kbd')) return `${rect.x - rootState.props.gap! / 2}px`;
+		if (rootState.dragState.startsWith('kbd') && draggedRect)
+			return `${draggedRect.x - rootState.props.gap! / 2}px`;
 
 		return `${rect.x}px`;
 	}
@@ -191,7 +192,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `${top}px`;
 		}
 
-		if (rootState.dragState.startsWith('kbd')) return `${rect.y - rootState.props.gap! / 2}px`;
+		if (rootState.dragState.startsWith('kbd') && draggedRect)
+			return `${draggedRect.y - rootState.props.gap! / 2}px`;
 
 		return `${rect.y}px`;
 	}
@@ -390,10 +392,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const styleLeft = $derived.by(() => {
 		void rootState.dragState;
+		void rootState.scrollOffset;
 		return untrack(() => getStyleLeft());
 	});
 	const styleTop = $derived.by(() => {
 		void rootState.dragState;
+		void rootState.scrollOffset;
 		return untrack(() => getStyleTop());
 	});
 	const styleWidth = $derived.by(() => {
@@ -408,6 +412,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
+		if (rootState.dragState.startsWith('kbd')) void rootState.scrollOffset;
 		void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isWithinBounds;

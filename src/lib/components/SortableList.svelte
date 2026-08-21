@@ -190,18 +190,23 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) untrack(() => scroll());
 	});
 
+	function updateScrollOffset() {
+		if (!scrollableAncestor) return;
+
+		const left = scrollableAncestor.scrollLeft - scrollOrigin.left;
+		const top = scrollableAncestor.scrollTop - scrollOrigin.top;
+		if (left === rootState.scrollOffset.left && top === rootState.scrollOffset.top) return;
+
+		rootState.scrollOffset = { left, top };
+	}
+
 	function updateTargetItem() {
 		if (!rootState.itemRects || !ref || !rootState.draggedItem) return;
 
 		const draggedRect = rootState.draggedItem.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
 		rootState.isWithinBounds = areColliding(draggedRect, rootRect);
-		if (scrollableAncestor) {
-			rootState.scrollOffset = {
-				left: scrollableAncestor.scrollLeft - scrollOrigin.left,
-				top: scrollableAncestor.scrollTop - scrollOrigin.top,
-			};
-		}
+		updateScrollOffset();
 
 		// Offset the dragged rect by the current scroll.
 		const draggedRectWithOffset =
@@ -333,8 +338,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	let scrollRafId: number | null = null;
-	let scrollTarget: Document | HTMLElement | null = null;
+	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
+		if (!rootState.dragState.startsWith('ptr')) {
+			updateScrollOffset();
+			return;
+		}
+
 		if (scrollRafId) return;
 
 		scrollRafId = requestAnimationFrame(() => {
@@ -466,15 +476,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (scrollableAncestor && canScroll(scrollableAncestor)) {
 			// The document’s scrolling element doesn’t reliably receive its own
 			// `scroll` events, so `document` is the target used for that case.
-			scrollTarget = isScrollingDocument ? document : scrollableAncestor;
-			scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
+			scrollEventTarget = isScrollingDocument ? document : scrollableAncestor;
+			scrollEventTarget.addEventListener('scroll', handleScroll, { passive: true });
 		}
 		document.addEventListener(
 			'pointerup',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollTarget?.removeEventListener('scroll', handleScroll);
-				scrollTarget = null;
+				scrollEventTarget?.removeEventListener('scroll', handleScroll);
+				scrollEventTarget = null;
 				handlePointerUp();
 			},
 			{ once: true }
@@ -483,8 +493,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'pointercancel',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollTarget?.removeEventListener('scroll', handleScroll);
-				scrollTarget = null;
+				scrollEventTarget?.removeEventListener('scroll', handleScroll);
+				scrollEventTarget = null;
 				handlePointerCancel();
 			},
 			{ once: true }
@@ -495,8 +505,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollTarget?.removeEventListener('scroll', handleScroll);
-				scrollTarget = null;
+				scrollEventTarget?.removeEventListener('scroll', handleScroll);
+				scrollEventTarget = null;
 				// lostpointercapture can fire before pointerup in Chromium on macOS, causing valid
 				// drops to be canceled. Treating it as a drop instead means a genuine capture loss
 				// will drop rather than cancel, but that is preferable to silently broken drops.
@@ -613,6 +623,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						top: scrollableAncestor?.scrollTop ?? 0,
 					};
 					rootState.scrollOffset = { left: 0, top: 0 };
+					if (scrollableAncestor && canScroll(scrollableAncestor)) {
+						// The document’s scrolling element doesn’t reliably receive its own
+						// `scroll` events, so `document` is the target used for that case.
+						scrollEventTarget = isScrollingDocument ? document : scrollableAncestor;
+						scrollEventTarget.addEventListener('scroll', handleScroll, { passive: true });
+					}
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
@@ -1068,6 +1084,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		if (!rootState.draggedItem) return;
+
+		scrollEventTarget?.removeEventListener('scroll', handleScroll);
+		scrollEventTarget = null;
+		if (scrollRafId) {
+			cancelAnimationFrame(scrollRafId);
+			scrollRafId = null;
+		}
 
 		const draggedItem = rootState.draggedItem;
 		const targetItem = rootState.targetItem;
