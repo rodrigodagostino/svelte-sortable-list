@@ -21,10 +21,19 @@
 	function conditionalTransition(node: HTMLElement) {
 		if (!isPeerPlaceholder) return {};
 		if (registry.crossingItemId === node.id) return {};
-		return scaleFly(node, {
+		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
 		});
+		// Svelte caches this config while a transition is in flight (an outro that starts
+		// mid-intro reuses the intro’s config), so the crossing check must also run when
+		// each direction starts, not only when the config is created.
+		return {
+			...config,
+			get duration() {
+				return registry.crossingItemId === node.id ? 0 : config.duration;
+			},
+		};
 	}
 
 	const rootState = getSortableListRootState();

@@ -57,10 +57,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	function defaultTransition(node: HTMLElement) {
 		if (registry.crossingItemId === node.id) return {};
-		return scaleFly(node, {
+		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
 		});
+		// Svelte caches this config while a transition is in flight (an outro that starts
+		// mid-intro reuses the intro’s config), so the crossing check must also run when
+		// each direction starts, not only when the config is created.
+		return {
+			...config,
+			get duration() {
+				return registry.crossingItemId === node.id ? 0 : config.duration;
+			},
+		};
 	}
 	const _transitionIn = untrack(() => transitionIn) || defaultTransition;
 	const _transitionOut = untrack(() => transitionOut) || defaultTransition;
