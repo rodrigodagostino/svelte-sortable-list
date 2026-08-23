@@ -45,4 +45,5 @@ export interface SortableListRootStateContext {
 	isWithinBounds: boolean;
 	scrollOffset: { left: number; top: number };
 	isRTL: boolean;
+	interruptDropTransition: (() => void) | null;
 }

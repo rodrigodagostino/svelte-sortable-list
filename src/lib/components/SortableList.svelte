@@ -140,7 +140,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let isPointerReleased = false;
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
-	let skipDragEnd: (() => void) | null = null;
 	let liveText = $state('');
 
 	let registryEntry: RegistryList | null = null;
@@ -359,23 +358,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 		}
 
-		// Interrupt any ongoing drop transition so the user can immediately start a new drag,
-		// regardless of whether it’s finishing a pointer or a keyboard interaction.
-		if (
-			rootState.dragState === 'ptr-drop' ||
-			rootState.dragState === 'ptr-cancel' ||
-			rootState.dragState === 'ptr-remove' ||
-			rootState.dragState === 'kbd-drop' ||
-			rootState.dragState === 'kbd-cancel'
-		) {
-			const isPtrState = rootState.dragState.startsWith('ptr');
-			const element = isPtrState ? rootState.draggedItem : rootState.focusedItem;
-			e.preventDefault();
-			interruptDropTransition(element, rootState.dragState);
-			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
-			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
-			await tick();
-		}
+		await interruptDropTransition(e);
 
 		if (rootState.dragState !== 'idle') {
 			e.preventDefault();
@@ -577,23 +560,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
-		// Interrupt any ongoing drop transition so the user can immediately start a new drag,
-		// regardless of whether it’s finishing a pointer or a keyboard interaction.
-		if (
-			rootState.dragState === 'ptr-drop' ||
-			rootState.dragState === 'ptr-cancel' ||
-			rootState.dragState === 'ptr-remove' ||
-			rootState.dragState === 'kbd-drop' ||
-			rootState.dragState === 'kbd-cancel'
-		) {
-			const isPtrState = rootState.dragState.startsWith('ptr');
-			const element = isPtrState ? rootState.draggedItem : rootState.focusedItem;
-			e.preventDefault();
-			interruptDropTransition(element, rootState.dragState);
-			// The `ondragend` fired above calls sortItems() in the parent updating the items array.
-			// Wait for Svelte to flush the re-render so getItemRects() captures the new sorted positions.
-			await tick();
-		}
+		await interruptDropTransition(e);
 
 		const { key } = e;
 		const target = e.target as HTMLElement;
@@ -1061,7 +1028,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (isResolved) return;
 
 				isResolved = true;
-				skipDragEnd = null;
+				rootState.interruptDropTransition = null;
 				element?.removeEventListener('transitionend', handleTransitionEnd);
 				if (transitionTimeoutId) {
 					clearTimeout(transitionTimeoutId);
@@ -1071,7 +1038,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (shouldHandleDragEnd) handlePointerAndKeyboardDragEnd(action);
 			}
 
-			skipDragEnd = () => finalizeDrop(false);
+			rootState.interruptDropTransition = () => {
+				// Prevent the pending `transitionend`/timeout from triggering
+				// `handlePointerAndKeyboardDragEnd()`, then settle the drop right away.
+				finalizeDrop(false);
+				element?.getAnimations().forEach((animation) => animation.finish());
+				handlePointerAndKeyboardDragEnd(action);
+			};
 
 			function handleTransitionEnd(e: TransitionEvent) {
 				if (e.propertyName === 'transform') finalizeDrop();
@@ -1138,15 +1111,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.isWithinBounds = true;
 	}
 
-	function interruptDropTransition(
-		element: HTMLElement | null | undefined,
-		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
-	) {
-		// Prevent the pending `transitionend`/timeout from triggering handlePointerAndKeyboardDragEnd().
-		skipDragEnd?.();
-		element?.getAnimations().forEach((animation) => animation.finish());
+	// Interrupt any ongoing drop transition so the user can immediately start a new drag,
+	// regardless of whether it’s finishing a pointer or a keyboard interaction.
+	async function interruptDropTransition(e: PointerEvent | KeyboardEvent) {
+		const droppingRootState = rootState.interruptDropTransition
+			? rootState
+			: group
+				? registry.getPeers(group, rootState).find((peer) => peer.state.interruptDropTransition)
+						?.state
+				: undefined;
+		if (!droppingRootState?.interruptDropTransition) return;
 
-		handlePointerAndKeyboardDragEnd(action);
+		e.preventDefault();
+		droppingRootState.interruptDropTransition();
+		// The `ondragend` fired above calls `sortItems()` in the parent updating the items array.
+		// Wait for Svelte to flush the re-render so `getItemRects()` captures the new sorted positions.
+		await tick();
 	}
 
 	function handleContextMenu(e: MouseEvent) {

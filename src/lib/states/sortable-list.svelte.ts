@@ -13,6 +13,7 @@ export class SortableListRootState {
 	isWithinBounds: Context['isWithinBounds'] = $state(true);
 	scrollOffset: Context['scrollOffset'] = $state.raw({ left: 0, top: 0 });
 	isRTL: Context['isRTL'] = $state(false);
+	interruptDropTransition: Context['interruptDropTransition'] = $state.raw(null);
 }
 
 const KEY = Symbol('SortableList.RootState');
