@@ -96,14 +96,15 @@
 		& :global(.app-main .container) {
 			align-items: start;
 			max-width: calc(100% + 6rem);
-			padding-inline: 3rem;
-			padding-block-end: 3rem;
 			margin-inline: -3rem;
-			overflow-x: auto;
 
 			&:has(.lists.direction-vertical) {
 				margin-block-start: 8vh;
 				margin-block-start: 8dvh;
+
+				@media (min-width: 46em) {
+					align-items: center;
+				}
 
 				@media (min-width: 58em) {
 					margin-block-start: 20vh;
@@ -111,16 +112,26 @@
 				}
 			}
 
-			@media (min-width: 46em) {
-				align-items: center;
+			&:has(.lists.direction-horizontal) {
+				margin-inline-end: auto;
+				overflow-x: auto;
 			}
 		}
 	}
 
 	.lists {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(12rem, 1fr));
 		gap: 2rem;
+		padding-inline: 3rem;
+		padding-block-end: 3rem;
+
+		&.direction-vertical {
+			grid-template-columns: repeat(3, minmax(12rem, 1fr));
+		}
+
+		&.direction-horizontal {
+			grid-template-rows: 1fr;
+		}
 	}
 
 	.list {
@@ -149,5 +160,9 @@
 
 	.list__title {
 		font-size: 1rem;
+	}
+
+	:global(.ssl-item) {
+		white-space: nowrap;
 	}
 </style>
