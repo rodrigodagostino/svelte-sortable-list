@@ -653,33 +653,53 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
+				const { lists, sourceList, targetList } = registry;
 
 				if (!rootState.dragState.startsWith('kbd-drag')) {
 					if (
 						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'vertical') ||
 						((key === 'ArrowUp' || key === 'ArrowDown') && direction === 'horizontal')
-					)
-						return;
+					) {
+						if (!group || !rootState.focusedItem) return;
 
-					if (!rootState.focusedItem || focusedIndex === null) {
-						const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
-						firstItem?.focus({ preventScroll: true });
+						// Prevent switching focus if the focused item is located at the first or last list.
+						if ((step === -1 && index === 0) || (step === 1 && index === lists.length - 1)) return;
+
+						const nextIndex = index! + step;
+						const peer = registry.getPeers(group, rootState).find((p) => p.index === nextIndex);
+
+						if (peer) {
+							const closestRect = getClosestItemRect(
+								rootState.focusedItem.getBoundingClientRect(),
+								getItemRects(peer.ref)
+							);
+							const peerTargetItem =
+								closestRect &&
+								peer.ref.querySelector<HTMLLIElement>(
+									`.ssl-item[data-item-id="${closestRect.id}"]`
+								);
+							peerTargetItem?.focus({ preventScroll: true });
+						}
 					} else {
-						// Prevent focusing the previous item if the current one is the first,
-						// and focusing the next item if the current one is the last.
-						const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
-						if (
-							(step === -1 && focusedIndex === 0) ||
-							(step === 1 && focusedIndex === items.length - 1)
-						)
-							return;
+						if (!rootState.focusedItem || focusedIndex === null) {
+							const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
+							firstItem?.focus({ preventScroll: true });
+						} else {
+							// Prevent focusing the previous item if the current one is the first,
+							// and focusing the next item if the current one is the last.
+							const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
+							if (
+								(step === -1 && focusedIndex === 0) ||
+								(step === 1 && focusedIndex === items.length - 1)
+							)
+								return;
 
-						getItemSibling(rootState.focusedItem, step)?.focus({ preventScroll: true });
+							getItemSibling(rootState.focusedItem, step)?.focus({ preventScroll: true });
+						}
 					}
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
 
-					const { lists, sourceList, targetList } = registry;
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
@@ -761,11 +781,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 										targetItemIndex: peerTargetItem ? getIndex(peerTargetItem) : null,
 									};
 								}
-								return;
 							}
-
 							// If the peer list is empty, place the dragged item in its first position.
-							if (!peerTargetItem) {
+							else {
 								if (registry.targetList?.state !== peer.state) {
 									registry.targetList = {
 										...peer,
@@ -784,7 +802,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 										};
 									});
 								}
-								return;
 							}
 						} else {
 							// Offset the dragged rect by the current scroll.
