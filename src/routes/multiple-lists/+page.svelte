@@ -1,78 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, sortItems, removeItem, insertItem } from '$lib/index.js';
-	import { defaultRootProps } from '../fixtures.js';
+	import { defaultRootProps, getDefaultLists } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
 
-	let lists = $state([
-		{
-			id: `to-do`,
-			title: `To Do`,
-			items: [
-				{
-					id: `to-do-item-1`,
-					text: `To Do Item 1`,
-				},
-				{
-					id: `to-do-item-2`,
-					text: `To Do Item 2`,
-				},
-				{
-					id: `to-do-item-3`,
-					text: `To Do Item 3`,
-				},
-				{
-					id: `to-do-item-4`,
-					text: `To Do Item 4`,
-				},
-				{
-					id: `to-do-item-5`,
-					text: `To Do Item 5`,
-				},
-			],
-		},
-		{
-			id: `doing`,
-			title: `Doing`,
-			items: [
-				{
-					id: `doing-item-1`,
-					text: `Doing Item 1`,
-				},
-				{
-					id: `doing-item-2`,
-					text: `Doing Item 2`,
-				},
-				{
-					id: `doing-item-3`,
-					text: `Doing Item 3`,
-				},
-			],
-		},
-		{
-			id: `done`,
-			title: `Done`,
-			items: [
-				{
-					id: `done-item-1`,
-					text: `Done Item 1`,
-				},
-				{
-					id: `done-item-2`,
-					text: `Done Item 2`,
-				},
-				{
-					id: `done-item-3`,
-					text: `Done Item 3`,
-				},
-				{
-					id: `done-item-4`,
-					text: `Done Item 4`,
-				},
-			],
-		},
-	]);
+	let lists = $state(
+		getDefaultLists([
+			{ title: 'To Do', length: 5 },
+			{ title: 'Doing', length: 3 },
+			{ title: 'Done', length: 4 },
+		])
+	);
 
 	onMount(() => {
 		layoutState.props = {

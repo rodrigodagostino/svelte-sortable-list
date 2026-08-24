@@ -1,4 +1,5 @@
 import type { SortableList } from '$lib/index.js';
+import { toKebabCase } from './utils.ts';
 
 export const defaultRootProps: SortableList.RootProps = {
 	gap: 12,
@@ -17,10 +18,25 @@ export const defaultRootProps: SortableList.RootProps = {
 	isDisabled: false,
 };
 
+export function getDefaultLists(lists: { title: string; length: number }[]) {
+	return lists.map((list) => ({
+		id: toKebabCase(list.title),
+		title: list.title,
+		items: getLabeledItems(list.title, list.length),
+	}));
+}
+
 export function getDefaultItems(length: number): SortableList.ItemData[] {
 	return Array.from({ length }, (_, i) => ({
 		id: `list-item-${i + 1}`,
 		text: `List Item ${i + 1}`,
+	}));
+}
+
+function getLabeledItems(label: string, length: number): SortableList.ItemData[] {
+	return Array.from({ length }, (_, i) => ({
+		id: `${toKebabCase(label)}-item-${i + 1}`,
+		text: `${label} Item ${i + 1}`,
 	}));
 }
 
