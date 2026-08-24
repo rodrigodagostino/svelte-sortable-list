@@ -33,6 +33,23 @@ export function getCollidingItemRect(draggedRect: DOMRect, itemRects: ItemRect[]
 	});
 }
 
+export function getClosestItemRect(draggedRect: DOMRect, itemRects: ItemRect[]) {
+	if (itemRects.length === 0) return null;
+
+	let closestItemRect: ItemRect | undefined;
+	let closestDistance = Infinity;
+
+	for (const itemRect of itemRects) {
+		const distance = getDistanceBetweenCenters(draggedRect, itemRect);
+		if (distance < closestDistance) {
+			closestDistance = distance;
+			closestItemRect = itemRect;
+		}
+	}
+
+	return closestItemRect;
+}
+
 export function keepWithinBounds(
 	axis: 'x' | 'y',
 	pointer: number,

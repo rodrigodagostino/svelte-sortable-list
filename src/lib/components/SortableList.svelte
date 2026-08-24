@@ -57,6 +57,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		canScroll,
 		canScrollX,
 		canScrollY,
+		getClosestItemRect,
 		getClosestScrollableAncestor,
 		getCollidingItemRect,
 		getIndex,
@@ -737,10 +738,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 						if (!rootState.targetItem) rootState.targetItem = rootState.draggedItem;
 
+						const draggedRect = rootState.draggedItem.getBoundingClientRect();
 						const nextIndex = targetList ? targetList.index! + step : index! + step;
 						const peer = registry.getPeers(group, rootState).find((p) => p.index === nextIndex);
+
 						if (peer && index !== nextIndex) {
-							const peerTargetItem = peer.ref.querySelector<HTMLLIElement>('.ssl-item');
+							const closestRect = getClosestItemRect(draggedRect, getItemRects(peer.ref));
+							const peerTargetItem =
+								closestRect &&
+								peer.ref.querySelector<HTMLLIElement>(
+									`.ssl-item[data-item-id="${closestRect.id}"]`
+								);
 							if (peerTargetItem) {
 								if (
 									registry.targetList?.state !== peer.state ||
@@ -779,6 +787,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								return;
 							}
 						} else {
+							// Offset the dragged rect by the current scroll.
+							const draggedRectWithOffset =
+								rootState.scrollOffset?.left || rootState.scrollOffset?.top
+									? new DOMRect(
+											draggedRect.x + rootState.scrollOffset.left,
+											draggedRect.y + rootState.scrollOffset.top,
+											draggedRect.width,
+											draggedRect.height
+										)
+									: draggedRect;
+							const closestRect = getClosestItemRect(draggedRectWithOffset, rootState.itemRects);
+							if (closestRect) {
+								rootState.targetItem = ref!.querySelector<HTMLLIElement>(
+									`.ssl-item[data-item-id="${closestRect.id}"]`
+								);
+							}
 							registry.targetList = null;
 						}
 					}
