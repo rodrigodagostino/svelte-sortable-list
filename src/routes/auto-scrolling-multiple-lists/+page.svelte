@@ -7,9 +7,9 @@
 
 	let lists = $state(
 		getDefaultLists([
-			{ title: 'To Do', length: 5 },
-			{ title: 'Doing', length: 3 },
-			{ title: 'Done', length: 4 },
+			{ title: 'To Do', length: 100 },
+			{ title: 'Doing', length: 100 },
+			{ title: 'Done', length: 100 },
 		])
 	);
 
@@ -61,7 +61,7 @@
 </script>
 
 <svelte:head>
-	<title>Multiple lists — Svelte Sortable List</title>
+	<title>Auto scrolling multiple lists — Svelte Sortable List</title>
 </svelte:head>
 
 <div class="lists direction-{layoutState.props.direction}">
@@ -92,28 +92,19 @@
 </div>
 
 <style>
-	:global([data-page-pathname='multiple-lists']) {
+	:global([data-page-pathname='auto-scrolling-multiple-lists']) {
 		& :global(.app-main .container) {
 			align-items: start;
 			max-width: calc(100% + 6rem);
 			margin-inline: -3rem;
 
 			&:has(.lists.direction-vertical) {
-				margin-block-start: 8vh;
-				margin-block-start: 8dvh;
-
 				@media (min-width: 46em) {
 					align-items: center;
-				}
-
-				@media (min-width: 58em) {
-					margin-block-start: 20vh;
-					margin-block-start: 20dvh;
 				}
 			}
 
 			&:has(.lists.direction-horizontal) {
-				margin-inline-end: auto;
 				overflow-x: auto;
 			}
 		}
@@ -147,7 +138,7 @@
 			border-color 320ms;
 
 		&:has(:global(.ssl-root[data-is-target='true'])) {
-			color: var(--ssl-indigo-900);
+			color: var(--ssl-indigo-600);
 			background-color: var(--ssl-indigo-200);
 			border-color: var(--ssl-indigo-400);
 		}

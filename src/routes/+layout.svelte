@@ -39,6 +39,7 @@
 		{ text: 'Auto scrolling container', path: '/auto-scrolling-container' },
 		{ text: 'Auto scrolling container horizontal', path: '/auto-scrolling-container-horizontal' },
 		{ text: 'Auto scrolling dialog', path: '/auto-scrolling-dialog' },
+		{ text: 'Auto scrolling multiple lists', path: '/auto-scrolling-multiple-lists' },
 		{ text: 'Locked list', path: '/locked-list' },
 		{ text: 'Locked items', path: '/locked-items' },
 		{ text: 'Disabled list', path: '/disabled-list' },
