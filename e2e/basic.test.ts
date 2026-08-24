@@ -187,14 +187,17 @@ test.describe('Sortable List - Basic', () => {
 		await expect(placeholder).toHaveAttribute('data-drag-state', 'ptr-drag-start');
 		await expect(placeholder).toBeVisible();
 
-		// Wait for the drag operation to start by checking the drag state
-		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		// Verify the placeholder item content has reduced opacity
+		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
 
 		// Check cursor changes to grabbing during drag
 		expect(draggedItem).toHaveCSS('cursor', 'grabbing');
 
 		// Verify the placeholder item content has reduced opacity
 		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
+
+		// Verify the dragged item is now positioned as fixed, floating above the placeholder
+		await expect(draggedItem).toHaveCSS('position', 'fixed');
 
 		// Verify the placeholder item content has the correct box-shadow
 		await expect(draggedItemContent).toHaveCSS(
@@ -207,6 +210,12 @@ test.describe('Sortable List - Basic', () => {
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the dragged item returns to the normal document flow
+		await expect(draggedItem).toHaveCSS('position', 'relative');
+
+		// Verify the placeholder element disappears after drag completes
+		await expect(placeholder).toBeHidden();
 
 		// Verify the placeholder item content has no outer box-shadow
 		await expect(draggedItemContent).toHaveCSS(
@@ -291,22 +300,29 @@ test.describe('Sortable List - Basic', () => {
 	});
 
 	test('should show correct appearance when dragging using keyboard', async ({ page }) => {
-		// Find the root element and focus it
+		// Find the root element and the item to be dragged and its content (List Item 1)
 		const root = page.locator('.ssl-root');
-		await root.focus();
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const draggedItemContent = draggedItem.locator('.ssl-item-content');
 
-		// Navigate to the first item using the arrow keys
+		// Find the placeholder element and its content
+		const placeholder = page.locator('.ssl-placeholder');
+		const placeholderItemContent = placeholder.locator('.ssl-item-content');
+
+		// Verify the placeholder element is hidden and the dragged item sits in the normal
+		// document flow before dragging starts
+		await expect(placeholder).toBeHidden();
+		await expect(draggedItem).toHaveCSS('position', 'relative');
+
+		// Focus the root element and navigate to the first item
+		await root.focus();
 		await page.keyboard.press('ArrowDown');
 
-		// Get the focused item and its content
-		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
-		const focusedItemContent = focusedItem.locator('.ssl-item-content');
+		// Verify the dragged item has the correct outline
+		await expect(draggedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
 
-		// Verify the focused item has the correct outline
-		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
-
-		// Verify the focused item content has no outer box-shadow
-		await expect(focusedItemContent).toHaveCSS(
+		// Verify the dragged item content has no outer box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
 		);
@@ -314,8 +330,18 @@ test.describe('Sortable List - Basic', () => {
 		// Start dragging with the Space key
 		await page.keyboard.press('Space');
 
-		// Verify the focused item content has the correct box-shadow
-		await expect(focusedItemContent).toHaveCSS(
+		// Verify the placeholder element appears in the dragged item’s place
+		await expect(placeholder).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+		await expect(placeholder).toBeVisible();
+
+		// Verify the placeholder item content has reduced opacity
+		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
+
+		// Verify the dragged item is now positioned as fixed, floating above the placeholder
+		await expect(draggedItem).toHaveCSS('position', 'fixed');
+
+		// Verify the dragged item content has the correct box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
@@ -324,8 +350,11 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('ArrowDown');
 		await page.keyboard.press('ArrowDown');
 
-		// Verify the focused item content has the correct box-shadow
-		await expect(focusedItemContent).toHaveCSS(
+		// Verify the dragged item remains positioned as fixed while being moved around
+		await expect(draggedItem).toHaveCSS('position', 'fixed');
+
+		// Verify the dragged item content has the correct box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
@@ -334,19 +363,25 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 
 		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
-		// Verify the focused item content has no outer box-shadow
-		await expect(focusedItemContent).toHaveCSS(
+		// Verify the dragged item returns to the normal document flow
+		await expect(draggedItem).toHaveCSS('position', 'relative');
+
+		// Verify the placeholder element disappears after drag completes
+		await expect(placeholder).toBeHidden();
+
+		// Verify the dragged item content has no outer box-shadow
+		await expect(draggedItemContent).toHaveCSS(
 			'box-shadow',
 			'rgb(164, 166, 181) 0px 0px 0px 1px inset'
 		);
 
 		// Verify the dragged item is still focused
-		expect(focusedItem).toBeFocused();
+		expect(draggedItem).toBeFocused();
 
-		// Verify the focused item has the correct outline
-		await expect(focusedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
+		// Verify the dragged item has the correct outline
+		await expect(draggedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');
 	});
 
 	test('should switch through drag states when dragging using keyboard', async ({ page }) => {

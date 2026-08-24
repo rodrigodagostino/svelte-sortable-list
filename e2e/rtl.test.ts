@@ -26,7 +26,7 @@ test.describe('Sortable List - RTL', () => {
 
 		// === FIRST DRAG OPERATION ===
 		// Navigate to the first item using the arrow keys
-		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowLeft');
 
 		// Verify the List Item 1 is focused
 		let focusedItem = root.locator('.ssl-item[aria-selected="true"]');
@@ -56,8 +56,8 @@ test.describe('Sortable List - RTL', () => {
 
 		// === SECOND DRAG OPERATION ===
 		// Navigate back to List Item 2 (now at the first position after the previous drag)
-		await page.keyboard.press('ArrowUp');
-		await page.keyboard.press('ArrowUp');
+		await page.keyboard.press('ArrowRight');
+		await page.keyboard.press('ArrowRight');
 
 		// Verify List Item 2 is focused
 		focusedItem = root.locator('.ssl-item[aria-selected="true"]');
