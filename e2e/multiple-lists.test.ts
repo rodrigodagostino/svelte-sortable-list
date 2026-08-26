@@ -355,4 +355,336 @@ test.describe('Sortable List - Multiple Lists', () => {
 			initialDoneItems
 		);
 	});
+
+	test('should move an item from one list to another list using keyboard', async ({ page }) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Focus the «To Do» root and select its first item (To Do Item 1)
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = page.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Verify the «To Do» list is flagged as the drag source, and «Doing» isn’t yet a target
+		await expect(toDoList).toHaveAttribute('data-is-source', 'true');
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+
+		// Move right — the axis perpendicular to a vertical list — to target the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+
+		// Verify «Doing» is now flagged as the target, and shows a placeholder for the incoming item
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(doingList.locator('.ssl-placeholder')).toBeVisible();
+
+		// Drop the item with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify To Do Item 1 was removed from the «To Do» list
+		const toDoItemsAfterDrag = await toDoList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(toDoItemsAfterDrag).toEqual(listItemTexts['to-do'].slice(1));
+
+		// Verify To Do Item 1 was inserted into the «Doing» list, and the original three items
+		// kept their relative order
+		const doingItemsAfterDrag = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(doingItemsAfterDrag).toHaveLength(4);
+		expect(doingItemsAfterDrag).toContain('To Do Item 1');
+		expect(doingItemsAfterDrag.filter((text) => text !== 'To Do Item 1')).toEqual(
+			listItemTexts['doing']
+		);
+
+		// Verify the moved item retained focus after crossing into its new list
+		await expect(draggedItem).toBeFocused();
+
+		// Verify neither list is still flagged as source or target once the drag has ended
+		await expect(toDoList).not.toHaveAttribute('data-is-source', 'true');
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+	});
+
+	test('should navigate focus across peer lists using arrow keys without dragging', async ({
+		page,
+	}) => {
+		// Find the «To Do», «Doing» and «Done» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+		const doneList = page.locator('[data-list-id="done"]');
+
+		// Focus the «To Do» root and select its first item
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(toDoList.locator('[data-item-id="to-do-item-1"]')).toBeFocused();
+
+		// Attempting to move left from the first list in the group should have no effect
+		await page.keyboard.press('ArrowLeft');
+		await expect(toDoList.locator('[data-item-id="to-do-item-1"]')).toBeFocused();
+
+		// Move right to focus the closest item in the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList.locator('.ssl-item[aria-selected="true"]')).toBeFocused();
+
+		// Move right again to focus the closest item in the «Done» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(doneList.locator('.ssl-item[aria-selected="true"]')).toBeFocused();
+
+		// Attempting to move right from the last list in the group should have no effect
+		await page.keyboard.press('ArrowRight');
+		await expect(doneList.locator('.ssl-item[aria-selected="true"]')).toBeFocused();
+
+		// Move left to go back to the «Doing» peer list
+		await page.keyboard.press('ArrowLeft');
+		await expect(doingList.locator('.ssl-item[aria-selected="true"]')).toBeFocused();
+	});
+
+	test('should move an item into an empty peer list using keyboard', async ({ page }) => {
+		// Find the «Doing» and «Done» list roots
+		const doingList = page.locator('[data-list-id="doing"]');
+		const doneList = page.locator('[data-list-id="done"]');
+
+		// Empty the «Doing» list by moving each of its items onto the «To Do» list using mouse —
+		// see the note in the mouse version of this test above regarding scrollIntoViewIfNeeded.
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		for (let i = 0; i < listItemTexts['doing'].length; i++) {
+			const draggedItem = doingList.locator('.ssl-item:not(.ssl-placeholder)').first();
+			const targetItem = toDoList.locator('.ssl-item:not(.ssl-placeholder)').first();
+
+			await draggedItem.scrollIntoViewIfNeeded();
+			await targetItem.scrollIntoViewIfNeeded();
+
+			const draggedBox = await draggedItem.boundingBox();
+			const targetBox = await targetItem.boundingBox();
+			if (!draggedBox || !targetBox)
+				throw new Error('Could not get Doing or To Do item bounding box');
+
+			await page.mouse.move(
+				draggedBox.x + draggedBox.width / 2,
+				draggedBox.y + draggedBox.height / 2
+			);
+			await page.mouse.down();
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+			await page.mouse.move(
+				targetBox.x + targetBox.width / 2,
+				targetBox.y + targetBox.height / 2,
+				{ steps: 40 } // Smooth movement
+			);
+
+			// Wait a frame to flush any pending throttled update from the glide, then re-issue a
+			// single move at the exact target coordinates and wait one more frame for it to be
+			// processed — see the note in the previous cross-list move test.
+			await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+			await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2);
+			await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+			await page.mouse.up();
+			await expect(doingList.locator('.ssl-item')).toHaveCount(
+				listItemTexts['doing'].length - i - 1
+			);
+		}
+
+		// Verify the «Doing» list is now empty
+		await expect(doingList.locator('.ssl-item')).toHaveCount(0);
+
+		// Focus the «Done» root and select its first item (Done Item 1)
+		await doneList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = page.locator('[data-item-id="done-item-1"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Move left once to reach the now empty «Doing» peer list
+		await page.keyboard.press('ArrowLeft');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+
+		// Verify the «Doing» list still occupies space and shows a placeholder for the incoming item
+		const doingBox = await doingList.boundingBox();
+		if (!doingBox) throw new Error('Could not get the empty Doing list bounding box');
+		expect(doingBox.height).toBeGreaterThan(0);
+		await expect(doingList.locator('.ssl-placeholder')).toBeVisible();
+
+		// Drop the item with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify Done Item 1 was removed from the «Done» list
+		const doneItemsAfterDrag = await doneList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(doneItemsAfterDrag).toEqual(listItemTexts['done'].slice(1));
+
+		// Verify Done Item 1 is now the only item in the «Doing» list
+		const doingItemsAfterDrag = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(doingItemsAfterDrag).toEqual(['Done Item 1']);
+	});
+
+	test('should target the closest item when moving into a shorter peer list using keyboard', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Focus the «To Do» root and jump to its last item (To Do Item 5) — «Doing» only has
+		// three items, so the closest item to To Do Item 5’s position is Doing Item 3
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('End');
+		const draggedItem = page.locator('[data-item-id="to-do-item-5"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Move right to target the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+
+		// Drop the item with the Space key
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify To Do Item 5 was removed from the «To Do» list
+		const toDoItemsAfterDrag = await toDoList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(toDoItemsAfterDrag).toEqual(listItemTexts['to-do'].slice(0, 4));
+
+		// Verify To Do Item 5 was inserted right before Doing Item 3, its closest item, rather
+		// than being clamped to an out-of-range position
+		const doingItemsAfterDrag = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(doingItemsAfterDrag).toEqual([
+			'Doing Item 1',
+			'Doing Item 2',
+			'To Do Item 5',
+			'Doing Item 3',
+		]);
+	});
+
+	test('should end an in-flight peer drop transition when starting a new drag on another list using pointer', async ({
+		page,
+	}) => {
+		// Find the «To Do», «Doing» and «Done» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Drag To Do Item 1 into the «Doing» list — see the note in the cross-list mouse test
+		// above regarding the rAF-flush before reading the target's bounding box.
+		const draggedItem1 = page.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const targetItem = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		const draggedBox = await draggedItem1.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox)
+			throw new Error('Could not get To Do Item 1 or Doing Item 1 bounding box');
+
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, {
+			steps: 40,
+		});
+		await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+		await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2);
+		await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+		await page.mouse.up();
+
+		// Verify the drop transition is under way — still mid-flight, not yet idle
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'ptr-drop');
+
+		// Without waiting for the 320ms transition to finish, immediately start a new drag on
+		// the «Done» list — a peer that wasn’t involved in the first move
+		const draggedItem2 = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		const draggedBox2 = await draggedItem2.boundingBox();
+		if (!draggedBox2) throw new Error('Could not get Doing Item 1 bounding box');
+
+		const startTime = Date.now();
+		await page.mouse.move(
+			draggedBox2.x + draggedBox2.width / 2,
+			draggedBox2.y + draggedBox2.height / 2
+		);
+		await page.mouse.down();
+
+		// Verify the interrupted peer transition settles to idle well before its 320ms duration
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'idle');
+		expect(Date.now() - startTime).toBeLessThan(240);
+
+		// Verify the first move completed correctly in spite of the interruption
+		await expect(toDoList.locator('[data-item-id="to-do-item-1"]')).toHaveCount(0);
+		await expect(doingList.locator('[data-item-id="to-do-item-1"]')).toBeVisible();
+
+		// Verify the new drag on «Done» started normally
+		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Drop it back in place to leave the page in a clean state
+		await page.mouse.up();
+		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'idle');
+	});
+
+	test('should end an in-flight peer drop transition when starting a new drag on another list using keyboard', async ({
+		page,
+	}) => {
+		// Find the «To Do», «Doing» and «Done» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+		const doneList = page.locator('[data-list-id="done"]');
+
+		// Drag To Do Item 1 into the «Doing» list using the keyboard
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = page.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await page.keyboard.press('Space');
+
+		// Verify the drop transition is under way — still mid-flight, not yet idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drop');
+
+		// Without waiting for the 320ms transition to finish, immediately focus the «Done» list —
+		// a peer that wasn’t involved in the first move. `interruptDropTransition()` runs on every
+		// keydown, so this first ArrowDown is what interrupts the pending transition.
+		await doneList.focus();
+		const startTime = Date.now();
+		await page.keyboard.press('ArrowDown');
+
+		// Verify the interrupted peer transition settles to idle well before its 320ms duration
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		expect(Date.now() - startTime).toBeLessThan(240);
+
+		// Verify the first move completed correctly in spite of the interruption
+		await expect(toDoList.locator('[data-item-id="to-do-item-1"]')).toHaveCount(0);
+		await expect(doingList.locator('[data-item-id="to-do-item-1"]')).toBeVisible();
+
+		// Verify «Done» received focus normally and can now start its own drag
+		const doneDraggedItem = doneList.locator('[data-item-id="done-item-1"]:not(.ssl-placeholder)');
+		await expect(doneDraggedItem).toBeFocused();
+		await page.keyboard.press('Space');
+		await expect(doneDraggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Drop it back in place to leave the page in a clean state
+		await page.keyboard.press('Space');
+		await expect(doneDraggedItem).toHaveAttribute('data-drag-state', 'idle');
+	});
 });
