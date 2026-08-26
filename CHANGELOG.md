@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.3] (2026-08-26)
+
+### Added
+
+- Detect peer list targets during drag.
+- Add peer list reaction to cross-list keyboard drag.
+- Target closest item when moving into and out of peer list.
+- Add `data-is-source` attribute to `SortableList.Root`.
+- Add cross-list navigation with arrow keys.
+
+### Fixed
+
+- Apply `SortableList.Item` transitions during keyboard navigation.
+- Prevent placeholder from interfering with keyboard drag.
+- Reassign `registry.targetList` instead of mutating it for empty peer lists.
+- Correct `getId()` and `getIndex()` to return list id and index.
+- Retain item focus after cross-list keyboard drop.
+- Correct dragged item position on auto-scroll during keyboard drag.
+- Ensure dragged item stays visible during keyboard drag over peer list.
+- End peer placeholder transition on interrupted keyboard drop.
+- End peer transitions on interrupted pointer drop.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Generate data dynamically in **“Multiple lists”** demo page.
+- Correct horizontal lists visual issues in **“Multiple lists”** demo page.
+- Add the **“Auto scrolling multiple lists”** demo page.
+- Add NPM link in demo pages layout.
+
+### Test
+
+- Update E2E tests to reflect the latest changes.
+- Add new E2E test in the **“Multiple lists”** suite to cover latest changes.
+- Add E2E tests for the **“Auto scrolling multiple lists”** page.
+
 ## [3.0.0-next.2] (2026-08-14)
 
 ### BREAKING
@@ -1741,7 +1777,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...HEAD
+[3.0.0-next.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...v3.0.0-next.3
 [3.0.0-next.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...v3.0.0-next.2
 [3.0.0-next.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.6...v3.0.0-next.1
 [2.2.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.5...v2.2.6
