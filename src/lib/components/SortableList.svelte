@@ -448,7 +448,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			deviceType: 'pointer',
 			sourceList: ref!,
 			sourceListId: id,
-			sourceListIndex: getIndex(ref!),
+			sourceListIndex: index,
 			draggedItem: currItem,
 			draggedItemId: currItem.id,
 			draggedItemIndex: getIndex(currItem),
@@ -521,7 +521,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				deviceType: 'pointer',
 				sourceList: ref!,
 				sourceListId: id,
-				sourceListIndex: getIndex(ref!),
+				sourceListIndex: index,
 				draggedItem: rootState.draggedItem,
 				draggedItemId: rootState.draggedItem.id,
 				draggedItemIndex: getIndex(rootState.draggedItem),
@@ -616,8 +616,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					ondragstart?.({
 						deviceType: 'keyboard',
 						sourceList: ref!,
-						sourceListId: ref!.id,
-						sourceListIndex: getIndex(ref!),
+						sourceListId: id,
+						sourceListIndex: index,
 						draggedItem: rootState.focusedItem,
 						draggedItemId: rootState.focusedItem.id,
 						draggedItemIndex: draggedIndex,
@@ -625,18 +625,32 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 					});
 
-					liveText = _announcements.lifted(rootState.draggedItem, draggedIndex);
+					liveText = _announcements.lifted({
+						sourceList: ref!,
+						sourceListIndex: index,
+						draggedItem: rootState.draggedItem,
+						draggedItemIndex: draggedIndex,
+					});
 				} else {
 					if (!rootState.draggedItem) return;
 
 					const draggedIndex = getIndex(rootState.draggedItem);
 					const targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
-					liveText = _announcements.dropped(
-						rootState.draggedItem,
-						draggedIndex,
-						rootState.targetItem,
-						targetIndex
-					);
+					liveText = _announcements.dropped({
+						sourceList: ref!,
+						sourceListIndex: index,
+						draggedItem: rootState.draggedItem,
+						draggedItemIndex: draggedIndex,
+						targetList: registry.targetList?.ref ?? null,
+						targetListIndex: registry.targetList?.index ?? null,
+						targetItem: registry.targetList?.targetItem
+							? registry.targetList.targetItem
+							: rootState.targetItem,
+						targetItemIndex:
+							typeof registry.targetList?.targetItemIndex === 'number'
+								? registry.targetList.targetItemIndex
+								: targetIndex,
+					});
 
 					handlePointerAndKeyboardDrop(rootState.focusedItem, 'kbd-drop');
 				}
@@ -830,28 +844,39 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					await tick();
 					rootState.dragState = 'kbd-drag';
 
+					if (!rootState.targetItem) return;
+
 					ondrag?.({
 						deviceType: 'keyboard',
 						sourceList: ref!,
-						sourceListId: ref!.id,
-						sourceListIndex: getIndex(ref!),
+						sourceListId: id,
+						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
 						targetItem: rootState.targetItem,
-						targetItemId: rootState.targetItem?.id ?? null,
+						targetItemId: rootState.targetItem.id,
 						targetItemIndex: targetIndex,
 						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
 						...getPeerTargetFields(registry, group, rootState),
 					});
 
-					liveText = _announcements.dragged(
-						rootState.draggedItem,
-						draggedIndex,
-						rootState.targetItem!,
-						targetIndex
-					);
+					liveText = _announcements.dragged({
+						sourceList: ref!,
+						sourceListIndex: index,
+						draggedItem: rootState.draggedItem,
+						draggedItemIndex: draggedIndex,
+						targetList: registry.targetList?.ref,
+						targetListIndex: registry.targetList?.index,
+						targetItem: registry.targetList?.targetItem
+							? registry.targetList.targetItem
+							: rootState.targetItem,
+						targetItemIndex:
+							typeof registry.targetList?.targetItemIndex === 'number'
+								? registry.targetList.targetItemIndex
+								: targetIndex,
+					});
 				}
 			}
 
@@ -928,7 +953,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						deviceType: 'keyboard',
 						sourceList: ref!,
 						sourceListId: id,
-						sourceListIndex: getIndex(ref!),
+						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemId: rootState.draggedItem.id,
 						draggedItemIndex: draggedIndex,
@@ -940,12 +965,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						...getPeerTargetFields(registry, group, rootState),
 					});
 
-					liveText = _announcements.dragged(
-						rootState.draggedItem,
-						draggedIndex,
-						rootState.targetItem!,
-						targetIndex
-					);
+					liveText = _announcements.dragged({
+						sourceList: ref!,
+						sourceListIndex: index!,
+						draggedItem: rootState.draggedItem,
+						draggedItemIndex: draggedIndex,
+						targetList: registry.targetList?.ref,
+						targetListIndex: registry.targetList?.index,
+						targetItem: rootState.targetItem!,
+						targetItemIndex: targetIndex,
+					});
 				}
 			}
 
@@ -956,7 +985,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				shouldScrollIntoView = true;
 
 				const draggedIndex = getIndex(rootState.draggedItem);
-				liveText = _announcements.canceled(rootState.draggedItem, draggedIndex);
+				liveText = _announcements.canceled({
+					sourceList: ref!,
+					sourceListIndex: index,
+					draggedItem: rootState.draggedItem,
+					draggedItemIndex: draggedIndex,
+				});
 
 				handlePointerAndKeyboardDrop(rootState.draggedItem, 'kbd-cancel');
 			}
@@ -1051,7 +1085,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
 			sourceList: ref!,
 			sourceListId: id,
-			sourceListIndex: getIndex(ref!),
+			sourceListIndex: index,
 			draggedItem: rootState.draggedItem!,
 			draggedItemId: rootState.draggedItem!.id,
 			draggedItemIndex: draggedIndex,
@@ -1124,7 +1158,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
 			sourceList: ref!,
 			sourceListId: id,
-			sourceListIndex: getIndex(ref!),
+			sourceListIndex: index,
 			draggedItem,
 			draggedItemId: draggedItem.id,
 			draggedItemIndex: getIndex(draggedItem),
@@ -1204,8 +1238,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-description={!restProps['aria-describedby']
-		? restProps['aria-description'] ||
-			'Press the arrow keys to move through the list items. Press Space to start dragging an item. When dragging, use the arrow keys to move the item around. Press Space again to drop the item, or Escape to cancel.'
+		? restProps['aria-description'] || defaultDescription
 		: undefined}
 	aria-describedby={restProps['aria-describedby'] || undefined}
 	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
