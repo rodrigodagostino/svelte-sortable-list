@@ -1,4 +1,14 @@
-import type { SortableListAnnouncements as Announcements } from '$lib/types/index.js';
+import type {
+	SortableListAnnouncements as Announcements,
+	SortableListRootProps as RootProps,
+} from '$lib/types/index.js';
+
+function getListLabel(list: RootProps['ref'], listIndex: number): string {
+	const labelledBy = list?.getAttribute('aria-labelledby');
+	const label =
+		list?.getAttribute('aria-label') || document.getElementById(labelledBy!)?.textContent;
+	return label ? `${label} list` : `list ${listIndex + 1}`;
+}
 
 export const announce: Announcements = {
 	lifted: ({ draggedItemIndex }) => {
@@ -18,7 +28,7 @@ export const announce: Announcements = {
 		const hasCrossedList = !!targetList && targetList !== sourceList;
 
 		if (hasCrossedList)
-			return `You have moved the item from position ${startPosition} in list ${sourceListIndex! + 1} to position ${endPosition} in list ${targetListIndex! + 1}.`;
+			return `You have moved the item from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
 
 		const result =
 			startPosition !== endPosition
@@ -40,7 +50,7 @@ export const announce: Announcements = {
 		const hasCrossedList = !!targetList && targetList !== sourceList;
 
 		if (hasCrossedList)
-			return `You have dropped the item. It has moved from position ${startPosition} in list ${sourceListIndex! + 1} to position ${endPosition} in list ${targetListIndex! + 1}.`;
+			return `You have dropped the item. It has moved from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
 
 		const result =
 			endPosition === null
@@ -55,3 +65,16 @@ export const announce: Announcements = {
 		return `You have canceled the dragging. The item has returned to its starting position of ${draggedItemIndex + 1}.`;
 	},
 };
+
+export function getDefaultAriaDescription(
+	group: string | undefined,
+	direction: RootProps['direction']
+) {
+	const isVertical = direction === 'vertical';
+	const mainAxisArrowKeys = isVertical ? 'Up Arrow or Down Arrow' : 'Left Arrow or Right Arrow';
+	const crossAxisArrowKeys = isVertical ? 'Left Arrow or Right Arrow' : 'Up Arrow or Down Arrow';
+
+	return group
+		? `Press ${mainAxisArrowKeys} to move through the list items, or ${crossAxisArrowKeys} to move to a different list. Press Space to start dragging an item. When dragging, use ${mainAxisArrowKeys} to move the item within the list, or ${crossAxisArrowKeys} to move it to a different list. Press Space again to drop the item, or Escape to cancel.`
+		: `Press ${mainAxisArrowKeys} to move through the list items. Press Space to start dragging an item. When dragging, use ${mainAxisArrowKeys} to move the item around. Press Space again to drop the item, or Escape to cancel.`;
+}

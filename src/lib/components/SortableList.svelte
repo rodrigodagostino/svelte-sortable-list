@@ -60,6 +60,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getClosestItemRect,
 		getClosestScrollableAncestor,
 		getCollidingItemRect,
+		getDefaultAriaDescription,
 		getIndex,
 		getItemRect,
 		getItemRects,
@@ -1238,7 +1239,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-description={!restProps['aria-describedby']
-		? restProps['aria-description'] || defaultDescription
+		? restProps['aria-description'] || getDefaultAriaDescription(group, direction)
 		: undefined}
 	aria-describedby={restProps['aria-describedby'] || undefined}
 	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
