@@ -31,6 +31,7 @@ Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRem
 	stroke-linecap="round"
 	stroke-linejoin="round"
 	pointer-events="none"
+	aria-hidden="true"
 >
 	{#if name === 'handle'}
 		<circle cx="9" cy="12" r="1" />
