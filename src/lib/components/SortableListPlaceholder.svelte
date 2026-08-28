@@ -20,7 +20,7 @@
 
 	function conditionalTransition(node: HTMLElement) {
 		if (!isPeerPlaceholder) return {};
-		if (registry.crossingItemId === node.id) return {};
+		if (registry.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
@@ -31,7 +31,7 @@
 		return {
 			...config,
 			get duration() {
-				return registry.crossingItemId === node.id ? 0 : config.duration;
+				return registry.crossingItemId === node.dataset.itemId ? 0 : config.duration;
 			},
 		};
 	}
@@ -179,7 +179,6 @@
 
 <li
 	bind:this={ref}
-	{id}
 	class={classes}
 	style:width={styleWidth}
 	style:height={styleHeight}

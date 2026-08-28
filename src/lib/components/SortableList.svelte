@@ -925,7 +925,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						registry.targetList = {
 							...targetList,
 							targetItem: peerTargetItem,
-							targetItemId: peerTargetItem.id,
+							targetItemId: peerTargetItem.id ?? null,
 							targetItemIndex: getIndex(peerTargetItem),
 						};
 					} else {

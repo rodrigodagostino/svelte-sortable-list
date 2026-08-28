@@ -56,7 +56,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}: ItemProps & { class?: string } = $props();
 
 	function defaultTransition(node: HTMLElement) {
-		if (registry.crossingItemId === node.id) return {};
+		if (registry.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
@@ -67,7 +67,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return {
 			...config,
 			get duration() {
-				return registry.crossingItemId === node.id ? 0 : config.duration;
+				return registry.crossingItemId === node.dataset.itemId ? 0 : config.duration;
 			},
 		};
 	}
