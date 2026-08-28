@@ -28,6 +28,10 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	const rootState = getSortableListRootState();
 
 	const classes = $derived(['ssl-item-remove', restProps.class]);
+	const ariaLabel = $derived.by(() => {
+		const itemIndex = ref?.closest<HTMLLIElement>('.ssl-item')?.dataset.itemIndex;
+		return itemIndex ? `Remove item at position ${Number(itemIndex) + 1}` : 'Remove item';
+	});
 
 	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
 		if (rootState.focusedItem && rootState.props.ref) {
@@ -53,7 +57,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button bind:this={ref} {...restProps} class={classes} onclick={handleClick}>
+<button bind:this={ref} aria-label={ariaLabel} {...restProps} class={classes} onclick={handleClick}>
 	{#if children}
 		{@render children()}
 	{:else}
