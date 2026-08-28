@@ -78,8 +78,8 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 
 ## Limitations
 
-- Multiple and nested lists are not supported.
-- Keyboard navigation works across the main axis only.
+- Nested lists are not supported.
+- Wrapped lists can be keyboard-navigated across the main axis only.
 - Wrapping (line breaks) is limited to horizontal lists with items of identical width and height.
 
 ---
@@ -168,19 +168,23 @@ This package prioritizes accessibility with comprehensive keyboard navigation an
 **Navigation and interaction steps:**
 
 1. Press `Tab` to focus the list.
-2. Use `Arrow Up`, `Arrow Left`, `Arrow Down`, `Arrow Right`, `Home`, or `End` to focus the first item.
+2. Use `Up Arrow`, `Down Arrow`, or `Home` to focus the first item, or `End` to focus the last item.
 3. Navigate between items:
-   - `Arrow Up` or `Arrow Left`: Move to previous item.
-   - `Arrow Down` or `Arrow Right`: Move to next item.
-   - `Home`: Jump to first item.
-   - `End`: Jump to last item.
-4. Press `Space` to start dragging the focused item.
-5. While dragging:
-   - Use arrow keys to move the item to different positions.
-   - `Home`: Move to first position.
-   - `End`: Move to last position.
-   - `Space`: Drop the item at current position.
-   - `Escape`: Cancel drag and return item to original position.
+   - `Up Arrow`: Move to the previous item.
+   - `Down Arrow`: Move to the next item.
+   - `Home`: Jump to the first item.
+   - `End`: Jump to the last item.
+4. Navigate between lists:
+   - `Left Arrow`: Move to the previous list.
+   - `Right Arrow`: Move to the next list.
+5. Press `Space` to start dragging the focused item.
+6. While dragging:
+   - Use `Up Arrow` and `Down Arrow` to move the item to different positions within a list.
+   - Use `Left Arrow` and `Right Arrow` to move the item to different lists.
+   - `Home`: Move to the first position.
+   - `End`: Move to the last position.
+   - `Space`: Drop the item at the current position.
+   - `Escape`: Cancel drag and return item to the original position.
 
 ### Screen reader announcements customization
 
@@ -206,44 +210,79 @@ The following example demonstrates how to translate announcements to Spanish (ad
 	import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
 	const announcements: SortableList.RootProps['announcements'] = {
-		lifted: (_, draggedItemIndex) => {
-			return `Ha levantado un item en la posición ${draggedItemIndex + 1}.`;
+		lifted: ({ draggedItemIndex }) => {
+			return `Has levantado un ítem en la posición ${draggedItemIndex! + 1}.`;
 		},
-		dragged: (_, draggedItemIndex, __, targetItemIndex) => {
+
+		dragged: ({
+			sourceList,
+			sourceListIndex,
+			draggedItemIndex,
+			targetList,
+			targetListIndex,
+			targetItemIndex,
+		}) => {
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = targetItemIndex + 1;
+			const hasCrossedList = !!targetList && targetList !== sourceList;
+
+			if (hasCrossedList)
+				return `Has movido el ítem de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+
 			const result =
 				startPosition !== endPosition
 					? `desde la posición ${startPosition} a la posición ${endPosition}`
 					: `de vuelta a su posición inicial de ${startPosition}`;
-			return `Ha movido el item ${result}.`;
+			return `Has movido el ítem ${result}.`;
 		},
-		dropped: (_, draggedItemIndex, __, targetItemIndex) => {
+
+		dropped: ({
+			sourceList,
+			sourceListIndex,
+			draggedItemIndex,
+			targetList,
+			targetListIndex,
+			targetItemIndex,
+		}) => {
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = typeof targetItemIndex === 'number' ? targetItemIndex + 1 : null;
+			const hasCrossedList = !!targetList && targetList !== sourceList;
+
+			if (hasCrossedList)
+				return `Has soltado el ítem. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+
 			const result =
 				endPosition === null
 					? `Se ha mantenido en su posición inicial de ${startPosition}`
 					: startPosition !== endPosition
 						? `Se ha movido desde la posición ${startPosition} a la posición ${endPosition}`
 						: `Ha vuelto a su posición inicial de ${startPosition}`;
-			return `Ha soltado el item. ${result}.`;
+			return `Has soltado el ítem. ${result}.`;
 		},
-		canceled: (_, draggedItemIndex) => {
-			return `Ha cancelado el arrastre. El item ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
+
+		canceled: ({ draggedItemIndex }) => {
+			return `Has cancelado el arrastre. El ítem ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
 		},
 	};
+
+	const ariaDescription = $derived.by(() => {
+		const isVertical = layoutState.props.direction === 'vertical';
+		const arrowKeys = isVertical
+			? 'Flecha Arriba o Flecha Abajo'
+			: 'Flecha Izquierda o Flecha Derecha';
+
+		return `Presiona ${arrowKeys} para moverte por los ítems. Presiona Espacio para empezar a arrastrar un ítem. Al arrastrar, usa ${arrowKeys} para mover el ítem. Presiona Espacio de nuevo para soltar el ítem, o Escape para cancelar.`;
+	});
 </script>
 
-<SortableList.Root
-	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
-	{announcements}
->
-	<SortableList.Item {...item} {index}>
-		<div class="ssl-item-content">
-			<span class="ssl-item-content__text">{item.text}</span>
-		</div>
-	</SortableList.Item>
+<SortableList.Root aria-description={ariaDescription} {announcements}>
+	{#each items as item, index (item.id)}
+		<SortableList.Item {...item} {index}>
+			<div class="ssl-item-content">
+				<span class="ssl-item-content__text">{item.text}</span>
+			</div>
+		</SortableList.Item>
+	{/each}
 </SortableList.Root>
 ```
 
@@ -385,8 +424,72 @@ To drag items between lists, give each `<SortableList.Root>` the same `group` va
 	} from '@rodrigodagostino/svelte-sortable-list';
 
 	let lists = $state([
-		{ id: 'to-do', items: [/* ... */] },
-		{ id: 'doing', items: [/* ... */] },
+		{
+			id: 'to-do',
+			title: 'To Do',
+			items: [
+				{
+					id: 'to-do-item-1',
+					text: 'To Do Item 1',
+				},
+				{
+					id: 'to-do-item-2',
+					text: 'To Do Item 2',
+				},
+				{
+					id: 'to-do-item-3',
+					text: 'To Do Item 3',
+				},
+				{
+					id: 'to-do-item-4',
+					text: 'To Do Item 4',
+				},
+				{
+					id: 'to-do-item-5',
+					text: 'To Do Item 5',
+				},
+			],
+		},
+		{
+			id: 'doing',
+			title: 'Doing',
+			items: [
+				{
+					id: 'doing-item-1',
+					text: 'Doing Item 1',
+				},
+				{
+					id: 'doing-item-2',
+					text: 'Doing Item 2',
+				},
+				{
+					id: 'doing-item-3',
+					text: 'Doing Item 3',
+				},
+			],
+		},
+		{
+			id: 'done',
+			title: 'Done',
+			items: [
+				{
+					id: 'done-item-1',
+					text: 'Done Item 1',
+				},
+				{
+					id: 'done-item-2',
+					text: 'Done Item 2',
+				},
+				{
+					id: 'done-item-3',
+					text: 'Done Item 3',
+				},
+				{
+					id: 'done-item-4',
+					text: 'Done Item 4',
+				},
+			],
+		},
 	]);
 
 	function handleDragEnd(e: SortableList.RootEvents['ondragend']) {
@@ -604,18 +707,18 @@ Use your favorite CSS framework to style the SSL components.
 
 ```svelte
 <SortableList.Root
-	class="focus-visible:-outline-offset-2! focus-visible:outline-indigo-800! rounded-[0.625rem] focus-visible:outline-2 [&_.ssl-placeholder]:opacity-0"
+	class="rounded-[0.625rem] focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-indigo-800! [&_.ssl-placeholder]:opacity-0"
 >
 	{#each items as item, index (item.id)}
 		<SortableList.Item
 			{...item}
 			{index}
-			class="focus-within:outline-indigo-800! group rounded-md focus-within:outline-2 focus-within:outline-offset-2"
+			class="group rounded-md focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-800!"
 		>
 			<div
-				class="inset-ring inset-ring-indigo-800 duration-(--ssl-transition-duration) group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 transition-[background-color,box-shadow] group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state='idle']:hover:bg-indigo-600"
+				class="flex items-center justify-center rounded-md bg-indigo-500 px-7 py-2 inset-ring inset-ring-indigo-800 transition-[background-color,box-shadow] duration-(--ssl-transition-duration) group-focus-within:bg-indigo-600 group-data-[drag-state*='kbd-drag']:bg-indigo-400 group-data-[drag-state*='kbd-drag']:shadow-lg group-data-[drag-state*='kbd-drag']:shadow-indigo-900/72 group-data-[drag-state*='ptr-drag']:bg-indigo-400 group-data-[drag-state*='ptr-drag']:shadow-lg group-data-[drag-state*='ptr-drag']:shadow-indigo-900/72 group-data-[drag-state='idle']:hover:bg-indigo-600"
 			>
-				<span class="my-2.5 text-base font-medium uppercase leading-tight text-white">
+				<span class="my-2.5 text-base leading-tight font-medium text-white uppercase">
 					{item.text}
 				</span>
 			</div>
