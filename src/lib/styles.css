@@ -19,8 +19,11 @@
 	--ssl-black: #15151a;
 	--ssl-black-rich: #000;
 
-	--ssl-rose-300: #fda4af;
-	--ssl-rose-400: #fb7185;
+	/* Thank you, TailwindCSS :) */
+	/* https://tailwindcss.com/docs/colors */
+	--ssl-rose-200: oklch(89.2% 0.058 10.001);
+	--ssl-rose-300: oklch(81% 0.117 11.638);
+	--ssl-rose-400: oklch(71.2% 0.194 13.428);
 
 	--ssl-box-shadow-1:
 		0 1px 1px rgba(54, 57, 90, 0.1), 0 2px 2px rgba(54, 57, 90, 0.1),
@@ -155,5 +158,6 @@
 		box-shadow:
 			inset 0 0 0 0.0625rem var(--ssl-rose-400),
 			var(--ssl-box-shadow-1);
+		text-decoration-line: line-through;
 	}
 }
