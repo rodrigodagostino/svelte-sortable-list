@@ -190,6 +190,7 @@
 	data-item-index={index}
 	data-drag-state={sourceState.dragState}
 	aria-hidden="true"
+	inert
 	onintroend={() => (isPositioned = true)}
 	transition:conditionalTransition
 >
