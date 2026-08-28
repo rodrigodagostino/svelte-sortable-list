@@ -1,7 +1,7 @@
 {
 	"name": "@rodrigodagostino/svelte-sortable-list",
 	"description": "Create accessible, sortable lists in Svelte, with keyboard, mouse, and touch support.",
-	"version": "3.0.0-next.3",
+	"version": "3.0.0-next.4",
 	"author": "Rodrigo D’Agostino <rodrigo.dagostino@proton.me>",
 	"keywords": [
 		"sortable",

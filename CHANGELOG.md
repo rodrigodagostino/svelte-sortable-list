@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.4] (2026-08-28)
+
+### BREAKING
+
+- Add cross-list navigation to announcements.
+
+### Changed
+
+- Add cross-list navigation to `aria-description` attribute in `SortableList.Root` component.
+
+### Fixed
+
+- Add default `aria-label` attribute in `SortableList.ItemRemove` component.
+- Add `aria-hidden` attribute in `Icon` component.
+- Avoid pure color shift when attempting to remove on drop out.
+- Remove placeholder out of tab order.
+- Clear focused item when moving focus back to parent list.
+- Clear live text on focus out of list.
+
+### Test
+
+- Update E2E tests to reflect the latest changes.
+
+### Docs
+
+- Update the demo pages to reflect the latest changes.
+- Update the README to reflect the latest changes.
+
 ## [3.0.0-next.3] (2026-08-26)
 
 ### Added
@@ -1777,7 +1805,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...HEAD
+[3.0.0-next.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...v3.0.0-next.4
 [3.0.0-next.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...v3.0.0-next.3
 [3.0.0-next.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...v3.0.0-next.2
 [3.0.0-next.1]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v2.2.6...v3.0.0-next.1
