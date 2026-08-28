@@ -1205,6 +1205,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		await tick();
 	}
 
+	// `focusout` is preferred over `blur` since it detects the loss of focus
+	// on the current element and it’s descendants too.
+	function handleFocusOut(e: FocusEvent) {
+		const relatedTarget = e.relatedTarget as HTMLElement | null;
+		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget)
+			liveText = '';
+	}
+
 	function handleContextMenu(e: MouseEvent) {
 		if (rootState.dragState !== 'idle') {
 			e.preventDefault();
@@ -1245,6 +1253,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
 	onpointerdown={handlePointerDown}
 	onkeydown={handleKeyDown}
+	onfocusout={handleFocusOut}
 	oncontextmenu={handleContextMenu}
 	onitemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
 >
