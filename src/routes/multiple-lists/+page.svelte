@@ -64,11 +64,11 @@
 	<title>Multiple lists — Svelte Sortable List</title>
 </svelte:head>
 
-<div class="lists direction-{layoutState.props.direction}">
+<div class="lists direction-{layoutState.props.direction}" role="group" aria-label="Kanban board">
 	{#each lists as { id, title, items }, index (id)}
 		<div class="list">
 			<div class="list__header">
-				<h2 class="list__title">{title}</h2>
+				<h2 class="list__title" id="list-title-{id}">{title}</h2>
 				<span>{items.length}</span>
 			</div>
 			<SortableList.Root
@@ -76,6 +76,7 @@
 				group="list-group"
 				{id}
 				{index}
+				aria-labelledby="list-title-{id}"
 				ondrop={(e) => handleDrop(e)}
 				ondragend={(e) => handleDragEnd(e)}
 			>
@@ -116,6 +117,10 @@
 				margin-inline-end: auto;
 				overflow-x: auto;
 			}
+		}
+
+		:global(.ssl-item) {
+			white-space: nowrap;
 		}
 	}
 
@@ -165,9 +170,5 @@
 
 	.list__title {
 		font-size: 1rem;
-	}
-
-	:global(.ssl-item) {
-		white-space: nowrap;
 	}
 </style>

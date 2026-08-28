@@ -12,33 +12,69 @@
 	});
 
 	const announcements: SortableList.RootProps['announcements'] = {
-		lifted: (_, draggedItemIndex) => {
-			return `Ha levantado un item en la posición ${draggedItemIndex! + 1}.`;
+		lifted: ({ draggedItemIndex }) => {
+			return `Has levantado un ítem en la posición ${draggedItemIndex! + 1}.`;
 		},
-		dragged: (_, draggedItemIndex, __, targetItemIndex) => {
+
+		dragged: ({
+			sourceList,
+			sourceListIndex,
+			draggedItemIndex,
+			targetList,
+			targetListIndex,
+			targetItemIndex,
+		}) => {
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = targetItemIndex + 1;
+			const hasCrossedList = !!targetList && targetList !== sourceList;
+
+			if (hasCrossedList)
+				return `Has movido el ítem de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+
 			const result =
 				startPosition !== endPosition
 					? `desde la posición ${startPosition} a la posición ${endPosition}`
 					: `de vuelta a su posición inicial de ${startPosition}`;
-			return `Ha movido el item ${result}.`;
+			return `Has movido el ítem ${result}.`;
 		},
-		dropped: (_, draggedItemIndex, __, targetItemIndex) => {
+
+		dropped: ({
+			sourceList,
+			sourceListIndex,
+			draggedItemIndex,
+			targetList,
+			targetListIndex,
+			targetItemIndex,
+		}) => {
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = typeof targetItemIndex === 'number' ? targetItemIndex + 1 : null;
+			const hasCrossedList = !!targetList && targetList !== sourceList;
+
+			if (hasCrossedList)
+				return `Has soltado el ítem. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+
 			const result =
 				endPosition === null
 					? `Se ha mantenido en su posición inicial de ${startPosition}`
 					: startPosition !== endPosition
 						? `Se ha movido desde la posición ${startPosition} a la posición ${endPosition}`
 						: `Ha vuelto a su posición inicial de ${startPosition}`;
-			return `Ha soltado el item. ${result}.`;
+			return `Has soltado el ítem. ${result}.`;
 		},
-		canceled: (_, draggedItemIndex) => {
-			return `Ha cancelado el arrastre. El item ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
+
+		canceled: ({ draggedItemIndex }) => {
+			return `Has cancelado el arrastre. El ítem ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
 		},
 	};
+
+	const ariaDescription = $derived.by(() => {
+		const isVertical = layoutState.props.direction === 'vertical';
+		const arrowKeys = isVertical
+			? 'Flecha Arriba o Flecha Abajo'
+			: 'Flecha Izquierda o Flecha Derecha';
+
+		return `Presiona ${arrowKeys} para moverte por los ítems. Presiona Espacio para empezar a arrastrar un ítem. Al arrastrar, usa ${arrowKeys} para mover el ítem. Presiona Espacio de nuevo para soltar el ítem, o Escape para cancelar.`;
+	});
 
 	function handleDrop(e: SortableList.RootEvents['ondrop']) {
 		const { draggedItemIndex, isWithinBounds, canRemoveOnDropOut } = e;
@@ -58,7 +94,7 @@
 
 <SortableList.Root
 	{...layoutState.props}
-	aria-description="Presione las flechas para desplazarte por los elementos de la lista. Presione Espacio para empezar a arrastrar un elemento. Al arrastrar, use las flechas para moverlo. Presione Espacio de nuevo para soltar el elemento o Escape para cancelar."
+	aria-description={ariaDescription}
 	{announcements}
 	ondrop={handleDrop}
 	ondragend={handleDragEnd}
