@@ -444,7 +444,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.props.ref?.contains(relatedTarget)) {
+		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget) {
 			if (!rootState.focusedItem) return;
 			dispatch(ref!, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
