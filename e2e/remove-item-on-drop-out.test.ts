@@ -57,11 +57,11 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		const placeholderItem = root.locator('.ssl-placeholder');
 		await expect(placeholderItem).toHaveCSS('height', '0px');
 
-		// Verify the ghost item content has the correct background color and border
-		await expect(draggedItem1Content).toHaveCSS('background-color', 'rgb(253, 164, 175)');
+		// Verify the dragged item content has the correct background color and border
+		await expect(draggedItem1Content).toHaveCSS('background-color', 'oklch(0.81 0.117 11.638)');
 		await expect(draggedItem1Content).toHaveCSS(
 			'box-shadow',
-			'rgb(251, 113, 133) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+			'oklch(0.712 0.194 13.428) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
 
 		// Release the mouse to drop
@@ -116,11 +116,11 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// Verify the placeholder item has no height
 		await expect(placeholderItem).toHaveCSS('height', '0px');
 
-		// Verify the ghost item content has the correct background color and border
-		await expect(draggedItem2Content).toHaveCSS('background-color', 'rgb(253, 164, 175)');
+		// Verify the dragged item content has the correct background color and border
+		await expect(draggedItem2Content).toHaveCSS('background-color', 'oklch(0.81 0.117 11.638)');
 		await expect(draggedItem2Content).toHaveCSS(
 			'box-shadow',
-			'rgb(251, 113, 133) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
+			'oklch(0.712 0.194 13.428) 0px 0px 0px 1px inset, rgba(54, 57, 90, 0.1) 0px 1px 1px 0px, rgba(54, 57, 90, 0.1) 0px 2px 2px 0px, rgba(54, 57, 90, 0.1) 0px 4px 4px 0px, rgba(54, 57, 90, 0.1) 0px 6px 8px 0px, rgba(54, 57, 90, 0.1) 0px 8px 16px 0px'
 		);
 
 		// Release the mouse to drop

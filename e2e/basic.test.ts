@@ -168,7 +168,7 @@ test.describe('Sortable List - Basic', () => {
 		await expect(placeholder).toBeHidden();
 
 		// Verify the cursor is the grab cursor
-		expect(draggedItem).toHaveCSS('cursor', 'grab');
+		await expect(draggedItem).toHaveCSS('cursor', 'grab');
 
 		// When dragging, should show grabbing cursor
 		const draggedBox = await draggedItem.boundingBox();
@@ -191,7 +191,7 @@ test.describe('Sortable List - Basic', () => {
 		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
 
 		// Check cursor changes to grabbing during drag
-		expect(draggedItem).toHaveCSS('cursor', 'grabbing');
+		await expect(draggedItem).toHaveCSS('cursor', 'grabbing');
 
 		// Verify the placeholder item content has reduced opacity
 		await expect(placeholderItemContent).toHaveCSS('opacity', '0.5');
@@ -291,7 +291,7 @@ test.describe('Sortable List - Basic', () => {
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify the dragged item is still focused
-		expect(focusedItem).toBeFocused();
+		await expect(focusedItem).toBeFocused();
 
 		// Verify the final order after both drags
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
@@ -378,7 +378,7 @@ test.describe('Sortable List - Basic', () => {
 		);
 
 		// Verify the dragged item is still focused
-		expect(draggedItem).toBeFocused();
+		await expect(draggedItem).toBeFocused();
 
 		// Verify the dragged item has the correct outline
 		await expect(draggedItem).toHaveCSS('outline', 'rgb(57, 58, 73) solid 2px');

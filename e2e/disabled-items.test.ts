@@ -18,7 +18,7 @@ test.describe('Sortable List - Disabled Items', () => {
 
 		for (const disabledItem of disabledItems) {
 			// Check that the cursor is not allowed
-			expect(disabledItem).toHaveCSS('cursor', 'not-allowed');
+			await expect(disabledItem).toHaveCSS('cursor', 'not-allowed');
 
 			// Get the initial position
 			const initialBox = await disabledItem.boundingBox();
