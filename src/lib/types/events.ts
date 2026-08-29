@@ -1,4 +1,4 @@
-interface Event {
+type Event = {
 	/** The device type that triggered the event. */
 	deviceType: 'pointer' | 'keyboard';
 	/** The source list element. */
@@ -17,7 +17,7 @@ interface Event {
 	isWithinBounds?: boolean;
 	/** Whether the target item element can be removed on drop out. */
 	canRemoveOnDropOut: boolean;
-}
+};
 
 type TargetListFields = {
 	/** The target list element. */
