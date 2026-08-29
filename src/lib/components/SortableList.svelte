@@ -61,6 +61,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getClosestScrollableAncestor,
 		getCollidingItemRect,
 		getDefaultAriaDescription,
+		getDropAnimations,
 		getIndex,
 		getItemRect,
 		getItemRects,
@@ -1098,14 +1099,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			...getPeerTargetFields(registry, group, rootState),
 		});
 
-		if (_transition.duration > 0) {
+		const dropDuration = Math.max(
+			_transition.duration,
+			registry.targetList?.state.props.transition?.duration ?? 0
+		);
+
+		if (dropDuration > 0) {
 			let isResolved = false;
 			function finalizeDrop(shouldHandleDragEnd = true) {
 				if (isResolved) return;
 
 				isResolved = true;
 				rootState.interruptDropTransition = null;
-				element?.removeEventListener('transitionend', handleTransitionEnd);
 				if (transitionTimeoutId) {
 					clearTimeout(transitionTimeoutId);
 					transitionTimeoutId = null;
@@ -1115,19 +1120,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 
 			rootState.interruptDropTransition = () => {
-				// Prevent the pending `transitionend`/timeout from triggering
-				// `handlePointerAndKeyboardDragEnd()`, then settle the drop right away.
+				// Prevent the pending timeout from triggering `handlePointerAndKeyboardDragEnd()`,
+				// then settle the drop right away.
 				finalizeDrop(false);
-				element?.getAnimations().forEach((animation) => animation.finish());
+				getDropAnimations(element, ref!, registry).forEach((animation) => animation.finish());
 				handlePointerAndKeyboardDragEnd(action);
 			};
 
-			function handleTransitionEnd(e: TransitionEvent) {
-				if (e.propertyName === 'transform') finalizeDrop();
-			}
-
-			element?.addEventListener('transitionend', handleTransitionEnd);
 			transitionTimeoutId = setTimeout(finalizeDrop, _transition.duration + 100);
+
+			afterPaint(dropDuration, async () => {
+				if (isResolved) return;
+
+				const animations = getDropAnimations(element, ref!, registry);
+				if (animations.length)
+					await Promise.allSettled(animations.map((animation) => animation.finished));
+
+				finalizeDrop();
+			});
 		} else {
 			handlePointerAndKeyboardDragEnd(action);
 		}
