@@ -65,6 +65,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getIndex,
 		getItemRect,
 		getItemRects,
+		getItemRectWithOffset,
 		getItemSibling,
 		getPeerTargetFields,
 		getScrollingSpeed,
@@ -211,16 +212,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		updateScrollOffset();
 
 		// Offset the dragged rect by the current scroll.
-		const draggedRectWithOffset =
-			rootState.scrollOffset?.left || rootState.scrollOffset?.top
-				? new DOMRect(
-						draggedRect.x + rootState.scrollOffset.left,
-						draggedRect.y + rootState.scrollOffset.top,
-						draggedRect.width,
-						draggedRect.height
-					)
-				: draggedRect;
-
+		const draggedRectWithOffset = getItemRectWithOffset(draggedRect, rootState.scrollOffset);
 		const collidingItemRect = getCollidingItemRect(draggedRectWithOffset, rootState.itemRects);
 		if (collidingItemRect) {
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
@@ -821,15 +813,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							}
 						} else {
 							// Offset the dragged rect by the current scroll.
-							const draggedRectWithOffset =
-								rootState.scrollOffset?.left || rootState.scrollOffset?.top
-									? new DOMRect(
-											draggedRect.x + rootState.scrollOffset.left,
-											draggedRect.y + rootState.scrollOffset.top,
-											draggedRect.width,
-											draggedRect.height
-										)
-									: draggedRect;
+							const draggedRectWithOffset = getItemRectWithOffset(
+								draggedRect,
+								rootState.scrollOffset
+							);
 							const closestRect = getClosestItemRect(draggedRectWithOffset, rootState.itemRects);
 							if (closestRect) {
 								rootState.targetItem = ref!.querySelector<HTMLLIElement>(

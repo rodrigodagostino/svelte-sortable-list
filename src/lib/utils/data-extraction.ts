@@ -2,7 +2,10 @@ import type {
 	SortableListRegistry as Registry,
 	SortableListRootState as RootState,
 } from '$lib/states/index.js';
-import type { ItemRect } from '$lib/types/index.js';
+import type {
+	ItemRect,
+	SortableListRootStateContext as RootStateContext,
+} from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
 export function getId(element: HTMLUListElement | HTMLLIElement) {
@@ -60,6 +63,20 @@ export function getPeerTargetFields(
 		targetItemId,
 		targetItemIndex,
 	};
+}
+
+export function getItemRectWithOffset(
+	itemRect: DOMRect,
+	scrollOffset: RootStateContext['scrollOffset']
+): DOMRect {
+	return scrollOffset?.left || scrollOffset?.top
+		? new DOMRect(
+				itemRect.x + scrollOffset.left,
+				itemRect.y + scrollOffset.top,
+				itemRect.width,
+				itemRect.height
+			)
+		: itemRect;
 }
 
 export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
