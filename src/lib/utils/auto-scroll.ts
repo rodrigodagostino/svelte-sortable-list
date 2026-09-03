@@ -1,5 +1,8 @@
 import { getTranslateValues } from './index.js';
-import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
+import type {
+	SortableListRootProps as RootProps,
+	SortableListRootStateContext as RootStateContext,
+} from '$lib/types/index.js';
 
 export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	if (typeof document === 'undefined') return undefined;
@@ -126,6 +129,20 @@ export function scrollIntoView(
 
 function getScrollingOffset(element: HTMLElement, direction: RootProps['direction']) {
 	return direction === 'vertical' ? element.clientHeight * 0.2 : element.clientWidth * 0.2;
+}
+
+export function updateScrollOffset(
+	scrollableAncestor: HTMLElement | undefined,
+	scrollOrigin: { left: number; top: number },
+	scrollOffset: RootStateContext['scrollOffset']
+) {
+	if (!scrollableAncestor) return scrollOffset;
+
+	const left = scrollableAncestor.scrollLeft - scrollOrigin.left;
+	const top = scrollableAncestor.scrollTop - scrollOrigin.top;
+	if (left === scrollOffset.left && top === scrollOffset.top) return scrollOffset;
+
+	return { left, top };
 }
 
 export function getScrollingSpeed(

@@ -75,6 +75,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isRootElement,
 		scrollIntoView,
 		shouldAutoScroll,
+		updateScrollOffset,
 	} from '$lib/utils/index.js';
 
 	let {
@@ -193,23 +194,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) untrack(() => scroll());
 	});
 
-	function updateScrollOffset() {
-		if (!scrollableAncestor) return;
-
-		const left = scrollableAncestor.scrollLeft - scrollOrigin.left;
-		const top = scrollableAncestor.scrollTop - scrollOrigin.top;
-		if (left === rootState.scrollOffset.left && top === rootState.scrollOffset.top) return;
-
-		rootState.scrollOffset = { left, top };
-	}
-
 	function updateTargetItem() {
 		if (!rootState.itemRects || !ref || !rootState.draggedItem) return;
 
 		const draggedRect = rootState.draggedItem.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
 		rootState.isWithinBounds = areColliding(draggedRect, rootRect);
-		updateScrollOffset();
+		rootState.scrollOffset = updateScrollOffset(
+			scrollableAncestor,
+			scrollOrigin,
+			rootState.scrollOffset
+		);
 
 		// Offset the dragged rect by the current scroll.
 		const draggedRectWithOffset = getItemRectWithOffset(draggedRect, rootState.scrollOffset);
@@ -335,7 +330,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
 		if (!rootState.dragState.startsWith('ptr')) {
-			updateScrollOffset();
+			rootState.scrollOffset = updateScrollOffset(
+				scrollableAncestor,
+				scrollOrigin,
+				rootState.scrollOffset
+			);
 			return;
 		}
 
