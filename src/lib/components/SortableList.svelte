@@ -1246,8 +1246,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	data-has-bounds={hasBounds}
 	data-can-clear-on-drag-out={canClearOnDragOut}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
-	data-is-source={group ? !!id && id === registry.sourceList?.id : undefined}
-	data-is-target={group ? !!id && id === registry.targetList?.id : undefined}
+	data-is-source={group
+		? group === registry.sourceList?.group && !!id && id === registry.sourceList?.id
+		: undefined}
+	data-is-target={group
+		? group === registry.targetList?.group && !!id && id === registry.targetList?.id
+		: undefined}
 	data-is-locked={isLocked}
 	data-is-disabled={isDisabled}
 	tabindex="0"
