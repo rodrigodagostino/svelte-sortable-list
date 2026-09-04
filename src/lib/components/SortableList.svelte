@@ -1054,6 +1054,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			registry.targetList = null;
 			await tick();
 			rootState.targetItem = rootState.draggedItem;
+			rootState.isWithinBounds = true;
 			rootState.dragState = 'ptr-cancel';
 		}
 
