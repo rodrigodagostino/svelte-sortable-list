@@ -231,25 +231,25 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.targetItem = rootState.draggedItem;
 
 		if (group) {
-			const peer = registry
-				.getPeers(group, rootState)
+			const peerList = registry
+				.getPeerLists(group, rootState)
 				.find((p) => areColliding(draggedRect, p.ref.getBoundingClientRect()));
 
-			if (peer) {
+			if (peerList) {
 				// Dragging over a peer list counts as being between bounds.
 				rootState.isWithinBounds = true;
 
-				const peerItemRects = getItemRects(peer.ref);
+				const peerItemRects = getItemRects(peerList.ref);
 				const peerCollidingItemRect = getCollidingItemRect(draggedRect, peerItemRects);
 				if (peerCollidingItemRect) {
 					if (
-						registry.targetList?.state !== peer.state ||
+						registry.targetList?.state !== peerList.state ||
 						registry.targetList.targetItemId !== peerCollidingItemRect.id
 					) {
 						registry.targetList = {
-							...peer,
+							...peerList,
 							targetItem:
-								peer.ref.querySelector<HTMLLIElement>(
+								peerList.ref.querySelector<HTMLLIElement>(
 									`.ssl-item[data-item-id="${peerCollidingItemRect.id}"]`
 								) ?? null,
 							targetItemId: peerCollidingItemRect?.id ?? null,
@@ -261,9 +261,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				// If the peer list is empty, place the dragged item in its first position.
 				if (!peerItemRects.length) {
-					if (registry.targetList?.state !== peer.state) {
+					if (registry.targetList?.state !== peerList.state) {
 						registry.targetList = {
-							...peer,
+							...peerList,
 							targetItem: null,
 							targetItemId: null,
 							targetItemIndex: 0,
@@ -275,7 +275,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							if (!registry.targetList) return;
 							registry.targetList = {
 								...registry.targetList,
-								targetItem: peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
+								targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
 							};
 						});
 					}
@@ -283,14 +283,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				}
 
 				// Use the placeholder to let the dragged item be dropped at the end of the peer list.
-				const peerPlaceholder = peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+				const peerPlaceholder = peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
 				if (
 					peerPlaceholder &&
 					registry.targetList?.targetItemIndex !== peerItemRects.length &&
 					getCollidingItemRect(draggedRect, [getItemRect(peerPlaceholder)])
 				) {
 					registry.targetList = {
-						...peer,
+						...peerList,
 						targetItem: peerPlaceholder,
 						targetItemId: null,
 						targetItemIndex: peerItemRects.length,
@@ -670,7 +670,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
-				const { lists, sourceList, targetList } = registry;
+				const { sourceList, targetList } = registry;
 
 				if (!rootState.dragState.startsWith('kbd-drag')) {
 					if (
@@ -680,19 +680,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						if (!group || !rootState.focusedItem) return;
 
 						// Prevent switching focus if the focused item is located at the first or last list.
-						if ((step === -1 && index === 0) || (step === 1 && index === lists.length - 1)) return;
+						const lastListIndex = registry.getGroupLists(group).length - 1;
+						if ((step === -1 && index === 0) || (step === 1 && index === lastListIndex)) return;
 
 						const nextIndex = index! + step;
-						const peer = registry.getPeers(group, rootState).find((p) => p.index === nextIndex);
+						const peerList = registry
+							.getPeerLists(group, rootState)
+							.find((p) => p.index === nextIndex);
 
-						if (peer) {
+						if (peerList) {
 							const closestRect = getClosestItemRect(
 								rootState.focusedItem.getBoundingClientRect(),
-								getItemRects(peer.ref)
+								getItemRects(peerList.ref)
 							);
 							const peerTargetItem =
 								closestRect &&
-								peer.ref.querySelector<HTMLLIElement>(
+								peerList.ref.querySelector<HTMLLIElement>(
 									`.ssl-item[data-item-id="${closestRect.id}"]`
 								);
 							peerTargetItem?.focus({ preventScroll: true });
@@ -765,11 +768,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					} else {
 						if (!group) return;
 
+						const lastListIndex = registry.getGroupLists(group).length - 1;
 						if (
 							(step === -1 && sourceList?.index === 0 && !targetList) ||
 							(step === -1 && targetList?.index === 0) ||
-							(step === 1 && sourceList?.index === lists.length - 1 && !targetList?.targetItem) ||
-							(step === 1 && targetList?.index === lists.length - 1)
+							(step === 1 && sourceList?.index === lastListIndex && !targetList?.targetItem) ||
+							(step === 1 && targetList?.index === lastListIndex)
 						)
 							return;
 
@@ -777,22 +781,24 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 						const draggedRect = rootState.draggedItem.getBoundingClientRect();
 						const nextIndex = targetList ? targetList.index! + step : index! + step;
-						const peer = registry.getPeers(group, rootState).find((p) => p.index === nextIndex);
+						const peerList = registry
+							.getPeerLists(group, rootState)
+							.find((p) => p.index === nextIndex);
 
-						if (peer && index !== nextIndex) {
-							const closestRect = getClosestItemRect(draggedRect, getItemRects(peer.ref));
+						if (peerList && index !== nextIndex) {
+							const closestRect = getClosestItemRect(draggedRect, getItemRects(peerList.ref));
 							const peerTargetItem =
 								closestRect &&
-								peer.ref.querySelector<HTMLLIElement>(
+								peerList.ref.querySelector<HTMLLIElement>(
 									`.ssl-item[data-item-id="${closestRect.id}"]`
 								);
 							if (peerTargetItem) {
 								if (
-									registry.targetList?.state !== peer.state ||
+									registry.targetList?.state !== peerList.state ||
 									registry.targetList.targetItemId !== peerTargetItem.id
 								) {
 									registry.targetList = {
-										...peer,
+										...peerList,
 										targetItem: peerTargetItem ?? null,
 										targetItemId: peerTargetItem?.id ?? null,
 										targetItemIndex: peerTargetItem ? getIndex(peerTargetItem) : null,
@@ -801,9 +807,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							}
 							// If the peer list is empty, place the dragged item in its first position.
 							else {
-								if (registry.targetList?.state !== peer.state) {
+								if (registry.targetList?.state !== peerList.state) {
 									registry.targetList = {
-										...peer,
+										...peerList,
 										targetItem: null,
 										targetItemId: null,
 										targetItemIndex: 0,
@@ -815,7 +821,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 										if (!registry.targetList) return;
 										registry.targetList = {
 											...registry.targetList,
-											targetItem: peer.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
+											targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
 										};
 									});
 								}
@@ -1192,7 +1198,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const droppingRootState = rootState.interruptDropTransition
 			? rootState
 			: group
-				? registry.getPeers(group, rootState).find((peer) => peer.state.interruptDropTransition)
+				? registry.getPeerLists(group, rootState).find((peer) => peer.state.interruptDropTransition)
 						?.state
 				: undefined;
 		if (!droppingRootState?.interruptDropTransition) return;
