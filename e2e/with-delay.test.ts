@@ -49,11 +49,13 @@ test.describe('Sortable List - With Delay', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
+		// Verify a drag operation was not started
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'idle');
+		// Verify no placeholder is present
+		await expect(root.locator('.ssl-placeholder')).toHaveCount(0);
+
 		// Release the mouse to drop
 		await page.mouse.up();
-
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify the order is unchanged after the failed first drag
 		const itemsAfterFirstDrag = await root
@@ -89,11 +91,13 @@ test.describe('Sortable List - With Delay', () => {
 			{ steps: 40 } // Smooth movement
 		);
 
+		// Verify a drag operation was not started
+		await expect(draggedItem1).toHaveAttribute('data-drag-state', 'idle');
+		// Verify no placeholder is present
+		await expect(root.locator('.ssl-placeholder')).toHaveCount(0);
+
 		// Release the mouse to drop
 		await page.mouse.up();
-
-		// Wait for the drag operation to complete by checking the drag state returns to idle
-		await expect(draggedItem2).toHaveAttribute('data-drag-state', 'idle');
 
 		// Verify the final order remains unchanged after both failed drags
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
