@@ -406,8 +406,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		rootState.pointer = { x: e.clientX, y: e.clientY };
 		rootState.pointerOrigin = { x: e.clientX, y: e.clientY };
-		rootState.draggedItem = currItem;
-		rootState.itemRects = getItemRects(ref!);
 		scrollOrigin = {
 			left: scrollableAncestor?.scrollLeft ?? 0,
 			top: scrollableAncestor?.scrollTop ?? 0,
@@ -417,6 +415,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (delay <= 0) await handlePointerDragStart(currItem);
 		else {
 			document.addEventListener('pointermove', handlePointerMoveWithDelay);
+			document.addEventListener('pointerup', cancelDelayedDrag, { once: true });
 			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
 		}
 	}
@@ -424,8 +423,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
 		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
 
+		rootState.draggedItem = currItem;
+		rootState.itemRects = getItemRects(ref!);
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
+
 		if (group && rootState.itemRects) {
 			registry.sourceList = {
 				group,
@@ -526,17 +528,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 	}
 
-	function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
-		if (delayTimeoutId !== null && rootState.pointerOrigin) {
-			const threshold = 10;
-			const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
-			const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
+	function cancelDelayedDrag() {
+		if (delayTimeoutId === null) return;
 
-			if ((deltaX > threshold || deltaY > threshold) && delayTimeoutId) {
-				clearTimeout(delayTimeoutId);
-				delayTimeoutId = null;
-			}
-		}
+		clearTimeout(delayTimeoutId);
+		delayTimeoutId = null;
+		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
+	}
+
+	function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
+		if (delayTimeoutId === null || !rootState.pointerOrigin) return;
+
+		const THRESHOLD = 10;
+		const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
+		const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
+
+		if (deltaX > THRESHOLD || deltaY > THRESHOLD) cancelDelayedDrag();
 	}
 
 	function handlePointerUp() {
