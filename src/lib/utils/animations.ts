@@ -15,7 +15,7 @@ export function getDropAnimations(
 		.filter(isDropAnimation);
 }
 
-const DROP_TRANSITION_PROPERTIES = ['transform', 'width', 'height', 'margin'];
+const DROP_TRANSITION_PROPERTIES = ['transform', 'width', 'height', 'margin', 'z-index'];
 
 function isDropAnimation(animation: Animation) {
 	const { animationName, transitionProperty } = animation as Animation & {
