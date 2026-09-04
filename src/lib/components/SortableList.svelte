@@ -152,7 +152,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let registryEntry: RegistryList | null = null;
 	onMount(() => {
 		if (group) {
-			registryEntry = { group, ref: ref!, state: rootState, id: id ?? null, index: index ?? null };
+			registryEntry = {
+				group,
+				ref: ref!,
+				state: rootState,
+				get id() {
+					return id ?? null;
+				},
+				get index() {
+					return index ?? null;
+				},
+			};
 			unregister = registry.register(registryEntry);
 		}
 		onmounted?.(null);
