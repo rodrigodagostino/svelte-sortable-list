@@ -26,6 +26,7 @@
 		{ text: 'Direction horizontal', path: '/direction-horizontal' },
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'Multiple lists', path: '/multiple-lists' },
+		{ text: 'Multiple groups', path: '/multiple-groups' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With delay', path: '/with-delay' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
