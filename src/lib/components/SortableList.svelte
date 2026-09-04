@@ -51,6 +51,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	import { registry, setSortableListRootState } from '$lib/states/index.js';
 	import type { RegistryList, SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
+		addScrollListener,
 		afterPaint,
 		announce,
 		areColliding,
@@ -73,6 +74,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
+		removeScrollListener,
 		scrollIntoView,
 		shouldAutoScroll,
 		updateScrollOffset,
@@ -450,18 +452,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 
 		document.addEventListener('pointermove', handlePointerMove);
-		if (scrollableAncestor && canScroll(scrollableAncestor)) {
-			// The document’s scrolling element doesn’t reliably receive its own
-			// `scroll` events, so `document` is the target used for that case.
-			scrollEventTarget = isScrollingDocument ? document : scrollableAncestor;
-			scrollEventTarget.addEventListener('scroll', handleScroll, { passive: true });
-		}
+		scrollEventTarget = addScrollListener(scrollableAncestor, isScrollingDocument, handleScroll);
 		document.addEventListener(
 			'pointerup',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget?.removeEventListener('scroll', handleScroll);
-				scrollEventTarget = null;
+				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 				handlePointerUp();
 			},
 			{ once: true }
@@ -470,8 +466,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'pointercancel',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget?.removeEventListener('scroll', handleScroll);
-				scrollEventTarget = null;
+				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 				handlePointerCancel();
 			},
 			{ once: true }
@@ -482,8 +477,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			'lostpointercapture',
 			() => {
 				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget?.removeEventListener('scroll', handleScroll);
-				scrollEventTarget = null;
+				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 				// lostpointercapture can fire before pointerup in Chromium on macOS, causing valid
 				// drops to be canceled. Treating it as a drop instead means a genuine capture loss
 				// will drop rather than cancel, but that is preferable to silently broken drops.
@@ -584,12 +578,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						top: scrollableAncestor?.scrollTop ?? 0,
 					};
 					rootState.scrollOffset = { left: 0, top: 0 };
-					if (scrollableAncestor && canScroll(scrollableAncestor)) {
-						// The document’s scrolling element doesn’t reliably receive its own
-						// `scroll` events, so `document` is the target used for that case.
-						scrollEventTarget = isScrollingDocument ? document : scrollableAncestor;
-						scrollEventTarget.addEventListener('scroll', handleScroll, { passive: true });
-					}
+					scrollEventTarget = addScrollListener(
+						scrollableAncestor,
+						isScrollingDocument,
+						handleScroll
+					);
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
@@ -1134,8 +1127,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	) {
 		if (!rootState.draggedItem) return;
 
-		scrollEventTarget?.removeEventListener('scroll', handleScroll);
-		scrollEventTarget = null;
+		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (scrollRafId) {
 			cancelAnimationFrame(scrollRafId);
 			scrollRafId = null;
