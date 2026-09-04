@@ -142,4 +142,63 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(removeItem(itemsAfterFirstRemoval, 1));
 	});
+
+	test('should not remove List Item 2 when the pointer is canceled outside the list', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
+
+		// Find the dragged item (List Item 2)
+		const draggedItem = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+
+		// Get the bounding box for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+
+		// Press the mouse down to start dragging
+		await page.mouse.down();
+
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Drag outside the list bounds
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			viewport.height - 80,
+			{ steps: 40 } // Smooth movement
+		);
+
+		// Verify the dragged item is marked as being outside the list bounds
+		await expect(draggedItem).toHaveAttribute('data-is-within-bounds', 'false');
+
+		// Cancel the drag operation (the browser does this on its own, e.g. when a touch is
+		// interrupted). Playwright’s mouse can’t emit it, so dispatch it on the document directly.
+		await page.evaluate(() => document.dispatchEvent(new PointerEvent('pointercancel')));
+
+		// Wait for the dragged item to return to its slot
+		await expect(draggedItem).toHaveAttribute('data-is-within-bounds', 'true');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify no item was removed and the order is unchanged
+		await expect(root.locator('.ssl-item')).toHaveCount(5);
+		const itemsAfterCancel = await root
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(itemsAfterCancel).toEqual(initialItems);
+	});
 });
