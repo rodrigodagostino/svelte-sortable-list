@@ -539,9 +539,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		&[data-drag-state*='kbd'],
 		&:has(~ :global(.ssl-placeholder:not([data-drag-state='idle']))),
 		:global(.ssl-placeholder:not([data-drag-state='idle'])) ~ &[data-drag-state='idle'] {
-			transition:
-				transform var(--ssl-transition-duration),
-				z-index var(--ssl-transition-duration);
+			transition: transform var(--ssl-transition-duration);
 		}
 
 		&[data-drag-state='ptr-drop'],
@@ -554,21 +552,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			z-index: 9999;
 		}
 
-		/* Switching the z-index will ensure that, when the item is dropped,
-			 the transition runs for the full duration without being interrupted. */
-		&[data-drag-state*='ptr-drag'] {
-			margin: 0;
-			z-index: 10000;
-		}
-
 		&[data-drag-state*='kbd'] {
 			z-index: 2;
-		}
-
-		/* Switching the z-index will ensure that, when the item is dropped,
-			 the transition runs for the full duration without being interrupted. */
-		&[data-drag-state*='kbd-drag'] {
-			z-index: 3;
 		}
 	}
 </style>

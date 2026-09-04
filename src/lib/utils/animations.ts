@@ -11,22 +11,6 @@ export function getDropAnimations(
 	);
 
 	return [draggedItem, sourcePlaceholder, targetPlaceholder]
-		.flatMap((element) => element?.getAnimations() ?? [])
-		.filter(isDropAnimation);
-}
-
-const DROP_TRANSITION_PROPERTIES = ['transform', 'width', 'height', 'margin', 'z-index'];
-
-function isDropAnimation(animation: Animation) {
-	const { animationName, transitionProperty } = animation as Animation & {
-		animationName?: string;
-		transitionProperty?: string;
-	};
-
-	if (animation.effect?.getComputedTiming().iterations === Infinity) return false;
-	if (animationName) return false;
-	if (transitionProperty)
-		return DROP_TRANSITION_PROPERTIES.some((property) => transitionProperty.startsWith(property));
-
-	return true;
+		.flatMap((element) => element?.getAnimations({ subtree: true }) ?? [])
+		.filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity);
 }

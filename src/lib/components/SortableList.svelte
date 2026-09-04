@@ -1123,16 +1123,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				handlePointerAndKeyboardDragEnd(action);
 			};
 
-			transitionTimeoutId = setTimeout(finalizeDrop, _transition.duration + 100);
-
 			afterPaint(dropDuration, async () => {
 				if (isResolved) return;
-
-				const animations = getDropAnimations(element, ref!, registry);
-				if (animations.length)
-					await Promise.allSettled(animations.map((animation) => animation.finished));
-
-				finalizeDrop();
+				const TRANSITION_END_BUFFER = 32; // ~2 frames
+				transitionTimeoutId = setTimeout(finalizeDrop, dropDuration + TRANSITION_END_BUFFER);
 			});
 		} else {
 			handlePointerAndKeyboardDragEnd(action);
