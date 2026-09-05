@@ -5,6 +5,16 @@ export function dispatch(target: HTMLElement, name: string, detail: object) {
 	target.dispatchEvent(event);
 }
 
+export function startPointerSession(pointerSession: AbortController | null) {
+	pointerSession?.abort();
+	return new AbortController();
+}
+
+export function endPointerSession(pointerSession: AbortController | null) {
+	pointerSession?.abort();
+	return null;
+}
+
 export function addScrollListener(
 	scrollableAncestor: HTMLElement | undefined,
 	isScrollingDocument: boolean,

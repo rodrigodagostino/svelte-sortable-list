@@ -58,6 +58,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		canScroll,
 		canScrollX,
 		canScrollY,
+		endPointerSession,
 		getClosestItemRect,
 		getClosestScrollableAncestor,
 		getCollidingItemRect,
@@ -77,6 +78,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		removeScrollListener,
 		scrollIntoView,
 		shouldAutoScroll,
+		startPointerSession,
 		updateScrollOffset,
 	} from '$lib/utils/index.js';
 
@@ -143,8 +145,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	const classes = $derived(['ssl-root', restProps.class]);
+	let pointerSession: AbortController | null = null;
 	let pointerId: PointerEvent['pointerId'] | null = null;
 	let isPointerReleased = false;
+	let isDropping = false;
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let liveText = $state('');
@@ -171,6 +175,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let unregister: (() => void) | null = null;
 	onDestroy(() => {
+		pointerSession = endPointerSession(pointerSession);
 		unregister?.();
 		ondestroyed?.(null);
 	});
@@ -424,14 +429,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (delay <= 0) await handlePointerDragStart(currItem);
 		else {
-			document.addEventListener('pointermove', handlePointerMoveWithDelay);
-			document.addEventListener('pointerup', cancelDelayedDrag, { once: true });
-			delayTimeoutId = setTimeout(async () => await handlePointerDragStart(currItem), delay);
+			pointerSession = startPointerSession(pointerSession);
+			const { signal } = pointerSession;
+			document.addEventListener('pointermove', handlePointerMoveWithDelay, { signal });
+			document.addEventListener('pointerup', cancelDelayedDrag, { signal });
+			delayTimeoutId = setTimeout(() => {
+				delayTimeoutId = null;
+				handlePointerDragStart(currItem);
+			}, delay);
 		}
 	}
 
 	async function handlePointerDragStart(currItem: HTMLLIElement) {
-		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
+		pointerSession = startPointerSession(pointerSession);
+		const { signal } = pointerSession;
 
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(ref!);
@@ -463,40 +474,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 		});
 
-		document.addEventListener('pointermove', handlePointerMove);
+		document.addEventListener('pointermove', handlePointerMove, { signal });
+		document.addEventListener('pointerup', handlePointerUp, { signal });
+		document.addEventListener('pointercancel', handlePointerCancel, { signal });
+		// Provide a fallback for the `pointerup` event not firing on Webkit for iOS (tapping an item to
+		// start dragging and releasing without movement). It can also fire before `pointerup` in Chromium
+		// on macOS, causing valid drops to be canceled. Treating it as a drop instead means a genuine
+		// capture loss will drop rather than cancel, but that is preferable to silently broken drops.
+		document.addEventListener('lostpointercapture', handlePointerUp, { signal });
 		scrollEventTarget = addScrollListener(scrollableAncestor, isScrollingDocument, handleScroll);
-		document.addEventListener(
-			'pointerup',
-			() => {
-				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
-				handlePointerUp();
-			},
-			{ once: true }
-		);
-		document.addEventListener(
-			'pointercancel',
-			() => {
-				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
-				handlePointerCancel();
-			},
-			{ once: true }
-		);
-		// Provide a fallback for the pointerup event not firing on Webkit for iOS.
-		// This occurs when tapping an item to start dragging and releasing without movement.
-		document.addEventListener(
-			'lostpointercapture',
-			() => {
-				document.removeEventListener('pointermove', handlePointerMove);
-				scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
-				// lostpointercapture can fire before pointerup in Chromium on macOS, causing valid
-				// drops to be canceled. Treating it as a drop instead means a genuine capture loss
-				// will drop rather than cancel, but that is preferable to silently broken drops.
-				if (!isPointerReleased) handlePointerUp();
-			},
-			{ once: true }
-		);
 	}
 
 	let rafId: number | null = null;
@@ -543,7 +529,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		clearTimeout(delayTimeoutId);
 		delayTimeoutId = null;
-		document.removeEventListener('pointermove', handlePointerMoveWithDelay);
+		pointerSession = endPointerSession(pointerSession);
 	}
 
 	function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
@@ -557,10 +543,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	function handlePointerUp() {
+		pointerSession = endPointerSession(pointerSession);
+		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-drop');
 	}
 
 	function handlePointerCancel() {
+		pointerSession = endPointerSession(pointerSession);
+		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-cancel');
 	}
 
@@ -1018,13 +1008,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		element: HTMLElement,
 		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
-		if (
-			!rootState.draggedItem ||
-			(action.startsWith('ptr') && rootState.dragState === 'ptr-drop') ||
-			(action.startsWith('kbd') && rootState.dragState === 'kbd-drop')
-		)
-			return;
+		if (!rootState.draggedItem || isDropping) return;
 
+		isDropping = true;
 		isPointerReleased = true;
 		scrollSpeed = { x: 0, y: 0 };
 		if (rafId) {
@@ -1143,6 +1129,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerAndKeyboardDragEnd(
 		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
 	) {
+		isDropping = false;
+		pointerSession = endPointerSession(pointerSession);
+
 		if (!rootState.draggedItem) return;
 
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
