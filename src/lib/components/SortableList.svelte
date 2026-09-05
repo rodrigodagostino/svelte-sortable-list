@@ -374,15 +374,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 		}
 
-		await interruptDropTransition(e);
-
-		if (rootState.dragState !== 'idle') {
-			e.preventDefault();
-			return;
-		}
-
-		isPointerReleased = false;
-
 		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
@@ -421,6 +412,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
+		await interruptDropTransition(e);
+		if (rootState.dragState !== 'idle') return;
+
+		isPointerReleased = false;
 		currItem.setPointerCapture(e.pointerId);
 		pointerId = e.pointerId;
 
@@ -566,14 +561,20 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
-		await interruptDropTransition(e);
-
 		const { key } = e;
 		const target = e.target as HTMLElement;
 		let step: -1 | 1 = -1;
 		let shouldScrollIntoView = false;
 
 		if (target === ref || target === rootState.focusedItem) {
+			const isHandledKey =
+				key === ' ' ||
+				key.startsWith('Arrow') ||
+				key === 'Home' ||
+				key === 'End' ||
+				key === 'Escape';
+			if (isHandledKey) await interruptDropTransition(e);
+
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
