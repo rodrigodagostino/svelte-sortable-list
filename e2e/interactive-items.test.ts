@@ -168,4 +168,55 @@ test.describe('Sortable List - Interactive Items', () => {
 		// Verify the root element is focused
 		await expect(root).toBeFocused();
 	});
+
+	test('should let interactive elements be focused while a drop transition is running', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// === POINTER ===
+		// Find the dragged item (List Item 1) and the target item (List Item 3)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox) throw new Error('Could not get item bounding box');
+
+		// Drag List Item 1 from its edge (not on the interactive element) onto List Item 3
+		await page.mouse.move(draggedBox.x + 8, draggedBox.y + draggedBox.height / 2);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		await page.mouse.move(targetBox.x + 8, targetBox.y + targetBox.height / 2, { steps: 40 });
+
+		// Release the mouse and, while the drop transition is still running, click into the
+		// textarea of List Item 2. The click must focus it instead of being swallowed.
+		await page.mouse.up();
+		const textarea = page.getByRole('textbox', { name: 'List Item 2' });
+		const textareaBox = await textarea.boundingBox();
+		if (!textareaBox) throw new Error('Could not get List Item 2 textarea bounding box');
+		await page.mouse.click(textareaBox.x + 8, textareaBox.y + textareaBox.height / 2);
+		expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('TEXTAREA');
+
+		// Wait for the drag operation to complete
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// === KEYBOARD ===
+		// Focus the root, navigate to the first item and move it one position down with the keyboard
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		await expect(focusedItem).toBeFocused();
+		await page.keyboard.press('Space');
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('Space');
+
+		// While the drop transition is still running, press Tab. It must move the focus into the
+		// item’s interactive element instead of being swallowed.
+		await page.keyboard.press('Tab');
+		expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('LI');
+
+		// Wait for the drag operation to complete
+		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
+	});
 });
