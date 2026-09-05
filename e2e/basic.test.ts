@@ -524,4 +524,71 @@ test.describe('Sortable List - Basic', () => {
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(midwayItems, 4, 0));
 	});
+
+	test('should position the dragged item correctly inside an ancestor with a transform', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Turn an ancestor into the containing block of fixed-positioned elements. Any `transform` does
+		// (`filter`, `contain` or `will-change` too), and the dragged item is positioned with
+		// `position: fixed`, so its coordinates would resolve from that ancestor instead of the viewport.
+		await page.evaluate(() => {
+			document.querySelector<HTMLElement>('.app-main .container')!.style.transform =
+				'translateZ(0)';
+		});
+
+		// Find the dragged item (List Item 1)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+		// Get the bounding box for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
+
+		// === POINTER DRAG ===
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move the pointer down a little, without reaching the next item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2 + 20,
+			{ steps: 10 }
+		);
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Verify the dragged item followed the pointer from its own position
+		const pointerDragBox = await draggedItem.boundingBox();
+		if (!pointerDragBox) throw new Error('Could not get List Item 1 bounding box while dragging');
+		expect(Math.abs(pointerDragBox.x - draggedBox.x)).toBeLessThanOrEqual(1);
+		expect(Math.abs(pointerDragBox.y - (draggedBox.y + 20))).toBeLessThanOrEqual(1);
+
+		// Release the mouse and wait for the drag operation to complete
+		await page.mouse.up();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// === KEYBOARD DRAG ===
+		// Focus the root, navigate to the first item and lift it with the Space key
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(draggedItem).toBeFocused();
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Verify the lifted item stays over its own slot
+		const keyboardDragBox = await draggedItem.boundingBox();
+		if (!keyboardDragBox) throw new Error('Could not get List Item 1 bounding box while lifted');
+		expect(Math.abs(keyboardDragBox.x - draggedBox.x)).toBeLessThanOrEqual(1);
+		expect(Math.abs(keyboardDragBox.y - draggedBox.y)).toBeLessThanOrEqual(1);
+
+		// Cancel the drag operation with the Escape key
+		await page.keyboard.press('Escape');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+	});
 });
