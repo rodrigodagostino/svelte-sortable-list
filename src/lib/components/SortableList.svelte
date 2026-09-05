@@ -433,6 +433,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			const { signal } = pointerSession;
 			document.addEventListener('pointermove', handlePointerMoveWithDelay, { signal });
 			document.addEventListener('pointerup', cancelDelayedDrag, { signal });
+			// Cancel pending delayed drags that end without a `pointerup` (touch interrupted by the browser
+			// or the OS, capture lost on iOS when tapping without movement). Not canceling on those would
+			// start a drag for a pointer that is already gone and leave the item stuck in `ptr-drag-start`.
+			document.addEventListener('pointercancel', cancelDelayedDrag, { signal });
+			document.addEventListener('lostpointercapture', cancelDelayedDrag, { signal });
 			delayTimeoutId = setTimeout(() => {
 				delayTimeoutId = null;
 				handlePointerDragStart(currItem);
