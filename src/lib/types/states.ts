@@ -1,5 +1,8 @@
 import type { ItemRect } from './data-extraction.js';
-import type { SortableListRootProps as RootProps } from './props.js';
+import type {
+	SortableListRootProps as RootProps,
+	SortableListItemProps as ItemProps,
+} from './props.js';
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
 
 export interface RegistryList {
@@ -47,4 +50,8 @@ export interface SortableListRootStateContext {
 	scrollOffset: { left: number; top: number };
 	isRTL: boolean;
 	interruptDropTransition: (() => void) | null;
+}
+
+export interface SortableListItemStateContext {
+	props: Partial<ItemProps>;
 }

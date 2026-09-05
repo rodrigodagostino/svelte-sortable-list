@@ -19,36 +19,33 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
-	import { getSortableListRootState } from '$lib/states/index.js';
+	import { getSortableListItemState, getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
-	import { getIndex } from '$lib/utils/index.js';
 
 	let { ref = $bindable(null), children, ...restProps }: ItemRemoveProps = $props();
 
 	const rootState = getSortableListRootState();
+	const itemState = getSortableListItemState();
 
 	const classes = $derived(['ssl-item-remove', restProps.class]);
-	const ariaLabel = $derived.by(() => {
-		const itemIndex = ref?.closest<HTMLLIElement>('.ssl-item')?.dataset.itemIndex;
-		return itemIndex ? `Remove item at position ${Number(itemIndex) + 1}` : 'Remove item';
-	});
+	const ariaLabel = $derived(
+		typeof itemState.props.index === 'number'
+			? `Remove item at position ${itemState.props.index + 1}`
+			: 'Remove item'
+	);
 
 	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-		if (rootState.focusedItem && rootState.props.ref) {
+		const { ref: itemRef, index } = itemState.props;
+		if (rootState.focusedItem && itemRef && typeof index === 'number' && rootState.props.ref) {
 			const items = rootState.props.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
-				// Focus the next/previous item (if it exists) before removing.
-				const step = getIndex(rootState.focusedItem) !== items.length - 1 ? 1 : -1;
+				// Focus the next/previous item (if it exists) before removing the current one.
+				const step = index !== items.length - 1 ? 1 : -1;
 				if (step === 1)
-					(rootState.focusedItem.nextElementSibling as HTMLLIElement)?.focus({
-						preventScroll: true,
-					});
-				else
-					(rootState.focusedItem.previousElementSibling as HTMLLIElement)?.focus({
-						preventScroll: true,
-					});
+					(itemRef.nextElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
+				else (itemRef.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 			} else {
-				// Focus the root element (if there are no items left) before removing.
+				// Focus the root element (if there are no items left) before removing the current item.
 				rootState.props.ref.focus();
 			}
 		}

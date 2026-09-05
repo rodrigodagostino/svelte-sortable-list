@@ -27,7 +27,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
-	import { getSortableListRootState, registry } from '$lib/states/index.js';
+	import {
+		getSortableListRootState,
+		registry,
+		setSortableListItemState,
+	} from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
 	import {
@@ -56,6 +60,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		...restProps
 	}: ItemProps & { class?: string } = $props();
 
+	const itemState = setSortableListItemState();
+
 	function defaultTransition(node: HTMLElement) {
 		if (registry.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
@@ -76,6 +82,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const _transitionOut = untrack(() => transitionOut) || defaultTransition;
 
 	const rootState = getSortableListRootState();
+
+	$effect.pre(() => {
+		itemState.props = {
+			ref,
+			id,
+			index,
+		};
+	});
 
 	const classes = $derived(['ssl-item', restProps.class]);
 

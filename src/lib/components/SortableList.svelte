@@ -119,7 +119,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 	const _announcements = $derived(announcements || announce);
 
-	$effect(() => {
+	$effect.pre(() => {
 		rootState.props = {
 			ref,
 			gap,
