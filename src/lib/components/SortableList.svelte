@@ -79,6 +79,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		scrollIntoView,
 		shouldAutoScroll,
 		startPointerSession,
+		updateFixedOrigin,
 		updateScrollOffset,
 	} from '$lib/utils/index.js';
 
@@ -211,17 +212,25 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) untrack(() => scroll());
 	});
 
+	function refreshScrollOffset() {
+		const scrollOffset = updateScrollOffset(
+			scrollableAncestor,
+			scrollOrigin,
+			rootState.scrollOffset
+		);
+		if (scrollOffset === rootState.scrollOffset) return;
+
+		rootState.scrollOffset = scrollOffset;
+		rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
+	}
+
 	function updateTargetItem() {
 		if (!rootState.itemRects || !ref || !rootState.draggedItem) return;
 
 		const draggedRect = rootState.draggedItem.getBoundingClientRect();
 		const rootRect = ref.getBoundingClientRect();
 		rootState.isWithinBounds = areColliding(draggedRect, rootRect);
-		rootState.scrollOffset = updateScrollOffset(
-			scrollableAncestor,
-			scrollOrigin,
-			rootState.scrollOffset
-		);
+		refreshScrollOffset();
 
 		// Offset the dragged rect by the current scroll.
 		const draggedRectWithOffset = getItemRectWithOffset(draggedRect, rootState.scrollOffset);
@@ -347,11 +356,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
 		if (!rootState.dragState.startsWith('ptr')) {
-			rootState.scrollOffset = updateScrollOffset(
-				scrollableAncestor,
-				scrollOrigin,
-				rootState.scrollOffset
-			);
+			refreshScrollOffset();
 			return;
 		}
 
@@ -451,6 +456,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(ref!);
+		rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
 
@@ -585,6 +591,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
 					rootState.itemRects = getItemRects(ref!);
+					rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
 					scrollOrigin = {
 						left: scrollableAncestor?.scrollLeft ?? 0,
 						top: scrollableAncestor?.scrollTop ?? 0,

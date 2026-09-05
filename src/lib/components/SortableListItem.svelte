@@ -41,6 +41,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		isInSameRow,
 		isOrResidesInInteractiveElement,
 		keepWithinBounds,
+		toFixedPosition,
 	} from '$lib/utils/index.js';
 
 	let {
@@ -144,7 +145,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
 			const peerTarget = registry.targetList?.targetItem;
-			if (peerTarget) return `${getItemRect(peerTarget).x}px`;
+			if (peerTarget)
+				return `${toFixedPosition('x', getItemRect(peerTarget).x, rootState.fixedOrigin)}px`;
 		}
 
 		if (
@@ -160,13 +162,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 					: draggedIndex < targetIndex
 						? targetRect.right - draggedRect.width
 						: targetRect.x;
-			return `${left}px`;
+			return `${toFixedPosition('x', left, rootState.fixedOrigin)}px`;
 		}
 
 		if (rootState.dragState.startsWith('kbd') && draggedRect)
-			return `${draggedRect.x - rootState.props.gap! / 2}px`;
+			return `${toFixedPosition('x', draggedRect.x - rootState.props.gap! / 2, rootState.fixedOrigin)}px`;
 
-		return `${rect.x}px`;
+		return `${toFixedPosition('x', rect.x, rootState.fixedOrigin)}px`;
 	}
 
 	function getStyleTop() {
@@ -174,7 +176,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
 			const peerTarget = registry.targetList?.targetItem;
-			if (peerTarget) return `${getItemRect(peerTarget).y}px`;
+			if (peerTarget)
+				return `${toFixedPosition('y', getItemRect(peerTarget).y, rootState.fixedOrigin)}px`;
 		}
 
 		if (
@@ -198,13 +201,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							: alignItems === 'end' || alignItems === 'flex-end'
 								? targetRect.bottom - draggedRect.height
 								: targetRect.y;
-			return `${top}px`;
+			return `${toFixedPosition('y', top, rootState.fixedOrigin)}px`;
 		}
 
 		if (rootState.dragState.startsWith('kbd') && draggedRect)
-			return `${draggedRect.y - rootState.props.gap! / 2}px`;
+			return `${toFixedPosition('y', draggedRect.y - rootState.props.gap! / 2, rootState.fixedOrigin)}px`;
 
-		return `${rect.y}px`;
+		return `${toFixedPosition('y', rect.y, rootState.fixedOrigin)}px`;
 	}
 
 	function getStyleWidth() {
@@ -401,11 +404,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const styleLeft = $derived.by(() => {
 		void rootState.dragState;
+		void rootState.fixedOrigin;
 		void rootState.scrollOffset;
 		return untrack(() => getStyleLeft());
 	});
 	const styleTop = $derived.by(() => {
 		void rootState.dragState;
+		void rootState.fixedOrigin;
 		void rootState.scrollOffset;
 		return untrack(() => getStyleTop());
 	});

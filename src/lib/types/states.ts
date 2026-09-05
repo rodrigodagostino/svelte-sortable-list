@@ -42,6 +42,7 @@ export interface SortableListRootStateContext {
 	itemRects: ItemRect[] | null;
 	pointer: { x: number; y: number } | null;
 	pointerOrigin: { x: number; y: number } | null;
+	fixedOrigin: { x: number; y: number };
 	isWithinBounds: boolean;
 	scrollOffset: { left: number; top: number };
 	isRTL: boolean;

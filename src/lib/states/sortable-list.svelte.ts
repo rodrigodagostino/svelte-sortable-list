@@ -10,6 +10,7 @@ export class SortableListRootState {
 	itemRects: Context['itemRects'] = $state.raw(null);
 	pointer: Context['pointer'] = $state.raw(null);
 	pointerOrigin: Context['pointerOrigin'] = $state.raw(null);
+	fixedOrigin: Context['fixedOrigin'] = $state.raw({ x: 0, y: 0 });
 	isWithinBounds: Context['isWithinBounds'] = $state(true);
 	scrollOffset: Context['scrollOffset'] = $state.raw({ left: 0, top: 0 });
 	isRTL: Context['isRTL'] = $state(false);

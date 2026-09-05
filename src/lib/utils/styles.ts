@@ -1,4 +1,21 @@
-import type { ItemRect } from '$lib/types/index.js';
+import type {
+	ItemRect,
+	SortableListRootStateContext as RootStateContext,
+} from '$lib/types/index.js';
+
+/**
+ * Converts a viewport coordinate into the `left`/`top` value that places a `position: fixed`
+ * element there. Both match unless an ancestor establishes a containing block (`transform`,
+ * `filter`, `contain`, `will-change`, …), in which case `fixedOrigin` is where that block’s
+ * origin sits in the viewport (see `getFixedOrigin()`).
+ */
+export function toFixedPosition(
+	axis: 'x' | 'y',
+	value: number,
+	fixedOrigin: RootStateContext['fixedOrigin']
+) {
+	return value - fixedOrigin[axis];
+}
 
 const MATRIX_REGEX = /matrix.*\((.+)\)/;
 

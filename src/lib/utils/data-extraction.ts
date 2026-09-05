@@ -41,6 +41,33 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	);
 }
 
+/**
+ * Returns the viewport position that `position: fixed` descendants of `ref` resolve their `left`
+ * and `top` from. That is the viewport origin (0, 0) unless an ancestor establishes a containing
+ * block for fixed elements (`transform`, `filter`, `contain`, `will-change`, …), in which case
+ * it’s the padding box of that ancestor.
+ */
+function getFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
+	const probe = document.createElement('div');
+	probe.style.cssText =
+		'position: fixed; left: 0; top: 0; width: 0; height: 0; padding: 0; margin: 0; border: 0; visibility: hidden; pointer-events: none';
+	ref.appendChild(probe);
+	const { x, y } = probe.getBoundingClientRect();
+	probe.remove();
+
+	return { x, y };
+}
+
+export function updateFixedOrigin(
+	ref: HTMLUListElement,
+	fixedOrigin: RootStateContext['fixedOrigin']
+) {
+	const { x, y } = getFixedOrigin(ref);
+	if (x === fixedOrigin.x && y === fixedOrigin.y) return fixedOrigin;
+
+	return { x, y };
+}
+
 export function getPeerTargetFields(
 	registry: Registry,
 	group: string | undefined,
