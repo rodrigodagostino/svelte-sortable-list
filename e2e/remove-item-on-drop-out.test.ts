@@ -201,4 +201,67 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 			.allTextContents();
 		expect(itemsAfterCancel).toEqual(initialItems);
 	});
+
+	test('should remove List Item 2 only once when pointer capture is lost right before the pointer is released', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the viewport size
+		const viewport = page.viewportSize();
+		if (!viewport) throw new Error('Could not get viewport size');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getVaryingItems(5).map((item) => item.text));
+
+		// Find the dragged item (List Item 2)
+		const draggedItem = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+
+		// Get the bounding box for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+
+		// Press the mouse down to start dragging
+		await page.mouse.down();
+
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Drag outside the list bounds
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			viewport.height - 80,
+			{ steps: 40 } // Smooth movement
+		);
+
+		// Verify the dragged item is marked as being outside the list bounds
+		await expect(draggedItem).toHaveAttribute('data-is-within-bounds', 'false');
+
+		// Chromium on macOS can fire `lostpointercapture` before `pointerup`. Both events end the drag,
+		// so they must not each run a drop of their own (that fired `ondrop` twice and removed two
+		// items). Playwright’s mouse can’t reproduce that ordering, so dispatch the first event on the
+		// document directly and then release the mouse.
+		await page.evaluate(() => document.dispatchEvent(new PointerEvent('lostpointercapture')));
+		await page.mouse.up();
+
+		// Wait for the removal to start and the drag operation to fully complete
+		const placeholderItem = root.locator('.ssl-placeholder');
+		await expect(placeholderItem).toHaveAttribute('data-drag-state', 'ptr-remove');
+		await expect(placeholderItem).toHaveCount(0);
+
+		// Verify exactly one item was removed
+		await expect(root.locator('.ssl-item')).toHaveCount(4);
+		const itemsAfterRemoval = await root
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(itemsAfterRemoval).toEqual(removeItem(initialItems, 1));
+	});
 });
