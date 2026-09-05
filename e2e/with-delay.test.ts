@@ -198,4 +198,49 @@ test.describe('Sortable List - With Delay', () => {
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(sortItems(sortItems(initialItems, 0, 2), 0, 3));
 	});
+
+	test('should not start dragging when the pointer is canceled or loses capture before the delay completes', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Find the item to press (List Item 1)
+		const pressedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+		// Get the bounding box for a precise press
+		const pressedBox = await pressedItem.boundingBox();
+		if (!pressedBox) throw new Error('Could not get List Item 1 bounding box');
+
+		// Neither event is followed by a `pointerup`, and Playwright’s mouse can’t emit them,
+		// so they are dispatched on the document directly.
+		for (const type of ['pointercancel', 'lostpointercapture']) {
+			// Press the mouse down on the center of the item
+			await page.mouse.move(
+				pressedBox.x + pressedBox.width / 2,
+				pressedBox.y + pressedBox.height / 2
+			);
+			await page.mouse.down();
+
+			// End the pointer before the delay (400ms) completes
+			await page.waitForTimeout(100);
+			await page.evaluate((type) => document.dispatchEvent(new PointerEvent(type)), type);
+
+			// Wait past the delay and verify no drag operation was started
+			await page.waitForTimeout(600);
+			await expect(pressedItem).toHaveAttribute('data-drag-state', 'idle');
+			await expect(root.locator('.ssl-placeholder')).toHaveCount(0);
+
+			// Release the mouse
+			await page.mouse.up();
+		}
+
+		// Verify the order is unchanged
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(finalItems).toEqual(initialItems);
+	});
 });
