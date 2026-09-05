@@ -49,4 +49,50 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(removeItem(itemsAfterFirstRemoval, 1));
 	});
+
+	test('should update the remove buttons labels after sorting the items', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Verify the initial labels reflect each item position
+		const items = root.locator('.ssl-item');
+		await expect(items).toHaveCount(5);
+		for (let i = 0; i < 5; i++)
+			await expect(items.nth(i).locator('.ssl-item-remove')).toHaveAttribute(
+				'aria-label',
+				`Remove item at position ${i + 1}`
+			);
+
+		// Find the dragged item (List Item 1) and the target item (List Item 3)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox) throw new Error('Could not get item bounding box');
+
+		// Drag List Item 1 from its edge (not on the remove button) onto List Item 3
+		await page.mouse.move(draggedBox.x + 8, draggedBox.y + draggedBox.height / 2);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		await page.mouse.move(targetBox.x + 8, targetBox.y + targetBox.height / 2, { steps: 40 });
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(draggedItem).toHaveAttribute('data-item-index', '2');
+
+		// Verify the labels follow the new positions
+		await expect(draggedItem.locator('.ssl-item-remove')).toHaveAttribute(
+			'aria-label',
+			'Remove item at position 3'
+		);
+		await expect(root.locator('[data-item-id="list-item-2"] .ssl-item-remove')).toHaveAttribute(
+			'aria-label',
+			'Remove item at position 1'
+		);
+		await expect(root.locator('[data-item-id="list-item-3"] .ssl-item-remove')).toHaveAttribute(
+			'aria-label',
+			'Remove item at position 2'
+		);
+	});
 });
