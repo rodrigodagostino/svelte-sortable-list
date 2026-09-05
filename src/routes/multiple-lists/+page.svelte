@@ -127,8 +127,10 @@
 	.lists {
 		display: grid;
 		gap: 2rem;
+		max-width: 100%;
 		padding-inline: 3rem;
 		padding-block-end: 3rem;
+		overflow-x: auto;
 
 		&.direction-vertical {
 			grid-template-columns: repeat(3, minmax(12rem, 1fr));

@@ -141,6 +141,10 @@
 		}
 	}
 
+	.groups {
+		max-width: 100%;
+	}
+
 	.group {
 		display: flex;
 		flex-direction: column;
@@ -159,11 +163,13 @@
 	.lists {
 		display: grid;
 		gap: 2rem;
+		max-width: 100%;
 		padding-inline: 3rem;
 		padding-block-end: 3rem;
+		overflow-x: auto;
 
 		&.direction-vertical {
-			grid-template-columns: repeat(2, minmax(12rem, 1fr));
+			grid-template-columns: repeat(2, minmax(13.5rem, 1fr));
 		}
 
 		&.direction-horizontal {
