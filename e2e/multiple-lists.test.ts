@@ -789,4 +789,60 @@ test.describe('Sortable List - Multiple Lists', () => {
 			sortItems(initialDoingItems, 0, 2)
 		);
 	});
+
+	test('should read correct announcements when moving an item into a peer list using Home and End keys', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Find the ARIA live region of the «To Do» list (the source list does the announcing)
+		const liveRegion = page.locator('.ssl-live-region').first();
+
+		// Focus the «To Do» root and select its first item (To Do Item 1)
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+
+		// Move right — the axis perpendicular to a vertical list — to target the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		// Verify the announcer reads the position inside the «Doing» list
+		await expect(liveRegion).toHaveText(
+			'You have moved the item from position 1 in To Do list to position 1 in Doing list.'
+		);
+
+		// Move to the end of the «Doing» list (after its three items) with the End key
+		await page.keyboard.press('End');
+		// Verify the announcer reads the last position of the «Doing» list
+		await expect(liveRegion).toHaveText(
+			'You have moved the item from position 1 in To Do list to position 4 in Doing list.'
+		);
+
+		// Move back to the start of the «Doing» list with the Home key
+		await page.keyboard.press('Home');
+		// Verify the announcer reads the first position of the «Doing» list
+		await expect(liveRegion).toHaveText(
+			'You have moved the item from position 1 in To Do list to position 1 in Doing list.'
+		);
+
+		// Move to the end of the «Doing» list again and drop the item with the Space key
+		await page.keyboard.press('End');
+		await page.keyboard.press('Space');
+		// Verify the announcer reads the dropped announcement with the position inside the «Doing» list
+		await expect(liveRegion).toHaveText(
+			'You have dropped the item. It has moved from position 1 in To Do list to position 4 in Doing list.'
+		);
+
+		// Verify To Do Item 1 was inserted at the end of the «Doing» list
+		await expect(doingList.locator('.ssl-item .ssl-item-content__text')).toHaveText([
+			...listItemTexts['doing'],
+			'To Do Item 1',
+		]);
+	});
 });
