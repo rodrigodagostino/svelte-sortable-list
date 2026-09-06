@@ -369,6 +369,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerDown(e: PointerEvent) {
+		const focusedRootState = rootState.focusedItem
+			? rootState
+			: group
+				? registry.getPeerLists(group, rootState).find((l) => l.state.focusedItem)?.state
+				: null;
+		focusedRootState?.focusedItem?.blur();
+
 		if (e.button !== 0) {
 			e.preventDefault();
 			return;
@@ -412,6 +419,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
+		if (focusedRootState?.dragState.startsWith('kbd-drag')) await tick();
 		await interruptDropTransition(e);
 		if (rootState.dragState !== 'idle') return;
 
@@ -1234,7 +1242,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	bind:this={ref}
 	{id}
 	class={classes}
-	style:pointer-events={rootState.focusedItem ? 'none' : 'auto'}
 	style:--ssl-gap="{gap}px"
 	style:--ssl-wrap={hasWrapping ? 'wrap' : 'nowrap'}
 	style:--ssl-transition-duration="{_transition.duration}ms"
