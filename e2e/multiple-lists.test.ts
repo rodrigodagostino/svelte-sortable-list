@@ -687,4 +687,106 @@ test.describe('Sortable List - Multiple Lists', () => {
 		await page.keyboard.press('Space');
 		await expect(doneDraggedItem).toHaveAttribute('data-drag-state', 'idle');
 	});
+
+	test('should take over a keyboard drag in one list with a pointer click/tap on a peer list', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Get the initial order of the items to verify the starting state
+		const initialToDoItems = await toDoList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		const initialDoingItems = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(initialToDoItems).toEqual(listItemTexts['to-do']);
+		expect(initialDoingItems).toEqual(listItemTexts['doing']);
+
+		// Get the bounding box of Doing Item 2 before anything moves
+		const doingItem2Box = await doingList
+			.locator('[data-item-id="doing-item-2"]:not(.ssl-placeholder)')
+			.boundingBox();
+		if (!doingItem2Box) throw new Error('Could not get Doing Item 2 bounding box');
+
+		// Focus the «To Do» root and select its first item (To Do Item 1)
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const keyboardItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await expect(keyboardItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+
+		// Move right — the axis perpendicular to a vertical list — to target the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(keyboardItem).toHaveAttribute('data-drag-state', 'kbd-drag');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+
+		// Wait for Doing Item 1 to finish shifting down one slot (to the Doing Item 2 position) to make
+		// room for To Do Item 1, otherwise the press below could land on To Do Item 1 instead
+		const pointerItem = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		await expect
+			.poll(async () => (await pointerItem.boundingBox())?.y)
+			.toBeCloseTo(doingItem2Box.y, 0);
+
+		// Get the bounding box of Doing Item 1 for a precise press
+		const pointerBox = await pointerItem.boundingBox();
+		if (!pointerBox) throw new Error('Could not get Doing Item 1 bounding box');
+
+		// Press the mouse down near the left edge of Doing Item 1 while To Do Item 1 is still being
+		// dragged with the keyboard (its center falls inside the auto-scroll zone on narrow screens)
+		const pressX = pointerBox.x + 16;
+		const pressY = pointerBox.y + pointerBox.height / 2;
+		await page.mouse.move(pressX, pressY);
+		await page.mouse.down();
+
+		// Verify the keyboard drag was canceled and To Do Item 1 lost focus
+		await expect(keyboardItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(keyboardItem).not.toBeFocused();
+
+		// Verify «Doing» is no longer flagged as the target, and its placeholder for To Do Item 1 is gone
+		await expect(doingList).toHaveAttribute('data-is-target', 'false');
+		await expect(doingList.locator('.ssl-placeholder[data-item-id="to-do-item-1"]')).toHaveCount(0);
+
+		// Wait for the pointer drag to start on this same press by checking the drag state
+		await expect(pointerItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Find the target item (Doing Item 3) and wait for it to settle back after the canceled hover
+		const targetItem = doingList.locator('[data-item-id="doing-item-3"]:not(.ssl-placeholder)');
+		await expect
+			.poll(() => targetItem.evaluate((item) => getComputedStyle(item).transform))
+			.toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
+
+		// Get the bounding boxes for a precise drag operation
+		const settledPointerBox = await pointerItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!settledPointerBox || !targetBox)
+			throw new Error('Could not get Doing Item 1 or Doing Item 3 bounding box');
+
+		// Move by the distance between Doing Item 1 and Doing Item 3 to reach the target position
+		await page.mouse.move(
+			pressX + (targetBox.x - settledPointerBox.x),
+			pressY + (targetBox.y - settledPointerBox.y),
+			{ steps: 40 } // Smooth movement
+		);
+
+		// Release the mouse to drop
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(pointerItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the «To Do» list remains unaffected
+		await expect(toDoList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			initialToDoItems
+		);
+
+		// Verify the order within the «Doing» list after the drag
+		await expect(doingList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			sortItems(initialDoingItems, 0, 2)
+		);
+	});
 });

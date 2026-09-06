@@ -219,4 +219,72 @@ test.describe('Sortable List - Interactive Items', () => {
 		// Wait for the drag operation to complete
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
 	});
+
+	test('should let the pointer interact with the list while an item has keyboard focus', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Focus the root and navigate to the first item
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+
+		// Verify the List Item 1 is focused
+		const focusedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		await expect(focusedItem).toBeFocused();
+
+		// Get the bounding box of the input inside List Item 1 for a precise click
+		const input = focusedItem.locator('input');
+		const inputBox = await input.boundingBox();
+		if (!inputBox) throw new Error('Could not get List Item 1 input bounding box');
+
+		// Click the input once
+		await page.mouse.click(inputBox.x + inputBox.width / 2, inputBox.y + inputBox.height / 2);
+
+		// Verify the input is focused right away (the click must not fall through the list)
+		await expect(input).toBeFocused();
+
+		// Focus the root and navigate to the first item again
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(focusedItem).toBeFocused();
+
+		// Find the dragged item (List Item 2) and the target item (List Item 4)
+		const draggedItem = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-4"]:not(.ssl-placeholder)');
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox)
+			throw new Error('Could not get List Item 2 or List Item 4 bounding box');
+
+		// Press the mouse down on the edge of List Item 2 (not on the interactive element)
+		await page.mouse.move(draggedBox.x + 8, draggedBox.y + draggedBox.height / 2);
+		await page.mouse.down();
+
+		// Wait for the drag operation to start on this first press by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Verify the press cleared the keyboard focus from the list
+		await expect(focusedItem).not.toBeFocused();
+		await expect(focusedItem).toHaveAttribute('aria-selected', 'false');
+		await expect(root).not.toHaveAttribute('aria-activedescendant');
+
+		// Move to the target position (edge of List Item 4)
+		await page.mouse.move(targetBox.x + 8, targetBox.y + targetBox.height / 2, { steps: 40 });
+
+		// Release the mouse to drop
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify List Item 2 moved to the List Item 4 position
+		const itemIds = await root
+			.locator('.ssl-item')
+			.evaluateAll((items) => items.map((item) => item.getAttribute('data-item-id')));
+		expect(itemIds.indexOf('list-item-2')).toBe(3);
+	});
 });
