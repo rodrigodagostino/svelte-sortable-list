@@ -467,6 +467,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			if (!rootState.focusedItem) return;
 			dispatch(ref!, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
+			const { activeElement } = document;
+			if (activeElement !== rootState.props.ref && rootState.props.ref?.contains(activeElement))
+				return;
 			rootState.focusedItem = null;
 		}
 	}

@@ -77,6 +77,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isOrResidesInInteractiveElement,
 		isRootElement,
 		removeScrollListener,
+		restoreFocus,
 		scrollIntoView,
 		shouldAutoScroll,
 		startPointerSession,
@@ -180,25 +181,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		pointerSession = endPointerSession(pointerSession);
 		unregister?.();
 		ondestroyed?.(null);
-	});
-
-	// Svelte currently does not retain focus when elements are moved (even when keyed),
-	// so we need to manually keep focus on the selected <SortableList.Item> as items are sorted.
-	// https://github.com/sveltejs/svelte/issues/3973
-	let activeElement: HTMLLIElement | null = $derived(rootState.focusedItem);
-	$effect(() => {
-		if (rootState.dragState !== 'idle') return;
-
-		untrack(() => {
-			if (activeElement && activeElement !== document.activeElement) {
-				const crossingItem = registry.crossingItemId
-					? document.querySelector<HTMLLIElement>(
-							`.ssl-item[data-item-id="${CSS.escape(registry.crossingItemId)}"]`
-						)
-					: null;
-				(crossingItem || activeElement).focus({ preventScroll: true });
-			}
-		});
 	});
 
 	let scrollableAncestor = $derived(ref ? getClosestScrollableAncestor(ref) : undefined);
@@ -1173,6 +1155,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			requestAnimationFrame(() => (registry.crossingItemId = null));
 		}
 
+		// Svelte does not retain focus when elements are moved (even when keyed), so we’ll store the
+		// focused element inside the list before `ondragend` lets the consumer sort the items.
+		// https://github.com/sveltejs/svelte/issues/3973
+		const { activeElement } = document;
+		const focusedElement = ref!.contains(activeElement) ? activeElement : null;
+
 		rootState.dragState = 'idle';
 
 		ondragend?.({
@@ -1205,6 +1193,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.targetItem = null;
 		rootState.itemRects = null;
 		rootState.isWithinBounds = true;
+
+		// Wait for the sorted items to be updated before restoring focus.
+		await tick();
+		restoreFocus(focusedElement, registry.crossingItemId);
 	}
 
 	// Interrupt any ongoing drop transition so the user can immediately start a new drag,
@@ -1227,10 +1219,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	// `focusout` is preferred over `blur` since it detects the loss of focus
 	// on the current element and it’s descendants too.
-	function handleFocusOut(e: FocusEvent) {
+	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget)
+		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget) {
+			await tick();
+			const { activeElement } = document;
+			if (activeElement !== rootState.props.ref && rootState.props.ref?.contains(activeElement))
+				return;
 			liveText = '';
+		}
 	}
 
 	function handleContextMenu(e: MouseEvent) {

@@ -1,7 +1,26 @@
+import type { SortableListRegistry as Registry } from '$lib/states/registry.svelte.js';
 import type {
 	SortableListAnnouncements as Announcements,
 	SortableListRootProps as RootProps,
 } from '$lib/types/index.js';
+
+export function restoreFocus(
+	focusedElement: Element | null,
+	crossingItemId: Registry['crossingItemId']
+) {
+	if (!focusedElement) return;
+	// Do not restore the focus if it didn’t get lost.
+	const { activeElement } = document;
+	if (activeElement && activeElement !== document.body) return;
+
+	const crossingItem = crossingItemId
+		? document.querySelector<HTMLLIElement>(
+				`.ssl-item[data-item-id="${CSS.escape(crossingItemId)}"]`
+			)
+		: null;
+	const elementToFocus = focusedElement.isConnected ? focusedElement : crossingItem;
+	if (elementToFocus instanceof HTMLElement) elementToFocus.focus({ preventScroll: true });
+}
 
 function getListLabel(list: RootProps['ref'], listIndex: number): string {
 	const labelledBy = list?.getAttribute('aria-labelledby');
