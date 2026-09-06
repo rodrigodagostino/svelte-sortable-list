@@ -201,6 +201,9 @@ test.describe('Sortable List - Interactive Items', () => {
 		// Wait for the drag operation to complete
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 
+		// Verify the textarea is still focused once the items have been sorted
+		await expect(textarea).toBeFocused();
+
 		// === KEYBOARD ===
 		// Focus the root, navigate to the first item and move it one position down with the keyboard
 		await root.focus();
@@ -218,6 +221,11 @@ test.describe('Sortable List - Interactive Items', () => {
 
 		// Wait for the drag operation to complete
 		await expect(focusedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the textarea (List Item 2 is the first item after the pointer drag above) is still
+		// focused once the items have been sorted
+		await expect(focusedItem).toContainText('List Item 2');
+		await expect(textarea).toBeFocused();
 	});
 
 	test('should let the pointer interact with the list while an item has keyboard focus', async ({
