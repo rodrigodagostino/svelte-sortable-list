@@ -15,6 +15,10 @@ export function endPointerSession(pointerSession: AbortController | null) {
 	return null;
 }
 
+export function isActivePointer(e: PointerEvent, pointerId: PointerEvent['pointerId'] | null) {
+	return e.pointerId === pointerId;
+}
+
 export function addScrollListener(
 	scrollableAncestor: HTMLElement | undefined,
 	isScrollingDocument: boolean,

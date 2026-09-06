@@ -72,6 +72,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getPeerTargetFields,
 		getScrollingSpeed,
 		getTextDirection,
+		isActivePointer,
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
@@ -500,13 +501,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	let rafId: number | null = null;
-	function handlePointerMove({ clientX, clientY }: PointerEvent) {
-		if (rafId) return;
+	function handlePointerMove(e: PointerEvent) {
+		if (rafId || !isActivePointer(e, pointerId)) return;
 
 		if (rootState.dragState !== 'ptr-drag-start' && rootState.dragState !== 'ptr-drag') {
 			rafId = null;
 			return;
 		}
+
+		const { clientX, clientY } = e;
 
 		rafId = requestAnimationFrame(() => {
 			if (rootState.dragState === 'ptr-drag-start') rootState.dragState = 'ptr-drag';
@@ -538,31 +541,38 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		});
 	}
 
-	function cancelDelayedDrag() {
-		if (delayTimeoutId === null) return;
+	function cancelDelayedDrag(e: PointerEvent) {
+		if (delayTimeoutId === null || !isActivePointer(e, pointerId)) return;
 
 		clearTimeout(delayTimeoutId);
 		delayTimeoutId = null;
 		pointerSession = endPointerSession(pointerSession);
 	}
 
-	function handlePointerMoveWithDelay({ clientX, clientY }: PointerEvent) {
-		if (delayTimeoutId === null || !rootState.pointerOrigin) return;
+	function handlePointerMoveWithDelay(e: PointerEvent) {
+		if (delayTimeoutId === null || !isActivePointer(e, pointerId) || !rootState.pointerOrigin)
+			return;
+
+		const { clientX, clientY } = e;
 
 		const THRESHOLD = 10;
 		const deltaX = Math.abs(clientX - rootState.pointerOrigin.x);
 		const deltaY = Math.abs(clientY - rootState.pointerOrigin.y);
 
-		if (deltaX > THRESHOLD || deltaY > THRESHOLD) cancelDelayedDrag();
+		if (deltaX > THRESHOLD || deltaY > THRESHOLD) cancelDelayedDrag(e);
 	}
 
-	function handlePointerUp() {
+	function handlePointerUp(e: PointerEvent) {
+		if (!isActivePointer(e, pointerId)) return;
+
 		pointerSession = endPointerSession(pointerSession);
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-drop');
 	}
 
-	function handlePointerCancel() {
+	function handlePointerCancel(e: PointerEvent) {
+		if (!isActivePointer(e, pointerId)) return;
+
 		pointerSession = endPointerSession(pointerSession);
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-cancel');
