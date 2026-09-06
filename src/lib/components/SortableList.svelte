@@ -668,13 +668,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItemIndex: draggedIndex,
 						targetList: registry.targetList?.ref ?? null,
 						targetListIndex: registry.targetList?.index ?? null,
-						targetItem: registry.targetList?.targetItem
-							? registry.targetList.targetItem
-							: rootState.targetItem,
-						targetItemIndex:
-							typeof registry.targetList?.targetItemIndex === 'number'
-								? registry.targetList.targetItemIndex
-								: targetIndex,
+						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
+						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
 					});
 
 					handlePointerAndKeyboardDrop(rootState.focusedItem, 'kbd-drop');
@@ -895,13 +890,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItemIndex: draggedIndex,
 						targetList: registry.targetList?.ref,
 						targetListIndex: registry.targetList?.index,
-						targetItem: registry.targetList?.targetItem
-							? registry.targetList.targetItem
-							: rootState.targetItem,
-						targetItemIndex:
-							typeof registry.targetList?.targetItemIndex === 'number'
-								? registry.targetList.targetItemIndex
-								: targetIndex,
+						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
+						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
 					});
 				}
 			}
@@ -950,7 +940,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						registry.targetList = {
 							...targetList,
 							targetItem: peerTargetItem,
-							targetItemId: peerTargetItem.id ?? null,
+							targetItemId: peerTargetItem.classList.contains('ssl-placeholder')
+								? null
+								: peerTargetItem.id,
 							targetItemIndex: getIndex(peerTargetItem),
 						};
 					} else {
@@ -993,13 +985,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					liveText = _announcements.dragged({
 						sourceList: ref!,
-						sourceListIndex: index!,
+						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
 						targetList: registry.targetList?.ref,
 						targetListIndex: registry.targetList?.index,
-						targetItem: rootState.targetItem!,
-						targetItemIndex: targetIndex,
+						targetItem: registry.targetList?.targetItem ?? rootState.targetItem!,
+						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
 					});
 				}
 			}
