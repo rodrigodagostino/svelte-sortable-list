@@ -581,7 +581,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (
 					!target.classList.contains('ssl-item') ||
 					isLocked ||
-					target.dataset.isLocked === 'true'
+					target.dataset.isLocked === 'true' ||
+					e.repeat
 				)
 					return;
 				else e.preventDefault();
