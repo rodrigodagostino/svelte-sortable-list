@@ -377,16 +377,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				: null;
 		focusedRootState?.focusedItem?.blur();
 
-		if (e.button !== 0) {
-			e.preventDefault();
-			return;
-		}
-
 		const target = e.target as HTMLElement;
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
 
 		const isOrResidesInInteractiveElem = isOrResidesInInteractiveElement(target, currItem);
+		// Stop non-main buttons from interacting with the list.
+		if (e.button !== 0) {
+			// Let non-main buttons act normally on interactive elements.
+			if (!isOrResidesInInteractiveElem) e.preventDefault();
+			return;
+		}
 		if (
 			(isLocked && !isOrResidesInInteractiveElem) ||
 			(currItem.dataset.isLocked === 'true' && !isOrResidesInInteractiveElem) ||
