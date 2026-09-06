@@ -192,7 +192,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (activeElement && activeElement !== document.activeElement) {
 				const crossingItem = registry.crossingItemId
 					? document.querySelector<HTMLLIElement>(
-							`.ssl-item[data-item-id="${registry.crossingItemId}"]`
+							`.ssl-item[data-item-id="${CSS.escape(registry.crossingItemId)}"]`
 						)
 					: null;
 				(crossingItem || activeElement).focus({ preventScroll: true });
@@ -237,7 +237,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const collidingItemRect = getCollidingItemRect(draggedRectWithOffset, rootState.itemRects);
 		if (collidingItemRect) {
 			rootState.targetItem = ref.querySelector<HTMLLIElement>(
-				`.ssl-item[data-item-id="${collidingItemRect.id}"]`
+				`.ssl-item[data-item-id="${CSS.escape(collidingItemRect.id)}"]`
 			);
 			if (group) registry.targetList = null;
 			return;
@@ -264,7 +264,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							...peerList,
 							targetItem:
 								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${peerCollidingItemRect.id}"]`
+									`.ssl-item[data-item-id="${CSS.escape(peerCollidingItemRect.id)}"]`
 								) ?? null,
 							targetItemId: peerCollidingItemRect?.id ?? null,
 							targetItemIndex: peerCollidingItemRect?.index ?? null,
@@ -700,7 +700,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							const peerTargetItem =
 								closestRect &&
 								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${closestRect.id}"]`
+									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
 								);
 							peerTargetItem?.focus({ preventScroll: true });
 						}
@@ -794,7 +794,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							const peerTargetItem =
 								closestRect &&
 								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${closestRect.id}"]`
+									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
 								);
 							if (peerTargetItem) {
 								if (
@@ -839,7 +839,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							const closestRect = getClosestItemRect(draggedRectWithOffset, rootState.itemRects);
 							if (closestRect) {
 								rootState.targetItem = ref!.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${closestRect.id}"]`
+									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
 								);
 							}
 							registry.targetList = null;
