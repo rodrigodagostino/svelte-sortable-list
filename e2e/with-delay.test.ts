@@ -224,11 +224,27 @@ test.describe('Sortable List - With Delay', () => {
 				pressedBox.x + pressedBox.width / 2,
 				pressedBox.y + pressedBox.height / 2
 			);
+			// Record the id of the pointer that presses, so the synthetic events below come from that pointer
+			await page.evaluate(() =>
+				document.addEventListener(
+					'pointerdown',
+					(e) => (document.documentElement.dataset.pointerId = String(e.pointerId)),
+					{ once: true, capture: true }
+				)
+			);
 			await page.mouse.down();
 
 			// End the pointer before the delay (400ms) completes
 			await page.waitForTimeout(100);
-			await page.evaluate((type) => document.dispatchEvent(new PointerEvent(type)), type);
+			await page.evaluate(
+				(type) =>
+					document.dispatchEvent(
+						new PointerEvent(type, {
+							pointerId: Number(document.documentElement.dataset.pointerId),
+						})
+					),
+				type
+			);
 
 			// Wait past the delay and verify no drag operation was started
 			await page.waitForTimeout(600);

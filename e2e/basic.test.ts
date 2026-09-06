@@ -593,6 +593,99 @@ test.describe('Sortable List - Basic', () => {
 		);
 	});
 
+	test('should ignore a second touch while dragging with another one', async ({
+		page,
+		hasTouch,
+	}) => {
+		// Multi-touch can only be emulated through the Chrome DevTools Protocol on a touch device
+		test.skip(!hasTouch, 'Requires touch emulation');
+
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Find the dragged item (List Item 1) and the target item (List Item 3)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		const rootBox = await root.boundingBox();
+		if (!draggedBox || !targetBox || !rootBox)
+			throw new Error('Could not get List Item 1, List Item 3 or root bounding box');
+
+		// Open a CDP session to dispatch touch events with more than one touch point
+		const cdp = await page.context().newCDPSession(page);
+		const finger1 = {
+			x: draggedBox.x + draggedBox.width / 2,
+			y: draggedBox.y + draggedBox.height / 2,
+			id: 1,
+		};
+		const finger2 = { x: rootBox.x + rootBox.width / 2, y: rootBox.y + rootBox.height + 40, id: 2 };
+		const waitForFrames = () =>
+			page.evaluate(
+				() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+			);
+
+		// Press the first finger down on the center of List Item 1 and move it a bit to start dragging
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger1] });
+		finger1.y += 10;
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [finger1] });
+
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 10)');
+
+		// Press a second finger down on the page below the list and move it
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchStart',
+			touchPoints: [finger1, finger2],
+		});
+		finger2.y += 150;
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchMove',
+			touchPoints: [finger1, finger2],
+		});
+		await waitForFrames();
+
+		// Verify the dragged item did not follow the second finger
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(draggedItem).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 10)');
+
+		// Lift the second finger
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [finger2] });
+		await waitForFrames();
+
+		// Verify the drag operation is still in progress
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Move the first finger to the target position (center of List Item 3) in a few steps
+		const steps = 10;
+		const start = { x: finger1.x, y: finger1.y };
+		const end = { x: targetBox.x + targetBox.width / 2, y: targetBox.y + targetBox.height / 2 };
+		for (let step = 1; step <= steps; step++) {
+			finger1.x = start.x + ((end.x - start.x) * step) / steps;
+			finger1.y = start.y + ((end.y - start.y) * step) / steps;
+			await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [finger1] });
+			await waitForFrames();
+		}
+
+		// Lift the first finger to drop
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [finger1] });
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the order after the drag
+		await expect(root.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			sortItems(initialItems, 0, 2)
+		);
+	});
+
 	test('should position the dragged item correctly inside an ancestor with a transform', async ({
 		page,
 	}) => {

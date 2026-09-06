@@ -171,6 +171,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		);
 
 		// Press the mouse down to start dragging
+		// Record the id of the pointer that presses, so the synthetic events below come from that pointer
+		await page.evaluate(() =>
+			document.addEventListener(
+				'pointerdown',
+				(e) => (document.documentElement.dataset.pointerId = String(e.pointerId)),
+				{ once: true, capture: true }
+			)
+		);
 		await page.mouse.down();
 
 		// Wait for the drag operation to start by checking the drag state
@@ -188,7 +196,13 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 
 		// Cancel the drag operation (the browser does this on its own, e.g. when a touch is
 		// interrupted). Playwright’s mouse can’t emit it, so dispatch it on the document directly.
-		await page.evaluate(() => document.dispatchEvent(new PointerEvent('pointercancel')));
+		await page.evaluate(() =>
+			document.dispatchEvent(
+				new PointerEvent('pointercancel', {
+					pointerId: Number(document.documentElement.dataset.pointerId),
+				})
+			)
+		);
 
 		// Wait for the dragged item to return to its slot
 		await expect(draggedItem).toHaveAttribute('data-is-within-bounds', 'true');
@@ -230,6 +244,14 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		);
 
 		// Press the mouse down to start dragging
+		// Record the id of the pointer that presses, so the synthetic events below come from that pointer
+		await page.evaluate(() =>
+			document.addEventListener(
+				'pointerdown',
+				(e) => (document.documentElement.dataset.pointerId = String(e.pointerId)),
+				{ once: true, capture: true }
+			)
+		);
 		await page.mouse.down();
 
 		// Wait for the drag operation to start by checking the drag state
@@ -249,7 +271,13 @@ test.describe('Sortable List - Remove Item On Drop Out', () => {
 		// so they must not each run a drop of their own (that fired `ondrop` twice and removed two
 		// items). Playwright’s mouse can’t reproduce that ordering, so dispatch the first event on the
 		// document directly and then release the mouse.
-		await page.evaluate(() => document.dispatchEvent(new PointerEvent('lostpointercapture')));
+		await page.evaluate(() =>
+			document.dispatchEvent(
+				new PointerEvent('lostpointercapture', {
+					pointerId: Number(document.documentElement.dataset.pointerId),
+				})
+			)
+		);
 		await page.mouse.up();
 
 		// Wait for the removal to start and the drag operation to fully complete
