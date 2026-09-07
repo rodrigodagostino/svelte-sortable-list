@@ -352,7 +352,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let scrollRafId: number | null = null;
 	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
-		if (!rootState.dragState.startsWith('ptr')) {
+		// Only retarget while the pointer is actually dragging.
+		if (!rootState.dragState.startsWith('ptr-drag')) {
 			refreshScrollOffset();
 			return;
 		}
@@ -1045,6 +1046,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (pointerMoveRafId) {
 			cancelAnimationFrame(pointerMoveRafId);
 			pointerMoveRafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
+		}
+		if (scrollRafId) {
+			cancelAnimationFrame(scrollRafId);
+			scrollRafId = null;
 		}
 
 		if (action === 'ptr-drop') {
