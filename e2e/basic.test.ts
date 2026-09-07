@@ -453,6 +453,82 @@ test.describe('Sortable List - Basic', () => {
 		expect(finalItems).toEqual(initialItems);
 	});
 
+	test('should cancel pointer drag with Escape key while the list is focused', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Focus the root so keyboard events reach the list during the pointer drag
+		await root.focus();
+		await expect(root).toBeFocused();
+
+		// Find the dragged item (List Item 1) and the target item (List Item 3)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox)
+			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
+
+		// Start drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move to the target position (center of List Item 3)
+		await page.mouse.move(
+			targetBox.x + targetBox.width / 2,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Cancel the drag operation with the Escape key while the pointer is still down
+		await page.keyboard.press('Escape');
+
+		// Verify the cancelation goes through the pointer path, not the keyboard one
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-cancel');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Release the mouse after the cancelation has settled
+		await page.mouse.up();
+
+		// Verify the release does not start a second drop
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify original order is maintained
+		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(finalItems).toEqual(initialItems);
+
+		// Verify a new pointer drag works normally after the cancelation
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+		await page.mouse.move(
+			targetBox.x + targetBox.width / 2,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await page.mouse.up();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the new drag sorted the items
+		const sortedItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(sortedItems).toEqual(sortItems(getDefaultItems(5), 0, 2).map((item) => item.text));
+	});
+
 	test('should support keyboard navigation with Home and End keys', async ({ page }) => {
 		// Find the root element and its items
 		const root = page.locator('.ssl-root');
