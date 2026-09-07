@@ -570,6 +570,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	function handlePointerCancel(e: PointerEvent) {
 		if (!isActivePointer(e, pointerId)) return;
 
+		cancelPointerDrag();
+	}
+
+	function cancelPointerDrag() {
 		pointerSession = endPointerSession(pointerSession);
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-cancel');
@@ -993,6 +997,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === 'Escape' && rootState.draggedItem) {
 				// Prevent closing the <dialog> if the dragged item is inside one.
 				if (ref!.closest<HTMLDialogElement>('dialog')) e.preventDefault();
+
+				// If the list is focused and Escape is pressed during a pointer drag,
+				// ensure no pointer session is left alive.
+				if (rootState.dragState.startsWith('ptr')) {
+					cancelPointerDrag();
+					return;
+				}
 
 				shouldScrollIntoView = true;
 
