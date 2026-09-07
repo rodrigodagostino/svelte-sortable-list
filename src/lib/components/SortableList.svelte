@@ -176,9 +176,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.isRTL = getTextDirection(ref!) === 'rtl';
 	});
 
+	let isDestroyed = false;
 	let unregister: (() => void) | null = null;
 	onDestroy(() => {
+		isDestroyed = true;
+		if (delayTimeoutId) clearTimeout(delayTimeoutId);
+		if (transitionTimeoutId) clearTimeout(transitionTimeoutId);
+		if (pointerMoveRafId) cancelAnimationFrame(pointerMoveRafId);
+		if (scrollRafId) cancelAnimationFrame(scrollRafId);
+		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		pointerSession = endPointerSession(pointerSession);
+		if (registry.isSourceList(rootState)) {
+			registry.sourceList = null;
+			registry.targetList = null;
+		} else if (registry.isTargetList(rootState)) {
+			registry.targetList = null;
+		}
 		unregister?.();
 		ondestroyed?.(null);
 	});
@@ -483,18 +496,18 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		scrollEventTarget = addScrollListener(scrollableAncestor, isScrollingDocument, handleScroll);
 	}
 
-	let rafId: number | null = null;
+	let pointerMoveRafId: number | null = null;
 	function handlePointerMove(e: PointerEvent) {
-		if (rafId || !isActivePointer(e, pointerId)) return;
+		if (pointerMoveRafId || !isActivePointer(e, pointerId)) return;
 
 		if (rootState.dragState !== 'ptr-drag-start' && rootState.dragState !== 'ptr-drag') {
-			rafId = null;
+			pointerMoveRafId = null;
 			return;
 		}
 
 		const { clientX, clientY } = e;
 
-		rafId = requestAnimationFrame(() => {
+		pointerMoveRafId = requestAnimationFrame(() => {
 			if (rootState.dragState === 'ptr-drag-start') rootState.dragState = 'ptr-drag';
 
 			if (!rootState.draggedItem) return;
@@ -520,7 +533,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 			if (canScroll(scrollableAncestor)) autoScroll(clientX, clientY);
 
-			rafId = null;
+			pointerMoveRafId = null;
 		});
 	}
 
@@ -1020,9 +1033,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isDropping = true;
 		isPointerReleased = true;
 		scrollSpeed = { x: 0, y: 0 };
-		if (rafId) {
-			cancelAnimationFrame(rafId);
-			rafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
+		if (pointerMoveRafId) {
+			cancelAnimationFrame(pointerMoveRafId);
+			pointerMoveRafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.
 		}
 
 		if (action === 'ptr-drop') {
@@ -1082,6 +1095,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		draggedIndex: number,
 		targetIndex: number | null
 	) {
+		if (isDestroyed) return;
+
 		ondrop?.({
 			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
 			sourceList: ref!,
@@ -1143,7 +1158,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isDropping = false;
 		pointerSession = endPointerSession(pointerSession);
 
-		if (!rootState.draggedItem) return;
+		if (isDestroyed || !rootState.draggedItem) return;
 
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		if (scrollRafId) {
