@@ -688,6 +688,58 @@ test.describe('Sortable List - Multiple Lists', () => {
 		await expect(doneDraggedItem).toHaveAttribute('data-drag-state', 'idle');
 	});
 
+	test('should navigate from the dropped item’s new position when pressing an arrow key before the peer drop transition finishes', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Focus the «To Do» root and select its third item (To Do Item 3)
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = page.locator('[data-item-id="to-do-item-3"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key and move right to target the «Doing» peer list
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+
+		// Drop the item with the Space key
+		await page.keyboard.press('Space');
+
+		// Verify the drop transition is under way — still mid-flight, not yet idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drop');
+
+		// Without waiting for the 320ms transition to finish, press ArrowDown while the dropped item
+		// still has focus. This interrupts the transition, and the item crosses into «Doing» at once.
+		await page.keyboard.press('ArrowDown');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify To Do Item 3 landed in the «Doing» list right after Doing Item 2
+		const doingItemsAfterDrag = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(doingItemsAfterDrag).toEqual([
+			'Doing Item 1',
+			'Doing Item 2',
+			'To Do Item 3',
+			'Doing Item 3',
+		]);
+
+		// Verify focus moved to the item below To Do Item 3 in its new list, not to an item in «To Do»
+		await expect(doingList.locator('[data-item-id="doing-item-3"]')).toBeFocused();
+
+		// Verify only the focused item is selected, and «To Do» no longer points at the item it lost
+		await expect(page.locator('.ssl-item[aria-selected="true"]')).toHaveCount(1);
+		await expect(toDoList).not.toHaveAttribute('aria-activedescendant');
+		await expect(doingList).toHaveAttribute('aria-activedescendant', 'doing-item-3');
+	});
+
 	test('should take over a keyboard drag in one list with a pointer click/tap on a peer list', async ({
 		page,
 	}) => {
