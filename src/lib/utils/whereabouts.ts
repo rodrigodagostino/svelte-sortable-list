@@ -1,14 +1,12 @@
 import type { ItemRect } from '$lib/types/data-extraction.js';
 
 export function getItemSibling(item: HTMLLIElement, step: -1 | 1, isPlaceholderSkipped = true) {
-	let sibling = item[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];
-	if (!sibling) return item;
-
 	const allowedClasses = isPlaceholderSkipped ? ['ssl-item'] : ['ssl-item', 'ssl-placeholder'];
+	let sibling = item[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];
 	while (sibling && !allowedClasses.some((c) => sibling!.classList.contains(c)))
 		sibling = sibling[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];
 
-	return sibling as HTMLLIElement;
+	return (sibling as HTMLLIElement | null) ?? item;
 }
 
 export function isInSameRow(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
