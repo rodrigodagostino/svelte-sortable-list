@@ -282,7 +282,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						// Wait until `targetList` is set and the placeholder element
 						// is appended before setting `targetItem`.
 						tick().then(() => {
-							if (!registry.targetList) return;
+							// Bail out if the target changed in the meantime.
+							if (registry.targetList?.state !== peerList.state) return;
 							registry.targetList = {
 								...registry.targetList,
 								targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
@@ -827,7 +828,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 									// Wait until `targetList` is set and the placeholder element
 									// is appended before setting `targetItem`.
 									tick().then(() => {
-										if (!registry.targetList) return;
+										// Bail out if the target changed in the meantime.
+										if (registry.targetList?.state !== peerList.state) return;
 										registry.targetList = {
 											...registry.targetList,
 											targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
