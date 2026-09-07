@@ -62,6 +62,18 @@
 			: null
 	);
 
+	const content = $derived.by(() => {
+		if (!sourceState.draggedItem) return;
+
+		const clone = sourceState.draggedItem.cloneNode(true) as HTMLElement;
+		clone.querySelectorAll('[id], [name], [for]').forEach((element) => {
+			element.removeAttribute('id');
+			element.removeAttribute('name');
+			element.removeAttribute('for');
+		});
+
+		return clone.innerHTML;
+	});
 	const isPeerPlaceholder = registry.isTargetList(rootState);
 	let isPositioned = $state(!isPeerPlaceholder);
 
@@ -195,7 +207,7 @@
 	transition:conditionalTransition
 >
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html sourceState.draggedItem?.innerHTML}
+	{@html content}
 </li>
 
 <style>
