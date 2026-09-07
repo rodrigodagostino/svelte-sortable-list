@@ -28,6 +28,12 @@ test.describe('Sortable List - Interactive Items with Handle', () => {
 		await expect(checkboxes.nth(1)).toBeChecked();
 		await expect(checkboxes.nth(2)).not.toBeChecked();
 
+		// Test radio buttons
+		const radioButtons = page.getByRole('radio');
+		await expect(radioButtons.nth(0)).not.toBeChecked();
+		await expect(radioButtons.nth(1)).toBeChecked();
+		await expect(radioButtons.nth(2)).not.toBeChecked();
+
 		// Test button
 		const button = page.locator('button.button').first();
 		await expect(button).toBeEnabled();
