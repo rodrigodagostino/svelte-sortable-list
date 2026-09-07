@@ -901,4 +901,80 @@ test.describe('Sortable List - Multiple Lists', () => {
 		// Verify To Do Item 1 kept the focus
 		await expect(draggedItem).toBeFocused();
 	});
+
+	test('should clean up after itself when a list is destroyed during a drag', async ({ page }) => {
+		// Collect the errors thrown by the page, e.g. by callbacks running after the lists are destroyed
+		const pageErrors: string[] = [];
+		page.on('pageerror', (error) => pageErrors.push(error.message));
+
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Find the dragged item (To Do Item 1) and the target item (Doing Item 2)
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const targetItem = doingList.locator('[data-item-id="doing-item-2"]:not(.ssl-placeholder)');
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox)
+			throw new Error('Could not get To Do Item 1 or Doing Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+
+		// Press the mouse down to start dragging
+		await page.mouse.down();
+
+		// Wait for the drag operation to start by checking the drag state
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move to the target position (left side of Doing Item 2, clear of the auto-scroll zone on
+		// narrow screens)
+		await page.mouse.move(
+			targetBox.x + 16,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+
+		// Verify «Doing» is flagged as the target, and shows a placeholder for the incoming item
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await expect(doingList.locator('.ssl-placeholder')).toBeVisible();
+
+		// Navigate to another page while the drag is still in progress, destroying both lists
+		// (a synthetic click on the menu link, since the mouse is still held down)
+		await page
+			.locator('a.link[href="/multiple-groups"]')
+			.evaluate((link) => (link as HTMLElement).click());
+		await expect(page.locator('[data-list-id="backlog"]')).toBeVisible();
+
+		// Release the mouse
+		await page.mouse.up();
+
+		// Navigate back to the «Multiple lists» page
+		await page
+			.locator('a.link[href="/multiple-lists"]')
+			.evaluate((link) => (link as HTMLElement).click());
+		await expect(toDoList).toBeVisible();
+
+		// Verify no list is still flagged as source or target, and no placeholder was left behind
+		await expect(toDoList).toHaveAttribute('data-is-source', 'false');
+		await expect(doingList).toHaveAttribute('data-is-target', 'false');
+		await expect(page.locator('.ssl-placeholder')).toHaveCount(0);
+
+		// Verify a new drag works as usual
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+		await page.keyboard.press('Escape');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify nothing threw along the way
+		expect(pageErrors).toEqual([]);
+	});
 });
