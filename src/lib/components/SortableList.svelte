@@ -19,8 +19,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `hasBounds`: if `true`, items will only be draggable inside the list limits.
 - `canClearOnDragOut`: if `true`, the target item will be cleared when a the dragged item (by a pointing device) does not collide with any of the items in the list.
 - `canRemoveOnDropOut`: if `true`, items will be removed when dragged and dropped outside of the list bounds.
-- `isLocked`: if `true`, allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally.
-- `isDisabled`: if `true`, allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled.
+- `isLocked`: if `true`, allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally. When the list belongs to a `group`, it also stops receiving items from its peer lists.
+- `isDisabled`: if `true`, allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled. When the list belongs to a `group`, it also stops receiving items from its peer lists.
 - `announcements`: announcements to be read out by the screen reader during drag and drop operations.
 
 ### Events
@@ -242,8 +242,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (group) {
 			const peerList = registry
-				.getPeerLists(group, rootState)
-				.find((p) => areColliding(draggedRect, p.ref.getBoundingClientRect()));
+				.getTargetablePeerLists(group, rootState)
+				.find((l) => areColliding(draggedRect, l.ref.getBoundingClientRect()));
 
 			if (peerList) {
 				// Dragging over a peer list counts as being between bounds.
@@ -685,7 +685,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
-				const { sourceList, targetList } = registry;
+				const { targetList } = registry;
 
 				if (!rootState.dragState.startsWith('kbd-drag')) {
 					if (
@@ -701,7 +701,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						const nextIndex = index! + step;
 						const peerList = registry
 							.getPeerLists(group, rootState)
-							.find((p) => p.index === nextIndex);
+							.find((l) => l.index === nextIndex);
 
 						if (peerList) {
 							const closestRect = getClosestItemRect(
@@ -784,23 +784,26 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						if (!group) return;
 
 						const lastListIndex = registry.getGroupLists(group).length - 1;
-						if (
-							(step === -1 && sourceList?.index === 0 && !targetList) ||
-							(step === -1 && targetList?.index === 0) ||
-							(step === 1 && sourceList?.index === lastListIndex && !targetList?.targetItem) ||
-							(step === 1 && targetList?.index === lastListIndex)
-						)
-							return;
+						const targetablePeerLists = registry.getTargetablePeerLists(group, rootState);
+						let nextListIndex = (targetList ? targetList.index! : index!) + step;
+						let peerList: RegistryList | undefined;
+						while (
+							nextListIndex >= 0 &&
+							nextListIndex <= lastListIndex &&
+							nextListIndex !== index
+						) {
+							peerList = targetablePeerLists.find((l) => l.index === nextListIndex);
+							if (peerList) break;
+							nextListIndex += step;
+						}
+						// Prevent moving the selected item past the first or last list that can receive it.
+						if (nextListIndex < 0 || nextListIndex > lastListIndex) return;
 
 						if (!rootState.targetItem) rootState.targetItem = rootState.draggedItem;
 
 						const draggedRect = rootState.draggedItem.getBoundingClientRect();
-						const nextIndex = targetList ? targetList.index! + step : index! + step;
-						const peerList = registry
-							.getPeerLists(group, rootState)
-							.find((p) => p.index === nextIndex);
 
-						if (peerList && index !== nextIndex) {
+						if (peerList) {
 							const closestRect = getClosestItemRect(draggedRect, getItemRects(peerList.ref));
 							const peerTargetItem =
 								closestRect &&

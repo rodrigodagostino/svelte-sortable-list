@@ -32,6 +32,12 @@ export class SortableListRegistry {
 		return this.getGroupLists(group).filter((l) => l.state !== exclude);
 	}
 
+	getTargetablePeerLists(group: string, exclude: RootState) {
+		return this.getPeerLists(group, exclude).filter(
+			(l) => !l.state.props.isLocked && !l.state.props.isDisabled
+		);
+	}
+
 	isSourceList(state: RootState) {
 		return this.sourceList?.state === state;
 	}
