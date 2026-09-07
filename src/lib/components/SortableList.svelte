@@ -1055,7 +1055,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			await tick();
 			rootState.dragState = 'kbd-drop';
 		} else if (action === 'kbd-cancel') {
+			// Release the peer list so the dragged item returns to its list.
+			registry.targetList = null;
 			await tick();
+			rootState.targetItem = rootState.draggedItem;
 			rootState.dragState = 'kbd-cancel';
 		}
 
@@ -1092,6 +1095,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			targetItemIndex: targetIndex,
 			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
+			isCanceled: action.endsWith('cancel'),
 			...getPeerTargetFields(registry, group, rootState),
 		});
 

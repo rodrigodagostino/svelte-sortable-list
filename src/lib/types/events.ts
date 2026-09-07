@@ -34,19 +34,20 @@ type TargetListFields = {
 	targetItemIndex: number | null;
 };
 
+type CancelFields = {
+	/** Whether the drag operation was canceled */
+	isCanceled: boolean;
+};
+
 export type MountedEvent = null;
 
 export type DragStartEvent = Event;
 
 export type DragEvent = Event & TargetListFields;
 
-export type DropEvent = Event & TargetListFields;
+export type DropEvent = Event & TargetListFields & CancelFields;
 
-export type DragEndEvent = Event &
-	TargetListFields & {
-		/** Whether the drag operation was canceled */
-		isCanceled: boolean;
-	};
+export type DragEndEvent = Event & TargetListFields & CancelFields;
 
 export type DestroyedEvent = null;
 
