@@ -21,6 +21,12 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
+		// Verify the remove buttons are plain buttons, so they don’t submit an enclosing form
+		const removeButtonTypes = await root
+			.locator('.ssl-item-remove')
+			.evaluateAll((buttons) => buttons.map((button) => (button as HTMLButtonElement).type));
+		expect(removeButtonTypes).toEqual(Array(initialItems.length).fill('button'));
+
 		// === FIRST REMOVAL OPERATION ===
 		// Click the remove button for List Item 3
 		const listItem3 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
