@@ -54,7 +54,14 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	}
 </script>
 
-<button bind:this={ref} aria-label={ariaLabel} {...restProps} class={classes} onclick={handleClick}>
+<button
+	bind:this={ref}
+	type="button"
+	aria-label={ariaLabel}
+	{...restProps}
+	class={classes}
+	onclick={handleClick}
+>
 	{#if children}
 		{@render children()}
 	{:else}
