@@ -10,7 +10,7 @@
 			{ title: 'To Do', length: 5 },
 			{ title: 'Doing', length: 3 },
 			{ title: 'Done', length: 4 },
-		])
+		]).map((l) => ({ ...l, mode: 'default' }))
 	);
 
 	onMount(() => {
@@ -70,12 +70,22 @@
 			<div class="list__header">
 				<h2 class="list__title" id="list-title-{id}">{title}</h2>
 				<span>{items.length}</span>
+				<div class="list__mode-selector">
+					<label for="list-mode-{id}">Mode:</label>
+					<select id="list-mode-{id}" bind:value={lists[index].mode}>
+						<option value="default">Default</option>
+						<option value="locked">Locked</option>
+						<option value="disabled">Disabled</option>
+					</select>
+				</div>
 			</div>
 			<SortableList.Root
 				{...layoutState.props}
 				group="list-group"
 				{id}
 				{index}
+				isLocked={layoutState.props.isLocked || lists[index].mode === 'locked'}
+				isDisabled={layoutState.props.isDisabled || lists[index].mode === 'disabled'}
 				aria-labelledby="list-title-{id}"
 				ondrop={(e) => handleDrop(e)}
 				ondragend={(e) => handleDragEnd(e)}
@@ -161,9 +171,9 @@
 	}
 
 	.list__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		row-gap: 0.5rem;
 
 		& * {
 			transition: color 320ms;
@@ -172,5 +182,16 @@
 
 	.list__title {
 		font-size: 1rem;
+	}
+
+	.list__mode-selector {
+		grid-column: 1 / -1;
+		display: flex;
+		gap: 0.5rem;
+		align-items: baseline;
+
+		& select {
+			flex: 1;
+		}
 	}
 </style>

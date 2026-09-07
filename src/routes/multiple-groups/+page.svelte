@@ -12,7 +12,7 @@
 			lists: getDefaultLists([
 				{ title: 'Backlog', length: 4 },
 				{ title: 'Ready', length: 3 },
-			]),
+			]).map((l) => ({ ...l, mode: 'default' })),
 		},
 		{
 			id: 'group-b',
@@ -20,7 +20,7 @@
 			lists: getDefaultLists([
 				{ title: 'Review', length: 3 },
 				{ title: 'Shipped', length: 2 },
-			]),
+			]).map((l) => ({ ...l, mode: 'default' })),
 		},
 	]);
 	const allLists = $derived(groups.flatMap((g) => g.lists));
@@ -92,12 +92,22 @@
 						<div class="list__header">
 							<h3 class="list__title" id="list-title-{id}">{title}</h3>
 							<span>{items.length}</span>
+							<div class="list__mode-selector">
+								<label for="list-mode-{id}">Mode:</label>
+								<select id="list-mode-{id}" bind:value={lists[index].mode}>
+									<option value="default">Default</option>
+									<option value="locked">Locked</option>
+									<option value="disabled">Disabled</option>
+								</select>
+							</div>
 						</div>
 						<SortableList.Root
 							{...layoutState.props}
 							group={groupId}
 							{id}
 							{index}
+							isLocked={layoutState.props.isLocked || lists[index].mode === 'locked'}
+							isDisabled={layoutState.props.isDisabled || lists[index].mode === 'disabled'}
 							aria-labelledby="list-title-{id}"
 							ondrop={(e) => handleDrop(e)}
 							ondragend={(e) => handleDragEnd(e)}
@@ -122,7 +132,7 @@
 		& :global(.app-main .container) {
 			align-items: start;
 			max-width: calc(100% + 6rem);
-			margin-inline: -3rem;
+			margin: 0 -3rem;
 
 			&:has(.lists.direction-vertical) {
 				@media (min-width: 46em) {
@@ -149,6 +159,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+
+		& + & .group__header {
+			padding-block-start: 0;
+		}
 	}
 
 	.group__header {
@@ -197,9 +211,9 @@
 	}
 
 	.list__header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr auto;
+		row-gap: 0.5rem;
 
 		& * {
 			transition: color 320ms;
@@ -208,5 +222,16 @@
 
 	.list__title {
 		font-size: 1rem;
+	}
+
+	.list__mode-selector {
+		grid-column: 1 / -1;
+		display: flex;
+		gap: 0.5rem;
+		align-items: baseline;
+
+		& select {
+			flex: 1;
+		}
 	}
 </style>
