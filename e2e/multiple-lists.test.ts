@@ -845,4 +845,60 @@ test.describe('Sortable List - Multiple Lists', () => {
 			'To Do Item 1',
 		]);
 	});
+
+	test('should release the peer list when canceling a keyboard drag with the Escape key', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Get the initial order of the items to verify the starting state
+		const initialToDoItems = await toDoList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		const initialDoingItems = await doingList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(initialToDoItems).toEqual(listItemTexts['to-do']);
+		expect(initialDoingItems).toEqual(listItemTexts['doing']);
+
+		// Focus the «To Do» root and select its first item (To Do Item 1)
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+
+		// Start dragging with the Space key
+		await page.keyboard.press('Space');
+
+		// Move right — the axis perpendicular to a vertical list — to target the «Doing» peer list
+		await page.keyboard.press('ArrowRight');
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+		await expect(doingList.locator('.ssl-placeholder')).toBeVisible();
+
+		// Cancel the drag operation with the Escape key
+		await page.keyboard.press('Escape');
+
+		// Wait for cancel to start by checking the drag state changes to kbd-cancel
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-cancel');
+
+		// Verify the «Doing» list was released right away, while the item is still returning home
+		expect(await doingList.getAttribute('data-is-target')).toBe('false');
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the «Doing» placeholder is gone and both lists are unchanged
+		await expect(doingList.locator('.ssl-placeholder')).toHaveCount(0);
+		await expect(toDoList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			initialToDoItems
+		);
+		await expect(doingList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			initialDoingItems
+		);
+
+		// Verify To Do Item 1 kept the focus
+		await expect(draggedItem).toBeFocused();
+	});
 });
