@@ -49,7 +49,8 @@ export interface SortableListRootStateContext {
 	isWithinBounds: boolean;
 	scrollOffset: { left: number; top: number };
 	isRTL: boolean;
-	interruptDropTransition: (() => void) | null;
+	handleKeyDown: ((e: KeyboardEvent, target: HTMLElement) => Promise<void>) | null;
+	interruptDropTransition: (() => Promise<void>) | null;
 }
 
 export interface SortableListItemStateContext {

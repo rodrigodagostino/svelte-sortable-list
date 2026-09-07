@@ -23,7 +23,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 -->
 
 <script lang="ts">
-	import { onMount, tick, untrack } from 'svelte';
+	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
@@ -117,6 +117,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	onMount(() => {
 		setInteractiveElementsTabIndex();
+	});
+
+	onDestroy(() => {
+		if (rootState.focusedItem === ref) rootState.focusedItem = null;
 	});
 
 	const rect = $derived(rootState.itemRects ? rootState.itemRects[index] : null);

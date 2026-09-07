@@ -17,6 +17,7 @@ export class SortableListRootState {
 	isWithinBounds: RootStateContext['isWithinBounds'] = $state(true);
 	scrollOffset: RootStateContext['scrollOffset'] = $state.raw({ left: 0, top: 0 });
 	isRTL: RootStateContext['isRTL'] = $state(false);
+	handleKeyDown: RootStateContext['handleKeyDown'] = $state.raw(null);
 	interruptDropTransition: RootStateContext['interruptDropTransition'] = $state.raw(null);
 }
 

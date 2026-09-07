@@ -174,6 +174,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 		onmounted?.(null);
 		rootState.isRTL = getTextDirection(ref!) === 'rtl';
+		// Peer lists hand a key over to this list when interrupting a drop moved the focused item here.
+		rootState.handleKeyDown = handleKeyDown;
 	});
 
 	let isDestroyed = false;
@@ -580,9 +582,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (rootState.draggedItem) handlePointerAndKeyboardDrop(rootState.draggedItem, 'ptr-cancel');
 	}
 
-	async function handleKeyDown(e: KeyboardEvent) {
+	async function handleKeyDown(e: KeyboardEvent, target = e.target as HTMLElement) {
 		const { key } = e;
-		const target = e.target as HTMLElement;
 		let step: -1 | 1 = -1;
 		let shouldScrollIntoView = false;
 
@@ -593,7 +594,23 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				key === 'Home' ||
 				key === 'End' ||
 				key === 'Escape';
-			if (isHandledKey) await interruptDropTransition(e);
+			if (isHandledKey) {
+				await interruptDropTransition(e);
+
+				// Interrupting a peer drop moves the focused item into another list. Hand the key over to that
+				// list so it acts on the item’s new position instead of on the place it left behind.
+				const { activeElement } = document;
+				const focusedPeerList =
+					group && !ref!.contains(activeElement)
+						? registry
+								.getPeerLists(group, rootState)
+								.find((peer) => peer.ref.contains(activeElement))
+						: null;
+				if (focusedPeerList) {
+					focusedPeerList.state.handleKeyDown?.(e, activeElement as HTMLElement);
+					return;
+				}
+			}
 
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
@@ -1151,12 +1168,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (shouldHandleDragEnd) handlePointerAndKeyboardDragEnd(action);
 			}
 
-			rootState.interruptDropTransition = () => {
+			rootState.interruptDropTransition = async () => {
 				// Prevent the pending timeout from triggering `handlePointerAndKeyboardDragEnd()`,
 				// then settle the drop right away.
 				finalizeDrop(false);
 				getDropAnimations(element, ref!, registry).forEach((animation) => animation.finish());
-				handlePointerAndKeyboardDragEnd(action);
+				await handlePointerAndKeyboardDragEnd(action);
 			};
 
 			afterPaint(dropDuration, async () => {
@@ -1247,10 +1264,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (!droppingRootState?.interruptDropTransition) return;
 
 		e.preventDefault();
-		droppingRootState.interruptDropTransition();
-		// The `ondragend` fired above calls `sortItems()` in the parent updating the items array.
-		// Wait for Svelte to flush the re-render so `getItemRects()` captures the new sorted positions.
-		await tick();
+		// Wait for the interrupted drop to fully end: `ondragend` lets the consumer re-sort its items and
+		// focus is restored on the moved item, so `getItemRects()` and `document.activeElement` are reliable.
+		await droppingRootState.interruptDropTransition();
 	}
 
 	// `focusout` is preferred over `blur` since it detects the loss of focus
