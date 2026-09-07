@@ -306,4 +306,81 @@ test.describe('Sortable List - Interactive Items', () => {
 			.evaluateAll((items) => items.map((item) => item.getAttribute('data-item-id')));
 		expect(itemIds.indexOf('list-item-2')).toBe(3);
 	});
+
+	test('should show the current form element values inside the placeholder', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Change every form element away from its default value
+		const textInput = page.getByRole('textbox', { name: 'List Item 1' });
+		const textarea = page.getByRole('textbox', { name: 'List Item 2' });
+		const select = page.getByRole('combobox');
+		const checkboxes = page.getByRole('checkbox');
+		const radioButtons = page.getByRole('radio');
+		await textInput.fill('Updated input');
+		await textarea.fill('Updated textarea');
+		await select.selectOption('option-3');
+		await checkboxes.nth(0).uncheck();
+		await checkboxes.nth(2).check();
+		await radioButtons.nth(0).check();
+
+		// Drag every item with a form element and verify its placeholder shows the current values
+		const expectations: Record<
+			string,
+			(placeholder: import('@playwright/test').Locator) => Promise<void>
+		> = {
+			'list-item-1': async (placeholder) =>
+				expect(placeholder.locator('input')).toHaveValue('Updated input'),
+			'list-item-2': async (placeholder) =>
+				expect(placeholder.locator('textarea')).toHaveValue('Updated textarea'),
+			'list-item-3': async (placeholder) =>
+				expect(placeholder.locator('select')).toHaveValue('option-3'),
+			'list-item-4': async (placeholder) => {
+				await expect(placeholder.locator('input').nth(0)).not.toBeChecked();
+				await expect(placeholder.locator('input').nth(1)).toBeChecked();
+				await expect(placeholder.locator('input').nth(2)).toBeChecked();
+			},
+			'list-item-5': async (placeholder) => {
+				await expect(placeholder.locator('input').nth(0)).toBeChecked();
+				await expect(placeholder.locator('input').nth(1)).not.toBeChecked();
+				await expect(placeholder.locator('input').nth(2)).not.toBeChecked();
+			},
+		};
+
+		for (const [itemId, verifyPlaceholder] of Object.entries(expectations)) {
+			// Find the dragged item
+			const draggedItem = root.locator(`[data-item-id="${itemId}"]:not(.ssl-placeholder)`);
+
+			// Get the bounding box for a precise drag operation
+			const draggedBox = await draggedItem.boundingBox();
+			if (!draggedBox) throw new Error(`Could not get ${itemId} bounding box`);
+
+			// Press the mouse down on the edge of the item (not on the interactive element)
+			await page.mouse.move(draggedBox.x + 8, draggedBox.y + draggedBox.height / 2);
+			await page.mouse.down();
+
+			// Wait for the drag operation to start by checking the drag state
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+			// Verify the placeholder copy shows the current values, without competing ids or names
+			const placeholder = root.locator(`.ssl-placeholder[data-item-id="${itemId}"]`);
+			await expect(placeholder).toBeVisible();
+			await verifyPlaceholder(placeholder);
+			await expect(placeholder.locator('[id], [name], [for]')).toHaveCount(0);
+
+			// Release the mouse to drop
+			await page.mouse.up();
+
+			// Wait for the drag operation to complete by checking the drag state returns to idle
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		}
+
+		// Verify the form elements kept their values after all the drags
+		await expect(textInput).toHaveValue('Updated input');
+		await expect(textarea).toHaveValue('Updated textarea');
+		await expect(select).toHaveValue('option-3');
+		await expect(checkboxes.nth(0)).not.toBeChecked();
+		await expect(checkboxes.nth(2)).toBeChecked();
+		await expect(radioButtons.nth(0)).toBeChecked();
+	});
 });
