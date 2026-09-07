@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 	import { getSortableListRootState, registry } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListPlaceholderProps as PlaceholderProps } from '$lib/types/props.js';
@@ -9,6 +10,7 @@
 		getIndex,
 		getItemRect,
 		isInSameRow,
+		preserveSelectedOptions,
 	} from '$lib/utils/index.js';
 
 	let {
@@ -62,18 +64,22 @@
 			: null
 	);
 
-	const content = $derived.by(() => {
-		if (!sourceState.draggedItem) return;
+	const content: Attachment<HTMLLIElement> = (node) => {
+		const { draggedItem } = sourceState;
+		if (!draggedItem) return;
 
-		const clone = sourceState.draggedItem.cloneNode(true) as HTMLElement;
+		const clone = draggedItem.cloneNode(true) as HTMLLIElement;
+		preserveSelectedOptions(draggedItem, clone);
 		clone.querySelectorAll('[id], [name], [for]').forEach((element) => {
 			element.removeAttribute('id');
 			element.removeAttribute('name');
 			element.removeAttribute('for');
 		});
+		node.replaceChildren(...clone.childNodes);
 
-		return clone.innerHTML;
-	});
+		return () => node.replaceChildren();
+	};
+
 	const isPeerPlaceholder = registry.isTargetList(rootState);
 	let isPositioned = $state(!isPeerPlaceholder);
 
@@ -205,10 +211,8 @@
 	inert
 	onintroend={() => (isPositioned = true)}
 	transition:conditionalTransition
->
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html content}
-</li>
+	{@attach content}
+></li>
 
 <style>
 	.ssl-placeholder {

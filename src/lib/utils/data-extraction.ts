@@ -111,3 +111,16 @@ export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
 
 	return window.getComputedStyle(element).direction || 'auto';
 };
+
+export function preserveSelectedOptions(source: HTMLLIElement, clone: HTMLLIElement): void {
+	const clonedSelects = clone.querySelectorAll<HTMLSelectElement>('select');
+
+	source.querySelectorAll<HTMLSelectElement>('select').forEach((select, i) => {
+		const clonedOptions = clonedSelects[i]?.options;
+		if (!clonedOptions) return;
+
+		Array.from(select.options).forEach((option, j) => {
+			if (clonedOptions[j]) clonedOptions[j].selected = option.selected;
+		});
+	});
+}
