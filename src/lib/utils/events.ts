@@ -21,14 +21,15 @@ export function isActivePointer(e: PointerEvent, pointerId: PointerEvent['pointe
 
 export function addScrollListener(
 	scrollableAncestor: HTMLElement | undefined,
-	isScrollingDocument: boolean,
 	handleScroll: () => void
 ) {
 	if (!scrollableAncestor || !canScroll(scrollableAncestor)) return null;
 
-	// The document’s scrolling element doesn’t reliably receive its own
-	// `scroll` events, so `document` is the target used for that case.
-	const scrollEventTarget = isScrollingDocument ? document : scrollableAncestor;
+	// The document’s scrolling element doesn’t reliably receive its own `scroll` events,
+	// so `document` is the target used for that case. Any other element (even one taller
+	// than the viewport) will receive `scroll` events as expected and won’t bubble.
+	const scrollEventTarget =
+		scrollableAncestor === document.documentElement ? document : scrollableAncestor;
 	scrollEventTarget.addEventListener('scroll', handleScroll, { passive: true });
 
 	return scrollEventTarget;

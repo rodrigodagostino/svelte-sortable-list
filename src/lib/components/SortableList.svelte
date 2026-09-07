@@ -493,7 +493,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// on macOS, causing valid drops to be canceled. Treating it as a drop instead means a genuine
 		// capture loss will drop rather than cancel, but that is preferable to silently broken drops.
 		document.addEventListener('lostpointercapture', handlePointerUp, { signal });
-		scrollEventTarget = addScrollListener(scrollableAncestor, isScrollingDocument, handleScroll);
+		scrollEventTarget = addScrollListener(scrollableAncestor, handleScroll);
 	}
 
 	let pointerMoveRafId: number | null = null;
@@ -613,11 +613,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						top: scrollableAncestor?.scrollTop ?? 0,
 					};
 					rootState.scrollOffset = { left: 0, top: 0 };
-					scrollEventTarget = addScrollListener(
-						scrollableAncestor,
-						isScrollingDocument,
-						handleScroll
-					);
+					scrollEventTarget = addScrollListener(scrollableAncestor, handleScroll);
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
