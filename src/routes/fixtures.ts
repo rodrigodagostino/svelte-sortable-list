@@ -99,11 +99,16 @@ export function getInteractiveItems(): SortableList.ItemData[] {
 		{
 			id: 'list-item-5',
 			text: 'List Item 5',
-			type: 'button',
+			type: 'radio',
 		},
 		{
 			id: 'list-item-6',
 			text: 'List Item 6',
+			type: 'button',
+		},
+		{
+			id: 'list-item-7',
+			text: 'List Item 7',
 			type: 'a',
 		},
 	];

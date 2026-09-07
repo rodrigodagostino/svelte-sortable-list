@@ -68,6 +68,22 @@
 							Option 3
 						</label>
 					</fieldset>
+				{:else if item.type === 'radio'}
+					<fieldset>
+						<legend>{item.text}</legend>
+						<label for="radio-option-1">
+							<input type="radio" id="radio-option-1" name="radio-options" />
+							Option 1
+						</label>
+						<label for="radio-option-2">
+							<input type="radio" id="radio-option-2" name="radio-options" checked />
+							Option 2
+						</label>
+						<label for="radio-option-3">
+							<input type="radio" id="radio-option-3" name="radio-options" />
+							Option 3
+						</label>
+					</fieldset>
 				{:else if item.type === 'button'}
 					<div class="form-field">
 						<button class="button">{item.text}</button>
@@ -90,7 +106,7 @@
 		margin-block: 0.625rem;
 	}
 
-	label:not(:has(input[type='checkbox'])) {
+	label:not(:has(input[type='checkbox'])):not(:has(input[type='radio'])) {
 		display: flex;
 		flex-direction: column;
 	}
