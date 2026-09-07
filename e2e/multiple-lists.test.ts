@@ -977,4 +977,139 @@ test.describe('Sortable List - Multiple Lists', () => {
 		// Verify nothing threw along the way
 		expect(pageErrors).toEqual([]);
 	});
+
+	test('should not target a locked peer list when dragging over it using mouse', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Lock the «Doing» list through the demo controls
+		await page.locator('.list:has([data-list-id="doing"]) select').selectOption('locked');
+		await expect(doingList).toHaveAttribute('data-is-locked', 'true');
+
+		// Find the dragged item (To Do Item 1) and the item to hover in the peer list (Doing Item 2)
+		const draggedItem = page.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const hoveredItem = doingList.locator('[data-item-id="doing-item-2"]:not(.ssl-placeholder)');
+
+		// Scroll both items into view before reading their bounding boxes
+		await draggedItem.scrollIntoViewIfNeeded();
+		await hoveredItem.scrollIntoViewIfNeeded();
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const hoveredBox = await hoveredItem.boundingBox();
+		if (!draggedBox || !hoveredBox)
+			throw new Error('Could not get To Do Item 1 or Doing Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move over the center of Doing Item 2, inside the locked peer list
+		await page.mouse.move(
+			hoveredBox.x + hoveredBox.width / 2,
+			hoveredBox.y + hoveredBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Give the list a couple of frames to react to the last pointer position
+		await page.evaluate(
+			() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+		);
+
+		// Verify the locked list was never flagged as the target and shows no placeholder
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(doingList.locator('.ssl-placeholder')).toHaveCount(0);
+
+		// Release the mouse to drop
+		await page.mouse.up();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify both lists kept their items
+		expect(await toDoList.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			listItemTexts['to-do']
+		);
+		expect(await doingList.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			listItemTexts['doing']
+		);
+	});
+
+	test('should skip locked and disabled peer lists when moving an item across lists using keyboard', async ({
+		page,
+	}) => {
+		// Find the «To Do», «Doing» and «Done» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+		const doneList = page.locator('[data-list-id="done"]');
+
+		// Disable the «Doing» list through the demo controls
+		await page.locator('.list:has([data-list-id="doing"]) select').selectOption('disabled');
+		await expect(doingList).toHaveAttribute('data-is-disabled', 'true');
+
+		// Focus the «To Do» root, select its first item and start dragging with the Space key
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		const draggedItem = page.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		await expect(draggedItem).toBeFocused();
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Move right and verify the disabled «Doing» list was skipped in favor of «Done»
+		await page.keyboard.press('ArrowRight');
+		await expect(doneList).toHaveAttribute('data-is-target', 'true');
+		await expect(doneList.locator('.ssl-placeholder')).toBeVisible();
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(doingList.locator('.ssl-placeholder')).toHaveCount(0);
+
+		// Move left and verify the item went straight back to its own list
+		await page.keyboard.press('ArrowLeft');
+		await expect(doneList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(toDoList).toHaveAttribute('data-is-source', 'true');
+
+		// Cancel the drag operation with the Escape key
+		await page.keyboard.press('Escape');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Lock the «Done» list too, leaving no peer list able to receive items
+		await page.locator('.list:has([data-list-id="done"]) select').selectOption('locked');
+		await expect(doneList).toHaveAttribute('data-is-locked', 'true');
+
+		// Start a new keyboard drag from To Do Item 1
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(draggedItem).toBeFocused();
+		await page.keyboard.press('Space');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+
+		// Move right and verify nothing happened
+		await page.keyboard.press('ArrowRight');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'kbd-drag-start');
+		await expect(doingList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(doneList).not.toHaveAttribute('data-is-target', 'true');
+		await expect(doingList.locator('.ssl-placeholder')).toHaveCount(0);
+		await expect(doneList.locator('.ssl-placeholder')).toHaveCount(0);
+
+		// Cancel the drag operation with the Escape key
+		await page.keyboard.press('Escape');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify all lists kept their items
+		expect(await toDoList.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			listItemTexts['to-do']
+		);
+		expect(await doingList.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			listItemTexts['doing']
+		);
+		expect(await doneList.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			listItemTexts['done']
+		);
+	});
 });
