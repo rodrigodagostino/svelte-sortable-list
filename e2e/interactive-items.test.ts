@@ -390,6 +390,46 @@ test.describe('Sortable List - Interactive Items', () => {
 		expect(itemIds.indexOf('list-item-3')).toBe(4);
 	});
 
+	test('should not start a drag from a contenteditable region or an ARIA widget', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Add a contenteditable region and a switch to List Item 6, neither of which the demo provides
+		await root.evaluate((el) =>
+			el
+				.querySelector('[data-item-id="list-item-6"] .ssl-item-content')!
+				.insertAdjacentHTML(
+					'beforeend',
+					'<div id="editable" contenteditable="true" style="width: 120px; height: 32px">Edit me</div>' +
+						'<span id="switch" role="switch" aria-checked="false" tabindex="0" style="display: block; width: 120px; height: 32px">Switch</span>'
+				)
+		);
+
+		const item = root.locator('[data-item-id="list-item-6"]:not(.ssl-placeholder)');
+
+		for (const id of ['editable', 'switch']) {
+			// Get the bounding box of the injected element for a precise press
+			const element = page.locator(`#${id}`);
+			const box = await element.boundingBox();
+			if (!box) throw new Error(`Could not get #${id} bounding box`);
+
+			// Press the mouse down on it and move enough to start a drag
+			await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+			await page.mouse.down();
+			await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 40, { steps: 10 });
+
+			// Verify no drag was started and the element took the focus instead
+			await expect(item).toHaveAttribute('data-drag-state', 'idle');
+			await expect(root.locator('.ssl-placeholder')).toHaveCount(0);
+			await expect(element).toBeFocused();
+
+			// Release the mouse
+			await page.mouse.up();
+		}
+	});
+
 	test('should show the current form element values inside the placeholder', async ({ page }) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
