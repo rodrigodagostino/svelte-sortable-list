@@ -383,4 +383,39 @@ test.describe('Sortable List - Interactive Items', () => {
 		await expect(checkboxes.nth(2)).toBeChecked();
 		await expect(radioButtons.nth(0)).toBeChecked();
 	});
+
+	test('should remove interactive elements from the tab sequence when the list is disabled while an item is focused', async ({
+		page,
+	}) => {
+		// Find the root element and focus it
+		const root = page.locator('.ssl-root');
+		await root.focus();
+
+		// Navigate to the first item using the arrow keys
+		await page.keyboard.press('ArrowDown');
+
+		// Verify the List Item 1 is focused and its interactive element is tabbable
+		const focusedItem = root.locator('.ssl-item[aria-selected="true"]');
+		await expect(focusedItem).toBeFocused();
+		await expect(focusedItem).toContainText('List Item 1');
+		const interactiveElement = focusedItem.locator('input');
+		await expect(interactiveElement).toHaveAttribute('tabindex', '0');
+
+		// Disable the list through the demo controls without moving focus away from the item.
+		// The controls panel is inert while collapsed, so the checkbox is toggled programmatically.
+		const isDisabledControl = page.locator('#is-disabled');
+		await isDisabledControl.evaluate((el) => (el as HTMLInputElement).click());
+		await expect(root).toHaveAttribute('data-is-disabled', 'true');
+		await expect(focusedItem).toBeFocused();
+
+		// Verify the interactive element left the tab sequence
+		await expect(interactiveElement).toHaveAttribute('tabindex', '-1');
+
+		// Enable the list again
+		await isDisabledControl.evaluate((el) => (el as HTMLInputElement).click());
+		await expect(root).not.toHaveAttribute('data-is-disabled', 'true');
+
+		// Verify the interactive element rejoined the tab sequence
+		await expect(interactiveElement).toHaveAttribute('tabindex', '0');
+	});
 });
