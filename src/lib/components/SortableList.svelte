@@ -417,6 +417,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
 		if (isOrResidesInInteractiveElem && !isOrResidesInItemHandle) return;
+		// Blur the interactive element holding the focus inside the focused item,
+		// so it doesn’t receive keystrokes during the pointer drag.
+		const { activeElement } = document;
+		if (focusedRootState?.focusedItem?.contains(activeElement))
+			(activeElement as HTMLElement).blur();
 		// Prevent focus from being set on the current <SortableList.Item>.
 		e.preventDefault();
 
@@ -1335,7 +1340,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	onkeydown={handleKeyDown}
 	onfocusout={handleFocusOut}
 	oncontextmenu={handleContextMenu}
-	onitemfocusout={(event) => handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel')}
+	onitemfocusout={(event) => {
+		if (rootState.dragState.startsWith('kbd'))
+			handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel');
+	}}
 >
 	{#if children}
 		{@render children()}
