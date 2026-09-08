@@ -740,6 +740,65 @@ test.describe('Sortable List - Multiple Lists', () => {
 		await expect(doingList).toHaveAttribute('aria-activedescendant', 'doing-item-3');
 	});
 
+	test('should not let a keyboard drag start on a peer list while a pointer drag is in progress', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Get the initial order of the items to verify the starting state
+		const initialToDoItems = await toDoList
+			.locator('.ssl-item .ssl-item-content__text')
+			.allTextContents();
+		expect(initialToDoItems).toEqual(listItemTexts['to-do']);
+
+		// Find the dragged item (To Do Item 1) and the target item (To Do Item 3)
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const targetItem = toDoList.locator('[data-item-id="to-do-item-3"]:not(.ssl-placeholder)');
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!draggedBox || !targetBox)
+			throw new Error('Could not get To Do Item 1 or To Do Item 3 bounding box');
+
+		// Start dragging To Do Item 1 with the mouse and hold it
+		await page.mouse.move(draggedBox.x + 16, draggedBox.y + draggedBox.height / 2);
+		await page.mouse.down();
+		await page.mouse.move(draggedBox.x + 16, draggedBox.y + draggedBox.height, { steps: 10 });
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+		await expect(toDoList).toHaveAttribute('data-is-source', 'true');
+
+		// Focus the «Doing» root and select its first item (Doing Item 1)
+		await doingList.focus();
+		await page.keyboard.press('ArrowDown');
+		const peerItem = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		await expect(peerItem).toBeFocused();
+
+		// Try to start a second drag with the Space key while the pointer drag is still in progress
+		await page.keyboard.press('Space');
+
+		// Verify the peer list did not start a drag and did not take the source list over
+		await expect(peerItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(doingList).toHaveAttribute('data-is-source', 'false');
+		await expect(toDoList).toHaveAttribute('data-is-source', 'true');
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Move the mouse to the target position (To Do Item 3) and release it
+		await page.mouse.move(draggedBox.x + 16, targetBox.y + targetBox.height / 2, { steps: 40 });
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify To Do Item 1 moved to the To Do Item 3 position and the «Doing» list is untouched
+		await expect(toDoList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			sortItems(initialToDoItems, 0, 2)
+		);
+		await expect(doingList.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			listItemTexts['doing']
+		);
+	});
+
 	test('should take over a keyboard drag in one list with a pointer click/tap on a peer list', async ({
 		page,
 	}) => {
