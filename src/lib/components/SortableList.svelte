@@ -1188,7 +1188,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handlePointerAndKeyboardDragEnd(
-		action: 'ptr-drop' | 'ptr-cancel' | 'ptr-remove' | 'kbd-drop' | 'kbd-cancel'
+		action: 'ptr-drop' | 'ptr-cancel' | 'kbd-drop' | 'kbd-cancel'
 	) {
 		isDropping = false;
 		pointerSession = endPointerSession(pointerSession);
