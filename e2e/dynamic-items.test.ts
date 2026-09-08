@@ -101,4 +101,32 @@ test.describe('Sortable List - Dynamic Items', () => {
 			'Remove item at position 2'
 		);
 	});
+
+	test('should keep the focus inside the list after removing an item with the mouse', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Get the bounding box of the List Item 2 remove button for a precise click
+		const removeButton = root.locator('[data-item-id="list-item-2"] .ssl-item-remove');
+		const removeBox = await removeButton.boundingBox();
+		if (!removeBox) throw new Error('Could not get List Item 2 remove button bounding box');
+
+		// Click the remove button with the mouse, without focusing the item beforehand
+		await page.mouse.click(removeBox.x + removeBox.width / 2, removeBox.y + removeBox.height / 2);
+
+		// Verify List Item 2 was removed
+		await expect(root.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			removeItem(initialItems, 1)
+		);
+
+		// Verify the focus moved to the following item instead of falling back to the document
+		await expect(root.locator('[data-item-id="list-item-3"]')).toBeFocused();
+		await expect(root).toHaveAttribute('aria-activedescendant', 'list-item-3');
+	});
 });

@@ -307,6 +307,39 @@ test.describe('Sortable List - Interactive Items', () => {
 		expect(itemIds.indexOf('list-item-2')).toBe(3);
 	});
 
+	test('should follow the focus into an item entered through an interactive element', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Focus the root and navigate to the first item
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+		const firstItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		await expect(firstItem).toBeFocused();
+
+		// Get the bounding box of the textarea inside List Item 2 for a precise click
+		const secondItem = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
+		const textarea = secondItem.locator('textarea');
+		const textareaBox = await textarea.boundingBox();
+		if (!textareaBox) throw new Error('Could not get List Item 2 textarea bounding box');
+
+		// Click the textarea, moving the focus into List Item 2 without touching its <li>
+		await page.mouse.click(
+			textareaBox.x + textareaBox.width / 2,
+			textareaBox.y + textareaBox.height / 2
+		);
+		await expect(textarea).toBeFocused();
+
+		// Verify the list follows the focus into List Item 2
+		await expect(root).toHaveAttribute('aria-activedescendant', 'list-item-2');
+		await expect(secondItem).toHaveAttribute('tabindex', '0');
+		await expect(secondItem).toHaveAttribute('aria-selected', 'true');
+		await expect(firstItem).toHaveAttribute('tabindex', '-1');
+		await expect(firstItem).toHaveAttribute('aria-selected', 'false');
+	});
+
 	test('should show the current form element values inside the placeholder', async ({ page }) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
