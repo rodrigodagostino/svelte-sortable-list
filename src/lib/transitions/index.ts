@@ -24,7 +24,7 @@ interface ScaleFlyParams {
 }
 
 /**
- * Animates the opacity, scale and the x and y positions of an element. `in` transitions animate from an element's current (default) values to the provided values, passed as parameters. `out` transitions animate from the provided values to an element's default values.
+ * Animates the size, opacity and position of an element. `in` transitions start with the element collapsed along `axis`, offset by `x`/`y` and at the given `opacity`, then grow it into place while holding the offset, and finally fly it to its resting position while fading it in. `out` transitions run the same animation in reverse.
  *
  * @param node Element to animate.
  * @param params Animation parameters.
@@ -32,8 +32,8 @@ interface ScaleFlyParams {
  * @param params.duration Duration (in milliseconds).
  * @param params.easing Easing function.
  * @param params.axis Axis.
- * @param params.x X position.
- * @param params.y Y position.
+ * @param params.x Horizontal offset the element flies in from and out to (in pixels).
+ * @param params.y Vertical offset the element flies in from and out to (in pixels).
  * @param params.opacity Opacity.
  * @returns Transition configuration.
  */
@@ -84,7 +84,7 @@ export function scaleFly(
 		duration,
 		easing,
 		css: (t, u) =>
-			`${has_translate ? `transform: ${transform} translate3d(${t <= 0.5 ? `${(1 - t) * 2 * x_value}${x_unit}` : x}, ${t <= 0.5 ? `${(1 - t) * y_value}${y_unit}` : y}, 0);` : ''}` +
+			`${has_translate ? `transform: ${transform} translate3d(${t <= 0.5 ? x_value : u * 2 * x_value}${x_unit}, ${t <= 0.5 ? y_value : u * 2 * y_value}${y_unit}, 0);` : ''}` +
 			`${has_opacity_delta ? `opacity: ${t > 0.5 ? opacity_target_value - opacity_delta_value * u * 2 : 0};` : ''}` +
 			`${primary_property}: ${t <= 0.5 ? t * 2 * primary_property_value : primary_property_value}px;` +
 			`${primary_property_opposite}: ${primary_property_opposite_value}px;` +
