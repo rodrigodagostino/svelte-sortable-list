@@ -468,13 +468,20 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	// Prevent context menu from opening on long-press in Chrome for Android.
+	// Only the parts of the item that can start a drag are affected,
+	// so the page can still be scrolled from the rest.
 	const ontouchstart: Attachment = (element) => {
 		return on(
 			element,
 			'touchstart',
 			(e) => {
-				if (e.target && ref && !isOrResidesInInteractiveElement(e.target as HTMLElement, ref))
-					e.preventDefault();
+				const target = e.target as HTMLElement | null;
+				if (!target || !ref || isOrResidesInInteractiveElement(target, ref)) return;
+
+				const hasItemHandle = !!ref.querySelector('.ssl-item-handle');
+				if (hasItemHandle && !target.closest('.ssl-item-handle')) return;
+
+				e.preventDefault();
 			},
 			{ passive: false }
 		);

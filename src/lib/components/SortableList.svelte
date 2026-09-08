@@ -1359,7 +1359,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		min-height: var(--ssl-min-height, 44px);
 		padding-inline-start: 0;
 		margin: calc(var(--ssl-gap) / 2 * -1);
-		touch-action: none;
+
+		/* Prevent touch gestures during a pointer drag and on lists without handles. */
+		/* (lists with handles stay scrollable while idle). */
+		&:has(:global([data-drag-state*='ptr'])),
+		&:not(:has(:global(.ssl-item-handle))) {
+			touch-action: none;
+		}
 
 		&[aria-orientation='vertical'] {
 			flex-direction: column;
