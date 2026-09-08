@@ -192,4 +192,108 @@ test.describe('Sortable List - With Handle', () => {
 		// Check cursor changes to grabbing during drag
 		await expect(draggedHandle).toHaveCSS('cursor', 'grab');
 	});
+
+	test('should let the page scroll when swiping over item content while still dragging from the handle', async ({
+		page,
+		hasTouch,
+	}) => {
+		// Touch gestures can only be emulated through the Chrome DevTools Protocol on a touch device
+		test.skip(!hasTouch, 'Requires touch emulation');
+
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Make the page tall enough to scroll without disturbing the layout around the list
+		await page.evaluate(() =>
+			document.body.insertAdjacentHTML(
+				'beforeend',
+				'<div style="position: absolute; top: 0; left: 0; width: 1px; height: 300vh; pointer-events: none"></div>'
+			)
+		);
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+		const rootBox = await root.boundingBox();
+		const viewport = page.viewportSize();
+		if (!rootBox || !viewport) throw new Error('Could not get root bounding box or viewport size');
+		expect(rootBox.y + rootBox.height).toBeLessThanOrEqual(viewport.height);
+
+		// Verify the list leaves touch gestures alone while idle
+		await expect(root).toHaveCSS('touch-action', 'auto');
+
+		// Open a CDP session to dispatch real touch gestures
+		const cdp = await page.context().newCDPSession(page);
+		const waitForFrames = () =>
+			page.evaluate(
+				() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+			);
+
+		// === DRAG FROM THE HANDLE ===
+		// Find the handle of List Item 1 and the target item (List Item 3)
+		const handle = root.locator('[data-item-id="list-item-1"] .ssl-item-handle');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const targetItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+		const handleBox = await handle.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		if (!handleBox || !targetBox)
+			throw new Error('Could not get List Item 1 handle or List Item 3 bounding box');
+
+		// Drag List Item 1 to the List Item 3 position with a touch on its handle
+		const dragFinger = {
+			x: handleBox.x + handleBox.width / 2,
+			y: handleBox.y + handleBox.height / 2,
+			id: 1,
+		};
+		const startY = dragFinger.y;
+		const targetY = targetBox.y + targetBox.height / 2;
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [dragFinger] });
+		for (let i = 1; i <= 10; i++) {
+			dragFinger.y = startY + ((targetY - startY) * i) / 10;
+			await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [dragFinger] });
+			await waitForFrames();
+		}
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Verify the whole list blocks touch gestures while the drag is in progress
+		await expect(root).toHaveCSS('touch-action', 'none');
+
+		// Release the finger and wait for the drag operation to complete
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [dragFinger] });
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the page did not scroll during the drag and the items were sorted
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+		const sortedItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(sortedItems).toEqual(sortItems(getDefaultItems(5), 0, 2).map((item) => item.text));
+		await expect(root).toHaveCSS('touch-action', 'auto');
+
+		// === SWIPE OVER THE ITEM CONTENT ===
+		// Find the text of List Item 2, which lies outside of its handle
+		const itemText = root.locator('[data-item-id="list-item-2"] .ssl-item-content__text');
+		const textBox = await itemText.boundingBox();
+		if (!textBox) throw new Error('Could not get List Item 2 text bounding box');
+
+		// Swipe up over the item text
+		const swipeFinger = {
+			x: textBox.x + textBox.width / 2,
+			y: textBox.y + textBox.height / 2,
+			id: 1,
+		};
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [swipeFinger] });
+		for (let i = 0; i < 10; i++) {
+			swipeFinger.y -= 15;
+			await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [swipeFinger] });
+			await waitForFrames();
+		}
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [swipeFinger] });
+
+		// Verify the page scrolled and no drag was started
+		await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+		await expect(root.locator('.ssl-item[data-drag-state*="ptr"]')).toHaveCount(0);
+		expect(await root.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			sortedItems
+		);
+	});
 });
