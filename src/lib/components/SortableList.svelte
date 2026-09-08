@@ -1204,7 +1204,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const draggedItem = rootState.draggedItem;
 		const targetItem = rootState.targetItem;
 
-		if (!action.endsWith('cancel')) {
+		if (!action.endsWith('cancel') && group && registry.targetList) {
 			registry.crossingItemId = draggedItem.id;
 			requestAnimationFrame(() => (registry.crossingItemId = null));
 		}
