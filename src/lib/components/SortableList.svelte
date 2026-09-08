@@ -728,10 +728,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						const lastListIndex = registry.getGroupLists(group).length - 1;
 						if ((step === -1 && index === 0) || (step === 1 && index === lastListIndex)) return;
 
-						const nextIndex = index! + step;
-						const peerList = registry
+						// Leave out peer lists that are empty, so they won’t block the way to the lists behind it.
+						const peerListsWithItems = registry
 							.getPeerLists(group, rootState)
-							.find((l) => l.index === nextIndex);
+							.filter((l) => l.ref.querySelector('.ssl-item'));
+						let nextListIndex = index! + step;
+						let peerList: RegistryList | undefined;
+						while (nextListIndex >= 0 && nextListIndex <= lastListIndex) {
+							peerList = peerListsWithItems.find((l) => l.index === nextListIndex);
+							if (peerList) break;
+							nextListIndex += step;
+						}
 
 						if (peerList) {
 							const closestRect = getClosestItemRect(
