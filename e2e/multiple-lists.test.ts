@@ -446,6 +446,69 @@ test.describe('Sortable List - Multiple Lists', () => {
 		await expect(doingList.locator('.ssl-item[aria-selected="true"]')).toBeFocused();
 	});
 
+	test('should skip an empty peer list when moving the focus across lists using keyboard', async ({
+		page,
+	}) => {
+		// Find the «To Do», «Doing» and «Done» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+		const doneList = page.locator('[data-list-id="done"]');
+
+		// Empty the «Doing» list by moving each of its items onto the «To Do» list using mouse —
+		// see the note in the mouse version of the cross-list tests regarding scrollIntoViewIfNeeded.
+		for (let i = 0; i < listItemTexts['doing'].length; i++) {
+			const draggedItem = doingList.locator('.ssl-item:not(.ssl-placeholder)').first();
+			const targetItem = toDoList.locator('.ssl-item:not(.ssl-placeholder)').first();
+
+			await draggedItem.scrollIntoViewIfNeeded();
+			await targetItem.scrollIntoViewIfNeeded();
+
+			const draggedBox = await draggedItem.boundingBox();
+			const targetBox = await targetItem.boundingBox();
+			if (!draggedBox || !targetBox)
+				throw new Error('Could not get Doing or To Do item bounding box');
+
+			await page.mouse.move(
+				draggedBox.x + draggedBox.width / 2,
+				draggedBox.y + draggedBox.height / 2
+			);
+			await page.mouse.down();
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+			await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, {
+				steps: 40,
+			});
+
+			// Wait a frame to flush any pending throttled update from the glide, then re-issue a
+			// single move at the exact target coordinates and wait one more frame for it to be
+			// processed — see the note in the previous cross-list move test.
+			await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+			await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2);
+			await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+			await page.mouse.up();
+			await expect(doingList.locator('.ssl-item')).toHaveCount(
+				listItemTexts['doing'].length - i - 1
+			);
+		}
+
+		// Focus the «To Do» root and select its first item
+		await toDoList.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(toDoList.locator('.ssl-item').first()).toBeFocused();
+
+		// Move right — the axis perpendicular to a vertical list — past the empty «Doing» list
+		await page.keyboard.press('ArrowRight');
+
+		// Verify the focus skipped the empty list and landed on the closest «Done» item
+		await expect(doneList.locator('.ssl-item').first()).toBeFocused();
+
+		// Move back to the left, over the empty list again
+		await page.keyboard.press('ArrowLeft');
+
+		// Verify the focus returned to the «To Do» list instead of stopping at the empty one
+		await expect(toDoList.locator('.ssl-item').first()).toBeFocused();
+	});
+
 	test('should move an item into an empty peer list using keyboard', async ({ page }) => {
 		// Find the «Doing» and «Done» list roots
 		const doingList = page.locator('[data-list-id="doing"]');
