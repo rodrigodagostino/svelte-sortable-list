@@ -10,6 +10,35 @@ test.describe('Sortable List - Locked List', () => {
 		await page.locator('.ssl-root').waitFor();
 	});
 
+	test('should not scroll the page when pressing Space on a focused item', async ({ page }) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Make the page tall enough to scroll without disturbing the layout around the list
+		await page.evaluate(() =>
+			document.body.insertAdjacentHTML(
+				'beforeend',
+				'<div style="position: absolute; top: 0; left: 0; width: 1px; height: 300vh; pointer-events: none"></div>'
+			)
+		);
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+		// Focus the list and move the focus to Locked Item 1
+		await root.focus();
+		await page.keyboard.press('ArrowDown');
+		await expect(root).toHaveAttribute('aria-activedescendant', 'locked-item-1');
+
+		// Press Space to try to lift the locked item
+		await page.keyboard.press(' ');
+
+		// Give any smooth scroll triggered by the key press time to settle
+		await page.waitForTimeout(500);
+
+		// Verify no drag was started and the page did not scroll
+		await expect(root.locator('.ssl-item[data-drag-state*="kbd"]')).toHaveCount(0);
+		expect(await page.evaluate(() => window.scrollY)).toBe(0);
+	});
+
 	test('should let the page scroll when swiping over item content', async ({ page, hasTouch }) => {
 		// Touch gestures can only be emulated through the Chrome DevTools Protocol on a touch device
 		test.skip(!hasTouch, 'Requires touch emulation');
