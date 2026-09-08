@@ -1361,9 +1361,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		margin: calc(var(--ssl-gap) / 2 * -1);
 
 		/* Prevent touch gestures during a pointer drag and on lists without handles. */
-		/* (lists with handles stay scrollable while idle). */
+		/* (locked/disabled lists and lists with handles stay scrollable while idle). */
 		&:has(:global([data-drag-state*='ptr'])),
-		&:not(:has(:global(.ssl-item-handle))) {
+		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(
+				:has(:global(.ssl-item-handle))
+			) {
 			touch-action: none;
 		}
 

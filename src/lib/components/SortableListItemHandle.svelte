@@ -37,9 +37,3 @@ Serves as an element that limits the draggable area of a list item to itself. In
 		<Icon name="handle" />
 	{/if}
 </span>
-
-<style>
-	.ssl-item-handle {
-		touch-action: none;
-	}
-</style>

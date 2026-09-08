@@ -478,8 +478,15 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				const target = e.target as HTMLElement | null;
 				if (!target || !ref || isOrResidesInInteractiveElement(target, ref)) return;
 
-				const hasItemHandle = !!ref.querySelector('.ssl-item-handle');
-				if (hasItemHandle && !target.closest('.ssl-item-handle')) return;
+				const hasHandle = !!ref.querySelector('.ssl-item-handle');
+				if (
+					isLocked ||
+					rootState.props.isLocked ||
+					isDisabled ||
+					rootState.props.isDisabled ||
+					(hasHandle && !target.closest('.ssl-item-handle'))
+				)
+					return;
 
 				e.preventDefault();
 			},
@@ -533,14 +540,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		backface-visibility: hidden;
 		z-index: 1;
 
-		&:not(:has(.ssl-item-handle)),
-		& :global(.ssl-item-handle) {
+		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(:has(.ssl-item-handle)),
+		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-item-handle) {
 			touch-action: none;
+		}
+
+		&:not(:has(.ssl-item-handle)),
+		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-item-handle) {
 			cursor: grab;
 		}
 
 		&[data-drag-state*='ptr-drag'],
-		&[data-drag-state*='ptr-drag'] :global(.ssl-item-handle) {
+		&[data-drag-state*='ptr-drag']:not([data-is-locked='true']):not([data-is-disabled='true'])
+			:global(.ssl-item-handle) {
 			cursor: grabbing;
 		}
 
