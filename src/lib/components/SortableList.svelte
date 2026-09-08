@@ -615,16 +615,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (key === ' ') {
 				// Prevent default only if the target is a sortable item.
 				// This allows interactive elements (like buttons) to operate normally.
+				if (!target.classList.contains('ssl-item')) return;
+				e.preventDefault();
+
 				if (
-					!target.classList.contains('ssl-item') ||
 					isLocked ||
 					target.dataset.isLocked === 'true' ||
+					target.getAttribute('aria-disabled') === 'true' ||
+					!rootState.focusedItem ||
 					e.repeat
 				)
 					return;
-				else e.preventDefault();
-
-				if (!rootState.focusedItem || target.getAttribute('aria-disabled') === 'true') return;
 
 				if (rootState.dragState === 'idle') {
 					rootState.draggedItem = rootState.focusedItem;
