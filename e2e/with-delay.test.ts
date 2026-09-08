@@ -259,4 +259,91 @@ test.describe('Sortable List - With Delay', () => {
 		const finalItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(finalItems).toEqual(initialItems);
 	});
+
+	test('should not leave a drag pending when a second touch presses another item before the delay completes', async ({
+		page,
+		hasTouch,
+	}) => {
+		// Multi-touch can only be emulated through the Chrome DevTools Protocol on a touch device
+		test.skip(!hasTouch, 'Requires touch emulation');
+
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Get the initial order of the items to verify the starting state
+		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
+		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
+
+		// Find the item each finger will press (List Item 1 and List Item 3)
+		const firstItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+		const secondItem = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
+		const firstBox = await firstItem.boundingBox();
+		const secondBox = await secondItem.boundingBox();
+		if (!firstBox || !secondBox)
+			throw new Error('Could not get List Item 1 or List Item 3 bounding box');
+
+		// Open a CDP session to dispatch touch events with more than one touch point
+		const cdp = await page.context().newCDPSession(page);
+		const finger1 = {
+			x: firstBox.x + firstBox.width / 2,
+			y: firstBox.y + firstBox.height / 2,
+			id: 1,
+		};
+		const finger2 = {
+			x: secondBox.x + secondBox.width / 2,
+			y: secondBox.y + secondBox.height / 2,
+			id: 2,
+		};
+
+		// Press the first finger down on List Item 1
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger1] });
+
+		// Press a second finger down on List Item 3 while the first delay is still pending
+		await page.waitForTimeout(60);
+		await cdp.send('Input.dispatchTouchEvent', {
+			type: 'touchStart',
+			touchPoints: [finger1, finger2],
+		});
+
+		// Lift both fingers before either delay completes
+		await page.waitForTimeout(60);
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [finger2] });
+		await page.waitForTimeout(60);
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+
+		// Wait past both delays and verify neither press started or left a drag pending
+		await page.waitForTimeout(600);
+		await expect(root.locator('.ssl-item:not([data-drag-state="idle"])')).toHaveCount(0);
+		await expect(root.locator('.ssl-placeholder')).toHaveCount(0);
+		expect(await root.locator('.ssl-item .ssl-item-content__text').allTextContents()).toEqual(
+			initialItems
+		);
+
+		// Verify a normal touch drag still works afterwards
+		const waitForFrames = () =>
+			page.evaluate(
+				() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+			);
+		const dragFinger = { ...finger1, id: 1 };
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [dragFinger] });
+		await expect(firstItem).toHaveAttribute('data-drag-state', 'ptr-drag-start', {
+			timeout: 2000,
+		});
+
+		// Drag List Item 1 down to the List Item 3 position and release
+		const startY = dragFinger.y;
+		const targetY = secondBox.y + secondBox.height / 2;
+		for (let step = 1; step <= 10; step++) {
+			dragFinger.y = startY + ((targetY - startY) * step) / 10;
+			await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [dragFinger] });
+			await waitForFrames();
+		}
+		await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+
+		// Wait for the drag operation to complete and verify the items were sorted
+		await expect(firstItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(root.locator('.ssl-item .ssl-item-content__text')).toHaveText(
+			sortItems(initialItems, 0, 2)
+		);
+	});
 });
