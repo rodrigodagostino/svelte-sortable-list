@@ -21,16 +21,29 @@ export const INTERACTIVE_ELEMENTS = new Set([
 	'optgroup',
 	'option',
 	'select',
+	'summary',
 	'textarea',
 	'video',
 ]);
-export const INTERACTIVE_ROLES = new Set(['button', 'checkbox', 'link', 'tab']);
-export const INTERACTIVE_ROLE_ATTRIBUTES = new Set([
-	'[role="button"]',
-	'[role="checkbox"]',
-	'[role="link"]',
-	'[role="tab"]',
+export const INTERACTIVE_ROLES = new Set([
+	'button',
+	'checkbox',
+	'combobox',
+	'link',
+	'menuitem',
+	'menuitemcheckbox',
+	'menuitemradio',
+	'radio',
+	'searchbox',
+	'slider',
+	'spinbutton',
+	'switch',
+	'tab',
+	'textbox',
 ]);
+export const INTERACTIVE_ROLE_ATTRIBUTES = new Set(
+	[...INTERACTIVE_ROLES].map((role) => `[role="${role}"]`)
+);
 
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts
@@ -43,6 +56,8 @@ export function isOrResidesInInteractiveElement(target: HTMLElement, root: HTMLE
 
 		const role = target.getAttribute('role')?.toLowerCase();
 		if (role && INTERACTIVE_ROLES.has(role)) return true;
+
+		if (target.isContentEditable) return true;
 
 		if (tagName === 'label' && target.hasAttribute('for')) return true;
 

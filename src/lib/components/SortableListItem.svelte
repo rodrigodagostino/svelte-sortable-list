@@ -127,7 +127,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
-	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
+	const selectors = [
+		...INTERACTIVE_ELEMENTS,
+		...INTERACTIVE_ROLE_ATTRIBUTES,
+		'[contenteditable]:not([contenteditable="false"])',
+	].join(', ');
 	const areInteractiveElementsTabbable = $derived(
 		!rootState.dragState.startsWith('kbd-drag') &&
 			focusedId === String(id) &&
