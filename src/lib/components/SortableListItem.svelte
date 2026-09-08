@@ -23,7 +23,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 -->
 
 <script lang="ts">
-	import { onDestroy, onMount, tick, untrack } from 'svelte';
+	import { onDestroy, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
@@ -93,32 +93,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	const classes = $derived(['ssl-item', restProps.class]);
 
-	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async function setInteractiveElementsTabIndex(...args: unknown[]) {
-		await tick();
-		ref
-			?.querySelectorAll<HTMLElement>(selectors)
-			.forEach(
-				(el) =>
-					(el.tabIndex =
-						rootState.dragState !== 'kbd-drag-start' &&
-						rootState.dragState !== 'kbd-drag' &&
-						focusedId === String(id) &&
-						!rootState.props.isDisabled &&
-						!isDisabled
-							? 0
-							: -1)
-			);
-	}
-	$effect(() => {
-		setInteractiveElementsTabIndex(rootState.dragState === 'kbd-drag-start', focusedId);
-	});
-
-	onMount(() => {
-		setInteractiveElementsTabIndex();
-	});
-
 	onDestroy(() => {
 		if (rootState.focusedItem === ref) rootState.focusedItem = null;
 	});
@@ -152,6 +126,21 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
+
+	const selectors = [...INTERACTIVE_ELEMENTS, ...INTERACTIVE_ROLE_ATTRIBUTES].join(', ');
+	const areInteractiveElementsTabbable = $derived(
+		!rootState.dragState.startsWith('kbd-drag') &&
+			focusedId === String(id) &&
+			!rootState.props.isDisabled &&
+			!isDisabled
+	);
+
+	$effect(() => {
+		const tabIndex = areInteractiveElementsTabbable ? 0 : -1;
+		tick().then(() => {
+			ref?.querySelectorAll<HTMLElement>(selectors).forEach((el) => (el.tabIndex = tabIndex));
+		});
+	});
 
 	function getStylePosition() {
 		if (draggedId !== String(id)) return undefined;
