@@ -422,7 +422,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (focusedRootState?.dragState.startsWith('kbd-drag')) await tick();
 		await interruptDropTransition(e);
-		if (rootState.dragState !== 'idle' || delayTimeoutId !== null) return;
+		if (
+			rootState.dragState !== 'idle' ||
+			delayTimeoutId !== null ||
+			(group && registry.isOtherDragActive(rootState))
+		)
+			return;
 
 		isPointerReleased = false;
 		currItem.setPointerCapture(e.pointerId);
@@ -628,6 +633,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					return;
 
 				if (rootState.dragState === 'idle') {
+					if (group && registry.isOtherDragActive(rootState)) return;
+
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
 					rootState.itemRects = getItemRects(ref!);

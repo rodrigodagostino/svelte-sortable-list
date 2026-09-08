@@ -45,6 +45,12 @@ export class SortableListRegistry {
 	isTargetList(state: RootState) {
 		return this.targetList?.state === state;
 	}
+
+	isOtherDragActive(state: RootState) {
+		return (
+			!!this.sourceList && !this.isSourceList(state) && this.sourceList.state.dragState !== 'idle'
+		);
+	}
 }
 
 export const registry = new SortableListRegistry();
