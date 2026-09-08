@@ -442,7 +442,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return untrack(() => getStyleTransform());
 	});
 
-	async function handleFocus(e: FocusEvent) {
+	async function handleFocusIn(e: FocusEvent) {
 		if (rootState.dragState.startsWith('ptr')) {
 			e.preventDefault();
 			return;
@@ -522,7 +522,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-selected={focusedId === String(id)}
-	onfocus={handleFocus}
+	onfocusin={handleFocusIn}
 	onfocusout={handleFocusOut}
 	{@attach ontouchstart}
 	in:_transitionIn
