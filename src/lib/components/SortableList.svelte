@@ -422,7 +422,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (focusedRootState?.dragState.startsWith('kbd-drag')) await tick();
 		await interruptDropTransition(e);
-		if (rootState.dragState !== 'idle') return;
+		if (rootState.dragState !== 'idle' || delayTimeoutId !== null) return;
 
 		isPointerReleased = false;
 		currItem.setPointerCapture(e.pointerId);
