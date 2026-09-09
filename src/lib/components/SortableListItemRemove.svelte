@@ -1,7 +1,7 @@
 <!--
 @component
 ## <SortableList.ItemRemove>
-Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` will directly allow it to dispatch the `remove` event for that item.
+Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which performs the removal.
 
 ### Props
 - `ref`: reference to the remove element (HTMLButtonElement). `[$bindable]`

@@ -5,7 +5,7 @@ type Event = {
 	sourceList: HTMLUListElement;
 	/** The id of the source list element. */
 	sourceListId?: string;
-	/** The index of the source item element. */
+	/** The index of the source list element. */
 	sourceListIndex?: number;
 	/** The dragged item element. */
 	draggedItem: HTMLLIElement;
@@ -13,9 +13,9 @@ type Event = {
 	draggedItemId: string;
 	/** The index of the dragged item element. */
 	draggedItemIndex: number;
-	/** Whether the target item element is between the bounds of the root element. */
+	/** Whether the dragged item element is within bounds of the root element. */
 	isWithinBounds?: boolean;
-	/** Whether the target item element can be removed on drop out. */
+	/** Whether the dragged item element can be removed on drop out. */
 	canRemoveOnDropOut: boolean;
 };
 
@@ -24,7 +24,7 @@ type TargetListFields = {
 	targetList: HTMLUListElement | null;
 	/** The id of the target list element. */
 	targetListId: string | null;
-	/** The index of the target item element. */
+	/** The index of the target list element. */
 	targetListIndex: number | null;
 	/** The target item element. */
 	targetItem: HTMLLIElement | null;
@@ -56,7 +56,7 @@ export interface SortableListRootEvents {
 	onmounted: MountedEvent;
 	/** Fired when an item starts to be dragged by a pointer device or a keyboard. */
 	ondragstart: DragStartEvent;
-	/** Fired when a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). */
+	/** Fired when a dragged item is moved around by a pointer device or a keyboard (fires once per animation frame while the pointer moves, and once per key press). */
 	ondrag: DragEvent;
 	/** Fired when a dragged item is released by a pointer device or a keyboard. */
 	ondrop: DropEvent;

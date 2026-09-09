@@ -62,7 +62,7 @@ interface SortableListRootBaseProps extends Pick<
 	onmounted?: (event: MountedEvent) => void;
 	/** Callback fired when an item starts to be dragged by a pointer device or a keyboard. */
 	ondragstart?: (event: DragStartEvent) => void;
-	/** Callback fired when a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds). */
+	/** Callback fired when a dragged item is moved around by a pointer device or a keyboard (fires once per animation frame while the pointer moves, and once per key press). */
 	ondrag?: (event: DragEvent) => void;
 	/** Callback fired when a dragged item is released by a pointer device or a keyboard. */
 	ondrop?: (event: DropEvent) => void;

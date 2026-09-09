@@ -1,7 +1,7 @@
 type AnnouncementContext = {
 	/** The source list element. */
 	sourceList: HTMLUListElement;
-	/** The index of the source item element. */
+	/** The index of the source list element. */
 	sourceListIndex?: number;
 	/** The dragged item element. */
 	draggedItem: HTMLLIElement;
@@ -12,7 +12,7 @@ type AnnouncementContext = {
 type TargetListFields = {
 	/** The target list element. */
 	targetList?: HTMLUListElement | null;
-	/** The index of the target item element. */
+	/** The index of the target list element. */
 	targetListIndex?: number | null;
 };
 
