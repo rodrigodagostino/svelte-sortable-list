@@ -76,6 +76,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
+		removeFixedOriginProbe,
 		removeScrollListener,
 		restoreFocus,
 		scrollIntoView,
@@ -1235,6 +1236,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const focusedElement = ref!.contains(activeElement) ? activeElement : null;
 
 		rootState.dragState = 'idle';
+		removeFixedOriginProbe(ref!);
 
 		ondragend?.({
 			deviceType: action.startsWith('ptr') ? 'pointer' : 'keyboard',
