@@ -208,4 +208,89 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 		);
 		expect(finalIndex).toBe(expectedTargetIndex);
 	});
+
+	for (const { ancestor, selector } of [
+		{ ancestor: 'the list', selector: '.ssl-root' },
+		{ ancestor: 'an ancestor of the wrapper', selector: '.app-main .container' },
+	]) {
+		test(`should keep the dragged item under the pointer while auto scrolling when ${ancestor} has a transform`, async ({
+			page,
+		}) => {
+			// Turn the ancestor into the containing block of fixed-positioned elements. The dragged item
+			// is positioned with `position: fixed`, so its coordinates resolve from that ancestor. When the
+			// ancestor is the list, it scrolls along with the content; when it’s an ancestor of the
+			// wrapper (the scroller), it stays put.
+			await page.evaluate((selector) => {
+				document.querySelector<HTMLElement>(selector)!.style.transform = 'translateZ(0)';
+			}, selector);
+
+			// Find the wrapper element
+			const wrapper = page.locator('.wrapper');
+			const wrapperBox = await wrapper.boundingBox();
+			if (!wrapperBox) throw new Error('Could not get wrapper size');
+
+			const root = page.locator('.ssl-root');
+
+			// Find the dragged item (List Item 1)
+			const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+			// Get the bounding box for a precise drag operation
+			const draggedBox = await draggedItem.boundingBox();
+			if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
+
+			// Start the drag from the center of the dragged item
+			const pointerX = draggedBox.x + draggedBox.width / 2;
+			await page.mouse.move(pointerX, draggedBox.y + draggedBox.height / 2);
+			await page.mouse.down();
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+			// Count the nodes added to or removed from the list from now on
+			await root.evaluate((el) => {
+				const counter = window as unknown as { sslListMutations: number };
+				counter.sslListMutations = 0;
+				new MutationObserver((records) => {
+					for (const { addedNodes, removedNodes } of records)
+						counter.sslListMutations += addedNodes.length + removedNodes.length;
+				}).observe(el, { childList: true });
+			});
+
+			// Move to the bottom edge of the wrapper to trigger auto scroll
+			const pointerY = wrapperBox.y + wrapperBox.height;
+			await page.mouse.move(pointerX, pointerY, { steps: 40 });
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+			// Wait for the auto scroll to have moved the content a good distance
+			await expect.poll(() => wrapper.evaluate((el) => el.scrollTop)).toBeGreaterThan(200);
+
+			// Verify the dragged item is still centered under the pointer while auto scrolling
+			const scrollingBox = await draggedItem.boundingBox();
+			if (!scrollingBox) throw new Error('Could not get List Item 1 bounding box while scrolling');
+			expect(Math.abs(scrollingBox.x + scrollingBox.width / 2 - pointerX)).toBeLessThanOrEqual(1);
+			expect(Math.abs(scrollingBox.y + scrollingBox.height / 2 - pointerY)).toBeLessThanOrEqual(1);
+
+			// Verify auto scrolling didn’t touch the list’s children (re-measuring the fixed origin with a
+			// throwaway probe on every frame did, and made auto scrolling lag on mobile devices)
+			expect(
+				await page.evaluate(
+					() => (window as unknown as { sslListMutations: number }).sslListMutations
+				)
+			).toBe(0);
+
+			// Move back to the middle of the wrapper to stop the auto scroll
+			const restingY = wrapperBox.y + wrapperBox.height / 2;
+			await page.mouse.move(pointerX, restingY, { steps: 40 });
+
+			// Verify the dragged item is still centered under the pointer after auto scrolling
+			const restingBox = await draggedItem.boundingBox();
+			if (!restingBox) throw new Error('Could not get List Item 1 bounding box after scrolling');
+			expect(Math.abs(restingBox.x + restingBox.width / 2 - pointerX)).toBeLessThanOrEqual(1);
+			expect(Math.abs(restingBox.y + restingBox.height / 2 - restingY)).toBeLessThanOrEqual(1);
+
+			// Release the mouse to drop
+			await page.mouse.up();
+
+			// Wait for the drag operation to complete by checking the drag state returns to idle
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		});
+	}
 });
