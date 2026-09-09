@@ -1,4 +1,4 @@
-import type { SortableListRegistry as Registry } from '$lib/states/registry.svelte.js';
+import type { SortableListRegistry as Registry } from '$lib/states/index.js';
 import type {
 	SortableListAnnouncements as Announcements,
 	SortableListRootProps as RootProps,

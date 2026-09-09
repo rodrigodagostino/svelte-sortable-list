@@ -2,10 +2,7 @@ import type {
 	SortableListRegistry as Registry,
 	SortableListRootState as RootState,
 } from '$lib/states/index.js';
-import type {
-	ItemRect,
-	SortableListRootStateContext as RootStateContext,
-} from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/index.js';
 import { getTranslateValues } from './index.js';
 
 export function getId(element: HTMLUListElement | HTMLLIElement) {
@@ -67,10 +64,7 @@ export function removeFixedOriginProbe(ref: HTMLUListElement) {
 	ref.querySelector(`:scope > .${FIXED_ORIGIN_PROBE_CLASS}`)?.remove();
 }
 
-export function updateFixedOrigin(
-	ref: HTMLUListElement,
-	fixedOrigin: RootStateContext['fixedOrigin']
-) {
+export function updateFixedOrigin(ref: HTMLUListElement, fixedOrigin: RootState['fixedOrigin']) {
 	const { x, y } = getFixedOrigin(ref);
 	if (x === fixedOrigin.x && y === fixedOrigin.y) return fixedOrigin;
 
@@ -103,7 +97,7 @@ export function getPeerTargetFields(
 
 export function getItemRectWithOffset(
 	itemRect: DOMRect,
-	scrollOffset: RootStateContext['scrollOffset']
+	scrollOffset: RootState['scrollOffset']
 ): DOMRect {
 	return scrollOffset?.left || scrollOffset?.top
 		? new DOMRect(

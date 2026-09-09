@@ -1,7 +1,5 @@
-import type {
-	ItemRect,
-	SortableListRootStateContext as RootStateContext,
-} from '$lib/types/index.js';
+import type { SortableListRootState as RootState } from '$lib/states/index.js';
+import type { ItemRect } from '$lib/types/index.js';
 
 /**
  * Converts a viewport coordinate into the `left`/`top` value that places a `position: fixed`
@@ -12,7 +10,7 @@ import type {
 export function toFixedPosition(
 	axis: 'x' | 'y',
 	value: number,
-	fixedOrigin: RootStateContext['fixedOrigin']
+	fixedOrigin: RootState['fixedOrigin']
 ) {
 	return value - fixedOrigin[axis];
 }

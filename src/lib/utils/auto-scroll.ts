@@ -1,8 +1,6 @@
 import { getTranslateValues } from './index.js';
-import type {
-	SortableListRootProps as RootProps,
-	SortableListRootStateContext as RootStateContext,
-} from '$lib/types/index.js';
+import type { SortableListRootState as RootState } from '$lib/states/index.js';
+import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 
 export const getClosestScrollableAncestor = (element: HTMLElement) => {
 	if (typeof document === 'undefined') return undefined;
@@ -134,7 +132,7 @@ function getScrollingOffset(element: HTMLElement, direction: RootProps['directio
 export function updateScrollOffset(
 	scrollableAncestor: HTMLElement | undefined,
 	scrollOrigin: { left: number; top: number },
-	scrollOffset: RootStateContext['scrollOffset']
+	scrollOffset: RootState['scrollOffset']
 ) {
 	if (!scrollableAncestor) return scrollOffset;
 
