@@ -7,6 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.5] (2026-09-09)
+
+### Changed
+
+- Display leaner property references through event types.
+- Extract dragged rect offset calculation into utils.
+- Extract `updateScrollOffset()` into utils.
+- Extract scroll listener helpers into utils.
+- Return item itself from `getItemSibling()` when no sibling matches.
+
+### Fixed
+
+- Prevent placeholder transition cutoff on quick keyboard cross-list drop.
+- Prevent `data-is-source` and `data-is-target` conflict when multiple groups are present.
+- Cancel pending delayed drag on pointer up.
+- Prevent drop transitions cutoff on keyboard drop.
+- Prevent counting other groups lists on cross-list keyboard navigation.
+- Prevent accidental item deletion on canceled pointer drag.
+- Prevent duplicate drops from stale pointer listeners.
+- Cancel pending delayed drag on pointer cancel and capture loss.
+- Position dragged item correctly inside transformed ancestors.
+- Limit drop transition interruption to drag-starting keyboard input.
+- Keep `SortableList.ItemRemove` label in sync with item position.
+- Ignore Space `keydown` repeat to avoid lift/drop flicker.
+- Safely handle ids with special characters passed to `querySelector`.
+- Clear keyboard focus and cancel keyboard drag on pointer interaction.
+- Ignore pointer events from pointers different from dragging pointer.
+- Announce position in peer list when using `Home` and `End` keys.
+- Retain focus on interactive element after drop.
+- Prevent `SortableList.ItemRemove` from submitting enclosing forms.
+- Release target list and announce cancelation of keyboard drag.
+- Ensure complete cleanup when list is destroyed during drag.
+- Keep target in sync during auto scroll inside containers taller than viewport.
+- Prevent conflicts between `id`s and `name`s in placeholder content and dragged item content.
+- Keep form field values inside placeholder content in sync with source.
+- Leave unrelated drags untouched when list is destroyed.
+- End pointer session when canceling with Escape key while list is focused.
+- Stop scroll events from retargeting after dragged item is released.
+- Skip locked and disabled peer lists on cross-list drag.
+- Keep focus on dropped item after interrupting cross-list drop transition.
+- Remove interactive elements from tab sequence when list or item gets disabled.
+- Allow page scroll over handle-based lists on touch devices.
+- Allow page scroll over locked and disabled lists on touch devices.
+- Prevent page scroll when pressing Space on focused locked item.
+- Suppress item transitions only on cross-list drops.
+- Prevent second drag during `delay` window.
+- Prevent second drag while another is active in different list.
+- Keep focus inside list after removing item with pointer.
+- Clear focus from interactive elements when pointer drag starts.
+- Prevent drags from starting on editable regions and ARIA widgets.
+- Allow focus to reach lists behind empty ones.
+- Avoid re-creating fixed origin probe on every frame during drag.
+
+### Test
+
+- Improve **“With delay”** E2E tests.
+- Add E2E coverage for lost pointer capture drop.
+- Add E2E coverage for **“Multiple groups”** page.
+- Add E2E coverage for interrupted pointer during drag delay.
+- Add E2E coverage for dragging inside a transformed ancestor.
+- Add E2E coverage for focusing inputs during drop transition.
+- Add E2E coverage for remove button labels after sorting.
+- Add E2E coverage for pointer interaction while item has keyboard focus.
+- Add E2E coverage for ignoring second touch while pointer dragging.
+- Add E2E coverage for announcements when using Home and End keys across lists.
+- Add E2E coverage for `SortableList.ItemRemove` button type.
+- Add E2E coverage for destroying list during drop transition.
+- Add E2E coverage for auto scrolling containers taller than viewport.
+- Add E2E coverage for interaction with radio buttons.
+- Add E2E coverage for current form values inside placeholder.
+- Add E2E coverage for canceling pointer drag with Escape key while list is focused.
+- Add E2E coverage for drop target stability under scroll after release.
+- Add E2E coverage for skipping locked and disabled lists during cross-list drags.
+- Add E2E coverage for navigating from dropped item’s position mid-transition.
+- Add E2E coverage for interactive elements `tabindex` when list is disabled while item is focused.
+- Add E2E coverage for scrolling over locked and disabled lists on touch devices.
+- Add E2E coverage for page scrolling when pressing Space on focused item.
+- Add E2E coverage for multi-touch during `delay` window.
+- Add E2E coverage for concurrent drags across lists.
+- Add E2E coverage for focus entering item through interactive element.
+- Add E2E coverage for pointer drag starting with interactive element focused.
+- Add E2E coverage for pressing contenteditable region and ARIA widget.
+- Add E2E coverage for skipping empty peer list when moving focus across lists with keyboard.
+- Add E2E coverage for auto scrolling inside transformed ancestors.
+
+### Docs
+
+- Add **“Multiple groups”** demo page.
+- Add radio group to **“Interactive items”** and **“Interactive items with handle”** demo pages.
+- Add list mode selector to **“Multiple lists”** and **“Multiple groups”** demo pages.
+- Correct outdated props, events, selectors and type comments.
+- Update README to reflect latest changes.
+
 ## [3.0.0-next.4] (2026-08-28)
 
 ### BREAKING
@@ -1805,7 +1898,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.5...HEAD
+[3.0.0-next.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...v3.0.0-next.5
 [3.0.0-next.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...v3.0.0-next.4
 [3.0.0-next.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...v3.0.0-next.3
 [3.0.0-next.2]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.1...v3.0.0-next.2
