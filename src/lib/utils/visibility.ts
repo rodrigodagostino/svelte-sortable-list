@@ -1,4 +1,4 @@
-import { getTranslateValues } from './index.js';
+import { getTranslateValues } from './styles.js';
 
 export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
 	const elementRect = element.getBoundingClientRect();

@@ -25,7 +25,7 @@ export const INTERACTIVE_ELEMENTS = new Set([
 	'textarea',
 	'video',
 ]);
-export const INTERACTIVE_ROLES = new Set([
+const INTERACTIVE_ROLES = new Set([
 	'button',
 	'checkbox',
 	'combobox',

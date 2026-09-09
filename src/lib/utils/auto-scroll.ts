@@ -1,4 +1,4 @@
-import { getTranslateValues } from './index.js';
+import { getTranslateValues } from './styles.js';
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
 import type { SortableListRootProps as RootProps } from '$lib/types/index.js';
 

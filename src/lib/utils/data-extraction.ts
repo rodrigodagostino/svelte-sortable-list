@@ -1,13 +1,9 @@
+import { getTranslateValues } from './styles.js';
 import type {
 	SortableListRegistry as Registry,
 	SortableListRootState as RootState,
 } from '$lib/states/index.js';
 import type { ItemRect } from '$lib/types/index.js';
-import { getTranslateValues } from './index.js';
-
-export function getId(element: HTMLUListElement | HTMLLIElement) {
-	return String(element.dataset.listId ?? element.dataset.itemId);
-}
 
 export function getIndex(element: HTMLUListElement | HTMLLIElement) {
 	return Number(element.dataset.listIndex ?? element.dataset.itemIndex);

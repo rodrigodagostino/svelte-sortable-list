@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { SortableList, removeItem, sortItems } from '$lib/index.js';
-	import { scaleFly } from '$lib/transitions/index.js';
+	import { SortableList, removeItem, scaleFly, sortItems } from '$lib/index.js';
 	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import { toKebabCase } from '../utils.js';
