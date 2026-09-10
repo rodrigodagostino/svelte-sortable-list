@@ -26,7 +26,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 ### Events
 - `onmounted`: the component is mounted.
 - `ondragstart`: an item starts to be dragged by a pointer device or a keyboard.
-- `ondrag`: a dragged item is moved around by a pointer device or a keyboard (fires every few hundred milliseconds).
+- `ondrag`: a dragged item is moved around by a pointer device or a keyboard (fires once per animation frame while the pointer moves, and once per key press).
 - `ondrop`: a dragged item is released by a pointer device or a keyboard.
 - `ondragend`: a dragged item reaches its destination after being released.
 - `ondestroyed`: the component is destroyed.
@@ -225,8 +225,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (!rootState.itemRects || !ref || !rootState.draggedItem) return;
 
 		const draggedRect = rootState.draggedItem.getBoundingClientRect();
-		const rootRect = ref.getBoundingClientRect();
-		rootState.isWithinBounds = areColliding(draggedRect, rootRect);
+		rootState.rect = ref.getBoundingClientRect();
+		rootState.isWithinBounds = areColliding(draggedRect, rootState.rect);
 		refreshScrollOffset();
 
 		// Offset the dragged rect by the current scroll.

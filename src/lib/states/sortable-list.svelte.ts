@@ -22,6 +22,7 @@ export class SortableListRootState {
 	draggedItem: HTMLLIElement | null = $state(null);
 	targetItem: HTMLLIElement | null = $state(null);
 	focusedItem: HTMLLIElement | null = $state(null);
+	rect: DOMRect | null = null;
 	itemRects: ItemRect[] | null = $state.raw(null);
 	pointer: { x: number; y: number } | null = $state.raw(null);
 	pointerOrigin: { x: number; y: number } | null = $state.raw(null);

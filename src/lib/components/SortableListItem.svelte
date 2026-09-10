@@ -375,7 +375,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	function getPointerTransform() {
 		if (!rootState.pointer || !rootState.pointerOrigin) return 'translate3d(0, 0, 0)';
 
-		const rootRect = rootState.props.ref!.getBoundingClientRect();
+		const rootRect = rootState.props.hasBounds
+			? (rootState.rect ?? rootState.props.ref!.getBoundingClientRect())
+			: null;
 
 		const x =
 			rootState.props.direction === 'horizontal' ||
@@ -385,7 +387,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							'x',
 							rootState.pointer.x,
 							rootState.pointerOrigin.x,
-							rootRect,
+							rootRect!,
 							draggedRect!,
 							rootState.props.gap!
 						)
@@ -399,7 +401,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 							'y',
 							rootState.pointer.y,
 							rootState.pointerOrigin.y,
-							rootRect,
+							rootRect!,
 							draggedRect!,
 							rootState.props.gap!
 						)
