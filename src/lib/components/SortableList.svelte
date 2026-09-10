@@ -507,22 +507,23 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	let pointerMoveRafId: number | null = null;
+	let lastClientX = 0;
+	let lastClientY = 0;
 	function handlePointerMove(e: PointerEvent) {
-		if (pointerMoveRafId || !isActivePointer(e, pointerId)) return;
+		if (!isActivePointer(e, pointerId)) return;
 
-		if (rootState.dragState !== 'ptr-drag-start' && rootState.dragState !== 'ptr-drag') {
-			pointerMoveRafId = null;
-			return;
-		}
+		if (rootState.dragState !== 'ptr-drag-start' && rootState.dragState !== 'ptr-drag') return;
 
-		const { clientX, clientY } = e;
+		lastClientX = e.clientX;
+		lastClientY = e.clientY;
+		if (pointerMoveRafId) return;
 
 		pointerMoveRafId = requestAnimationFrame(() => {
 			if (rootState.dragState === 'ptr-drag-start') rootState.dragState = 'ptr-drag';
 
 			if (!rootState.draggedItem) return;
 
-			rootState.pointer = { x: clientX, y: clientY };
+			rootState.pointer = { x: lastClientX, y: lastClientY };
 			updateTargetItem();
 
 			ondrag?.({
@@ -541,7 +542,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				...getPeerTargetFields(registry, group, rootState),
 			});
 
-			if (canScroll(scrollableAncestor)) autoScroll(clientX, clientY);
+			if (canScroll(scrollableAncestor)) autoScroll(lastClientX, lastClientY);
 
 			pointerMoveRafId = null;
 		});
