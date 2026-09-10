@@ -40,7 +40,8 @@
 		"test:headed": "playwright test --headed",
 		"test:ui": "playwright test --ui",
 		"test:trace": "playwright test --trace on",
-		"test:trigger-flaky": "playwright test --repeat-each=20 --workers=4 -x"
+		"test:trigger-flaky": "playwright test --repeat-each=20 --workers=4 -x",
+		"bench": "node benchmarking/run.mjs"
 	},
 	"files": [
 		"dist",
