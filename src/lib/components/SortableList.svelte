@@ -187,6 +187,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (transitionTimeoutId) clearTimeout(transitionTimeoutId);
 		if (pointerMoveRafId) cancelAnimationFrame(pointerMoveRafId);
 		if (scrollRafId) cancelAnimationFrame(scrollRafId);
+		if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
+		isPointerReleased = true;
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		pointerSession = endPointerSession(pointerSession);
 		if (registry.isSourceList(rootState)) {
@@ -309,11 +311,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 	}
 
+	let autoScrollRafId: number | null = null;
 	function scroll() {
 		if (!scrollableAncestor) return;
 
 		isAutoScrolling = true;
-		requestAnimationFrame(() => {
+		autoScrollRafId = requestAnimationFrame(() => {
+			autoScrollRafId = null;
 			if (
 				isPointerReleased ||
 				(!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeed.x) &&
