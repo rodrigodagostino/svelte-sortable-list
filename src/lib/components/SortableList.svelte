@@ -46,7 +46,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 -->
 
 <script lang="ts">
-	import { onDestroy, onMount, tick, untrack } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import { registry, setSortableListRootState } from '$lib/states/index.js';
 	import type { RegistryList, SortableListRootProps as RootProps } from '$lib/types/index.js';
@@ -201,15 +201,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let scrollableAncestor = $derived(ref ? getClosestScrollableAncestor(ref) : undefined);
 	let scrollOrigin = { left: 0, top: 0 };
-	let scrollSpeed = $state({ x: 0, y: 0 });
+	let scrollSpeed = { x: 0, y: 0 };
 	let isScrollingDocument = $derived(
 		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : false
 	);
 	let isAutoScrolling = false;
-
-	$effect(() => {
-		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) untrack(() => scroll());
-	});
 
 	function refreshScrollOffset() {
 		const scrollOffset = updateScrollOffset(
@@ -345,6 +341,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
 				: 0,
 		};
+
+		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) scroll();
 	}
 
 	let scrollRafId: number | null = null;
