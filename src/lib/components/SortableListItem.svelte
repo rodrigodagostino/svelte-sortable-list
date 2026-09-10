@@ -512,8 +512,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:transform={styleTransform}
-	style:--ssl-transition-duration="{rootState.props?.transition?.duration}ms"
-	style:--ssl-transition-easing={rootState.props?.transition?.easing}
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
