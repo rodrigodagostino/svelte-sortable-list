@@ -6,7 +6,7 @@ import type {
 import { getContext, setContext } from 'svelte';
 
 export class SortableListRootState {
-	props: RootProps = $state({});
+	props: RootProps = $state.raw({});
 	dragState:
 		| 'idle'
 		| 'ptr-drag-start'
@@ -46,7 +46,7 @@ export function getSortableListRootState() {
 }
 
 class SortableListItemState {
-	props: Partial<ItemProps> = $state({});
+	props: Partial<ItemProps> = $state.raw({});
 }
 
 const ITEM_KEY = Symbol('SortableList.ItemState');
