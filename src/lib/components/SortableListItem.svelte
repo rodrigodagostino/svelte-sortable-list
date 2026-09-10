@@ -438,7 +438,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
 		if (rootState.dragState.startsWith('kbd')) void rootState.scrollOffset;
-		void rootState.pointer;
+		if (draggedId === String(id)) void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isWithinBounds;
 		void registry.sourceList;
