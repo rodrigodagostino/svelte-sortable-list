@@ -141,13 +141,8 @@
 	}
 
 	function getPeerTransform() {
-		const targetItemId = registry.targetList?.targetItemId;
-		if (!ref || targetItemId == null) return 'translate3d(0, 0, 0)';
-
-		const targetItem = rootState.props.ref?.querySelector<HTMLLIElement>(
-			`.ssl-item[data-item-id="${CSS.escape(targetItemId)}"]`
-		);
-		if (!targetItem) return 'translate3d(0, 0, 0)';
+		const { targetItem, targetItemId } = registry.targetList ?? {};
+		if (!ref || targetItemId == null || !targetItem) return 'translate3d(0, 0, 0)';
 
 		const targetRect = getItemRect(targetItem);
 		const placeholderRect = getItemRect(ref);

@@ -25,6 +25,7 @@ export function getItemRect(item: HTMLLIElement): ItemRect {
 		left: left - (itemTranslate?.x || 0),
 		id: item.dataset.itemId!,
 		index: Number(item.dataset.itemIndex),
+		ref: item,
 	};
 }
 

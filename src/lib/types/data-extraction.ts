@@ -9,4 +9,5 @@ export interface ItemRect {
 	left: DOMRect['left'];
 	id: string;
 	index: number;
+	ref: HTMLLIElement;
 }

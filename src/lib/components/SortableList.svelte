@@ -235,9 +235,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const draggedRectWithOffset = getItemRectWithOffset(draggedRect, rootState.scrollOffset);
 		const collidingItemRect = getCollidingItemRect(draggedRectWithOffset, rootState.itemRects);
 		if (collidingItemRect) {
-			rootState.targetItem = ref.querySelector<HTMLLIElement>(
-				`.ssl-item[data-item-id="${CSS.escape(collidingItemRect.id)}"]`
-			);
+			rootState.targetItem = collidingItemRect.ref;
 			if (group) registry.targetList = null;
 			return;
 		} else if (canClearOnDragOut && !rootState.isWithinBounds)
@@ -261,12 +259,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					) {
 						registry.targetList = {
 							...peerList,
-							targetItem:
-								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${CSS.escape(peerCollidingItemRect.id)}"]`
-								) ?? null,
-							targetItemId: peerCollidingItemRect?.id ?? null,
-							targetItemIndex: peerCollidingItemRect?.index ?? null,
+							targetItem: peerCollidingItemRect.ref,
+							targetItemId: peerCollidingItemRect.id,
+							targetItemIndex: peerCollidingItemRect.index,
 						};
 					}
 					return;
@@ -746,11 +741,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								rootState.focusedItem.getBoundingClientRect(),
 								getItemRects(peerList.ref)
 							);
-							const peerTargetItem =
-								closestRect &&
-								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
-								);
+							const peerTargetItem = closestRect?.ref;
 							peerTargetItem?.focus({ preventScroll: true });
 						}
 					} else {
@@ -843,11 +834,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 						if (peerList) {
 							const closestRect = getClosestItemRect(draggedRect, getItemRects(peerList.ref));
-							const peerTargetItem =
-								closestRect &&
-								peerList.ref.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
-								);
+							const peerTargetItem = closestRect?.ref;
 							if (peerTargetItem) {
 								if (
 									registry.targetList?.state !== peerList.state ||
@@ -890,11 +877,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								rootState.scrollOffset
 							);
 							const closestRect = getClosestItemRect(draggedRectWithOffset, rootState.itemRects);
-							if (closestRect) {
-								rootState.targetItem = ref!.querySelector<HTMLLIElement>(
-									`.ssl-item[data-item-id="${CSS.escape(closestRect.id)}"]`
-								);
-							}
+							if (closestRect) rootState.targetItem = closestRect.ref;
 							registry.targetList = null;
 						}
 					}
