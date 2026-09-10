@@ -151,7 +151,7 @@
 	}
 
 	function getStyleOverflow() {
-		if (rootState.props.canRemoveOnDropOut || isSlotClosing()) return 'hidden';
+		if (rootState.props.canRemoveOnDropOut || isSlotClosing()) return 'clip';
 		return undefined;
 	}
 
