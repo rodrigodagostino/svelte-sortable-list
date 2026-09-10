@@ -41,16 +41,18 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
  * block for fixed elements (`transform`, `filter`, `contain`, `will-change`, …), in which case
  * it’s the padding box of that ancestor.
  */
+const fixedOriginProbes = new WeakMap<HTMLUListElement, HTMLElement>();
 const FIXED_ORIGIN_PROBE_CLASS = 'ssl-fixed-origin-probe';
 function getFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
-	let probe = ref.querySelector<HTMLElement>(`:scope > .${FIXED_ORIGIN_PROBE_CLASS}`);
-	if (!probe) {
+	let probe = fixedOriginProbes.get(ref);
+	if (!probe?.isConnected) {
 		probe = document.createElement('div');
 		probe.className = FIXED_ORIGIN_PROBE_CLASS;
 		probe.setAttribute('aria-hidden', 'true');
 		probe.style.cssText =
 			'position: fixed; left: 0; top: 0; width: 0; height: 0; padding: 0; margin: 0; border: 0; visibility: hidden; pointer-events: none';
 		ref.appendChild(probe);
+		fixedOriginProbes.set(ref, probe);
 	}
 	const { x, y } = probe.getBoundingClientRect();
 
@@ -58,7 +60,8 @@ function getFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
 }
 
 export function removeFixedOriginProbe(ref: HTMLUListElement) {
-	ref.querySelector(`:scope > .${FIXED_ORIGIN_PROBE_CLASS}`)?.remove();
+	fixedOriginProbes.get(ref)?.remove();
+	fixedOriginProbes.delete(ref);
 }
 
 export function updateFixedOrigin(ref: HTMLUListElement, fixedOrigin: RootState['fixedOrigin']) {
