@@ -1183,11 +1183,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				await handlePointerAndKeyboardDragEnd(action);
 			};
 
-			afterPaint(dropDuration, async () => {
+			function startDropTimer() {
 				if (isResolved) return;
 				const TRANSITION_END_BUFFER = 32; // ~2 frames
 				transitionTimeoutId = setTimeout(finalizeDrop, dropDuration + TRANSITION_END_BUFFER);
-			});
+			}
+
+			if (action === 'ptr-drop' && _transition.duration > 0) startDropTimer();
+			else afterPaint(dropDuration, startDropTimer);
 		} else {
 			handlePointerAndKeyboardDragEnd(action);
 		}
