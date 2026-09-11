@@ -636,6 +636,17 @@ Use these CSS selectors to customize the appearance of list components:
 | Selector                                             | Description                                                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `.ssl-root`                                          | List element inside `<SortableList.Root>`.                                                                         |
+| `.ssl-root[data-drag-state="idle"]`                  | List whose item is in default, inactive state.                                                                     |
+| `.ssl-root[data-drag-state="ptr-drag-start"]`        | List whose item is starting pointer drag.                                                                          |
+| `.ssl-root[data-drag-state="ptr-drag"]`              | List whose item is being dragged via pointer.                                                                      |
+| `.ssl-root[data-drag-state="ptr-predrop"]`           | List whose item is settling into dropped position.                                                                 |
+| `.ssl-root[data-drag-state="ptr-drop"]`              | List whose item is being dropped via pointer.                                                                      |
+| `.ssl-root[data-drag-state="ptr-cancel"]`            | List whose item’s pointer drag was canceled.                                                                       |
+| `.ssl-root[data-drag-state="ptr-remove"]`            | List whose item was dropped outside list boundaries via pointer (with `canRemoveOnDropOut` enabled).               |
+| `.ssl-root[data-drag-state="kbd-drag-start"]`        | List whose item is starting keyboard drag.                                                                         |
+| `.ssl-root[data-drag-state="kbd-drag"]`              | List whose item is being dragged via keyboard.                                                                     |
+| `.ssl-root[data-drag-state="kbd-drop"]`              | List whose item is being dropped via keyboard.                                                                     |
+| `.ssl-root[data-drag-state="kbd-cancel"]`            | List whose item’s keyboard drag was canceled.                                                                      |
 | `.ssl-root[aria-orientation="vertical"]`             | Vertically oriented list.                                                                                          |
 | `.ssl-root[aria-orientation="horizontal"]`           | Horizontally oriented list.                                                                                        |
 | `.ssl-root[data-has-locked-axis="true"]`             | List with movement restricted to main axis.                                                                        |

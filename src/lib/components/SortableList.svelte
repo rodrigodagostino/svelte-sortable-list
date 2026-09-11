@@ -1308,6 +1308,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	style:--ssl-transition-easing={_transition.easing}
 	data-list-id={id}
 	data-list-index={index}
+	data-drag-state={rootState.dragState}
 	data-has-locked-axis={hasLockedAxis}
 	data-has-bounds={hasBounds}
 	data-can-clear-on-drag-out={canClearOnDragOut}
@@ -1373,7 +1374,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		/* Prevent touch gestures during a pointer drag and on lists without handles. */
 		/* (locked/disabled lists and lists with handles stay scrollable while idle). */
-		&:has(:global([data-drag-state*='ptr'])),
+		&[data-drag-state*='ptr'],
 		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(
 				:has(:global(.ssl-item-handle))
 			) {
