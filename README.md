@@ -626,6 +626,8 @@ To use the demo page styles in your project:
 </script>
 ```
 
+The default stylesheet is a demo theme rather than a minimal baseline. If you use it as a starting point for lists with hundreds of items, drop the `text-shadow` on `.ssl-item-content` first: it is applied to every item and makes each repaint of the list’s text more expensive. The layered `box-shadow` on the dragged item costs far less, since only one item carries it at a time.
+
 ### Selectors
 
 Use these CSS selectors to customize the appearance of list components:
