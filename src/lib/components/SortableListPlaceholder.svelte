@@ -215,7 +215,6 @@
 		position: relative;
 		list-style: none;
 		user-select: none;
-		backface-visibility: hidden;
 		transition:
 			width var(--ssl-transition-duration),
 			height var(--ssl-transition-duration),

@@ -244,7 +244,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			draggedIndex === null ||
 			!draggedRect
 		)
-			return 'translate3d(0, 0, 0)';
+			return undefined;
 
 		if (draggedId !== String(id)) return getNeighborTransform();
 
@@ -265,7 +265,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			index < targetList.targetItemIndex ||
 			!sourceList.state.itemRects
 		)
-			return 'translate3d(0, 0, 0)';
+			return undefined;
 
 		const sourceDraggedRect = sourceList.state.itemRects[getIndex(sourceList.draggedItem)];
 		const x =
@@ -281,8 +281,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getNeighborTransform() {
-		if (rootState.props.canRemoveOnDropOut && !rootState.isWithinBounds)
-			return 'translate3d(0, 0, 0)';
+		if (rootState.props.canRemoveOnDropOut && !rootState.isWithinBounds) return undefined;
 
 		if (
 			targetIndex === null ||
@@ -291,7 +290,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			index < Math.min(draggedIndex!, targetIndex) ||
 			index > Math.max(draggedIndex!, targetIndex)
 		)
-			return 'translate3d(0, 0, 0)';
+			return undefined;
 
 		const step = index > draggedIndex! ? -1 : 1;
 		const direction = index > draggedIndex! === !rootState.isRTL ? -1 : 1;
@@ -541,8 +540,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		position: relative;
 		list-style: none;
 		user-select: none;
-		backface-visibility: hidden;
 		z-index: 1;
+
+		&:not([data-drag-state='idle']) {
+			will-change: transform;
+		}
 
 		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(:has(.ssl-item-handle)),
 		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-item-handle) {
