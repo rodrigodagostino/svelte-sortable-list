@@ -78,6 +78,9 @@ export function scaleFly(
 
 	const has_translate = x_value !== 0 || y_value !== 0;
 	const has_opacity_delta = opacity_delta_value !== 0;
+	const has_padding = padding_start_value !== 0 || padding_end_value !== 0;
+	const has_margin = margin_start_value !== 0 || margin_end_value !== 0;
+	const has_border = border_width_start_value !== 0 || border_width_end_value !== 0;
 
 	return {
 		delay,
@@ -88,12 +91,9 @@ export function scaleFly(
 			`${has_opacity_delta ? `opacity: ${t > 0.5 ? opacity_target_value - opacity_delta_value * u * 2 : 0};` : ''}` +
 			`${primary_property}: ${t <= 0.5 ? t * 2 * primary_property_value : primary_property_value}px;` +
 			`${primary_property_opposite}: ${primary_property_opposite_value}px;` +
-			`padding-${secondary_properties[0]}: ${t <= 0.5 ? t * 2 * padding_start_value : padding_start_value}px;` +
-			`padding-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * padding_end_value : padding_end_value}px;` +
-			`margin-${secondary_properties[0]}: ${margin_start_value}px;` +
-			`margin-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * (margin_start_value + margin_end_value) - margin_start_value : margin_end_value}px;` +
-			`border-${secondary_properties[0]}-width: ${t <= 0.5 ? t * 2 * border_width_start_value : border_width_start_value}px;` +
-			`border-${secondary_properties[1]}-width: ${t <= 0.5 ? t * 2 * border_width_end_value : border_width_end_value}px;` +
+			`${has_padding ? `padding-${secondary_properties[0]}: ${t <= 0.5 ? t * 2 * padding_start_value : padding_start_value}px; padding-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * padding_end_value : padding_end_value}px;` : ''}` +
+			`${has_margin ? `margin-${secondary_properties[0]}: ${margin_start_value}px; margin-${secondary_properties[1]}: ${t <= 0.5 ? t * 2 * (margin_start_value + margin_end_value) - margin_start_value : margin_end_value}px;` : ''}` +
+			`${has_border ? `border-${secondary_properties[0]}-width: ${t <= 0.5 ? t * 2 * border_width_start_value : border_width_start_value}px; border-${secondary_properties[1]}-width: ${t <= 0.5 ? t * 2 * border_width_end_value : border_width_end_value}px;` : ''}` +
 			`min-${primary_property}: 0;`,
 	};
 }
