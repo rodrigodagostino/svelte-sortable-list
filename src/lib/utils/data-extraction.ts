@@ -64,6 +64,14 @@ export function clearPeerItemRects() {
 	peerSnapshot = null;
 }
 
+export function getTargetItemFields(item: HTMLLIElement | null) {
+	return {
+		targetItem: item,
+		targetItemId: !item || item.classList.contains('ssl-placeholder') ? null : item.id,
+		targetItemIndex: item ? getIndex(item) : null,
+	};
+}
+
 export function getPeerTargetFields(
 	registry: Registry,
 	group: string | undefined,

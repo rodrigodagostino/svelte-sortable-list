@@ -73,6 +73,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getPeerItemRects,
 		getPeerTargetFields,
 		getScrollingSpeed,
+		getTargetItemFields,
 		getTextDirection,
 		isActivePointer,
 		isCenterCrossed,
@@ -257,14 +258,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					if (
 						registry.targetList?.state !== peerList.state ||
 						registry.targetList.targetItemId !== peerCollidingItemRect.id
-					) {
+					)
 						registry.targetList = {
 							...peerList,
-							targetItem: peerCollidingItemRect.ref,
-							targetItemId: peerCollidingItemRect.id,
-							targetItemIndex: peerCollidingItemRect.index,
+							...getTargetItemFields(peerCollidingItemRect.ref),
 						};
-					}
 					return;
 				}
 
@@ -283,10 +281,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						tick().then(() => {
 							// Bail out if the target changed in the meantime.
 							if (registry.targetList?.state !== peerList.state) return;
-							registry.targetList = {
-								...registry.targetList,
-								targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
-							};
+							const placeholder = peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+							registry.targetList = { ...registry.targetList, ...getTargetItemFields(placeholder) };
 						});
 					}
 					return;
@@ -299,12 +295,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					registry.targetList?.targetItemIndex !== peerItemRects.length &&
 					isCenterCrossed(draggedRect, getItemRect(peerPlaceholder))
 				) {
-					registry.targetList = {
-						...peerList,
-						targetItem: peerPlaceholder,
-						targetItemId: null,
-						targetItemIndex: peerItemRects.length,
-					};
+					registry.targetList = { ...peerList, ...getTargetItemFields(peerPlaceholder) };
 				}
 				return;
 			}
@@ -789,14 +780,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								return;
 
 							const targetItemSibling = getItemSibling(targetList.targetItem, step, false);
-							registry.targetList = {
-								...targetList,
-								targetItem: targetItemSibling,
-								targetItemId: targetItemSibling?.classList.contains('ssl-placeholder')
-									? null
-									: (targetItemSibling?.id ?? null),
-								targetItemIndex: targetItemSibling ? getIndex(targetItemSibling) : null,
-							};
+							registry.targetList = { ...targetList, ...getTargetItemFields(targetItemSibling) };
 						} else {
 							// Prevent moving the selected item if it’s the first or last item,
 							// or is at the top or bottom of the list.
@@ -845,14 +829,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								if (
 									registry.targetList?.state !== peerList.state ||
 									registry.targetList.targetItemId !== peerTargetItem.id
-								) {
-									registry.targetList = {
-										...peerList,
-										targetItem: peerTargetItem ?? null,
-										targetItemId: peerTargetItem?.id ?? null,
-										targetItemIndex: peerTargetItem ? getIndex(peerTargetItem) : null,
-									};
-								}
+								)
+									registry.targetList = { ...peerList, ...getTargetItemFields(peerTargetItem) };
 							}
 							// If the peer list is empty, place the dragged item in its first position.
 							else {
@@ -869,9 +847,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 									tick().then(() => {
 										// Bail out if the target changed in the meantime.
 										if (registry.targetList?.state !== peerList.state) return;
+										const placeholder =
+											peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
 										registry.targetList = {
 											...registry.targetList,
-											targetItem: peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder'),
+											...getTargetItemFields(placeholder),
 										};
 									});
 								}
@@ -966,14 +946,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							key === 'Home'
 								? targetListChildren[0]
 								: targetListChildren[targetListChildren.length - 1];
-						registry.targetList = {
-							...targetList,
-							targetItem: peerTargetItem,
-							targetItemId: peerTargetItem.classList.contains('ssl-placeholder')
-								? null
-								: peerTargetItem.id,
-							targetItemIndex: getIndex(peerTargetItem),
-						};
+						registry.targetList = { ...targetList, ...getTargetItemFields(peerTargetItem) };
 					} else {
 						// Prevent moving the selected item if it’s the first or last item,
 						// or is at the top or bottom of the list.
