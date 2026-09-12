@@ -3,7 +3,7 @@ import type {
 	SortableListRegistry as Registry,
 	SortableListRootState as RootState,
 } from '$lib/states/index.js';
-import type { ItemRect } from '$lib/types/index.js';
+import type { ItemRect, RegistryList } from '$lib/types/index.js';
 
 export function getIndex(element: HTMLUListElement | HTMLLIElement) {
 	return Number(element.dataset.listIndex ?? element.dataset.itemIndex);
@@ -33,6 +33,59 @@ export function getItemRects(list: HTMLUListElement): ItemRect[] {
 	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
 		getItemRect(item)
 	);
+}
+
+export function getItemRectWithOffset(
+	itemRect: DOMRect,
+	scrollOffset: RootState['scrollOffset']
+): DOMRect {
+	return scrollOffset?.left || scrollOffset?.top
+		? new DOMRect(
+				itemRect.x + scrollOffset.left,
+				itemRect.y + scrollOffset.top,
+				itemRect.width,
+				itemRect.height
+			)
+		: itemRect;
+}
+
+let peerSnapshot: { list: RegistryList; key: string; rects: ItemRect[] } | null = null;
+
+export function getPeerItemRects(list: RegistryList): ItemRect[] {
+	const { x, y, width, height } = list.ref.getBoundingClientRect();
+	const key = `${x},${y},${width},${height},${list.ref.scrollLeft},${list.ref.scrollTop}`;
+	if (peerSnapshot?.list !== list || peerSnapshot.key !== key)
+		peerSnapshot = { list, key, rects: getItemRects(list.ref) };
+
+	return peerSnapshot.rects;
+}
+
+export function clearPeerItemRects() {
+	peerSnapshot = null;
+}
+
+export function getPeerTargetFields(
+	registry: Registry,
+	group: string | undefined,
+	state: RootState
+) {
+	if (!group || !registry.targetList || !registry.isSourceList(state))
+		return {
+			targetList: null,
+			targetListId: null,
+			targetListIndex: null,
+		};
+
+	const { targetItem, targetItemId, targetItemIndex } = registry.targetList;
+
+	return {
+		targetList: registry.targetList?.ref ?? null,
+		targetListId: registry.targetList?.id ?? null,
+		targetListIndex: registry.targetList?.index ?? null,
+		targetItem,
+		targetItemId,
+		targetItemIndex,
+	};
 }
 
 /**
@@ -69,44 +122,6 @@ export function updateFixedOrigin(ref: HTMLUListElement, fixedOrigin: RootState[
 	if (x === fixedOrigin.x && y === fixedOrigin.y) return fixedOrigin;
 
 	return { x, y };
-}
-
-export function getPeerTargetFields(
-	registry: Registry,
-	group: string | undefined,
-	state: RootState
-) {
-	if (!group || !registry.targetList || !registry.isSourceList(state))
-		return {
-			targetList: null,
-			targetListId: null,
-			targetListIndex: null,
-		};
-
-	const { targetItem, targetItemId, targetItemIndex } = registry.targetList;
-
-	return {
-		targetList: registry.targetList?.ref ?? null,
-		targetListId: registry.targetList?.id ?? null,
-		targetListIndex: registry.targetList?.index ?? null,
-		targetItem,
-		targetItemId,
-		targetItemIndex,
-	};
-}
-
-export function getItemRectWithOffset(
-	itemRect: DOMRect,
-	scrollOffset: RootState['scrollOffset']
-): DOMRect {
-	return scrollOffset?.left || scrollOffset?.top
-		? new DOMRect(
-				itemRect.x + scrollOffset.left,
-				itemRect.y + scrollOffset.top,
-				itemRect.width,
-				itemRect.height
-			)
-		: itemRect;
 }
 
 export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {

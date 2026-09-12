@@ -58,6 +58,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		canScroll,
 		canScrollX,
 		canScrollY,
+		clearPeerItemRects,
 		endPointerSession,
 		getClosestItemRect,
 		getClosestScrollableAncestor,
@@ -69,10 +70,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getItemRects,
 		getItemRectWithOffset,
 		getItemSibling,
+		getPeerItemRects,
 		getPeerTargetFields,
 		getScrollingSpeed,
 		getTextDirection,
 		isActivePointer,
+		isCenterCrossed,
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
@@ -248,7 +251,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				// Dragging over a peer list counts as being between bounds.
 				rootState.isWithinBounds = true;
 
-				const peerItemRects = getItemRects(peerList.ref);
+				const peerItemRects = getPeerItemRects(peerList);
 				const peerCollidingItemRect = getCollidingItemRect(draggedRect, peerItemRects);
 				if (peerCollidingItemRect) {
 					if (
@@ -294,7 +297,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				if (
 					peerPlaceholder &&
 					registry.targetList?.targetItemIndex !== peerItemRects.length &&
-					getCollidingItemRect(draggedRect, [getItemRect(peerPlaceholder)])
+					isCenterCrossed(draggedRect, getItemRect(peerPlaceholder))
 				) {
 					registry.targetList = {
 						...peerList,
@@ -1256,6 +1259,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.draggedItem = null;
 		rootState.targetItem = null;
 		rootState.itemRects = null;
+		clearPeerItemRects();
 		rootState.isWithinBounds = true;
 
 		// Wait for the sorted items to be updated before restoring focus.

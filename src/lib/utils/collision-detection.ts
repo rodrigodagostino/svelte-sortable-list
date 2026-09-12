@@ -11,7 +11,7 @@ function getDistanceBetweenCenters(a: DOMRect | ItemRect, b: DOMRect | ItemRect)
 	return Math.sqrt(dx * dx + dy * dy);
 }
 
-function isCenterCrossed(draggedRect: DOMRect, itemRect: ItemRect) {
+export function isCenterCrossed(draggedRect: DOMRect, itemRect: ItemRect) {
 	const itemCenterX = itemRect.x + itemRect.width / 2;
 	const itemCenterY = itemRect.y + itemRect.height / 2;
 
