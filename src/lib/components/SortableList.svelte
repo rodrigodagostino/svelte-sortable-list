@@ -871,12 +871,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						}
 					}
 
-					await tick();
 					targetIndex = getIndex(rootState.targetItem!);
-
-					await tick();
 					rootState.dragState = 'kbd-drag';
 
+					await tick();
 					if (!rootState.targetItem) return;
 
 					ondrag?.({
@@ -966,12 +964,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						rootState.targetItem = key === 'Home' ? items[0] : items[items.length - 1];
 					}
 
-					await tick();
 					targetIndex = getIndex(rootState.targetItem!);
-
-					await tick();
 					rootState.dragState = 'kbd-drag';
 
+					await tick();
 					ondrag?.({
 						deviceType: 'keyboard',
 						sourceList: ref!,
