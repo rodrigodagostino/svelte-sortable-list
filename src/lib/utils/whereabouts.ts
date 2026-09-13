@@ -44,6 +44,11 @@ const INTERACTIVE_ROLES = new Set([
 export const INTERACTIVE_ROLE_ATTRIBUTES = new Set(
 	[...INTERACTIVE_ROLES].map((role) => `[role="${role}"]`)
 );
+export const INTERACTIVE_SELECTORS = [
+	...INTERACTIVE_ELEMENTS,
+	...INTERACTIVE_ROLE_ATTRIBUTES,
+	'[contenteditable]:not([contenteditable="false"])',
+].join(', ');
 
 // Thank you, Vojtech Miksu :)
 // https://github.com/tajo/react-movable/blob/master/src/utils.ts

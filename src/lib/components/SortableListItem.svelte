@@ -40,8 +40,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		dispatch,
 		getIndex,
 		getItemRect,
-		INTERACTIVE_ELEMENTS,
-		INTERACTIVE_ROLE_ATTRIBUTES,
+		INTERACTIVE_SELECTORS,
 		isInSameRow,
 		isOrResidesInInteractiveElement,
 		keepWithinBounds,
@@ -127,11 +126,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
-	const selectors = [
-		...INTERACTIVE_ELEMENTS,
-		...INTERACTIVE_ROLE_ATTRIBUTES,
-		'[contenteditable]:not([contenteditable="false"])',
-	].join(', ');
 	const areInteractiveElementsTabbable = $derived(
 		!rootState.dragState.startsWith('kbd-drag') &&
 			focusedId === String(id) &&
@@ -141,9 +135,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 	$effect(() => {
 		const tabIndex = areInteractiveElementsTabbable ? 0 : -1;
-		tick().then(() => {
-			ref?.querySelectorAll<HTMLElement>(selectors).forEach((el) => (el.tabIndex = tabIndex));
-		});
+		ref
+			?.querySelectorAll<HTMLElement>(INTERACTIVE_SELECTORS)
+			.forEach((el) => (el.tabIndex = tabIndex));
 	});
 
 	function getStylePosition() {
