@@ -40,7 +40,9 @@
 
 	const rootState = getSortableListRootState();
 	const sourceState = $derived(
-		rootState.draggedItem ? rootState : (registry.sourceList?.state ?? rootState)
+		rootState.draggedItem || !rootState.group
+			? rootState
+			: (registry.sourceList?.state ?? rootState)
 	);
 
 	const classes = $derived(['ssl-placeholder', restProps.class]);
@@ -52,7 +54,7 @@
 			: null
 	);
 	const targetIndex = $derived(
-		registry.targetList && registry.isSourceList(rootState)
+		rootState.group && registry.targetList && registry.isSourceList(rootState)
 			? null
 			: sourceState.targetItem
 				? getIndex(sourceState.targetItem)
@@ -135,7 +137,7 @@
 				? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
 				: isInSameRow(draggedRect, targetRect)
 					? 0
-					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect);
+					: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -159,33 +161,33 @@
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		void registry.targetList;
+		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleWidth());
 	});
 	const styleHeight = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		void registry.targetList;
+		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleHeight());
 	});
 	const styleMargin = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		void registry.targetList;
+		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleMargin());
 	});
 	const styleTransform = $derived.by(() => {
 		void rootState.targetItem;
-		void registry.targetList;
+		if (rootState.group) void registry.targetList;
 		void ref;
 		return untrack(() => getStyleTransform());
 	});
 	const styleOverflow = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.isWithinBounds;
-		void registry.targetList;
+		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleOverflow());
 	});
 </script>

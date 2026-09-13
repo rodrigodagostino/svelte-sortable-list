@@ -1,8 +1,8 @@
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
 
 export interface RegistryList {
-	group: string;
 	ref: HTMLUListElement;
+	group: string;
 	state: RootState;
 	id: string | null;
 	index: number | null;

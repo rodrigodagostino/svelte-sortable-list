@@ -111,7 +111,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const targetIndex = $derived(
-		registry.targetList && registry.isSourceList(rootState)
+		rootState.group && registry.targetList && registry.isSourceList(rootState)
 			? null
 			: rootState.targetItem
 				? getIndex(rootState.targetItem)
@@ -198,8 +198,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			typeof draggedIndex === 'number' &&
 			typeof targetIndex === 'number'
 		) {
-			const alignItems =
-				rootState.props.ref && window.getComputedStyle(rootState.props.ref).alignItems;
+			const alignItems = rootState.ref && window.getComputedStyle(rootState.ref).alignItems;
 			const top =
 				rootState.props.direction === 'vertical'
 					? draggedIndex < targetIndex
@@ -308,7 +307,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				? direction * (draggedRect!.height + rootState.props.gap!)
 				: isSameRow
 					? 0
-					: calculateTranslateWithAlignment(rootState.props.ref!, neighborRect, rect!);
+					: calculateTranslateWithAlignment(rootState.ref!, neighborRect, rect!);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -337,7 +336,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 				? calculateTranslate('y', targetRect, draggedRect!, draggedIndex!, targetIndex)
 				: isInSameRow(draggedRect!, targetRect)
 					? 0
-					: calculateTranslateWithAlignment(rootState.props.ref!, targetRect, draggedRect!);
+					: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect!);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -366,7 +365,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		const y =
 			rootState.props.direction === 'vertical'
 				? calculateTranslate('y', draggedRectLive, targetRect, draggedIndex!, targetIndex)
-				: calculateTranslateWithAlignment(rootState.props.ref!, draggedRectLive, targetRect);
+				: calculateTranslateWithAlignment(rootState.ref!, draggedRectLive, targetRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -375,7 +374,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (!rootState.pointer || !rootState.pointerOrigin) return 'translate3d(0, 0, 0)';
 
 		const rootRect = rootState.props.hasBounds
-			? (rootState.rect ?? rootState.props.ref!.getBoundingClientRect())
+			? (rootState.rect ?? rootState.ref!.getBoundingClientRect())
 			: null;
 
 		const x =
@@ -442,8 +441,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (draggedId === String(id)) void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isWithinBounds;
-		void registry.sourceList;
-		void registry.targetList;
+		if (rootState.group) {
+			void registry.sourceList;
+			void registry.targetList;
+		}
 		return untrack(() => getStyleTransform());
 	});
 
@@ -461,13 +462,12 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget) {
+		if (!rootState.ref?.contains(relatedTarget) || rootState.ref === relatedTarget) {
 			if (!rootState.focusedItem) return;
 			dispatch(ref!, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
 			const { activeElement } = document;
-			if (activeElement !== rootState.props.ref && rootState.props.ref?.contains(activeElement))
-				return;
+			if (activeElement !== rootState.ref && rootState.ref?.contains(activeElement)) return;
 			rootState.focusedItem = null;
 		}
 	}

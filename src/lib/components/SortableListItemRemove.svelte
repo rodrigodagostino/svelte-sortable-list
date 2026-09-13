@@ -36,8 +36,8 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 
 	function handleClick(e: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
 		const { ref: itemRef, index } = itemState.props;
-		if (rootState.focusedItem && itemRef && typeof index === 'number' && rootState.props.ref) {
-			const items = rootState.props.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
+		if (rootState.focusedItem && itemRef && typeof index === 'number' && rootState.ref) {
+			const items = rootState.ref.querySelectorAll<HTMLLIElement>('.ssl-item');
 			if (items.length > 1) {
 				// Focus the next/previous item (if it exists) before removing the current one.
 				const step = index !== items.length - 1 ? 1 : -1;
@@ -46,7 +46,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 				else (itemRef.previousElementSibling as HTMLLIElement)?.focus({ preventScroll: true });
 			} else {
 				// Focus the root element (if there are no items left) before removing the current item.
-				rootState.props.ref.focus();
+				rootState.ref.focus();
 			}
 		}
 

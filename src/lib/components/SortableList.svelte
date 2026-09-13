@@ -127,11 +127,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const _announcements = $derived(announcements || announce);
 
 	$effect.pre(() => {
+		rootState.ref = ref;
+		rootState.group = group;
 		rootState.props = {
-			ref,
-			gap,
 			id,
 			index,
+			gap,
 			direction,
 			delay,
 			transition: _transition,
@@ -165,8 +166,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	onMount(() => {
 		if (group) {
 			registryEntry = {
-				group,
 				ref: ref!,
+				group,
 				state: rootState,
 				get id() {
 					return id ?? null;
@@ -1261,11 +1262,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.props.ref?.contains(relatedTarget) || rootState.props.ref === relatedTarget) {
+		if (!rootState.ref?.contains(relatedTarget) || rootState.ref === relatedTarget) {
 			await tick();
 			const { activeElement } = document;
-			if (activeElement !== rootState.props.ref && rootState.props.ref?.contains(activeElement))
-				return;
+			if (activeElement !== rootState.ref && rootState.ref?.contains(activeElement)) return;
 			liveText = '';
 		}
 	}
