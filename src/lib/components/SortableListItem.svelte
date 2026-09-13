@@ -25,7 +25,6 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 <script lang="ts">
 	import { onDestroy, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
-	import { on } from 'svelte/events';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import {
 		getSortableListRootState,
@@ -467,30 +466,27 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	// Prevent context menu from opening on long-press in Chrome for Android.
-	// Only the parts of the item that can start a drag are affected,
-	// so the page can still be scrolled from the rest.
-	const ontouchstart: Attachment = (element) => {
-		return on(
-			element,
+	// The listener is non-passive, which forces the browser to wait for it before scrolling,
+	// so it’s only attached to the parts of the item that can start a drag: the handle when
+	// there is one, and nothing at all while the item can’t be dragged.
+	const ontouchstart: Attachment<HTMLLIElement> = (element) => {
+		if (isLocked || rootState.props.isLocked || isDisabled || rootState.props.isDisabled) return;
+
+		const handle = element.querySelector('.ssl-item-handle');
+		const controller = new AbortController();
+
+		(handle ?? element).addEventListener(
 			'touchstart',
 			(e) => {
 				const target = e.target as HTMLElement | null;
-				if (!target || !ref || isOrResidesInInteractiveElement(target, ref)) return;
-
-				const hasHandle = !!ref.querySelector('.ssl-item-handle');
-				if (
-					isLocked ||
-					rootState.props.isLocked ||
-					isDisabled ||
-					rootState.props.isDisabled ||
-					(hasHandle && !target.closest('.ssl-item-handle'))
-				)
-					return;
+				if (!target || isOrResidesInInteractiveElement(target, element)) return;
 
 				e.preventDefault();
 			},
-			{ passive: false }
+			{ passive: false, signal: controller.signal }
 		);
+
+		return () => controller.abort();
 	};
 </script>
 
