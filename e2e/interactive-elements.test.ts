@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Sortable List - Interactive Items', () => {
 	test.beforeEach(async ({ page }) => {
 		// Navigate to the Interactive Items page
-		await page.goto('/interactive-items');
+		await page.goto('/interactive-elements');
 
 		// Wait for the root element to be loaded
 		await page.locator('.ssl-root').waitFor();

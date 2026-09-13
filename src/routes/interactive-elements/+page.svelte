@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>Interactive items — Svelte Sortable List</title>
+	<title>Interactive elements — Svelte Sortable List</title>
 </svelte:head>
 
 <SortableList.Root {...layoutState.props} ondrop={handleDrop} ondragend={handleDragEnd}>
