@@ -353,10 +353,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			return;
 		}
 
-		if (scrollRafId) return;
+		// The pointer frame retargets as well, so only one of the two may run per frame.
+		if (pointerMoveRafId || scrollRafId) return;
 
 		scrollRafId = requestAnimationFrame(() => {
-			updateTargetItem();
+			// If a pointer frame was requested after this one, let it do the retargeting.
+			if (!pointerMoveRafId) updateTargetItem();
 			scrollRafId = null;
 		});
 	}
