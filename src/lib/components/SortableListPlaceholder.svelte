@@ -1,3 +1,19 @@
+<!--
+@component
+## SortableListPlaceholder
+Serves as a stand-in for the dragged item’s original position. Rendered by `<SortableList.Item>` for the item currently being dragged within its own list, and by `<SortableList.Root>` itself when the list is the target of a cross-list drag, to mark where the incoming item would land.
+
+### Props
+- `ref`: reference to the placeholder element (HTMLLIElement). `[$bindable]`
+- `id`: unique identifier of the item being replaced by the placeholder.
+- `index`: position of the placeholder in the list.
+
+### Usage
+```svelte
+	<SortableListPlaceholder {id} {index} />
+```
+-->
+
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
