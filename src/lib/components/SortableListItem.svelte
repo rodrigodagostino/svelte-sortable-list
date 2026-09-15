@@ -231,7 +231,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getStyleTransform() {
-		if (registry.isTargetList(rootState)) return getForeignNeighborTransform();
+		if (registry.isTargetList(rootState)) return getPeerNeighborTransform();
 
 		if (
 			rootState.dragState === 'idle' ||
@@ -255,7 +255,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return getPointerTransform();
 	}
 
-	function getForeignNeighborTransform() {
+	function getPeerNeighborTransform() {
 		const { sourceList, targetList } = registry;
 		if (
 			!targetList ||
