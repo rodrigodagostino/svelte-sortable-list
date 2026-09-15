@@ -156,11 +156,22 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const classes = $derived(['ssl-root', restProps.class]);
 	let pointerSession: AbortController | null = null;
 	let pointerId: PointerEvent['pointerId'] | null = null;
-	let isPointerReleased = false;
+	let liveText = $state('');
+
+	const isIdle = $derived(rootState.dragState === 'idle');
+	const isPointerDrag = $derived(rootState.dragState.startsWith('ptr'));
+	const isPointerStartingDrag = $derived(rootState.dragState === 'ptr-drag-start');
+	const isPointerDragging = $derived(rootState.dragState === 'ptr-drag');
+	const isPointerStartingDragOrDragging = $derived(rootState.dragState.startsWith('ptr-drag'));
+	const isPointerPredropping = $derived(rootState.dragState === 'ptr-predrop');
+	const isKeyboardDrag = $derived(rootState.dragState.startsWith('kbd'));
+	const isKeyboardDragging = $derived(rootState.dragState === 'kbd-drag');
+	const isKeyboardStartingDragOrDragging = $derived(rootState.dragState.startsWith('kbd-drag'));
 	let isDropping = false;
+	let isPointerReleased = false;
+
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
-	let liveText = $state('');
 
 	let registryEntry: RegistryList | null = null;
 	onMount(() => {
@@ -348,7 +359,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
 		// Only retarget while the pointer is actually dragging.
-		if (!rootState.dragState.startsWith('ptr-drag')) {
+		if (!isPointerStartingDragOrDragging) {
 			refreshScrollOffset();
 			return;
 		}
@@ -422,11 +433,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (focusedRootState?.dragState.startsWith('kbd-drag')) await tick();
 		await interruptDropTransition(e);
-		if (
-			rootState.dragState !== 'idle' ||
-			delayTimeoutId !== null ||
-			(group && registry.isOtherDragActive(rootState))
-		)
+		if (!isIdle || delayTimeoutId !== null || (group && registry.isOtherDragActive(rootState)))
 			return;
 
 		isPointerReleased = false;
@@ -511,14 +518,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	function handlePointerMove(e: PointerEvent) {
 		if (!isActivePointer(e, pointerId)) return;
 
-		if (rootState.dragState !== 'ptr-drag-start' && rootState.dragState !== 'ptr-drag') return;
+		if (!isPointerStartingDrag && !isPointerDragging) return;
 
 		lastClientX = e.clientX;
 		lastClientY = e.clientY;
 		if (pointerMoveRafId) return;
 
 		pointerMoveRafId = requestAnimationFrame(() => {
-			if (rootState.dragState === 'ptr-drag-start') rootState.dragState = 'ptr-drag';
+			if (isPointerStartingDrag) rootState.dragState = 'ptr-drag';
 
 			if (!rootState.draggedItem) return;
 
@@ -633,7 +640,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				)
 					return;
 
-				if (rootState.dragState === 'idle') {
+				if (isIdle) {
 					if (group && registry.isOtherDragActive(rootState)) return;
 
 					rootState.draggedItem = rootState.focusedItem;
@@ -713,7 +720,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
 				const { targetList } = registry;
 
-				if (!rootState.dragState.startsWith('kbd-drag')) {
+				if (!isKeyboardStartingDragOrDragging) {
 					if (
 						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'vertical') ||
 						((key === 'ArrowUp' || key === 'ArrowDown') && direction === 'horizontal')
@@ -914,7 +921,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
 				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
-				if (!rootState.dragState.startsWith('kbd-drag')) {
+				if (!isKeyboardStartingDragOrDragging) {
 					// Prevent focusing the previous item if the current one is the first,
 					// and focusing the next item if the current one is the last.
 					if (
@@ -1003,7 +1010,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				// If the list is focused and Escape is pressed during a pointer drag,
 				// ensure no pointer session is left alive.
-				if (rootState.dragState.startsWith('ptr')) {
+				if (isPointerDrag) {
 					cancelPointerDrag();
 					return;
 				}
@@ -1024,12 +1031,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			if (!shouldScrollIntoView) return;
 
 			await tick();
-			const scrollTarget =
-				rootState.dragState !== 'kbd-drag'
-					? rootState.focusedItem
-					: registry.targetList
-						? registry.targetList.targetItem
-						: rootState.targetItem;
+			const scrollTarget = !isKeyboardDragging
+				? rootState.focusedItem
+				: registry.targetList
+					? registry.targetList.targetItem
+					: rootState.targetItem;
 
 			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
 				scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
@@ -1063,7 +1069,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					: _transition.duration > 0
 						? 'ptr-predrop'
 						: 'ptr-drop';
-			if (rootState.dragState === 'ptr-predrop') {
+			if (isPointerPredropping) {
 				// Wait until the CSS transform in <SortableListItem> that
 				// depends on `ptr-predrop` has been set before continuing.
 				afterPaint(_transition.duration, async () => {
@@ -1269,7 +1275,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	function handleContextMenu(e: MouseEvent) {
-		if (rootState.dragState !== 'idle') {
+		if (!isIdle) {
 			e.preventDefault();
 		}
 	}
@@ -1315,8 +1321,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	onfocusout={handleFocusOut}
 	oncontextmenu={handleContextMenu}
 	onitemfocusout={(event) => {
-		if (rootState.dragState.startsWith('kbd'))
-			handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel');
+		if (isKeyboardDrag) handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel');
 	}}
 >
 	{#if children}

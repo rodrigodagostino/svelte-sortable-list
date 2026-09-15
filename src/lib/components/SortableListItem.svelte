@@ -125,11 +125,18 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 	const focusedId = $derived(rootState.focusedItem ? rootState.focusedItem.id : null);
 
+	const isDragged = $derived(draggedId === String(id));
+	const isFocused = $derived(focusedId === String(id));
+	const _isLocked = $derived(isLocked || rootState.props.isLocked);
+	const _isDisabled = $derived(isDisabled || rootState.props.isDisabled);
+
+	const isPointerDrag = $derived(rootState.dragState.startsWith('ptr'));
+	const isPointerPredropping = $derived(rootState.dragState === 'ptr-predrop');
+	const isPointerDropping = $derived(rootState.dragState === 'ptr-drop');
+	const isKeyboardDrag = $derived(rootState.dragState.startsWith('kbd'));
+	const isKeyboardStartingDragOrDragging = $derived(rootState.dragState.startsWith('kbd-drag'));
 	const areInteractiveElementsTabbable = $derived(
-		!rootState.dragState.startsWith('kbd-drag') &&
-			focusedId === String(id) &&
-			!rootState.props.isDisabled &&
-			!isDisabled
+		!isKeyboardStartingDragOrDragging && isFocused && !_isDisabled
 	);
 
 	$effect(() => {
@@ -140,21 +147,21 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 
 	function getStylePosition() {
-		if (draggedId !== String(id)) return undefined;
+		if (!isDragged) return undefined;
 		return 'fixed';
 	}
 
 	function getStyleLeft() {
-		if (draggedId !== String(id) || !rect) return undefined;
+		if (!isDragged || !rect) return undefined;
 
-		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
+		if (isPointerPredropping || isPointerDropping) {
 			const peerTarget = registry.targetList?.targetItem;
 			if (peerTarget)
 				return `${toFixedPosition('x', getItemRect(peerTarget).x, rootState.fixedOrigin)}px`;
 		}
 
 		if (
-			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
+			(isPointerPredropping || isPointerDropping) &&
 			draggedRect &&
 			targetRect &&
 			typeof draggedIndex === 'number' &&
@@ -169,23 +176,23 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `${toFixedPosition('x', left, rootState.fixedOrigin)}px`;
 		}
 
-		if (rootState.dragState.startsWith('kbd') && draggedRect)
+		if (isKeyboardDrag && draggedRect)
 			return `${toFixedPosition('x', draggedRect.x - rootState.props.gap! / 2, rootState.fixedOrigin)}px`;
 
 		return `${toFixedPosition('x', rect.x, rootState.fixedOrigin)}px`;
 	}
 
 	function getStyleTop() {
-		if (draggedId !== String(id) || !rect || !ref) return undefined;
+		if (!isDragged || !rect || !ref) return undefined;
 
-		if (rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') {
+		if (isPointerPredropping || isPointerDropping) {
 			const peerTarget = registry.targetList?.targetItem;
 			if (peerTarget)
 				return `${toFixedPosition('y', getItemRect(peerTarget).y, rootState.fixedOrigin)}px`;
 		}
 
 		if (
-			(rootState.dragState === 'ptr-predrop' || rootState.dragState === 'ptr-drop') &&
+			(isPointerPredropping || isPointerDropping) &&
 			draggedRect &&
 			targetRect &&
 			typeof draggedIndex === 'number' &&
@@ -207,19 +214,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			return `${toFixedPosition('y', top, rootState.fixedOrigin)}px`;
 		}
 
-		if (rootState.dragState.startsWith('kbd') && draggedRect)
+		if (isKeyboardDrag && draggedRect)
 			return `${toFixedPosition('y', draggedRect.y - rootState.props.gap! / 2, rootState.fixedOrigin)}px`;
 
 		return `${toFixedPosition('y', rect.y, rootState.fixedOrigin)}px`;
 	}
 
 	function getStyleWidth() {
-		if (draggedId !== String(id)) return undefined;
+		if (!isDragged) return undefined;
 		return `${rect?.width}px`;
 	}
 
 	function getStyleHeight() {
-		if (draggedId !== String(id)) return undefined;
+		if (!isDragged) return undefined;
 		return `${rect?.height}px`;
 	}
 
@@ -238,9 +245,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		)
 			return undefined;
 
-		if (draggedId !== String(id)) return getNeighborTransform();
+		if (!isDragged) return getNeighborTransform();
 
-		if (rootState.dragState.startsWith('kbd')) return getKeyboardTransform();
+		if (isKeyboardDrag) return getKeyboardTransform();
 		if (rootState.dragState === 'ptr-remove') return ref?.style.transform;
 		if (rootState.dragState === 'ptr-drop') return 'translate3d(0, 0, 0)';
 		if (rootState.dragState === 'ptr-predrop') return getPredropTransform();
@@ -406,32 +413,37 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		void rootState.dragState;
 		return untrack(() => getStylePosition());
 	});
+
 	const styleLeft = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.fixedOrigin;
 		void rootState.scrollOffset;
 		return untrack(() => getStyleLeft());
 	});
+
 	const styleTop = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.fixedOrigin;
 		void rootState.scrollOffset;
 		return untrack(() => getStyleTop());
 	});
+
 	const styleWidth = $derived.by(() => {
 		void rootState.draggedItem;
 		void rootState.isWithinBounds;
 		return untrack(() => getStyleWidth());
 	});
+
 	const styleHeight = $derived.by(() => {
 		void rootState.draggedItem;
 		void rootState.isWithinBounds;
 		return untrack(() => getStyleHeight());
 	});
+
 	const styleTransform = $derived.by(() => {
 		void rootState.dragState;
-		if (rootState.dragState.startsWith('kbd')) void rootState.scrollOffset;
-		if (draggedId === String(id)) void rootState.pointer;
+		if (isKeyboardDrag) void rootState.scrollOffset;
+		if (isDragged) void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isWithinBounds;
 		if (rootState.group) {
@@ -442,7 +454,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 
 	async function handleFocusIn(e: FocusEvent) {
-		if (rootState.dragState.startsWith('ptr')) {
+		if (isPointerDrag) {
 			e.preventDefault();
 			return;
 		}
@@ -470,7 +482,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	// so it’s only attached to the parts of the item that can start a drag: the handle when
 	// there is one, and nothing at all while the item can’t be dragged.
 	const ontouchstart: Attachment<HTMLLIElement> = (element) => {
-		if (isLocked || rootState.props.isLocked || isDisabled || rootState.props.isDisabled) return;
+		if (_isLocked || _isDisabled) return;
 
 		const handle = element.querySelector('.ssl-item-handle');
 		const controller = new AbortController();
@@ -490,7 +502,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	};
 </script>
 
-{#if draggedId === String(id)}
+{#if isDragged}
 	<SortableListPlaceholder {id} {index} />
 {/if}
 <li
@@ -505,16 +517,16 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:transform={styleTransform}
 	data-item-id={id}
 	data-item-index={index}
-	data-drag-state={draggedId === String(id) ? rootState.dragState : 'idle'}
-	data-is-within-bounds={!rootState.isWithinBounds && draggedId === String(id) ? false : true}
-	data-is-locked={rootState.props.isLocked || isLocked}
-	data-is-disabled={rootState.props.isDisabled || isDisabled}
-	tabindex={focusedId === String(id) ? 0 : -1}
+	data-drag-state={isDragged ? rootState.dragState : 'idle'}
+	data-is-within-bounds={!rootState.isWithinBounds && isDragged ? false : true}
+	data-is-locked={_isLocked}
+	data-is-disabled={_isDisabled}
+	tabindex={isFocused ? 0 : -1}
 	role="option"
-	aria-disabled={rootState.props.isDisabled || isDisabled}
+	aria-disabled={_isDisabled}
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
-	aria-selected={focusedId === String(id)}
+	aria-selected={isFocused}
 	onfocusin={handleFocusIn}
 	onfocusout={handleFocusOut}
 	{@attach ontouchstart}

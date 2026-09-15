@@ -41,7 +41,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (registry.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
-			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
+			axis: isVertical ? 'y' : 'x',
 		});
 		// Svelte caches this config while a transition is in flight (an outro that starts
 		// mid-intro reuses the intro’s config), so the crossing check must also run when
@@ -98,6 +98,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		return () => node.replaceChildren();
 	};
 
+	let isVertical = $derived(rootState.props.direction === 'vertical');
 	const isPeerPlaceholder = registry.isTargetList(rootState);
 	let isPositioned = $state(!isPeerPlaceholder);
 
@@ -113,7 +114,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 
 	function getStyleWidth() {
 		if (
-			rootState.props.direction === 'horizontal' &&
+			!isVertical &&
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return 0;
@@ -122,7 +123,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 
 	function getStyleHeight() {
 		if (
-			rootState.props.direction === 'vertical' &&
+			isVertical &&
 			((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing())
 		)
 			return 0;
@@ -131,9 +132,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 
 	function getStyleMargin() {
 		if ((!rootState.isWithinBounds && rootState.props.canRemoveOnDropOut) || isSlotClosing()) {
-			return rootState.props.direction === 'vertical'
-				? `0 calc(var(--ssl-gap) / 2)`
-				: 'calc(var(--ssl-gap) / 2) 0';
+			return isVertical ? `0 calc(var(--ssl-gap) / 2)` : 'calc(var(--ssl-gap) / 2) 0';
 		}
 		return `calc(var(--ssl-gap) / 2)`;
 	}
@@ -144,16 +143,14 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (!draggedRect || !targetRect || draggedIndex === null || targetIndex === null)
 			return 'translate3d(0, 0, 0)';
 
-		const x =
-			rootState.props.direction === 'vertical'
+		const x = isVertical
+			? 0
+			: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
+		const y = isVertical
+			? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
+			: isInSameRow(draggedRect, targetRect)
 				? 0
-				: calculateTranslate('x', targetRect, draggedRect, draggedIndex, targetIndex);
-		const y =
-			rootState.props.direction === 'vertical'
-				? calculateTranslate('y', targetRect, draggedRect, draggedIndex, targetIndex)
-				: isInSameRow(draggedRect, targetRect)
-					? 0
-					: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect);
+				: calculateTranslateWithAlignment(rootState.ref!, targetRect, draggedRect);
 
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
@@ -180,6 +177,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleWidth());
 	});
+
 	const styleHeight = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
@@ -187,6 +185,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleHeight());
 	});
+
 	const styleMargin = $derived.by(() => {
 		void rootState.dragState;
 		void sourceState.draggedItem;
@@ -194,12 +193,14 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (rootState.group) void registry.targetList;
 		return untrack(() => getStyleMargin());
 	});
+
 	const styleTransform = $derived.by(() => {
 		void rootState.targetItem;
 		if (rootState.group) void registry.targetList;
 		void ref;
 		return untrack(() => getStyleTransform());
 	});
+
 	const styleOverflow = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.isWithinBounds;
