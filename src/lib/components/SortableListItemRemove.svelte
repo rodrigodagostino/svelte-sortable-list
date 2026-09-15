@@ -18,7 +18,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 -->
 
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
+	import SortableListIcon from '$lib/components/SortableListIcon.svelte';
 	import { getSortableListItemState, getSortableListRootState } from '$lib/states/index.js';
 	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
 
@@ -65,6 +65,6 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	{#if children}
 		{@render children()}
 	{:else}
-		<Icon name="remove" />
+		<SortableListIcon name="remove" />
 	{/if}
 </button>

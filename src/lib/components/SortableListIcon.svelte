@@ -1,6 +1,6 @@
 <!--
 @component
-## Icon
+## <SortableListIcon>
 Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.
 
 ### Props
@@ -8,7 +8,7 @@ Serves as an icon for the `<SortableList.ItemHandle>` and `<SortableList.ItemRem
 
 ### Usage
 ```svelte
-	<Icon name="handle" />
+	<SortableListIcon name="handle" />
 ```
 -->
 

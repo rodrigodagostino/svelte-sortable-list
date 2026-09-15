@@ -18,7 +18,7 @@ Serves as an element that limits the draggable area of a list item to itself. In
 -->
 
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
+	import SortableListIcon from '$lib/components/SortableListIcon.svelte';
 	import type { SortableListItemHandleProps as ItemHandleProps } from '$lib/types/props.js';
 
 	let {
@@ -34,6 +34,6 @@ Serves as an element that limits the draggable area of a list item to itself. In
 	{#if children}
 		{@render children()}
 	{:else}
-		<Icon name="handle" />
+		<SortableListIcon name="handle" />
 	{/if}
 </span>
