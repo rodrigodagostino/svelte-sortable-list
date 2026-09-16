@@ -579,8 +579,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		&[data-drag-state='ptr-drop'],
 		&[data-drag-state='ptr-cancel'],
 		&[data-drag-state*='kbd'],
-		:global(.ssl-root:has(> .ssl-placeholder:not([data-drag-state='idle'])))
-			> &[data-drag-state='idle'] {
+		:global(.ssl-root:not([data-drag-state='idle'])) > &[data-drag-state='idle'],
+		:global(.ssl-root[data-is-target='true']) > &[data-drag-state='idle'] {
 			transition: transform var(--ssl-transition-duration);
 		}
 
