@@ -161,13 +161,13 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	}
 
 	function getPeerTransform() {
-		const { targetItem, targetItemId } = registry.targetList ?? {};
-		if (!ref || targetItemId == null || !targetItem) return 'translate3d(0, 0, 0)';
+		const { targetItemId, targetItemRect, placeholderRect } = registry.targetList ?? {};
+		if (!ref || targetItemId == null || !targetItemRect) return 'translate3d(0, 0, 0)';
+		// The placeholder is appended when `targetList` is set,
+		// so it is still missing when the pointer first enters this list.
+		const rect = placeholderRect ?? getItemRect(ref);
 
-		const targetRect = getItemRect(targetItem);
-		const placeholderRect = getItemRect(ref);
-
-		return `translate3d(${targetRect.x - placeholderRect.x}px, ${targetRect.y - placeholderRect.y}px, 0)`;
+		return `translate3d(${targetItemRect.x - rect.x}px, ${targetItemRect.y - rect.y}px, 0)`;
 	}
 
 	function getStyleOverflow() {

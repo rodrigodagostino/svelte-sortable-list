@@ -65,10 +65,13 @@ export function clearPeerItemRects() {
 }
 
 export function getTargetItemFields(item: HTMLLIElement | null) {
+	const placeholder = item?.parentElement?.querySelector<HTMLLIElement>('.ssl-placeholder') ?? null;
 	return {
 		targetItem: item,
 		targetItemId: !item || item.classList.contains('ssl-placeholder') ? null : item.id,
 		targetItemIndex: item ? getIndex(item) : null,
+		targetItemRect: item ? getItemRect(item) : null,
+		placeholderRect: placeholder ? getItemRect(placeholder) : null,
 	};
 }
 

@@ -281,12 +281,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				// If the peer list is empty, place the dragged item in its first position.
 				if (!peerItemRects.length) {
 					if (registry.targetList?.state !== peerList.state) {
-						registry.targetList = {
-							...peerList,
-							targetItem: null,
-							targetItemId: null,
-							targetItemIndex: 0,
-						};
+						registry.targetList = { ...peerList, ...getTargetItemFields(null), targetItemIndex: 0 };
 
 						// Wait until `targetList` is set and the placeholder element
 						// is appended before setting `targetItem`.
@@ -473,6 +468,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(ref!);
 		rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
+		scrollEventTarget = addScrollListener(scrollableAncestor, handleScroll);
+
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
 
@@ -509,7 +506,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		// on macOS, causing valid drops to be canceled. Treating it as a drop instead means a genuine
 		// capture loss will drop rather than cancel, but that is preferable to silently broken drops.
 		document.addEventListener('lostpointercapture', handlePointerUp, { signal });
-		scrollEventTarget = addScrollListener(scrollableAncestor, handleScroll);
 	}
 
 	let pointerMoveRafId: number | null = null;
@@ -847,8 +843,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								if (registry.targetList?.state !== peerList.state) {
 									registry.targetList = {
 										...peerList,
-										targetItem: null,
-										targetItemId: null,
+										...getTargetItemFields(null),
 										targetItemIndex: 0,
 									};
 
