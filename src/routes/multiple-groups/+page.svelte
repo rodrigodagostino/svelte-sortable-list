@@ -142,7 +142,7 @@
 
 			&:has(.lists.direction-horizontal) {
 				margin-inline-end: auto;
-				overflow-x: auto;
+				overflow: auto hidden;
 			}
 		}
 
@@ -180,7 +180,7 @@
 		max-width: 100%;
 		padding-inline: 3rem;
 		padding-block-end: 3rem;
-		overflow-x: auto;
+		overflow: auto hidden;
 
 		&.direction-vertical {
 			grid-template-columns: repeat(2, minmax(13.5rem, 1fr));

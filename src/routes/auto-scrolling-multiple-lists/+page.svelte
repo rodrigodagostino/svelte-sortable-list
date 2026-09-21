@@ -106,7 +106,7 @@
 			}
 
 			&:has(.lists.direction-horizontal) {
-				overflow-x: auto;
+				overflow: auto hidden;
 			}
 		}
 
