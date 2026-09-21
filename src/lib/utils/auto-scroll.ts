@@ -55,13 +55,13 @@ export function shouldAutoScroll(
 ) {
 	if (direction === 'vertical')
 		return (
-			(element?.scrollTop > 0 && scrollingSpeed < 0) ||
-			(element?.scrollTop + element?.clientHeight < element?.scrollHeight && scrollingSpeed > 0)
+			(scrollingSpeed < 0 && element?.scrollTop > 0) ||
+			(scrollingSpeed > 0 && element?.scrollTop + element?.clientHeight < element?.scrollHeight)
 		);
 	else
 		return (
-			(element?.scrollLeft > 0 && scrollingSpeed < 0) ||
-			(element?.scrollLeft + element?.clientWidth < element?.scrollWidth && scrollingSpeed > 0)
+			(scrollingSpeed < 0 && element?.scrollLeft > 0) ||
+			(scrollingSpeed > 0 && element?.scrollLeft + element?.clientWidth < element?.scrollWidth)
 		);
 }
 
