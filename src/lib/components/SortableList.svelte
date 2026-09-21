@@ -65,6 +65,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getCollidingItemRect,
 		getDefaultAriaDescription,
 		getDropAnimations,
+		getFixedOrigin,
 		getIndex,
 		getItemRect,
 		getItemRects,
@@ -467,7 +468,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		rootState.draggedItem = currItem;
 		rootState.itemRects = getItemRects(ref!);
-		rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
+		rootState.fixedOrigin = getFixedOrigin(ref!);
 		scrollEventTarget = addScrollListener(scrollableAncestor, handleScroll);
 
 		await tick();
@@ -642,7 +643,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
 					rootState.itemRects = getItemRects(ref!);
-					rootState.fixedOrigin = updateFixedOrigin(ref!, rootState.fixedOrigin);
+					rootState.fixedOrigin = getFixedOrigin(ref!);
 					scrollOrigin = {
 						left: scrollableAncestor?.scrollLeft ?? 0,
 						top: scrollableAncestor?.scrollTop ?? 0,

@@ -3,16 +3,16 @@ import type { ItemRect } from '$lib/types/index.js';
 
 /**
  * Converts a viewport coordinate into the `left`/`top` value that places a `position: fixed`
- * element there. Both match unless an ancestor establishes a containing block (`transform`,
- * `filter`, `contain`, `will-change`, …), in which case `fixedOrigin` is where that block’s
- * origin sits in the viewport (see `getFixedOrigin()`).
+ * element there. Both match (`fixedOrigin` is `null`) unless an ancestor establishes a containing
+ * block (`transform`, `filter`, `contain`, `will-change`, …), in which case `fixedOrigin` is where
+ * that block’s origin sits in the viewport (see `getFixedOrigin()`).
  */
 export function toFixedPosition(
 	axis: 'x' | 'y',
 	value: number,
 	fixedOrigin: RootState['fixedOrigin']
 ) {
-	return value - fixedOrigin[axis];
+	return fixedOrigin ? value - fixedOrigin[axis] : value;
 }
 
 const MATRIX_REGEX = /matrix.*\((.+)\)/;

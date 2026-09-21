@@ -28,7 +28,7 @@ export class SortableListRootState {
 	itemRects: ItemRect[] | null = $state.raw(null);
 	pointer: { x: number; y: number } | null = $state.raw(null);
 	pointerOrigin: { x: number; y: number } | null = $state.raw(null);
-	fixedOrigin: { x: number; y: number } = $state.raw({ x: 0, y: 0 });
+	fixedOrigin: { x: number; y: number } | null = $state.raw(null);
 	isWithinBounds: boolean = $state(true);
 	scrollOffset: { left: number; top: number } = $state.raw({ left: 0, top: 0 });
 	isRTL: boolean = $state(false);

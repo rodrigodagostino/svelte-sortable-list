@@ -100,14 +100,42 @@ export function getPeerTargetFields(
 }
 
 /**
- * Returns the viewport position that `position: fixed` descendants of `ref` resolve their `left`
- * and `top` from. That is the viewport origin (0, 0) unless an ancestor establishes a containing
- * block for fixed elements (`transform`, `filter`, `contain`, `will-change`, …), in which case
- * it’s the padding box of that ancestor.
+ * Returns the origin used by `position: fixed` descendants of `ref`. This is usually the viewport
+ * origin (0, 0), unless an ancestor establishes a containing block for fixed elements.
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Display/Containing_block
  */
 const fixedOriginProbes = new WeakMap<HTMLUListElement, HTMLElement>();
 const FIXED_ORIGIN_PROBE_CLASS = 'ssl-fixed-origin-probe';
-function getFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
+const FIXED_CONTAINING_BLOCK_PROPERTIES = [
+	'transform',
+	'translate',
+	'rotate',
+	'scale',
+	'perspective',
+	'filter',
+	'backdropFilter',
+] as const;
+const FIXED_CONTAINING_BLOCK_CONTAIN_REGEX = /\b(?:paint|layout|strict|content)\b/;
+const FIXED_CONTAINING_BLOCK_WILL_CHANGE_REGEX =
+	/\b(?:transform|translate|rotate|scale|perspective|filter|backdrop-filter|contain)\b/;
+
+function hasFixedContainingBlock(ref: HTMLElement) {
+	for (let element: HTMLElement | null = ref; element; element = element.parentElement) {
+		const style = window.getComputedStyle(element);
+		if (
+			FIXED_CONTAINING_BLOCK_PROPERTIES.some((property) => style[property] !== 'none') ||
+			FIXED_CONTAINING_BLOCK_CONTAIN_REGEX.test(style.contain) ||
+			FIXED_CONTAINING_BLOCK_WILL_CHANGE_REGEX.test(style.willChange) ||
+			style.contentVisibility === 'auto' ||
+			style.contentVisibility === 'hidden'
+		)
+			return true;
+	}
+
+	return false;
+}
+
+function measureFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
 	let probe = fixedOriginProbes.get(ref);
 	if (!probe?.isConnected) {
 		probe = document.createElement('div');
@@ -123,16 +151,24 @@ function getFixedOrigin(ref: HTMLUListElement): { x: number; y: number } {
 	return { x, y };
 }
 
-export function removeFixedOriginProbe(ref: HTMLUListElement) {
-	fixedOriginProbes.get(ref)?.remove();
-	fixedOriginProbes.delete(ref);
+export function getFixedOrigin(ref: HTMLUListElement): RootState['fixedOrigin'] {
+	if (!hasFixedContainingBlock(ref)) return null;
+
+	return measureFixedOrigin(ref);
 }
 
 export function updateFixedOrigin(ref: HTMLUListElement, fixedOrigin: RootState['fixedOrigin']) {
-	const { x, y } = getFixedOrigin(ref);
+	if (!fixedOrigin) return fixedOrigin;
+
+	const { x, y } = measureFixedOrigin(ref);
 	if (x === fixedOrigin.x && y === fixedOrigin.y) return fixedOrigin;
 
 	return { x, y };
+}
+
+export function removeFixedOriginProbe(ref: HTMLUListElement) {
+	fixedOriginProbes.get(ref)?.remove();
+	fixedOriginProbes.delete(ref);
 }
 
 export const getTextDirection = (element: HTMLElement): HTMLElement['dir'] => {
