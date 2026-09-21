@@ -42,6 +42,11 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: isVertical ? 'y' : 'x',
+			metrics: {
+				width: draggedRect?.width ?? 0,
+				height: draggedRect?.height ?? 0,
+				margin: [rootState.props.gap! / 2, rootState.props.gap! / 2],
+			},
 		});
 		// Svelte caches this config while a transition is in flight (an outro that starts
 		// mid-intro reuses the intro’s config), so the crossing check must also run when
