@@ -828,4 +828,56 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Escape');
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 	});
+
+	test('should only probe the fixed origin inside an ancestor with a transform', async ({
+		page,
+	}) => {
+		// Find the root element
+		const root = page.locator('.ssl-root');
+
+		// Find the dragged item (List Item 1)
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+		// Find the probe the list appends to measure where fixed-positioned descendants resolve from
+		const probe = root.locator('.ssl-fixed-origin-probe');
+
+		// Get the bounding box for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
+
+		// Start the drag from the center of the dragged item
+		const pointerX = draggedBox.x + draggedBox.width / 2;
+		const pointerY = draggedBox.y + draggedBox.height / 2;
+		await page.mouse.move(pointerX, pointerY);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Verify no probe was needed: fixed-positioned descendants resolve from the viewport
+		await expect(probe).toHaveCount(0);
+
+		// Release the mouse and wait for the drag operation to complete
+		await page.mouse.up();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Turn an ancestor into the containing block of fixed-positioned elements
+		await page.evaluate(() => {
+			document.querySelector<HTMLElement>('.app-main .container')!.style.transform =
+				'translateZ(0)';
+		});
+
+		// Start the drag again from the center of the dragged item
+		await page.mouse.move(pointerX, pointerY);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Verify the probe is now in place to measure the ancestor’s origin
+		await expect(probe).toHaveCount(1);
+
+		// Release the mouse and wait for the drag operation to complete
+		await page.mouse.up();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the probe is removed once the drag operation is over
+		await expect(probe).toHaveCount(0);
+	});
 });
