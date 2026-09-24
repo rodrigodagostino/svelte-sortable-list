@@ -200,15 +200,6 @@
 		background-color: var(--ssl-gray-150);
 		border: 1px solid var(--ssl-gray-400);
 		border-radius: 0.25rem;
-		transition:
-			background-color 320ms,
-			border-color 320ms;
-
-		&:has(:global(.ssl-root[data-is-target='true'])) {
-			color: var(--ssl-indigo-900);
-			background-color: var(--ssl-indigo-200);
-			border-color: var(--ssl-indigo-400);
-		}
 	}
 
 	.lists.has-scroll-container .list {
