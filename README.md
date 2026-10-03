@@ -655,6 +655,7 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-root[data-has-bounds="true"]`                  | List with boundary-constrained movement.                                                                           |
 | `.ssl-root[data-can-clear-on-drag-out="true"]`       | List that clears target item when dragged outside boundaries.                                                      |
 | `.ssl-root[data-can-remove-on-drop-out="true"]`      | List that removes items when dropped outside boundaries.                                                           |
+| `.ssl-root[data-is-group-dragging="true"]`           | List whose `group` has an item being dragged.                                                                      |
 | `.ssl-root[data-is-source="true"]`                   | List the dragged item came from (in a `group`).                                                                    |
 | `.ssl-root[data-is-target="true"]`                   | List currently targeted by an item dragged from a peer list (in a `group`).                                        |
 | `.ssl-root[data-is-locked="true"]`                   | List with dragging disabled for all items.                                                                         |
