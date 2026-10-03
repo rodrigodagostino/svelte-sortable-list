@@ -356,6 +356,73 @@ test.describe('Sortable List - Multiple Lists', () => {
 		);
 	});
 
+	test('should keep transitioning the peer list items when the dragged item leaves the peer list using mouse', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Find the dragged item (To Do Item 1), the target item (Doing Item 1) and the return item (To Do Item 2)
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const targetItem = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		const returnItem = toDoList.locator('[data-item-id="to-do-item-2"]:not(.ssl-placeholder)');
+
+		// Scroll the items into view before reading their bounding boxes — see the note in the
+		// same-list reorder test above.
+		await draggedItem.scrollIntoViewIfNeeded();
+		await targetItem.scrollIntoViewIfNeeded();
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		const returnBox = await returnItem.boundingBox();
+		if (!draggedBox || !targetBox || !returnBox)
+			throw new Error('Could not get To Do Item 1, Doing Item 1 or To Do Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move over the center of Doing Item 1 to target the «Doing» peer list
+		await page.mouse.move(
+			targetBox.x + targetBox.width / 2,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+
+		// Move back over To Do Item 2 to leave the «Doing» peer list
+		await page.mouse.move(
+			returnBox.x + returnBox.width / 2,
+			returnBox.y + returnBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(doingList).toHaveAttribute('data-is-target', 'false');
+
+		// Verify the «Doing» items keep their transform transition while they slide back. Firefox
+		// drops the running transition when the rule goes away in the same style change.
+		await expect(doingList).toHaveAttribute('data-is-group-dragging', 'true');
+		await expect
+			.poll(() =>
+				doingList
+					.locator('.ssl-item')
+					.evaluateAll((items) => items.map((item) => getComputedStyle(item).transitionProperty))
+			)
+			.toEqual(['transform', 'transform', 'transform']);
+
+		// Release the mouse to drop
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		await expect(doingList).toHaveAttribute('data-is-group-dragging', 'false');
+	});
+
 	test('should move an item from one list to another list using keyboard', async ({ page }) => {
 		// Find the «To Do» and «Doing» list roots
 		const toDoList = page.locator('[data-list-id="to-do"]');
