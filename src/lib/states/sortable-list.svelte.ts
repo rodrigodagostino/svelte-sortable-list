@@ -31,6 +31,7 @@ export class SortableListRootState {
 	fixedOrigin: { x: number; y: number } | null = $state.raw(null);
 	isWithinBounds: boolean = $state(true);
 	scrollOffset: { left: number; top: number } = $state.raw({ left: 0, top: 0 });
+	visibleRange: { first: number; last: number } | null = null;
 	isRTL: boolean = $state(false);
 	handleKeyDown: ((e: KeyboardEvent, target: HTMLElement) => Promise<void>) | null =
 		$state.raw(null);

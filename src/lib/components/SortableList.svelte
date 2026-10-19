@@ -76,6 +76,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getScrollingSpeed,
 		getTargetItemFields,
 		getTextDirection,
+		getVisibleRange,
 		isActivePointer,
 		isCenterCrossed,
 		isFullyVisible,
@@ -245,6 +246,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.rect = ref.getBoundingClientRect();
 		rootState.isWithinBounds = areColliding(draggedRect, rootState.rect);
 		refreshScrollOffset();
+		rootState.visibleRange = getVisibleRange(
+			rootState.itemRects,
+			draggedRect,
+			gap,
+			rootState.scrollOffset
+		);
 
 		// Offset the dragged rect by the current scroll.
 		const draggedRectWithOffset = getItemRectWithOffset(draggedRect, rootState.scrollOffset);
@@ -266,6 +273,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				rootState.isWithinBounds = true;
 
 				const peerItemRects = getPeerItemRects(peerList);
+				peerList.state.visibleRange = getVisibleRange(
+					peerItemRects,
+					draggedRect,
+					peerList.state.props.gap!
+				);
 				const peerCollidingItemRect = getCollidingItemRect(draggedRect, peerItemRects);
 				if (peerCollidingItemRect) {
 					if (
@@ -1201,6 +1213,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const { activeElement } = document;
 		const focusedElement = ref!.contains(activeElement) ? activeElement : null;
 
+		// Return their transitions back to the items that shifted out of sight.
+		rootState.visibleRange = null;
+		if (group)
+			registry.getPeerLists(group, rootState).forEach((l) => (l.state.visibleRange = null));
 		rootState.dragState = 'idle';
 		removeFixedOriginProbe(ref!);
 

@@ -409,6 +409,14 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return `translate3d(${x}px, ${y}px, 0)`;
 	}
 
+	function getStyleTransition() {
+		const { visibleRange } = rootState;
+		if (isDragged || !visibleRange) return undefined;
+		// Items that cannot be seen while they shift take their new place at once, so long lists don’t
+		// run a transition for each of them.
+		return index < visibleRange.first || index > visibleRange.last ? 'none' : undefined;
+	}
+
 	const stylePosition = $derived.by(() => {
 		void rootState.dragState;
 		return untrack(() => getStylePosition());
@@ -451,6 +459,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			void registry.targetList;
 		}
 		return untrack(() => getStyleTransform());
+	});
+
+	const styleTransition = $derived.by(() => {
+		void styleTransform;
+		void rootState.dragState;
+		if (rootState.group) void registry.sourceList;
+		return untrack(() => getStyleTransition());
 	});
 
 	async function handleFocusIn(e: FocusEvent) {
@@ -515,6 +530,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	style:width={styleWidth}
 	style:height={styleHeight}
 	style:transform={styleTransform}
+	style:transition={styleTransition}
 	data-item-id={id}
 	data-item-index={index}
 	data-drag-state={isDragged ? rootState.dragState : 'idle'}
