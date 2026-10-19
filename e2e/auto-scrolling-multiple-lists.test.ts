@@ -59,6 +59,80 @@ test.describe('Sortable List - Auto Scrolling Multiple Lists', () => {
 		await expect(doingList.locator('[data-item-id="to-do-item-1"]')).toBeVisible();
 	});
 
+	test('should skip the transition of the peer list items shifted outside the viewport using mouse', async ({
+		page,
+	}) => {
+		// Find the «To Do» and «Doing» list roots
+		const toDoList = page.locator('[data-list-id="to-do"]');
+		const doingList = page.locator('[data-list-id="doing"]');
+
+		// Find the dragged item (To Do Item 1), the target item (Doing Item 1) and the return item (To Do Item 2)
+		const draggedItem = toDoList.locator('[data-item-id="to-do-item-1"]:not(.ssl-placeholder)');
+		const targetItem = doingList.locator('[data-item-id="doing-item-1"]:not(.ssl-placeholder)');
+		const returnItem = toDoList.locator('[data-item-id="to-do-item-2"]:not(.ssl-placeholder)');
+
+		// Find a peer item that stays in view (Doing Item 2) and one far below the viewport (Doing Item 100)
+		const nearItem = doingList.locator('[data-item-id="doing-item-2"]');
+		const farItem = doingList.locator('[data-item-id="doing-item-100"]');
+
+		// Scroll both items into view before reading their bounding boxes — needed on narrower
+		// viewports (e.g. Mobile Chrome), where the three lists overflow horizontally.
+		await draggedItem.scrollIntoViewIfNeeded();
+		await targetItem.scrollIntoViewIfNeeded();
+
+		// Get the bounding boxes for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		const targetBox = await targetItem.boundingBox();
+		const returnBox = await returnItem.boundingBox();
+		if (!draggedBox || !targetBox || !returnBox)
+			throw new Error('Could not get To Do Item 1, Doing Item 1 or To Do Item 2 bounding box');
+
+		// Start the drag from the center of the dragged item
+		await page.mouse.move(
+			draggedBox.x + draggedBox.width / 2,
+			draggedBox.y + draggedBox.height / 2
+		);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move over the center of Doing Item 1 to target the «Doing» peer list
+		await page.mouse.move(
+			targetBox.x + targetBox.width / 2,
+			targetBox.y + targetBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(doingList).toHaveAttribute('data-is-target', 'true');
+
+		// Verify both peer items shift to open the slot
+		await expect(nearItem).not.toHaveCSS('transform', 'none');
+		await expect(farItem).not.toHaveCSS('transform', 'none');
+
+		// Verify only the peer item in view transitions while shifting
+		await expect(nearItem).toHaveCSS('transition-property', 'transform');
+		await expect(farItem).toHaveCSS('transition-property', 'none');
+
+		// Move back over To Do Item 2 to leave the «Doing» peer list
+		await page.mouse.move(
+			returnBox.x + returnBox.width / 2,
+			returnBox.y + returnBox.height / 2,
+			{ steps: 40 } // Smooth movement
+		);
+		await expect(doingList).toHaveAttribute('data-is-target', 'false');
+
+		// Verify only the peer item in view transitions while sliding back
+		await expect(nearItem).toHaveCSS('transition-property', 'transform');
+		await expect(farItem).toHaveCSS('transition-property', 'none');
+
+		// Release the mouse to drop
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+
+		// Verify the peer item outside the viewport gets its transition back
+		await expect.poll(() => farItem.evaluate((item) => item.style.transition)).toBe('');
+	});
+
 	test('should auto scroll the window when dragging to the bottom and then to the top', async ({
 		page,
 	}) => {
