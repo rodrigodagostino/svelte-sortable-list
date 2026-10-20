@@ -136,10 +136,10 @@ export interface SortableListHandleProps {
 	children?: Snippet;
 }
 
-export interface SortableListItemRemoveProps extends HTMLButtonAttributes {
+export interface SortableListRemoverProps extends HTMLButtonAttributes {
 	/** Reference to the remove element. `[$bindable]` */
 	ref?: HTMLButtonElement | null;
-	/** Content to be rendered inside the remove button. */
+	/** Content to be rendered inside the remover button. */
 	children?: Snippet;
 }
 

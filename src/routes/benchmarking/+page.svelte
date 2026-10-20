@@ -13,7 +13,7 @@
 	 * - `lists`: number of lists; more than one puts them in the same group (default 1).
 	 * - `scroll=container`: wraps each list in a fixed-height scroll container (default: document scroll).
 	 * - `duration`: transition duration in ms (default 320).
-	 * - `handle=1` / `remove=1`: render a handle / remove button inside each item.
+	 * - `handle=1` / `remover=1`: render a handle / remover button inside each item.
 	 */
 	const params = page.url.searchParams;
 	const count = Number(params.get('count') ?? 500);
@@ -21,7 +21,7 @@
 	const hasScrollContainer = params.get('scroll') === 'container';
 	const duration = Number(params.get('duration') ?? defaultRootProps.transition?.duration ?? 320);
 	const hasHandle = params.get('handle') === '1';
-	const hasRemove = params.get('remove') === '1';
+	const hasRemover = params.get('remover') === '1';
 
 	let lists = $state(
 		getDefaultLists(
@@ -127,8 +127,8 @@
 					<SortableList.Handle />
 				{/if}
 				<span class="ssl-item-content__text">{item.text}</span>
-				{#if hasRemove}
-					<SortableList.ItemRemove onclick={() => handleRemoveClick(listId, item.id)} />
+				{#if hasRemover}
+					<SortableList.Remover onclick={() => handleRemoveClick(listId, item.id)} />
 				{/if}
 			</div>
 		</SortableList.Item>

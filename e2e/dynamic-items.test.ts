@@ -11,7 +11,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 		await page.locator('.ssl-root').waitFor();
 	});
 
-	test('should remove List Item 3 and List Item 2 by clicking on their remove buttons', async ({
+	test('should remove List Item 3 and List Item 2 by clicking on their remover buttons', async ({
 		page,
 	}) => {
 		// Find the root element
@@ -21,16 +21,16 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
-		// Verify the remove buttons are plain buttons, so they don’t submit an enclosing form
-		const removeButtonTypes = await root
-			.locator('.ssl-item-remove')
+		// Verify the remover buttons are plain buttons, so they don’t submit an enclosing form
+		const removerButtonTypes = await root
+			.locator('.ssl-remover')
 			.evaluateAll((buttons) => buttons.map((button) => (button as HTMLButtonElement).type));
-		expect(removeButtonTypes).toEqual(Array(initialItems.length).fill('button'));
+		expect(removerButtonTypes).toEqual(Array(initialItems.length).fill('button'));
 
 		// === FIRST REMOVAL OPERATION ===
-		// Click the remove button for List Item 3
+		// Click the remover button for List Item 3
 		const listItem3 = root.locator('[data-item-id="list-item-3"]:not(.ssl-placeholder)');
-		await listItem3.locator('.ssl-item-remove').click();
+		await listItem3.locator('.ssl-remover').click();
 
 		// Verify List Item 3 has been removed
 		await listItem3.waitFor({ state: 'detached' });
@@ -43,9 +43,9 @@ test.describe('Sortable List - Dynamic Items', () => {
 		expect(itemsAfterFirstRemoval).toEqual(removeItem(initialItems, 2));
 
 		// === SECOND REMOVAL OPERATION ===
-		// Click the remove button for List Item 2
+		// Click the remover button for List Item 2
 		const listItem2 = root.locator('[data-item-id="list-item-2"]:not(.ssl-placeholder)');
-		await listItem2.locator('.ssl-item-remove').click();
+		await listItem2.locator('.ssl-remover').click();
 
 		// Verify List Item 2 has been removed
 		await listItem2.waitFor({ state: 'detached' });
@@ -56,7 +56,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 		expect(finalItems).toEqual(removeItem(itemsAfterFirstRemoval, 1));
 	});
 
-	test('should update the remove buttons labels after sorting the items', async ({ page }) => {
+	test('should update the remover buttons labels after sorting the items', async ({ page }) => {
 		// Find the root element
 		const root = page.locator('.ssl-root');
 
@@ -64,7 +64,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const items = root.locator('.ssl-item');
 		await expect(items).toHaveCount(5);
 		for (let i = 0; i < 5; i++)
-			await expect(items.nth(i).locator('.ssl-item-remove')).toHaveAttribute(
+			await expect(items.nth(i).locator('.ssl-remover')).toHaveAttribute(
 				'aria-label',
 				`Remove item at position ${i + 1}`
 			);
@@ -76,7 +76,7 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const targetBox = await targetItem.boundingBox();
 		if (!draggedBox || !targetBox) throw new Error('Could not get item bounding box');
 
-		// Drag List Item 1 from its edge (not on the remove button) onto List Item 3
+		// Drag List Item 1 from its edge (not on the remover button) onto List Item 3
 		await page.mouse.move(draggedBox.x + 8, draggedBox.y + draggedBox.height / 2);
 		await page.mouse.down();
 		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
@@ -88,15 +88,15 @@ test.describe('Sortable List - Dynamic Items', () => {
 		await expect(draggedItem).toHaveAttribute('data-item-index', '2');
 
 		// Verify the labels follow the new positions
-		await expect(draggedItem.locator('.ssl-item-remove')).toHaveAttribute(
+		await expect(draggedItem.locator('.ssl-remover')).toHaveAttribute(
 			'aria-label',
 			'Remove item at position 3'
 		);
-		await expect(root.locator('[data-item-id="list-item-2"] .ssl-item-remove')).toHaveAttribute(
+		await expect(root.locator('[data-item-id="list-item-2"] .ssl-remover')).toHaveAttribute(
 			'aria-label',
 			'Remove item at position 1'
 		);
-		await expect(root.locator('[data-item-id="list-item-3"] .ssl-item-remove')).toHaveAttribute(
+		await expect(root.locator('[data-item-id="list-item-3"] .ssl-remover')).toHaveAttribute(
 			'aria-label',
 			'Remove item at position 2'
 		);
@@ -112,12 +112,12 @@ test.describe('Sortable List - Dynamic Items', () => {
 		const initialItems = await root.locator('.ssl-item .ssl-item-content__text').allTextContents();
 		expect(initialItems).toEqual(getDefaultItems(5).map((item) => item.text));
 
-		// Get the bounding box of the List Item 2 remove button for a precise click
-		const removeButton = root.locator('[data-item-id="list-item-2"] .ssl-item-remove');
+		// Get the bounding box of the List Item 2 remover button for a precise click
+		const removeButton = root.locator('[data-item-id="list-item-2"] .ssl-remover');
 		const removeBox = await removeButton.boundingBox();
-		if (!removeBox) throw new Error('Could not get List Item 2 remove button bounding box');
+		if (!removeBox) throw new Error('Could not get List Item 2 remover button bounding box');
 
-		// Click the remove button with the mouse, without focusing the item beforehand
+		// Click the remover button with the mouse, without focusing the item beforehand
 		await page.mouse.click(removeBox.x + removeBox.width / 2, removeBox.y + removeBox.height / 2);
 
 		// Verify List Item 2 was removed

@@ -109,7 +109,7 @@
 }
 
 .ssl-handle,
-.ssl-item-remove {
+.ssl-remover {
 	flex-shrink: 0;
 	display: flex;
 	padding: 0.5rem;
@@ -121,8 +121,8 @@
 
 .ssl-handle:hover,
 .ssl-item[data-drag-state*="ptr"] .ssl-handle,
-.ssl-item-remove:focus,
-.ssl-item-remove:hover {
+.ssl-remover:focus,
+.ssl-remover:hover {
 	background-color: var(--ssl-gray-150);
 	color: var(--ssl-gray-700);
 }
@@ -131,7 +131,7 @@
 	margin-inline-start: -1rem;
 }
 
-.ssl-item-remove {
+.ssl-remover {
 	margin-inline-end: -1rem;
 }
 

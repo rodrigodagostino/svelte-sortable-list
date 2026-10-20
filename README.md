@@ -50,7 +50,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Root>` events](#sortablelistroot-events)
   - [`<SortableList.Item>` props](#sortablelistitem-props)
   - [`<SortableList.Handle>` props](#sortablelisthandle-props)
-  - [`<SortableList.ItemRemove>` props](#sortablelistitemremove-props)
+  - [`<SortableList.Remover>` props](#sortablelistremover-props)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
 - [Types](#types)
@@ -296,15 +296,15 @@ The following example demonstrates how to translate announcements to Spanish (ad
 
 This package follows the [Compound Component Pattern](https://www.smashingmagazine.com/2021/08/compound-components-react/), inspired in the remarkable work of [Hunter Johnston](https://github.com/huntabyte) in [Bits UI](https://github.com/huntabyte/bits-ui). This pattern allows you to access modular components that work together seamlessly, all stemming from a single source.
 
-| Component                   | Description                                                                                                                                                                                                   |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<SortableList.Root>`       | The primary container that provides the main structure, drag-and-drop interactions, and emits available events.                                                                                               |
-| `<SortableList.Item>`       | An individual list item that holds data and content, and can contain `<SortableList.Handle>` and `<SortableList.ItemRemove>` components.                                                                      |
-| `<SortableList.Handle>`     | An element that restricts the draggable area of a list item to itself. Including this inside a `<SortableList.Item>` directly activates handle functionality for that item.                                   |
-| `<SortableList.ItemRemove>` | A `<button>` element that removes an item when pressed. Including this inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which handles the removal. |
+| Component                | Description                                                                                                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<SortableList.Root>`    | The primary container that provides the main structure, drag-and-drop interactions, and emits available events.                                                                                               |
+| `<SortableList.Item>`    | An individual list item that holds data and content, and can contain `<SortableList.Handle>` and `<SortableList.Remover>` components.                                                                         |
+| `<SortableList.Handle>`  | An element that restricts the draggable area of a list item to itself. Including this inside a `<SortableList.Item>` directly activates handle functionality for that item.                                   |
+| `<SortableList.Remover>` | A `<button>` element that removes an item when pressed. Including this inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which handles the removal. |
 
 > [!WARNING]
-> While you can use a standard `<button>` element instead of `<SortableList.ItemRemove>` to trigger item removal, the provided component offers additional benefits. It automatically focuses the next item in the list when a user removes an item via keyboard, preventing focus from falling back to the `<body>` element.
+> While you can use a standard `<button>` element instead of `<SortableList.Remover>` to trigger item removal, the provided component offers additional benefits. It automatically focuses the next item in the list when a user removes an item via keyboard, preventing focus from falling back to the `<body>` element.
 
 ### `<SortableList.Root>` props
 
@@ -362,7 +362,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | ------------------- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
 | `ref` `[$bindable]` | `HTMLSpanElement \| null \| undefined` | `null`  | `HTMLSpanElement \| null \| undefined` | Reference to the handle element. |
 
-### `<SortableList.ItemRemove>` props
+### `<SortableList.Remover>` props
 
 | Prop                | Type                                     | Default | Possible values                          | Description                      |
 | ------------------- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
@@ -690,7 +690,7 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-placeholder[data-drag-state="kbd-drop"]`       | Placeholder present during a keyboard drop.                                                                        |
 | `.ssl-placeholder[data-drag-state="kbd-cancel"]`     | Placeholder present during a canceled keyboard drag.                                                               |
 | `.ssl-handle`                                        | Handle element inside `<SortableList.Handle>`.                                                                     |
-| `.ssl-item-remove`                                   | Remove button element inside `<SortableList.ItemRemove>`.                                                          |
+| `.ssl-remover`                                       | Remove button element inside `<SortableList.Remover>`.                                                             |
 
 > [!TIP]
 > **Advanced selector combinations**: Combine the available selectors to target specific states.

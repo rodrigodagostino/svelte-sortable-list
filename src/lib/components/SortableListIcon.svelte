@@ -1,7 +1,7 @@
 <!--
 @component
 ## <SortableListIcon>
-Serves as an icon for the `<SortableList.Handle>` and `<SortableList.ItemRemove>` components.
+Serves as an icon for the `<SortableList.Handle>` and `<SortableList.Remover>` components.
 
 ### Props
 - `name`: name of the icon to display.

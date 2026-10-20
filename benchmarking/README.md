@@ -101,7 +101,7 @@ The benchmarking route accepts a few more parameters that no scenario uses by de
 | `scroll=container` | Wraps each list in a fixed-height container that scrolls, instead of scrolling the document.                        |
 | `duration=<ms>`    | Transition duration passed to the lists. Default 320.                                                               |
 | `handle=1`         | Renders a drag handle inside every item.                                                                            |
-| `remove=1`         | Renders a remove button inside every item.                                                                          |
+| `remover=1`        | Renders a remover button inside every item.                                                                         |
 
 Parameters are read once when the page loads; reload after changing them.
 

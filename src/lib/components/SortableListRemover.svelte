@@ -1,6 +1,6 @@
 <!--
 @component
-## <SortableList.ItemRemove>
+## <SortableList.Remover>
 Serves as a `<button>` element that (when pressed) removes an item. Including it inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which performs the removal.
 
 ### Props
@@ -12,7 +12,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 		<div class="ssl-item-content">
 			{item.text}
 		</div>
-		<SortableList.ItemRemove onclick={handleRemoveClick} />
+		<SortableList.Remover onclick={handleRemoveClick} />
 	</SortableList.Item>
 ```
 -->
@@ -20,14 +20,14 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 <script lang="ts">
 	import SortableListIcon from '$lib/components/SortableListIcon.svelte';
 	import { getSortableListItemState, getSortableListRootState } from '$lib/states/index.js';
-	import type { SortableListItemRemoveProps as ItemRemoveProps } from '$lib/types/index.js';
+	import type { SortableListRemoverProps as RemoverProps } from '$lib/types/index.js';
 
-	let { ref = $bindable(null), children, ...restProps }: ItemRemoveProps = $props();
+	let { ref = $bindable(null), children, ...restProps }: RemoverProps = $props();
 
 	const rootState = getSortableListRootState();
 	const itemState = getSortableListItemState();
 
-	const classes = $derived(['ssl-item-remove', restProps.class]);
+	const classes = $derived(['ssl-remover', restProps.class]);
 	const ariaLabel = $derived(
 		typeof itemState.props.index === 'number'
 			? `Remove item at position ${itemState.props.index + 1}`

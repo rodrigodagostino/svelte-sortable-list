@@ -1,7 +1,7 @@
 <!--
 @component
 ## <SortableList.Item>
-Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.Handle>` and `<SortableList.ItemRemove>` components when needed.
+Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.Handle>` and `<SortableList.Remover>` components when needed.
 
 ### Props
 - `ref`: reference to the item element (HTMLLIElement). `[$bindable]`

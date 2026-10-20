@@ -61,7 +61,7 @@
 		>
 			<div class="ssl-item-content">
 				<span class="ssl-item-content__text">{item.text}</span>
-				<SortableList.ItemRemove onclick={handleRemoveClick} />
+				<SortableList.Remover onclick={handleRemoveClick} />
 			</div>
 		</SortableList.Item>
 	{/each}
