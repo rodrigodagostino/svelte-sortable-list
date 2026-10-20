@@ -34,6 +34,6 @@ Serves as an element that limits the draggable area of a list item to itself. In
 	{#if children}
 		{@render children()}
 	{:else}
-		<SortableListIcon name="handle" />
+		<SortableListIcon name="grip-vertical" />
 	{/if}
 </span>

@@ -65,6 +65,6 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 	{#if children}
 		{@render children()}
 	{:else}
-		<SortableListIcon name="remove" />
+		<SortableListIcon name="x" />
 	{/if}
 </button>
