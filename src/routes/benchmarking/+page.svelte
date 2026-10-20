@@ -124,7 +124,7 @@
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">
 				{#if hasHandle}
-					<SortableList.ItemHandle />
+					<SortableList.Handle />
 				{/if}
 				<span class="ssl-item-content__text">{item.text}</span>
 				{#if hasRemove}

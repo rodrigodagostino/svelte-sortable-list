@@ -31,7 +31,7 @@
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">
-				<SortableList.ItemHandle />
+				<SortableList.Handle />
 				<span class="ssl-item-content__text">{item.text}</span>
 			</div>
 		</SortableList.Item>

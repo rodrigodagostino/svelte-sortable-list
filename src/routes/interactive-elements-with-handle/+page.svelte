@@ -31,7 +31,7 @@
 	{#each items as item, index (item.id)}
 		<SortableList.Item {...item} {index}>
 			<div class="ssl-item-content">
-				<SortableList.ItemHandle />
+				<SortableList.Handle />
 				{#if item.type === 'input'}
 					<div class="form-field">
 						<label for="form-field-{item.id}">{item.text}</label>

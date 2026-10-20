@@ -129,7 +129,7 @@ export interface SortableListPlaceholderProps {
 	index: number;
 }
 
-export interface SortableListItemHandleProps {
+export interface SortableListHandleProps {
 	/** Reference to the handle element. `[$bindable]` */
 	ref?: HTMLSpanElement | null;
 	/** Content to be rendered inside the handle. */

@@ -108,7 +108,7 @@
 	margin: 0.625rem auto;
 }
 
-.ssl-item-handle,
+.ssl-handle,
 .ssl-item-remove {
 	flex-shrink: 0;
 	display: flex;
@@ -119,15 +119,15 @@
 	transition: background-color calc(var(--ssl-transition-duration) / 3 * 2);
 }
 
-.ssl-item-handle:hover,
-.ssl-item[data-drag-state*="ptr"] .ssl-item-handle,
+.ssl-handle:hover,
+.ssl-item[data-drag-state*="ptr"] .ssl-handle,
 .ssl-item-remove:focus,
 .ssl-item-remove:hover {
 	background-color: var(--ssl-gray-150);
 	color: var(--ssl-gray-700);
 }
 
-.ssl-item-handle {
+.ssl-handle {
 	margin-inline-start: -1rem;
 }
 

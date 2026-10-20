@@ -1,7 +1,7 @@
 <!--
 @component
 ## <SortableList.Item>
-Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components when needed.
+Serves as an individual item within `<SortableList.Root>`. Holds the data and content for each list item, as well as the `<SortableList.Handle>` and `<SortableList.ItemRemove>` components when needed.
 
 ### Props
 - `ref`: reference to the item element (HTMLLIElement). `[$bindable]`
@@ -499,7 +499,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const ontouchstart: Attachment<HTMLLIElement> = (element) => {
 		if (_isLocked || _isDisabled) return;
 
-		const handle = element.querySelector('.ssl-item-handle');
+		const handle = element.querySelector('.ssl-handle');
 		const controller = new AbortController();
 
 		(handle ?? element).addEventListener(
@@ -564,19 +564,19 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			will-change: transform;
 		}
 
-		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(:has(.ssl-item-handle)),
-		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-item-handle) {
+		&:not([data-is-locked='true']):not([data-is-disabled='true']):not(:has(.ssl-handle)),
+		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-handle) {
 			touch-action: none;
 		}
 
-		&:not(:has(.ssl-item-handle)),
-		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-item-handle) {
+		&:not(:has(.ssl-handle)),
+		&:not([data-is-locked='true']):not([data-is-disabled='true']) :global(.ssl-handle) {
 			cursor: grab;
 		}
 
 		&[data-drag-state*='ptr-drag'],
 		&[data-drag-state*='ptr-drag']:not([data-is-locked='true']):not([data-is-disabled='true'])
-			:global(.ssl-item-handle) {
+			:global(.ssl-handle) {
 			cursor: grabbing;
 		}
 

@@ -426,16 +426,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) e.preventDefault();
 
 		// Prevent dragging if the current list item contains an item handle, but we’re not dragging from it.
-		const hasItemHandle = !!currItem.querySelector('.ssl-item-handle');
-		const isOrResidesInItemHandle = target.closest('.ssl-item-handle');
-		if (hasItemHandle && !isOrResidesInItemHandle && !isOrResidesInInteractiveElem) {
+		const hasHandle = !!currItem.querySelector('.ssl-handle');
+		const isOrResidesInHandle = target.closest('.ssl-handle');
+		if (hasHandle && !isOrResidesInHandle && !isOrResidesInInteractiveElem) {
 			e.preventDefault();
 			return;
 		}
 
 		// Prevent dragging if the current list item contains an interactive element
 		// and we’re also not dragging from a handle inside that interactive element.
-		if (isOrResidesInInteractiveElem && !isOrResidesInItemHandle) return;
+		if (isOrResidesInInteractiveElem && !isOrResidesInHandle) return;
 		// Blur the interactive element holding the focus inside the focused item,
 		// so it doesn’t receive keystrokes during the pointer drag.
 		const { activeElement } = document;

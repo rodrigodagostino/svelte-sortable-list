@@ -1,6 +1,6 @@
 <!--
 @component
-## <SortableList.ItemHandle>
+## <SortableList.Handle>
 Serves as an element that limits the draggable area of a list item to itself. Including it inside a `<SortableList.Item>` will directly activate the handle functionality for that item.
 
 ### Props
@@ -9,7 +9,7 @@ Serves as an element that limits the draggable area of a list item to itself. In
 ### Usage
 ```svelte
 	<SortableList.Item id={item.id} {index}>
-		<SortableList.ItemHandle />
+		<SortableList.Handle />
 		<div class="ssl-item-content">
 			{item.text}
 		</div>
@@ -19,15 +19,15 @@ Serves as an element that limits the draggable area of a list item to itself. In
 
 <script lang="ts">
 	import SortableListIcon from '$lib/components/SortableListIcon.svelte';
-	import type { SortableListItemHandleProps as ItemHandleProps } from '$lib/types/props.js';
+	import type { SortableListHandleProps as HandleProps } from '$lib/types/props.js';
 
 	let {
 		ref = $bindable(null),
 		children,
 		...restProps
-	}: ItemHandleProps & { class?: string } = $props();
+	}: HandleProps & { class?: string } = $props();
 
-	const classes = $derived(['ssl-item-handle', restProps.class]);
+	const classes = $derived(['ssl-handle', restProps.class]);
 </script>
 
 <span bind:this={ref} class={classes} aria-hidden="true">

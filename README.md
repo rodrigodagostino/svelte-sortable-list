@@ -49,7 +49,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Root>` props](#sortablelistroot-props)
   - [`<SortableList.Root>` events](#sortablelistroot-events)
   - [`<SortableList.Item>` props](#sortablelistitem-props)
-  - [`<SortableList.ItemHandle>` props](#sortablelistitemhandle-props)
+  - [`<SortableList.Handle>` props](#sortablelisthandle-props)
   - [`<SortableList.ItemRemove>` props](#sortablelistitemremove-props)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
@@ -299,8 +299,8 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Component                   | Description                                                                                                                                                                                                   |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `<SortableList.Root>`       | The primary container that provides the main structure, drag-and-drop interactions, and emits available events.                                                                                               |
-| `<SortableList.Item>`       | An individual list item that holds data and content, and can contain `<SortableList.ItemHandle>` and `<SortableList.ItemRemove>` components.                                                                  |
-| `<SortableList.ItemHandle>` | An element that restricts the draggable area of a list item to itself. Including this inside a `<SortableList.Item>` directly activates handle functionality for that item.                                   |
+| `<SortableList.Item>`       | An individual list item that holds data and content, and can contain `<SortableList.Handle>` and `<SortableList.ItemRemove>` components.                                                                      |
+| `<SortableList.Handle>`     | An element that restricts the draggable area of a list item to itself. Including this inside a `<SortableList.Item>` directly activates handle functionality for that item.                                   |
 | `<SortableList.ItemRemove>` | A `<button>` element that removes an item when pressed. Including this inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which handles the removal. |
 
 > [!WARNING]
@@ -356,7 +356,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | `transitionIn`      | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is added to the list.                          |
 | `transitionOut`     | `(node: HTMLElement, params?: any) => TransitionConfig` | `scaleFly`  | Function                             | Animation played when the item is removed from the list.                      |
 
-### `<SortableList.ItemHandle>` props
+### `<SortableList.Handle>` props
 
 | Prop                | Type                                   | Default | Possible values                        | Description                      |
 | ------------------- | -------------------------------------- | ------- | -------------------------------------- | -------------------------------- |
@@ -689,7 +689,7 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-placeholder[data-drag-state="kbd-drag"]`       | Placeholder present during a keyboard drag.                                                                        |
 | `.ssl-placeholder[data-drag-state="kbd-drop"]`       | Placeholder present during a keyboard drop.                                                                        |
 | `.ssl-placeholder[data-drag-state="kbd-cancel"]`     | Placeholder present during a canceled keyboard drag.                                                               |
-| `.ssl-item-handle`                                   | Handle element inside `<SortableList.ItemHandle>`.                                                                 |
+| `.ssl-handle`                                        | Handle element inside `<SortableList.Handle>`.                                                                     |
 | `.ssl-item-remove`                                   | Remove button element inside `<SortableList.ItemRemove>`.                                                          |
 
 > [!TIP]
