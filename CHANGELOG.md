@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.6] (2026-10-19)
+
+### Performance
+
+- Subscribe only dragged item to pointer updates.
+- Store target item on rect snapshot instead of querying it.
+- Apply last pointer position in each drag frame.
+- Avoid relying on `$effect` to start auto scroll loop.
+- Reduce amount of times root rect is measured.
+- Cache fixed-origin probe to avoid querying it every frame.
+- Use `$state.raw` for root and item props.
+- Stop compositing idle items and promote only active one.
+- Gate item transitions from root instead of sibling selectors.
+- Skip zero-valued layout declarations in `scaleFly` keyframes.
+- Start pointer-drop timer directly instead of after another paint.
+- Snapshot peer list geometry while hovering it.
+- Recompute drag target once per frame.
+- Flush keyboard drag state changes once per key press.
+- Prevent forced reflow by passing node metrics to `scaleFly`.
+- Prevent forced reflow by storing target and placeholder rects in `targetList`.
+- Invert guards order in `shouldAutoScroll`.
+- Avoid fixed-origin probe when no containing block is present.
+- Avoid transitioning items out of visible range.
+- Stop bystander lists from reacting to target changes.
+
+### Changed
+
+- Resolve unused export and circular dependency issues.
+- Remove redundant CSS custom properties.
+- Retrieve target item fields from single source.
+- Avoid subscribing ungrouped lists to registry.
+- Remove redundant `tick` in item `tabindex` effect.
+- Combine repeated guards into variables.
+
+### Fixed
+
+- Avoid turning placeholder into scroll container while collapsing.
+- Stop auto scrolling after list is destroyed mid-drag.
+- Avoid blocking touch scroll over items that cannot be dragged.
+- Keep peer item transitions in Firefox when leaving peer list.
+
+### Test
+
+- Add benchmarking harness and route.
+- Add E2E coverage for touch scroll over items that cannot be dragged.
+- Add E2E coverage for fixed-origin probe.
+- Add E2E coverage for peer item transitions when leaving peer list.
+- Add E2E coverage for skipped transitions on items out of visible range.
+
+### Docs
+
+- Note `text-shadow` cost of default theme on large lists.
+- Rename `interactive-items` routes to `interactive-elements`.
+- Add component documentation to `SortableListPlaceholder`.
+- Fix scrollbar flickering in multi-column demo pages.
+- Restore dialog absolute position in **“Inside custom dialog”** demo page.
+- Remove unnecessary styles from **“Benchmarking”** demo page.
+- Document `data-is-group-dragging` root attribute.
+
+### Style
+
+- Rename `Icon` component to `SortableListIcon`.
+
+### Chores
+
+- Remove duplicated state context type definitions.
+
 ## [3.0.0-next.5] (2026-09-09)
 
 ### Changed
@@ -1898,7 +1965,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.5...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.6...HEAD
+[3.0.0-next.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.5...v3.0.0-next.6
 [3.0.0-next.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...v3.0.0-next.5
 [3.0.0-next.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...v3.0.0-next.4
 [3.0.0-next.3]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.2...v3.0.0-next.3
