@@ -155,6 +155,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		};
 	});
 
+	$effect.pre(() => {
+		rootState.isSource = registry.isSourceList(rootState);
+		rootState.isTarget = registry.isTargetList(rootState);
+	});
+
 	const classes = $derived(['ssl-root', restProps.class]);
 	let pointerSession: AbortController | null = null;
 	let pointerId: PointerEvent['pointerId'] | null = null;
@@ -1312,12 +1317,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	data-is-group-dragging={group
 		? group === registry.sourceList?.group && registry.sourceList.state.dragState !== 'idle'
 		: undefined}
-	data-is-source={group
-		? group === registry.sourceList?.group && !!id && id === registry.sourceList?.id
-		: undefined}
-	data-is-target={group
-		? group === registry.targetList?.group && !!id && id === registry.targetList?.id
-		: undefined}
+	data-is-source={group ? rootState.isSource : undefined}
+	data-is-target={group ? rootState.isTarget : undefined}
 	data-is-locked={isLocked}
 	data-is-disabled={isDisabled}
 	tabindex="0"
@@ -1341,7 +1342,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 >
 	{#if children}
 		{@render children()}
-		{#if registry.isTargetList(rootState) && registry.sourceList?.draggedItemId}
+		{#if rootState.isTarget && registry.sourceList?.draggedItemId}
 			<SortableListPlaceholder
 				id={registry.sourceList.draggedItemId}
 				index={ref.querySelectorAll('.ssl-item').length ?? 0}

@@ -109,7 +109,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const targetIndex = $derived(
-		rootState.group && registry.targetList && registry.isSourceList(rootState)
+		rootState.isSource && registry.targetList
 			? null
 			: rootState.targetItem
 				? getIndex(rootState.targetItem)
@@ -456,7 +456,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		void rootState.isWithinBounds;
 		if (rootState.group) {
 			void registry.sourceList;
-			void registry.targetList;
+			if (rootState.isSource || rootState.isTarget) void registry.targetList;
 		}
 		return untrack(() => getStyleTransform());
 	});

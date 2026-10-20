@@ -75,7 +75,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 			: null
 	);
 	const targetIndex = $derived(
-		rootState.group && registry.targetList && registry.isSourceList(rootState)
+		rootState.isSource && registry.targetList
 			? null
 			: sourceState.targetItem
 				? getIndex(sourceState.targetItem)

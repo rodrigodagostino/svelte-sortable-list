@@ -8,6 +8,8 @@ import { getContext, setContext } from 'svelte';
 export class SortableListRootState {
 	ref: HTMLUListElement | null = $state.raw(null);
 	group: string | undefined = $state.raw(undefined);
+	isSource: boolean = $state(false);
+	isTarget: boolean = $state(false);
 	props: RootProps = $state.raw({});
 	dragState:
 		| 'idle'
