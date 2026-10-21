@@ -12,14 +12,16 @@
 	});
 
 	const announcements: SortableList.RootProps['announcements'] = {
-		lifted: ({ draggedItemIndex }) => {
-			return `Has levantado un ítem en la posición ${draggedItemIndex! + 1}.`;
+		lifted: ({ draggedItemIndex, draggedItemType }) => {
+			const subject = draggedItemType === 'list' ? 'una lista' : 'un ítem';
+			return `Has levantado ${subject} en la posición ${draggedItemIndex + 1}.`;
 		},
 
 		dragged: ({
 			sourceList,
 			sourceListIndex,
 			draggedItemIndex,
+			draggedItemType,
 			targetList,
 			targetListIndex,
 			targetItemIndex,
@@ -27,21 +29,24 @@
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = targetItemIndex + 1;
 			const hasCrossedList = !!targetList && targetList !== sourceList;
+			const subject = draggedItemType === 'list' ? 'la lista' : 'el ítem';
 
 			if (hasCrossedList)
-				return `Has movido el ítem de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+				return `Has movido ${subject} de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
 
 			const result =
 				startPosition !== endPosition
 					? `desde la posición ${startPosition} a la posición ${endPosition}`
 					: `de vuelta a su posición inicial de ${startPosition}`;
-			return `Has movido el ítem ${result}.`;
+
+			return `Has movido ${subject} ${result}.`;
 		},
 
 		dropped: ({
 			sourceList,
 			sourceListIndex,
 			draggedItemIndex,
+			draggedItemType,
 			targetList,
 			targetListIndex,
 			targetItemIndex,
@@ -49,9 +54,10 @@
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = typeof targetItemIndex === 'number' ? targetItemIndex + 1 : null;
 			const hasCrossedList = !!targetList && targetList !== sourceList;
+			const subject = draggedItemType === 'list' ? 'la lista' : 'el ítem';
 
 			if (hasCrossedList)
-				return `Has soltado el ítem. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+				return `Has soltado ${subject}. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
 
 			const result =
 				endPosition === null
@@ -59,11 +65,14 @@
 					: startPosition !== endPosition
 						? `Se ha movido desde la posición ${startPosition} a la posición ${endPosition}`
 						: `Ha vuelto a su posición inicial de ${startPosition}`;
-			return `Has soltado el ítem. ${result}.`;
+
+			return `Has soltado ${subject}. ${result}.`;
 		},
 
-		canceled: ({ draggedItemIndex }) => {
-			return `Has cancelado el arrastre. El ítem ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
+		canceled: ({ draggedItemIndex, draggedItemType }) => {
+			const subject = draggedItemType === 'list' ? 'La lista' : 'El ítem';
+
+			return `Has cancelado el arrastre. ${subject} ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
 		},
 	};
 

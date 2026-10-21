@@ -1,5 +1,31 @@
 import type { ItemRect } from '$lib/types/data-extraction.js';
 
+/**
+ * Returns the items owned by `list`. Nested lists hold their own items,
+ * so only the direct children of this list are taken into account.
+ */
+export function getItems(list: HTMLUListElement, isPlaceholderSkipped = true) {
+	return list.querySelectorAll<HTMLLIElement>(
+		isPlaceholderSkipped ? ':scope > .ssl-item' : ':scope > .ssl-item, :scope > .ssl-placeholder'
+	);
+}
+
+export function getPlaceholder(list: HTMLUListElement) {
+	return list.querySelector<HTMLLIElement>(':scope > .ssl-placeholder');
+}
+
+/**
+ * Returns the handle owned by `item`. A handle can sit at any depth inside its item,
+ * so the ones belonging to the items of a nested list are left out.
+ */
+export function getHandle(item: HTMLLIElement) {
+	return (
+		Array.from(item.querySelectorAll<HTMLElement>('.ssl-handle')).find(
+			(handle) => handle.closest('.ssl-item') === item
+		) ?? null
+	);
+}
+
 export function getItemSibling(item: HTMLLIElement, step: -1 | 1, isPlaceholderSkipped = true) {
 	const allowedClasses = isPlaceholderSkipped ? ['ssl-item'] : ['ssl-item', 'ssl-placeholder'];
 	let sibling = item[step === -1 ? 'previousElementSibling' : 'nextElementSibling'];

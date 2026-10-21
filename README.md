@@ -51,6 +51,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Item>` props](#sortablelistitem-props)
   - [`<SortableList.Handle>` props](#sortablelisthandle-props)
   - [`<SortableList.Remover>` props](#sortablelistremover-props)
+- [Nested lists](#nested-lists)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
 - [Types](#types)
@@ -78,7 +79,6 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 
 ## Limitations
 
-- Nested lists are not supported.
 - An ancestor that creates a stacking context (`transform`, `filter`, `opacity` below `1`, `isolation: isolate`, `contain`, `will-change`, a positioned element with a `z-index`…) prevents the dragged item from being rendered above content outside of it.
 - Wrapped lists can be keyboard-navigated across the main axis only.
 - Wrapping (line breaks) is limited to horizontal lists with items of identical width and height.
@@ -213,14 +213,16 @@ The following example demonstrates how to translate announcements to Spanish (ad
 	import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
 
 	const announcements: SortableList.RootProps['announcements'] = {
-		lifted: ({ draggedItemIndex }) => {
-			return `Has levantado un ítem en la posición ${draggedItemIndex! + 1}.`;
+		lifted: ({ draggedItemIndex, draggedItemType }) => {
+			const subject = draggedItemType === 'list' ? 'una lista' : 'un ítem';
+			return `Has levantado ${subject} en la posición ${draggedItemIndex + 1}.`;
 		},
 
 		dragged: ({
 			sourceList,
 			sourceListIndex,
 			draggedItemIndex,
+			draggedItemType,
 			targetList,
 			targetListIndex,
 			targetItemIndex,
@@ -228,21 +230,24 @@ The following example demonstrates how to translate announcements to Spanish (ad
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = targetItemIndex + 1;
 			const hasCrossedList = !!targetList && targetList !== sourceList;
+			const subject = draggedItemType === 'list' ? 'la lista' : 'el ítem';
 
 			if (hasCrossedList)
-				return `Has movido el ítem de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+				return `Has movido ${subject} de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
 
 			const result =
 				startPosition !== endPosition
 					? `desde la posición ${startPosition} a la posición ${endPosition}`
 					: `de vuelta a su posición inicial de ${startPosition}`;
-			return `Has movido el ítem ${result}.`;
+
+			return `Has movido ${subject} ${result}.`;
 		},
 
 		dropped: ({
 			sourceList,
 			sourceListIndex,
 			draggedItemIndex,
+			draggedItemType,
 			targetList,
 			targetListIndex,
 			targetItemIndex,
@@ -250,9 +255,10 @@ The following example demonstrates how to translate announcements to Spanish (ad
 			const startPosition = draggedItemIndex + 1;
 			const endPosition = typeof targetItemIndex === 'number' ? targetItemIndex + 1 : null;
 			const hasCrossedList = !!targetList && targetList !== sourceList;
+			const subject = draggedItemType === 'list' ? 'la lista' : 'el ítem';
 
 			if (hasCrossedList)
-				return `Has soltado el ítem. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
+				return `Has soltado ${subject}. Se ha movido de la posición ${startPosition} en la lista ${sourceListIndex! + 1} a la posición ${endPosition} en la lista ${targetListIndex! + 1}.`;
 
 			const result =
 				endPosition === null
@@ -260,11 +266,14 @@ The following example demonstrates how to translate announcements to Spanish (ad
 					: startPosition !== endPosition
 						? `Se ha movido desde la posición ${startPosition} a la posición ${endPosition}`
 						: `Ha vuelto a su posición inicial de ${startPosition}`;
-			return `Has soltado el ítem. ${result}.`;
+
+			return `Has soltado ${subject}. ${result}.`;
 		},
 
-		canceled: ({ draggedItemIndex }) => {
-			return `Has cancelado el arrastre. El ítem ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
+		canceled: ({ draggedItemIndex, draggedItemType }) => {
+			const subject = draggedItemType === 'list' ? 'La lista' : 'El ítem';
+
+			return `Has cancelado el arrastre. ${subject} ha vuelto a su posición inicial de ${draggedItemIndex + 1}.`;
 		},
 	};
 
@@ -367,6 +376,113 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Prop                | Type                                     | Default | Possible values                          | Description                      |
 | ------------------- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
 | `ref` `[$bindable]` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
+
+---
+
+## Nested lists
+
+To reorder the lists themselves, wrap each of them in an item of an outer `<SortableList.Root>`. Lists then _are_ items, so they get dragged, dropped, transitioned and announced like any other item, and `sortItems` reorders them in your data.
+
+Two things to keep in mind:
+
+- The outer list has to be **ungrouped** (no `group` prop). A `group` is what lets items travel between lists, and dragging a list out of its own container into another one is not supported.
+- The `index` of every grouped inner list has to be renumbered when the lists are reordered, since keyboard traversal across lists relies on it. Deriving it from the position in your data (as the `{#each}` below does) takes care of that.
+
+A list is dragged from anywhere inside its own item, unless that item holds a `<SortableList.Handle>`, in which case it is dragged from the handle alone. Grabbing anything inside the nested list hands the gesture over to it instead.
+
+```svelte
+<script lang="ts">
+	import {
+		SortableList,
+		insertItem,
+		removeItem,
+		sortItems,
+	} from '@rodrigodagostino/svelte-sortable-list';
+
+	let lists = $state([
+		{
+			id: 'to-do',
+			title: 'To Do',
+			items: [
+				{ id: 'to-do-item-1', text: 'To Do Item 1' },
+				{ id: 'to-do-item-2', text: 'To Do Item 2' },
+			],
+		},
+		{
+			id: 'doing',
+			title: 'Doing',
+			items: [{ id: 'doing-item-1', text: 'Doing Item 1' }],
+		},
+	]);
+
+	function handleListsDragEnd(event: SortableList.RootEvents['ondragend']) {
+		const { draggedItemIndex, targetItemIndex, isCanceled } = event;
+		if (isCanceled || typeof targetItemIndex !== 'number' || draggedItemIndex === targetItemIndex)
+			return;
+
+		lists = sortItems(lists, draggedItemIndex, targetItemIndex);
+	}
+
+	function handleItemsDragEnd(event: SortableList.RootEvents['ondragend']) {
+		const {
+			sourceListId,
+			targetListId,
+			draggedItemId,
+			draggedItemIndex,
+			targetItemIndex,
+			isCanceled,
+		} = event;
+		if (isCanceled || typeof targetItemIndex !== 'number') return;
+
+		if (!targetListId || targetListId === sourceListId) {
+			const list = lists.find((l) => l.id === sourceListId);
+			if (!list) return;
+			list.items = sortItems(list.items, draggedItemIndex, targetItemIndex);
+		} else {
+			const sourceList = lists.find((l) => l.id === sourceListId);
+			const targetList = lists.find((l) => l.id === targetListId);
+			const draggedItem = sourceList?.items.find((item) => item.id === draggedItemId);
+			if (!sourceList || !targetList || !draggedItem) return;
+
+			targetList.items = insertItem(targetList.items, draggedItem, targetItemIndex);
+			sourceList.items = removeItem(sourceList.items, draggedItemIndex);
+		}
+	}
+</script>
+
+<SortableList.Root direction="horizontal" ondragend={handleListsDragEnd}>
+	{#each lists as { id, title, items }, index (id)}
+		<SortableList.Item id="column-{id}" {index}>
+			<div class="ssl-item-content">
+				<SortableList.Handle />
+				<h2 id="column-title-{id}">{title}</h2>
+				<SortableList.Root
+					group="my-group"
+					{id}
+					{index}
+					aria-labelledby="column-title-{id}"
+					ondragend={handleItemsDragEnd}
+				>
+					{#each items as item, itemIndex (item.id)}
+						<SortableList.Item {...item} index={itemIndex}>
+							<div class="ssl-item-content">
+								<span class="ssl-item-content__text">{item.text}</span>
+							</div>
+						</SortableList.Item>
+					{/each}
+				</SortableList.Root>
+			</div>
+		</SortableList.Item>
+	{/each}
+</SortableList.Root>
+```
+
+> [!NOTE]
+> The default styles look for a handle anywhere inside an item, so an item wrapping a nested list whose items hold handles is taken to have one too: it loses its `cursor: grab` and its `touch-action: none`. Giving that item a handle of its own (as above) keeps both in place.
+
+Deeper nesting follows the same ownership rules, but it is not covered by the test suite.
+
+See the [“Nested lists” live demo](https://svelte-sortable-list.netlify.app/nested-lists) for a complete, working example.
 
 ---
 
@@ -658,6 +774,7 @@ Use these CSS selectors to customize the appearance of list components:
 | `.ssl-root[data-is-group-dragging="true"]`           | List whose `group` has an item being dragged.                                                                      |
 | `.ssl-root[data-is-source="true"]`                   | List the dragged item came from (in a `group`).                                                                    |
 | `.ssl-root[data-is-target="true"]`                   | List currently targeted by an item dragged from a peer list (in a `group`).                                        |
+| `.ssl-root[data-is-nested="true"]`                   | List nested inside another list.                                                                                   |
 | `.ssl-root[data-is-locked="true"]`                   | List with dragging disabled for all items.                                                                         |
 | `.ssl-root[data-is-disabled="true"]`                 | List with dragging and interactivity disabled for all items.                                                       |
 | `.ssl-root[aria-disabled="true"]`                    | List with dragging and interactivity disabled for all items.                                                       |

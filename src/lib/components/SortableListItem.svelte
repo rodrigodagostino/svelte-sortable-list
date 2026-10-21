@@ -37,6 +37,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		calculateTranslate,
 		calculateTranslateWithAlignment,
 		dispatch,
+		getHandle,
 		getIndex,
 		getItemRect,
 		INTERACTIVE_SELECTORS,
@@ -138,6 +139,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const areInteractiveElementsTabbable = $derived(
 		!isKeyboardStartingDragOrDragging && isFocused && !_isDisabled
 	);
+	const hasNestedLists = $derived(itemState.childRoots.length > 0);
 
 	$effect(() => {
 		const tabIndex = areInteractiveElementsTabbable ? 0 : -1;
@@ -469,6 +471,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	});
 
 	async function handleFocusIn(e: FocusEvent) {
+		// `focusin` bubbles, so an item of a nested list would otherwise mark this one as focused.
+		if ((e.target as HTMLElement).closest('.ssl-item') !== ref) return;
+
 		if (isPointerDrag) {
 			e.preventDefault();
 			return;
@@ -482,12 +487,13 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.ref?.contains(relatedTarget) || rootState.ref === relatedTarget) {
+		if (relatedTarget?.closest('.ssl-root') !== rootState.ref || rootState.ref === relatedTarget) {
 			if (!rootState.focusedItem) return;
 			dispatch(ref!, 'itemfocusout', { item: rootState.focusedItem });
 			await tick();
 			const { activeElement } = document;
-			if (activeElement !== rootState.ref && rootState.ref?.contains(activeElement)) return;
+			if (activeElement !== rootState.ref && activeElement?.closest('.ssl-root') === rootState.ref)
+				return;
 			rootState.focusedItem = null;
 		}
 	}
@@ -499,7 +505,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const ontouchstart: Attachment<HTMLLIElement> = (element) => {
 		if (_isLocked || _isDisabled) return;
 
-		const handle = element.querySelector('.ssl-handle');
+		const handle = getHandle(element);
 		const controller = new AbortController();
 
 		(handle ?? element).addEventListener(
@@ -520,6 +526,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 {#if isDragged}
 	<SortableListPlaceholder {id} {index} />
 {/if}
+<!-- The roving tabindex is the keyboard drag model, and it stays in place for `role="listitem"` too. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <li
 	bind:this={ref}
 	{id}
@@ -538,11 +546,11 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	data-is-locked={_isLocked}
 	data-is-disabled={_isDisabled}
 	tabindex={isFocused ? 0 : -1}
-	role="option"
+	role={hasNestedLists ? 'listitem' : 'option'}
 	aria-disabled={_isDisabled}
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
-	aria-selected={isFocused}
+	aria-selected={hasNestedLists ? undefined : isFocused}
 	onfocusin={handleFocusIn}
 	onfocusout={handleFocusOut}
 	{@attach ontouchstart}
@@ -612,6 +620,10 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 
 		&[data-drag-state*='kbd'] {
 			z-index: 2;
+		}
+
+		&:has(:global(.ssl-root:not([data-drag-state='idle']))) {
+			z-index: 9999;
 		}
 	}
 </style>

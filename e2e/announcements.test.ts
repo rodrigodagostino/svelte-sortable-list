@@ -39,7 +39,12 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 		// Verify the announcer reads the lifted announcement
 		await expect(liveRegion).toContainText(
-			announce.lifted({ sourceList: root, draggedItem: focusedItem, draggedItemIndex: 0 })
+			announce.lifted({
+				sourceList: root,
+				draggedItem: focusedItem,
+				draggedItemIndex: 0,
+				draggedItemType: 'item',
+			})
 		);
 
 		// Move down once to reach the List Item 2 position
@@ -50,6 +55,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 1,
 			})
@@ -63,6 +69,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 2,
 			})
@@ -76,6 +83,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 2,
 			})
@@ -105,7 +113,12 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 		// Verify the announcer reads the lifted announcement
 		await expect(liveRegion).toContainText(
-			announce.lifted({ sourceList: root, draggedItem: focusedItem, draggedItemIndex: 0 })
+			announce.lifted({
+				sourceList: root,
+				draggedItem: focusedItem,
+				draggedItemIndex: 0,
+				draggedItemType: 'item',
+			})
 		);
 
 		// Move down to the end of the list to reach the List Item 5 position
@@ -116,6 +129,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 4,
 			})
@@ -129,6 +143,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 4,
 			})
@@ -138,7 +153,12 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 		// Verify the announcer reads the lifted announcement
 		await expect(liveRegion).toContainText(
-			announce.lifted({ sourceList: root, draggedItem: focusedItem, draggedItemIndex: 4 })
+			announce.lifted({
+				sourceList: root,
+				draggedItem: focusedItem,
+				draggedItemIndex: 4,
+				draggedItemType: 'item',
+			})
 		);
 
 		// Move up to the start of the list to reach the List Item 2 position
@@ -149,6 +169,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 4,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 0,
 			})
@@ -162,6 +183,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 4,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 0,
 			})
@@ -191,7 +213,12 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Space');
 		// Verify the announcer reads the lifted announcement
 		await expect(liveRegion).toContainText(
-			announce.lifted({ sourceList: root, draggedItem: focusedItem, draggedItemIndex: 0 })
+			announce.lifted({
+				sourceList: root,
+				draggedItem: focusedItem,
+				draggedItemIndex: 0,
+				draggedItemType: 'item',
+			})
 		);
 
 		// Move down 4 times to reach the List Item 5 position
@@ -205,6 +232,7 @@ test.describe('Sortable List - Basic', () => {
 				sourceList: root,
 				draggedItem: focusedItem,
 				draggedItemIndex: 0,
+				draggedItemType: 'item',
 				targetItem: root.locator('.ssl-item'),
 				targetItemIndex: 4,
 			})
@@ -214,7 +242,12 @@ test.describe('Sortable List - Basic', () => {
 		await page.keyboard.press('Escape');
 		// Verify the announcer reads the dropped announcement
 		await expect(liveRegion).toContainText(
-			announce.canceled({ sourceList: root, draggedItem: focusedItem, draggedItemIndex: 0 })
+			announce.canceled({
+				sourceList: root,
+				draggedItem: focusedItem,
+				draggedItemIndex: 0,
+				draggedItemType: 'item',
+			})
 		);
 	});
 });

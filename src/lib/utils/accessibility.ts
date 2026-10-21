@@ -30,14 +30,15 @@ function getListLabel(list: RootProps['ref'], listIndex: number): string {
 }
 
 export const announce: Announcements = {
-	lifted: ({ draggedItemIndex }) => {
-		return `You have lifted an item at position ${draggedItemIndex + 1}.`;
+	lifted: ({ draggedItemIndex, draggedItemType }) => {
+		return `You have lifted ${draggedItemType === 'list' ? 'a' : 'an'} ${draggedItemType} at position ${draggedItemIndex + 1}.`;
 	},
 
 	dragged: ({
 		sourceList,
 		sourceListIndex,
 		draggedItemIndex,
+		draggedItemType,
 		targetList,
 		targetListIndex,
 		targetItemIndex,
@@ -47,19 +48,20 @@ export const announce: Announcements = {
 		const hasCrossedList = !!targetList && targetList !== sourceList;
 
 		if (hasCrossedList)
-			return `You have moved the item from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
+			return `You have moved the ${draggedItemType} from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
 
 		const result =
 			startPosition !== endPosition
 				? `from position ${startPosition} to position ${endPosition}`
 				: `back to its starting position of ${startPosition}`;
-		return `You have moved the item ${result}.`;
+		return `You have moved the ${draggedItemType} ${result}.`;
 	},
 
 	dropped: ({
 		sourceList,
 		sourceListIndex,
 		draggedItemIndex,
+		draggedItemType,
 		targetList,
 		targetListIndex,
 		targetItemIndex,
@@ -69,7 +71,7 @@ export const announce: Announcements = {
 		const hasCrossedList = !!targetList && targetList !== sourceList;
 
 		if (hasCrossedList)
-			return `You have dropped the item. It has moved from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
+			return `You have dropped the ${draggedItemType}. It has moved from position ${startPosition} in ${getListLabel(sourceList, sourceListIndex!)} to position ${endPosition} in ${getListLabel(targetList, targetListIndex!)}.`;
 
 		const result =
 			endPosition === null
@@ -77,21 +79,25 @@ export const announce: Announcements = {
 				: startPosition !== endPosition
 					? `It has moved from position ${startPosition} to position ${endPosition}`
 					: `It has returned to its starting position of ${startPosition}`;
-		return `You have dropped the item. ${result}.`;
+		return `You have dropped the ${draggedItemType}. ${result}.`;
 	},
 
-	canceled: ({ draggedItemIndex }) => {
-		return `You have canceled the dragging. The item has returned to its starting position of ${draggedItemIndex + 1}.`;
+	canceled: ({ draggedItemIndex, draggedItemType }) => {
+		return `You have canceled the dragging. The ${draggedItemType} has returned to its starting position of ${draggedItemIndex + 1}.`;
 	},
 };
 
 export function getDefaultAriaDescription(
 	group: string | undefined,
-	direction: RootProps['direction']
+	direction: RootProps['direction'],
+	hasNestedLists = false
 ) {
 	const isVertical = direction === 'vertical';
 	const mainAxisArrowKeys = isVertical ? 'Up Arrow or Down Arrow' : 'Left Arrow or Right Arrow';
 	const crossAxisArrowKeys = isVertical ? 'Left Arrow or Right Arrow' : 'Up Arrow or Down Arrow';
+
+	if (hasNestedLists)
+		return `Press ${mainAxisArrowKeys} to move through the lists. Press Space to start dragging a list. When dragging, use ${mainAxisArrowKeys} to move the list around. Press Space again to drop the list, or Escape to cancel.`;
 
 	return group
 		? `Press ${mainAxisArrowKeys} to move through the list items, or ${crossAxisArrowKeys} to move to a different list. Press Space to start dragging an item. When dragging, use ${mainAxisArrowKeys} to move the item within the list, or ${crossAxisArrowKeys} to move it to a different list. Press Space again to drop the item, or Escape to cancel.`

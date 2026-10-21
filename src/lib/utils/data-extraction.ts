@@ -1,4 +1,5 @@
 import { getTranslateValues } from './styles.js';
+import { getItems, getPlaceholder } from './whereabouts.js';
 import type {
 	SortableListRegistry as Registry,
 	SortableListRootState as RootState,
@@ -30,9 +31,7 @@ export function getItemRect(item: HTMLLIElement): ItemRect {
 }
 
 export function getItemRects(list: HTMLUListElement): ItemRect[] {
-	return Array.from(list.querySelectorAll<HTMLLIElement>('.ssl-item')).map((item) =>
-		getItemRect(item)
-	);
+	return Array.from(getItems(list)).map((item) => getItemRect(item));
 }
 
 export function getItemRectWithOffset(
@@ -65,7 +64,8 @@ export function clearPeerItemRects() {
 }
 
 export function getTargetItemFields(item: HTMLLIElement | null) {
-	const placeholder = item?.parentElement?.querySelector<HTMLLIElement>('.ssl-placeholder') ?? null;
+	const list = item?.parentElement as HTMLUListElement | null;
+	const placeholder = list ? getPlaceholder(list) : null;
 	return {
 		targetItem: item,
 		targetItemId: !item || item.classList.contains('ssl-placeholder') ? null : item.id,

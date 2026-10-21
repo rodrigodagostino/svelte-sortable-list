@@ -48,7 +48,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <script lang="ts">
 	import { onDestroy, onMount, tick } from 'svelte';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
-	import { registry, setSortableListRootState } from '$lib/states/index.js';
+	import {
+		registry,
+		setSortableListRootState,
+		unsetSortableListRootState,
+	} from '$lib/states/index.js';
 	import type { RegistryList, SortableListRootProps as RootProps } from '$lib/types/index.js';
 	import {
 		addScrollListener,
@@ -66,13 +70,16 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getDefaultAriaDescription,
 		getDropAnimations,
 		getFixedOrigin,
+		getHandle,
 		getIndex,
 		getItemRect,
 		getItemRects,
 		getItemRectWithOffset,
+		getItems,
 		getItemSibling,
 		getPeerItemRects,
 		getPeerTargetFields,
+		getPlaceholder,
 		getScrollingSpeed,
 		getTargetItemFields,
 		getTextDirection,
@@ -176,6 +183,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const isKeyboardStartingDragOrDragging = $derived(rootState.dragState.startsWith('kbd-drag'));
 	let isDropping = false;
 	let isPointerReleased = false;
+	const isNested = $derived(!!rootState.parentRoot);
+	const hasNestedLists = $derived(rootState.childRoots.length > 0);
 
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -221,6 +230,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			registry.targetList = null;
 		}
 		unregister?.();
+		unsetSortableListRootState(rootState);
 		ondestroyed?.(null);
 	});
 
@@ -306,7 +316,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						tick().then(() => {
 							// Bail out if the target changed in the meantime.
 							if (registry.targetList?.state !== peerList.state) return;
-							const placeholder = peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+							const placeholder = getPlaceholder(peerList.ref);
 							registry.targetList = { ...registry.targetList, ...getTargetItemFields(placeholder) };
 						});
 					}
@@ -314,7 +324,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				}
 
 				// Use the placeholder to let the dragged item be dropped at the end of the peer list.
-				const peerPlaceholder = peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+				const peerPlaceholder = getPlaceholder(peerList.ref);
 				if (
 					peerPlaceholder &&
 					registry.targetList?.targetItemIndex !== peerItemRects.length &&
@@ -399,6 +409,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const currItem = target.closest<HTMLLIElement>('.ssl-item');
 		if (!currItem) return;
 
+		// Events fired inside a nested list bubble up to this one. Hand the gesture over to the list
+		// that owns the item, but let a click landing in there still settle an ongoing drop.
+		if (target.closest('.ssl-root') !== ref) {
+			await interruptDropTransition(e);
+			return;
+		}
+
 		const isOrResidesInInteractiveElem = isOrResidesInInteractiveElement(target, currItem);
 		// Stop non-main buttons from interacting with the list.
 		if (e.button !== 0) {
@@ -426,7 +443,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (target.tagName.toLowerCase() === 'label' && target.hasAttribute('for')) e.preventDefault();
 
 		// Prevent dragging if the current list item contains an item handle, but we’re not dragging from it.
-		const hasHandle = !!currItem.querySelector('.ssl-handle');
+		const hasHandle = !!getHandle(currItem);
 		const isOrResidesInHandle = target.closest('.ssl-handle');
 		if (hasHandle && !isOrResidesInHandle && !isOrResidesInInteractiveElem) {
 			e.preventDefault();
@@ -446,7 +463,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		if (focusedRootState?.dragState.startsWith('kbd-drag')) await tick();
 		await interruptDropTransition(e);
-		if (!isIdle || delayTimeoutId !== null || (group && registry.isOtherDragActive(rootState)))
+		if (
+			!isIdle ||
+			delayTimeoutId !== null ||
+			(group && registry.isOtherDragActive(rootState)) ||
+			rootState.isNestedDragActive()
+		)
 			return;
 
 		isPointerReleased = false;
@@ -610,6 +632,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 
 	async function handleKeyDown(e: KeyboardEvent, target = e.target as HTMLElement) {
+		// Events fired inside a nested list bubble up to this one.
+		// Let the list that owns the item handle them.
+		if (target.closest('.ssl-root') !== ref) return;
+
 		const { key } = e;
 		let step: -1 | 1 = -1;
 		let shouldScrollIntoView = false;
@@ -656,6 +682,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				if (isIdle) {
 					if (group && registry.isOtherDragActive(rootState)) return;
+					if (rootState.isNestedDragActive()) return;
 
 					rootState.draggedItem = rootState.focusedItem;
 					const draggedIndex = getIndex(rootState.focusedItem);
@@ -700,6 +727,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
+						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
 					});
 				} else {
 					if (!rootState.draggedItem) return;
@@ -711,6 +739,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
+						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
 						targetList: registry.targetList?.ref ?? null,
 						targetListIndex: registry.targetList?.index ?? null,
 						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
@@ -748,7 +777,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						// Leave out peer lists that are empty, so they won’t block the way to the lists behind it.
 						const peerListsWithItems = registry
 							.getPeerLists(group, rootState)
-							.filter((l) => l.ref.querySelector('.ssl-item'));
+							.filter((l) => getItems(l.ref).length);
 						let nextListIndex = index! + step;
 						let peerList: RegistryList | undefined;
 						while (nextListIndex >= 0 && nextListIndex <= lastListIndex) {
@@ -767,12 +796,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						}
 					} else {
 						if (!rootState.focusedItem || focusedIndex === null) {
-							const firstItem = ref!.querySelector<HTMLLIElement>('.ssl-item');
+							const firstItem = getItems(ref!)[0];
 							firstItem?.focus({ preventScroll: true });
 						} else {
 							// Prevent focusing the previous item if the current one is the first,
 							// and focusing the next item if the current one is the last.
-							const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
+							const items = getItems(ref!);
 							if (
 								(step === -1 && focusedIndex === 0) ||
 								(step === 1 && focusedIndex === items.length - 1)
@@ -793,9 +822,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'horizontal')
 					) {
 						if (targetList?.targetItem) {
-							const targetListChildren = targetList.ref.querySelectorAll<HTMLLIElement>(
-								'.ssl-item, .ssl-placeholder'
-							);
+							const targetListChildren = getItems(targetList.ref, false);
 							// Prevent moving the selected item if it’s at the top or bottom of the list.
 							if (
 								(step === -1 && targetList.targetItemIndex === 0) ||
@@ -870,8 +897,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 									tick().then(() => {
 										// Bail out if the target changed in the meantime.
 										if (registry.targetList?.state !== peerList.state) return;
-										const placeholder =
-											peerList.ref.querySelector<HTMLLIElement>('.ssl-placeholder');
+										const placeholder = getPlaceholder(peerList.ref);
 										registry.targetList = {
 											...registry.targetList,
 											...getTargetItemFields(placeholder),
@@ -918,6 +944,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
+						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
 						targetList: registry.targetList?.ref,
 						targetListIndex: registry.targetList?.index,
 						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
@@ -931,7 +958,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 				step = key === 'Home' ? -1 : 1;
 				shouldScrollIntoView = true;
-				const items = ref!.querySelectorAll<HTMLLIElement>('.ssl-item');
+				const items = getItems(ref!);
 				const focusedIndex = (rootState.focusedItem && getIndex(rootState.focusedItem)) ?? null;
 
 				if (!isKeyboardStartingDragOrDragging) {
@@ -953,9 +980,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
 					if (targetList?.targetItem) {
-						const targetListChildren = targetList.ref.querySelectorAll<HTMLLIElement>(
-							'.ssl-item, .ssl-placeholder'
-						);
+						const targetListChildren = getItems(targetList.ref, false);
 						// Prevent moving the selected item if it’s at the top or bottom of the list.
 						if (
 							(step === -1 && targetList.targetItemIndex === 0) ||
@@ -1009,6 +1034,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						sourceListIndex: index,
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
+						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
 						targetList: registry.targetList?.ref,
 						targetListIndex: registry.targetList?.index,
 						targetItem: registry.targetList?.targetItem ?? rootState.targetItem!,
@@ -1036,6 +1062,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					sourceListIndex: index,
 					draggedItem: rootState.draggedItem,
 					draggedItemIndex: draggedIndex,
+					draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
 				});
 
 				handlePointerAndKeyboardDrop(rootState.draggedItem, 'kbd-cancel');
@@ -1283,10 +1310,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	// on the current element and it’s descendants too.
 	async function handleFocusOut(e: FocusEvent) {
 		const relatedTarget = e.relatedTarget as HTMLElement | null;
-		if (!rootState.ref?.contains(relatedTarget) || rootState.ref === relatedTarget) {
+		if (relatedTarget?.closest('.ssl-root') !== rootState.ref || rootState.ref === relatedTarget) {
 			await tick();
 			const { activeElement } = document;
-			if (activeElement !== rootState.ref && rootState.ref?.contains(activeElement)) return;
+			if (activeElement !== rootState.ref && activeElement?.closest('.ssl-root') === rootState.ref)
+				return;
 			liveText = '';
 		}
 	}
@@ -1298,7 +1326,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	}
 </script>
 
-<!-- svelte-ignore a11y_role_supports_aria_props -->
+<!-- The roving tabindex is the keyboard drag model, and it stays in place for `role="list"` too. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <ul
 	bind:this={ref}
 	{id}
@@ -1319,24 +1348,28 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		: undefined}
 	data-is-source={group ? rootState.isSource : undefined}
 	data-is-target={group ? rootState.isTarget : undefined}
+	data-is-nested={isNested}
 	data-is-locked={isLocked}
 	data-is-disabled={isDisabled}
-	tabindex="0"
-	role="listbox"
+	tabindex={!isNested || rootState.parentRoot?.focusedItem === ref?.closest('.ssl-item') ? 0 : -1}
+	role={hasNestedLists ? 'list' : 'listbox'}
 	aria-orientation={direction}
 	aria-disabled={isDisabled}
 	aria-label={restProps['aria-label'] || undefined}
 	aria-labelledby={restProps['aria-labelledby'] || undefined}
 	aria-description={!restProps['aria-describedby']
-		? restProps['aria-description'] || getDefaultAriaDescription(group, direction)
+		? restProps['aria-description'] || getDefaultAriaDescription(group, direction, hasNestedLists)
 		: undefined}
 	aria-describedby={restProps['aria-describedby'] || undefined}
-	aria-activedescendant={rootState.focusedItem ? rootState.focusedItem.id : undefined}
+	aria-activedescendant={!hasNestedLists && rootState.focusedItem
+		? rootState.focusedItem.id
+		: undefined}
 	onpointerdown={handlePointerDown}
 	onkeydown={handleKeyDown}
 	onfocusout={handleFocusOut}
 	oncontextmenu={handleContextMenu}
 	onitemfocusout={(event) => {
+		if (event.detail.item.closest('.ssl-root') !== ref) return;
 		if (isKeyboardDrag) handlePointerAndKeyboardDrop(event.detail.item, 'kbd-cancel');
 	}}
 >
@@ -1345,7 +1378,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		{#if rootState.isTarget && registry.sourceList?.draggedItemId}
 			<SortableListPlaceholder
 				id={registry.sourceList.draggedItemId}
-				index={ref.querySelectorAll('.ssl-item').length ?? 0}
+				index={getItems(ref).length ?? 0}
 			/>
 		{/if}
 	{:else}
@@ -1380,7 +1413,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			flex-direction: column;
 
 			&[data-can-remove-on-drop-out='true']
-				:global(.ssl-item[data-drag-state*='ptr'][data-is-within-bounds='false']) {
+				> :global(.ssl-item[data-drag-state*='ptr'][data-is-within-bounds='false']) {
 				margin: 0 calc(var(--ssl-gap) / 2);
 			}
 		}
@@ -1388,7 +1421,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		&[aria-orientation='horizontal'] {
 			flex-direction: row;
 
-			&[data-can-remove-on-drop-out='true'] :global(.ssl-item[data-is-within-bounds='false']) {
+			&[data-can-remove-on-drop-out='true'] > :global(.ssl-item[data-is-within-bounds='false']) {
 				margin: calc(var(--ssl-gap) / 2) 0;
 			}
 		}
