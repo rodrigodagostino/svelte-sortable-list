@@ -7,6 +7,8 @@ type AnnouncementContext = {
 	draggedItem: HTMLLIElement;
 	/** The index of the dragged item element. */
 	draggedItemIndex: number;
+	/** The type of content the dragged item element holds. */
+	draggedItemType: 'list' | 'item';
 };
 
 type TargetListFields = {
