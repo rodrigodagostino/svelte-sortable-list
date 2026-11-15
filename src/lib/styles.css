@@ -44,8 +44,10 @@
 }
 
 .ssl-root {
-	border-radius: 0.625rem;
-	outline-offset: calc(var(--ssl-gap) / 2 * -1 + 0.125rem);
+	--ssl-border-radius: 0.375rem;
+	--ssl-outline-offset: calc(var(--ssl-gap) / 2 * -1 + 0.125rem);
+	border-radius: calc(var(--ssl-border-radius) - var(--ssl-outline-offset));
+	outline-offset: var(--ssl-outline-offset);
 }
 
 .ssl-root:focus-visible,
