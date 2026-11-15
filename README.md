@@ -51,6 +51,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Item>` props](#sortablelistitem-props)
   - [`<SortableList.Handle>` props](#sortablelisthandle-props)
   - [`<SortableList.Remover>` props](#sortablelistremover-props)
+  - [`<SortableList.Icon>` props](#sortablelisticon-props)
 - [Nested lists](#nested-lists)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
@@ -311,6 +312,7 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | `<SortableList.Item>`    | An individual list item that holds data and content, and can contain `<SortableList.Handle>` and `<SortableList.Remover>` components.                                                                         |
 | `<SortableList.Handle>`  | An element that restricts the draggable area of a list item to itself. Including this inside a `<SortableList.Item>` directly activates handle functionality for that item.                                   |
 | `<SortableList.Remover>` | A `<button>` element that removes an item when pressed. Including this inside a `<SortableList.Item>` moves the focus to a neighboring item before calling your `onclick` handler, which handles the removal. |
+| `<SortableList.Icon>`    | An element that displays a selected icon from a very limited selection.                                                                                                                                       |
 
 > [!WARNING]
 > While you can use a standard `<button>` element instead of `<SortableList.Remover>` to trigger item removal, the provided component offers additional benefits. It automatically focuses the next item in the list when a user removes an item via keyboard, preventing focus from falling back to the `<body>` element.
@@ -376,6 +378,12 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Prop                | Type                                     | Default | Possible values                          | Description                      |
 | ------------------- | ---------------------------------------- | ------- | ---------------------------------------- | -------------------------------- |
 | `ref` `[$bindable]` | `HTMLButtonElement \| null \| undefined` | `null`  | `HTMLButtonElement \| null \| undefined` | Reference to the remove element. |
+
+### `<SortableList.Icon>` props
+
+| Prop   | Type     | Default     | Possible values       | Description                  |
+| ------ | -------- | ----------- | --------------------- | ---------------------------- |
+| `name` | `string` | `undefined` | `string \| undefined` | Name of the icon to display. |
 
 ---
 

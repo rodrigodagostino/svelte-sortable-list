@@ -13,7 +13,7 @@ Serves as an icon for the `<SortableList.Handle>` and `<SortableList.Remover>` c
 -->
 
 <script lang="ts">
-	import type { IconProps } from '$lib/types/props.js';
+	import type { SortableListIconProps as IconProps } from '$lib/types/props.js';
 
 	let { name }: IconProps = $props();
 </script>
