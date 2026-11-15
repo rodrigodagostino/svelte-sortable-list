@@ -110,7 +110,6 @@
 			margin-inline: -3rem;
 
 			&:has(.lists.direction-vertical) {
-				margin-block-start: 8vh;
 				margin-block-start: 8dvh;
 
 				@media (min-width: 46em) {
@@ -118,7 +117,6 @@
 				}
 
 				@media (min-width: 58em) {
-					margin-block-start: 20vh;
 					margin-block-start: 20dvh;
 				}
 			}
@@ -144,6 +142,10 @@
 
 		&.direction-vertical {
 			grid-template-columns: repeat(3, minmax(12rem, 1fr));
+
+			@media (min-width: 52em) {
+				grid-template-columns: repeat(3, minmax(14rem, 1fr));
+			}
 		}
 
 		&.direction-horizontal {
@@ -174,6 +176,7 @@
 		display: grid;
 		grid-template-columns: 1fr auto;
 		row-gap: 0.5rem;
+		padding-top: 0.25rem;
 
 		& * {
 			transition: color 320ms;

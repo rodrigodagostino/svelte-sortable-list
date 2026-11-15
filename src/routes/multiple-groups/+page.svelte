@@ -214,6 +214,7 @@
 		display: grid;
 		grid-template-columns: 1fr auto;
 		row-gap: 0.5rem;
+		padding-top: 0.25rem;
 
 		& * {
 			transition: color 320ms;
