@@ -17,6 +17,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
+	import { linear } from 'svelte/easing';
 	import { getSortableListRootState, registry } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListPlaceholderProps as PlaceholderProps } from '$lib/types/props.js';
@@ -41,6 +42,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		if (registry.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
+			easing: linear,
 			axis: isVertical ? 'y' : 'x',
 			metrics: {
 				width: draggedRect?.width ?? 0,
