@@ -40,7 +40,14 @@ Serves as an icon for the `<SortableList.Handle>` and `<SortableList.Remover>` c
 		<circle cx="15" cy="12" r="1" />
 		<circle cx="15" cy="5" r="1" />
 		<circle cx="15" cy="19" r="1" />
-	{:else}
+	{:else if name === 'grip-top-right'}
+		<circle cx="12" cy="5" r="1" />
+		<circle cx="19" cy="5" r="1" />
+		<circle cx="5" cy="5" r="1" />
+		<circle cx="12" cy="12" r="1" />
+		<circle cx="19" cy="12" r="1" />
+		<circle cx="19" cy="19" r="1" />
+	{:else if name === 'x'}
 		<path d="M18 6 6 18" />
 		<path d="m6 6 12 12" />
 	{/if}

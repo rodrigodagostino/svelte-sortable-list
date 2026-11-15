@@ -145,5 +145,5 @@ export interface SortableListRemoverProps extends HTMLButtonAttributes {
 
 export interface IconProps {
 	/** Name of the icon to display. */
-	name: 'grip-vertical' | 'x';
+	name: 'grip-vertical' | 'grip-top-right' | 'x';
 }
