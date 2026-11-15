@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.7] (2026-11-15)
+
+### BREAKING
+
+- Rename `SortableList.ItemHandle` to `SortableList.Handle`.
+- Rename `SortableList.ItemRemove` to `SortableList.Remover`.
+
+### Added
+
+- Support nested lists.
+- Add `grip-top-right` icon.
+- Expose `SortableList.Icon` and `SortableList.IconProps`.
+
+### Changed
+
+- Rename `name` prop values for `SortableList.Icon`.
+
+### Fixed
+
+- Soften list height transition.
+- Ensure `border-radius` of parent list outline in nested lists is always consistent.
+
+### Docs
+
+- Add **“Nested lists”** demo page.
+
 ## [3.0.0-next.6] (2026-10-19)
 
 ### Performance
@@ -1965,7 +1991,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.6...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.7...HEAD
+[3.0.0-next.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.6...v3.0.0-next.7
 [3.0.0-next.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.5...v3.0.0-next.6
 [3.0.0-next.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...v3.0.0-next.5
 [3.0.0-next.4]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.3...v3.0.0-next.4
