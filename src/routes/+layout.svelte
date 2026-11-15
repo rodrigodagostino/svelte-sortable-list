@@ -27,6 +27,7 @@
 		{ text: 'Varying heights', path: '/varying-heights' },
 		{ text: 'Multiple lists', path: '/multiple-lists' },
 		{ text: 'Multiple groups', path: '/multiple-groups' },
+		{ text: 'Nested lists', path: '/nested-lists' },
 		{ text: 'With handle', path: '/with-handle' },
 		{ text: 'With delay', path: '/with-delay' },
 		{ text: 'With wrapping', path: '/with-wrapping' },
