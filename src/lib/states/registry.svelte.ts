@@ -1,5 +1,5 @@
 import type { RegistryList, SourceList, TargetList } from '$lib/types/states.js';
-import type { SortableListRootState as RootState } from './sortable-list.svelte.ts';
+import type { SortableListRootState as RootState } from './sortable-list.svelte.js';
 
 export class SortableListRegistry {
 	lists: Record<string, RegistryList[]> = $state.raw({});

@@ -1,5 +1,5 @@
 import type { SortableList } from '$lib/index.js';
-import { toKebabCase } from './utils.ts';
+import { toKebabCase } from './utils.js';
 
 export const defaultRootProps: SortableList.RootProps = {
 	gap: 12,

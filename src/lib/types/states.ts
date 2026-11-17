@@ -1,5 +1,5 @@
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
-import type { ItemRect } from './data-extraction.ts';
+import type { ItemRect } from './data-extraction.js';
 
 export interface RegistryList {
 	ref: HTMLUListElement;
