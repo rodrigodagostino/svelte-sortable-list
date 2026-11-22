@@ -52,6 +52,7 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
   - [`<SortableList.Handle>` props](#sortablelisthandle-props)
   - [`<SortableList.Remover>` props](#sortablelistremover-props)
   - [`<SortableList.Icon>` props](#sortablelisticon-props)
+- [Modules](#modules)
 - [Nested lists](#nested-lists)
 - [Utilities](#utilities)
 - [Transitions](#transitions)
@@ -69,9 +70,10 @@ A comprehensive package for creating accessible, sortable lists in Svelte applic
 - **Multi-input support**: Mouse, keyboard, and touch interactions.
 - **Accessibility-first**: Screen reader support with customizable announcements.
 - **Flexible layouts**: Vertical and horizontal orientations with varying item heights.
-- **Enhanced UX**: Drop indicators, drag handles, auto-scrolling, and customizable transitions.
+- **Enhanced UX**: Drop indicators, drag handles, opt-in auto-scrolling, and customizable transitions.
 - **Advanced options**: Axis locking, boundary constraints, and remove-on-drop-outside functionality.
-- **Multiple lists**: Drag items between grouped lists.
+- **Multiple lists**: Drag items between grouped lists, with the opt-in `crossList()` module.
+- **Opt-in modules**: Features you don’t use stay out of your bundle.
 - **Integration**: Support for nested interactive elements and the `<dialog>` element.
 - **Internationalization**: RTL language support.
 - **Developer-friendly**: TypeScript definitions, unopinionated styling, and zero dependencies.
@@ -322,9 +324,9 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 | Prop                 | Type                                    | Default                                                     | Possible values                                       | Description                                                                                                                                                                                                                                                                                                                                                          |
 | -------------------- | --------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ref` `[$bindable]`  | `HTMLUListElement \| null \| undefined` | `null`                                                      | `HTMLUListElement \| null \| undefined`               | Reference to the list element.                                                                                                                                                                                                                                                                                                                                       |
-| `group`              | `string \| undefined`                   | `undefined`                                                 | Any string                                            | Group this list belongs to. Lists sharing the same `group` value can have items dragged between them. When set, `id` and `index` become required.                                                                                                                                                                                                                    |
-| `id`                 | `string \| undefined`                   | `undefined`                                                 | Unique string                                         | Unique identifier for the list. Required when `group` is set.                                                                                                                                                                                                                                                                                                        |
-| `index`              | `number \| undefined`                   | `undefined`                                                 | Unique number                                         | Position of the list within its `group`. Required when `group` is set.                                                                                                                                                                                                                                                                                               |
+| `modules`            | `SortableListModule[] \| undefined`     | `undefined`                                                 | Array of modules                                      | Opt-in features: `autoScroll()` and `crossList()` from `@rodrigodagostino/svelte-sortable-list/modules`. Read once at mount.                                                                                                                                                                                                                                         |
+| `id`                 | `string \| undefined`                   | `undefined`                                                 | Unique string                                         | Unique identifier for the list. Required with the `crossList` module.                                                                                                                                                                                                                                                                                                |
+| `index`              | `number \| undefined`                   | `undefined`                                                 | Unique number                                         | Position of the list within its group. Required with the `crossList` module.                                                                                                                                                                                                                                                                                         |
 | `gap`                | `number \| undefined`                   | `12`                                                        | Number ≥ `0`                                          | Separation between items in pixels.                                                                                                                                                                                                                                                                                                                                  |
 | `direction`          | `string \| undefined`                   | `'vertical'`                                                | `'vertical'` \| `'horizontal'`                        | Items orientation.                                                                                                                                                                                                                                                                                                                                                   |
 | `delay`              | `number \| undefined`                   | `0`                                                         | Number ≥ `0`                                          | Time before the drag operation starts (in milliseconds). Can help prevent accidental dragging.                                                                                                                                                                                                                                                                       |
@@ -387,13 +389,39 @@ This package follows the [Compound Component Pattern](https://www.smashingmagazi
 
 ---
 
+## Modules
+
+Auto-scrolling and dragging items between lists are opt-in, so a list that doesn’t need them doesn’t ship their code. Import the factories from the `/modules` subpath and pass them to `<SortableList.Root>` through the `modules` prop:
+
+```svelte
+<script lang="ts">
+	import { SortableList } from '@rodrigodagostino/svelte-sortable-list';
+	import { autoScroll, crossList } from '@rodrigodagostino/svelte-sortable-list/modules';
+</script>
+
+<SortableList.Root
+	modules={[autoScroll({ speed: 1.5 }), crossList({ group: 'my-group' })]}
+	{id}
+	{index}
+>
+	<!-- items -->
+</SortableList.Root>
+```
+
+- **`autoScroll({ speed?, threshold?, margin? })`**: scrolls the nearest scrollable ancestor while a pointer drags an item close to its edges. `speed` multiplies the scrolling speed (default `1`, higher is faster). `threshold` is the fraction of the scroll container, from each edge, where scrolling starts (default `0.2`). `margin` is the gap in pixels kept between the target item and the container edge when a keyboard drag scrolls it into view (default `40`). Keyboard drags scroll the target item into view with or without this module; without it, `margin` stays at `40`.
+- **`crossList({ group })`**: lets items be dragged between lists sharing the same `group`. Each of those lists also needs a unique `id` and its `index` within the group.
+
+`modules` is read once, when the list mounts. Changing it afterwards has no effect.
+
+---
+
 ## Nested lists
 
 To reorder the lists themselves, wrap each of them in an item of an outer `<SortableList.Root>`. Lists then _are_ items, so they get dragged, dropped, transitioned and announced like any other item, and `sortItems` reorders them in your data.
 
 Two things to keep in mind:
 
-- The outer list has to be **ungrouped** (no `group` prop). A `group` is what lets items travel between lists, and dragging a list out of its own container into another one is not supported.
+- The outer list has to be **ungrouped** (no `crossList()` module). A group is what lets items travel between lists, and dragging a list out of its own container into another one is not supported.
 - The `index` of every grouped inner list has to be renumbered when the lists are reordered, since keyboard traversal across lists relies on it. Deriving it from the position in your data (as the `{#each}` below does) takes care of that.
 
 A list is dragged from anywhere inside its own item, unless that item holds a `<SortableList.Handle>`, in which case it is dragged from the handle alone. Grabbing anything inside the nested list hands the gesture over to it instead.
@@ -406,6 +434,7 @@ A list is dragged from anywhere inside its own item, unless that item holds a `<
 		removeItem,
 		sortItems,
 	} from '@rodrigodagostino/svelte-sortable-list';
+	import { crossList } from '@rodrigodagostino/svelte-sortable-list/modules';
 
 	let lists = $state([
 		{
@@ -465,7 +494,7 @@ A list is dragged from anywhere inside its own item, unless that item holds a `<
 				<SortableList.Handle />
 				<h2 id="column-title-{id}">{title}</h2>
 				<SortableList.Root
-					group="my-group"
+					modules={[crossList({ group: 'my-group' })]}
 					{id}
 					{index}
 					aria-labelledby="column-title-{id}"
@@ -540,7 +569,7 @@ Utility functions to simplify common list operations:
 
 **Multiple lists example:**
 
-To drag items between lists, give each `<SortableList.Root>` the same `group` value, along with a unique `id` and its `index` within the group. Use `sourceListId`/`targetListId` from the `ondragend` event to figure out which lists were involved, and `insertItem`/`removeItem` to move the item across your data:
+To drag items between lists, give each `<SortableList.Root>` a `crossList()` module with the same `group` value, along with a unique `id` and its `index` within the group. Use `sourceListId`/`targetListId` from the `ondragend` event to figure out which lists were involved, and `insertItem`/`removeItem` to move the item across your data:
 
 ```svelte
 <script lang="ts">
@@ -550,6 +579,7 @@ To drag items between lists, give each `<SortableList.Root>` the same `group` va
 		removeItem,
 		sortItems,
 	} from '@rodrigodagostino/svelte-sortable-list';
+	import { crossList } from '@rodrigodagostino/svelte-sortable-list/modules';
 
 	let lists = $state([
 		{
@@ -648,7 +678,12 @@ To drag items between lists, give each `<SortableList.Root>` the same `group` va
 </script>
 
 {#each lists as { id, items }, index (id)}
-	<SortableList.Root group="my-group" {id} {index} ondragend={handleDragEnd}>
+	<SortableList.Root
+		modules={[crossList({ group: 'my-group' })]}
+		{id}
+		{index}
+		ondragend={handleDragEnd}
+	>
 		{#each items as item, itemIndex (item.id)}
 			<SortableList.Item {...item} index={itemIndex}>
 				<div class="ssl-item-content">
