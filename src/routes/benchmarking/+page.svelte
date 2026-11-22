@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { SortableList, insertItem, removeItem, sortItems } from '$lib/index.js';
+	import { autoScroll } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultLists } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
@@ -143,6 +144,7 @@
 				<SortableList.Root
 					{...layoutState.props}
 					group="benchmarking-group"
+					modules={[autoScroll()]}
 					{id}
 					{index}
 					aria-labelledby="list-title-{id}"
@@ -157,6 +159,7 @@
 			{:else}
 				<SortableList.Root
 					{...layoutState.props}
+					modules={[autoScroll()]}
 					{id}
 					aria-labelledby="list-title-{id}"
 					onmounted={() => performance.mark('ssl-mounted')}

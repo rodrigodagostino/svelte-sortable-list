@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, insertItem, removeItem, sortItems } from '$lib/index.js';
+	import { autoScroll } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultLists } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
@@ -79,6 +80,7 @@
 		direction="horizontal"
 		gap={32}
 		transition={layoutState.props.transition}
+		modules={[autoScroll()]}
 		aria-label="Kanban board"
 		ondragend={handleListsDragEnd}
 	>
@@ -95,6 +97,7 @@
 					<SortableList.Root
 						{...layoutState.props}
 						group="nested-list-group"
+						modules={[autoScroll()]}
 						{id}
 						{index}
 						aria-labelledby="column-title-{id}"

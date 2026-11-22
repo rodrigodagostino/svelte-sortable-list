@@ -54,15 +54,17 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		setSortableListRootState,
 		unsetSortableListRootState,
 	} from '$lib/states/index.js';
-	import type { RegistryList, SortableListRootProps as RootProps } from '$lib/types/index.js';
+	import type {
+		AutoScrollModule,
+		RegistryList,
+		SortableListRootProps as RootProps,
+	} from '$lib/types/index.js';
 	import {
 		addScrollListener,
 		afterPaint,
 		announce,
 		areColliding,
 		canScroll,
-		canScrollX,
-		canScrollY,
 		clearPeerItemRects,
 		endPointerSession,
 		getClosestItemRect,
@@ -81,7 +83,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getPeerItemRects,
 		getPeerTargetFields,
 		getPlaceholder,
-		getScrollingSpeed,
 		getTargetItemFields,
 		getTextDirection,
 		getVisibleRange,
@@ -135,6 +136,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		...transition,
 	});
 	const _modules = untrack(() => modules) ?? [];
+	const autoScroll = _modules.find((m): m is AutoScrollModule => m.kind === 'autoScroll');
 	const _announcements = $derived(announcements || announce);
 
 	$effect.pre(() => {
@@ -184,7 +186,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	const isKeyboardDragging = $derived(rootState.dragState === 'kbd-drag');
 	const isKeyboardStartingDragOrDragging = $derived(rootState.dragState.startsWith('kbd-drag'));
 	let isDropping = false;
-	let isPointerReleased = false;
 	const isNested = $derived(!!rootState.parentRoot);
 	const hasNestedLists = $derived(rootState.childRoots.length > 0);
 	const tabIndex = $derived(
@@ -228,8 +229,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (transitionTimeoutId) clearTimeout(transitionTimeoutId);
 		if (pointerMoveRafId) cancelAnimationFrame(pointerMoveRafId);
 		if (scrollRafId) cancelAnimationFrame(scrollRafId);
-		if (autoScrollRafId) cancelAnimationFrame(autoScrollRafId);
-		isPointerReleased = true;
+		autoScroll?.stop();
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		pointerSession = endPointerSession(pointerSession);
 		if (registry.isSourceList(rootState)) {
@@ -245,11 +245,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let scrollableAncestor = $derived(ref ? getClosestScrollableAncestor(ref) : undefined);
 	let scrollOrigin = { left: 0, top: 0 };
-	let scrollSpeed = { x: 0, y: 0 };
 	let isScrollingDocument = $derived(
 		scrollableAncestor ? isRootElement(scrollableAncestor, direction) : false
 	);
-	let isAutoScrolling = false;
 
 	function refreshScrollOffset() {
 		const scrollOffset = updateScrollOffset(
@@ -349,44 +347,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		}
 	}
 
-	let autoScrollRafId: number | null = null;
-	function scroll() {
-		if (!scrollableAncestor) return;
-
-		isAutoScrolling = true;
-		autoScrollRafId = requestAnimationFrame(() => {
-			autoScrollRafId = null;
-			if (
-				isPointerReleased ||
-				(!shouldAutoScroll(scrollableAncestor, 'horizontal', scrollSpeed.x) &&
-					!shouldAutoScroll(scrollableAncestor, 'vertical', scrollSpeed.y))
-			) {
-				isAutoScrolling = false;
-				return;
-			}
-
-			scrollableAncestor.scrollBy(scrollSpeed.x, scrollSpeed.y);
-
-			if (scrollSpeed.x !== 0 || scrollSpeed.y !== 0) scroll();
-			else isAutoScrolling = false;
-		});
-	}
-
-	function autoScroll(clientX: PointerEvent['clientX'], clientY: PointerEvent['clientY']) {
-		if (!scrollableAncestor) return;
-
-		scrollSpeed = {
-			x: canScrollX(scrollableAncestor)
-				? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'horizontal', isScrollingDocument)
-				: 0,
-			y: canScrollY(scrollableAncestor)
-				? getScrollingSpeed(scrollableAncestor, clientX, clientY, 'vertical', isScrollingDocument)
-				: 0,
-		};
-
-		if ((scrollSpeed.x !== 0 || scrollSpeed.y !== 0) && !isAutoScrolling) scroll();
-	}
-
 	let scrollRafId: number | null = null;
 	let scrollEventTarget: Document | HTMLElement | null = null;
 	function handleScroll() {
@@ -480,7 +440,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		)
 			return;
 
-		isPointerReleased = false;
 		currItem.setPointerCapture(e.pointerId);
 		pointerId = e.pointerId;
 
@@ -593,7 +552,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				...getPeerTargetFields(registry, group, rootState),
 			});
 
-			if (canScroll(scrollableAncestor)) autoScroll(lastClientX, lastClientY);
+			if (autoScroll && scrollableAncestor && canScroll(scrollableAncestor))
+				autoScroll.update(scrollableAncestor, lastClientX, lastClientY, isScrollingDocument);
 
 			pointerMoveRafId = null;
 		});
@@ -1087,7 +1047,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					: rootState.targetItem;
 
 			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
-				scrollIntoView(scrollTarget, scrollableAncestor, direction, step, isScrollingDocument);
+				scrollIntoView(
+					scrollTarget,
+					scrollableAncestor,
+					direction,
+					step,
+					isScrollingDocument,
+					autoScroll?.margin
+				);
 		}
 	}
 
@@ -1098,8 +1065,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (!rootState.draggedItem || isDropping) return;
 
 		isDropping = true;
-		isPointerReleased = true;
-		scrollSpeed = { x: 0, y: 0 };
+		autoScroll?.stop();
 		if (pointerMoveRafId) {
 			cancelAnimationFrame(pointerMoveRafId);
 			pointerMoveRafId = null; // Required on mobile when transition duration is `0ms` and `rafId` is not cleared during `pointermove`.

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
+	import { autoScroll } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
@@ -28,7 +29,12 @@
 </svelte:head>
 
 <div class="wrapper direction-{layoutState.props.direction}">
-	<SortableList.Root {...layoutState.props} ondrop={handleDrop} ondragend={handleDragEnd}>
+	<SortableList.Root
+		{...layoutState.props}
+		modules={[autoScroll()]}
+		ondrop={handleDrop}
+		ondragend={handleDragEnd}
+	>
 		{#each items as item, index (item.id)}
 			<SortableList.Item id={item.id} {index}>
 				<div class="ssl-item-content">

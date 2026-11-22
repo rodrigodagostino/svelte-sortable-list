@@ -40,44 +40,19 @@ export function canScroll(element: HTMLElement | undefined) {
 	);
 }
 
-export function canScrollX(element: HTMLElement | undefined) {
-	return element && element.scrollWidth > element.clientWidth;
-}
-
-export function canScrollY(element: HTMLElement | undefined) {
-	return element && element.scrollHeight > element.clientHeight;
-}
-
-export function shouldAutoScroll(
-	element: HTMLElement,
-	direction: RootProps['direction'],
-	scrollingSpeed: number
-) {
-	if (direction === 'vertical')
-		return (
-			(scrollingSpeed < 0 && element?.scrollTop > 0) ||
-			(scrollingSpeed > 0 && element?.scrollTop + element?.clientHeight < element?.scrollHeight)
-		);
-	else
-		return (
-			(scrollingSpeed < 0 && element?.scrollLeft > 0) ||
-			(scrollingSpeed > 0 && element?.scrollLeft + element?.clientWidth < element?.scrollWidth)
-		);
-}
-
 export function scrollIntoView(
 	element: HTMLElement,
 	container: HTMLElement,
 	direction: RootProps['direction'],
 	step: 1 | -1,
-	isScrollingDocument: boolean
+	isScrollingDocument: boolean,
+	margin = 40
 ) {
 	const elementRect = element.getBoundingClientRect();
 	const elementStyles = window.getComputedStyle(element);
 	const elementTranslate = getTranslateValues(element);
 	const containerRect = container.getBoundingClientRect();
 	const containerStyles = window.getComputedStyle(container);
-	const SCROLL_MARGIN = 40;
 
 	const left =
 		direction === 'horizontal'
@@ -89,14 +64,14 @@ export function scrollIntoView(
 					parseFloat(containerStyles.borderRightWidth) +
 					parseFloat(elementStyles.marginRight) * 2 -
 					(elementTranslate?.x || 0) +
-					SCROLL_MARGIN
+					margin
 				: elementRect.left -
 					(isScrollingDocument ? 0 : containerRect.left) +
 					container.scrollLeft -
 					parseFloat(containerStyles.borderLeftWidth) -
 					parseFloat(elementStyles.marginLeft) * 2 -
 					(elementTranslate?.x || 0) -
-					SCROLL_MARGIN
+					margin
 			: undefined;
 	const top =
 		direction === 'vertical'
@@ -108,14 +83,14 @@ export function scrollIntoView(
 					parseFloat(containerStyles.borderBottomWidth) +
 					parseFloat(elementStyles.marginBottom) * 2 -
 					(elementTranslate?.y || 0) +
-					SCROLL_MARGIN
+					margin
 				: elementRect.top -
 					(isScrollingDocument ? 0 : containerRect.top) +
 					container.scrollTop -
 					parseFloat(containerStyles.borderTopWidth) -
 					parseFloat(elementStyles.marginTop) * 2 -
 					(elementTranslate?.y || 0) -
-					SCROLL_MARGIN
+					margin
 			: undefined;
 
 	container.scrollTo({
@@ -123,10 +98,6 @@ export function scrollIntoView(
 		top,
 		behavior: 'smooth',
 	});
-}
-
-function getScrollingOffset(element: HTMLElement, direction: RootProps['direction']) {
-	return direction === 'vertical' ? element.clientHeight * 0.2 : element.clientWidth * 0.2;
 }
 
 export function updateScrollOffset(
@@ -141,41 +112,4 @@ export function updateScrollOffset(
 	if (left === scrollOffset.left && top === scrollOffset.top) return scrollOffset;
 
 	return { left, top };
-}
-
-export function getScrollingSpeed(
-	container: HTMLElement,
-	clientX: PointerEvent['clientX'],
-	clientY: PointerEvent['clientY'],
-	direction: RootProps['direction'],
-	isScrollingDocument: boolean
-) {
-	const offset = getScrollingOffset(container, direction);
-	const SPEED_RATIO = 12;
-	// In those situations where the container is larger than the viewport,
-	// we want to use the document element as reference.
-	const rootElement = document.documentElement;
-	const containerRect = container.getBoundingClientRect();
-	const top = isScrollingDocument ? 0 : containerRect.top;
-	const left = isScrollingDocument ? 0 : containerRect.left;
-	const right = isScrollingDocument ? rootElement.clientWidth : containerRect.right;
-	const bottom = isScrollingDocument ? rootElement.clientHeight : containerRect.bottom;
-
-	if (direction === 'vertical') {
-		if (clientY - top < offset) {
-			return Math.round((offset - (clientY - top)) / -SPEED_RATIO);
-		} else if (bottom - clientY < offset) {
-			return Math.round((offset - (bottom - clientY)) / SPEED_RATIO);
-		} else {
-			return 0;
-		}
-	} else {
-		if (clientX - left < offset) {
-			return Math.round((offset - (clientX - left)) / -SPEED_RATIO);
-		} else if (right - clientX < offset) {
-			return Math.round((offset - (right - clientX)) / SPEED_RATIO);
-		} else {
-			return 0;
-		}
-	}
 }

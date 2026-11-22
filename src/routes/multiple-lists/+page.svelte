@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { SortableList, sortItems, removeItem, insertItem } from '$lib/index.js';
+	import { autoScroll } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultLists } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
@@ -82,6 +83,7 @@
 			<SortableList.Root
 				{...layoutState.props}
 				group="list-group"
+				modules={[autoScroll()]}
 				{id}
 				{index}
 				isLocked={layoutState.props.isLocked || lists[index].mode === 'locked'}
