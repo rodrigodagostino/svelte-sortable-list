@@ -1,10 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { SortableList, removeItem, sortItems } from '$lib/index.js';
 	import { autoScroll } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultItems } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
+
+	/**
+	 * Configured through the query string for the E2E tests (read once at mount):
+	 * - `autoScroll=off`: leaves the `autoScroll()` module out.
+	 * - `threshold` / `margin`: options passed to `autoScroll()`.
+	 */
+	const params = page.url.searchParams;
+	const threshold = params.has('threshold') ? Number(params.get('threshold')) : undefined;
+	const margin = params.has('margin') ? Number(params.get('margin')) : undefined;
+	const modules = params.get('autoScroll') === 'off' ? [] : [autoScroll({ threshold, margin })];
 
 	let items = $state(getDefaultItems(100));
 
@@ -29,12 +40,7 @@
 </svelte:head>
 
 <div class="wrapper direction-{layoutState.props.direction}">
-	<SortableList.Root
-		{...layoutState.props}
-		modules={[autoScroll()]}
-		ondrop={handleDrop}
-		ondragend={handleDragEnd}
-	>
+	<SortableList.Root {...layoutState.props} {modules} ondrop={handleDrop} ondragend={handleDragEnd}>
 		{#each items as item, index (item.id)}
 			<SortableList.Item id={item.id} {index}>
 				<div class="ssl-item-content">

@@ -293,4 +293,155 @@ test.describe('Sortable List - Auto Scrolling Container', () => {
 			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
 		});
 	}
+
+	test('should not auto scroll when the autoScroll() module is not included', async ({ page }) => {
+		// Navigate to the page without the auto scroll module
+		await page.goto('/auto-scrolling-container?autoScroll=off');
+		await page.locator('.ssl-root').waitFor();
+
+		// Find the wrapper element
+		const wrapper = page.locator('.wrapper');
+		const wrapperBox = await wrapper.boundingBox();
+		if (!wrapperBox) throw new Error('Could not get wrapper size');
+
+		// Find the dragged item (List Item 1)
+		const root = page.locator('.ssl-root');
+		const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+		// Get the bounding box for a precise drag operation
+		const draggedBox = await draggedItem.boundingBox();
+		if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
+
+		// Start the drag from the center of the dragged item
+		const pointerX = draggedBox.x + draggedBox.width / 2;
+		await page.mouse.move(pointerX, draggedBox.y + draggedBox.height / 2);
+		await page.mouse.down();
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+		// Move to the bottom edge of the wrapper, where auto scroll would kick in
+		await page.mouse.move(pointerX, wrapperBox.y + wrapperBox.height, { steps: 40 });
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+		// Wait for the time auto scroll would have needed to move the content
+		await page.waitForTimeout(1000);
+
+		// Verify the wrapper did not scroll
+		expect(await wrapper.evaluate((el) => el.scrollTop)).toBe(0);
+
+		// Release the mouse to drop
+		await page.mouse.up();
+
+		// Wait for the drag operation to complete by checking the drag state returns to idle
+		await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+	});
+
+	for (const { threshold, distance, shouldScroll } of [
+		{ threshold: undefined, distance: 0.15, shouldScroll: true },
+		{ threshold: 0.1, distance: 0.15, shouldScroll: false },
+		{ threshold: 0.1, distance: 0.05, shouldScroll: true },
+	]) {
+		test(`should ${shouldScroll ? '' : 'not '}auto scroll with the pointer at ${distance * 100}% from the edge and a threshold of ${threshold ?? 'default'}`, async ({
+			page,
+		}) => {
+			// Navigate to the page with the threshold under test
+			await page.goto(
+				`/auto-scrolling-container${threshold === undefined ? '' : `?threshold=${threshold}`}`
+			);
+			await page.locator('.ssl-root').waitFor();
+
+			// Find the wrapper element
+			const wrapper = page.locator('.wrapper');
+			const wrapperBox = await wrapper.boundingBox();
+			if (!wrapperBox) throw new Error('Could not get wrapper size');
+			const wrapperHeight = await wrapper.evaluate((el) => el.clientHeight);
+
+			// Find the dragged item (List Item 1)
+			const root = page.locator('.ssl-root');
+			const draggedItem = root.locator('[data-item-id="list-item-1"]:not(.ssl-placeholder)');
+
+			// Get the bounding box for a precise drag operation
+			const draggedBox = await draggedItem.boundingBox();
+			if (!draggedBox) throw new Error('Could not get List Item 1 bounding box');
+
+			// Start the drag from the center of the dragged item
+			const pointerX = draggedBox.x + draggedBox.width / 2;
+			await page.mouse.move(pointerX, draggedBox.y + draggedBox.height / 2);
+			await page.mouse.down();
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag-start');
+
+			// Move close to the bottom edge of the wrapper and hold still
+			const pointerY = wrapperBox.y + wrapperBox.height - wrapperHeight * distance;
+			await page.mouse.move(pointerX, pointerY, { steps: 40 });
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'ptr-drag');
+
+			// Wait for the time auto scroll needs to move the content
+			await page.waitForTimeout(1000);
+
+			// Verify the wrapper scrolled only when the pointer was inside the threshold
+			const scrollTop = await wrapper.evaluate((el) => el.scrollTop);
+			if (shouldScroll) expect(scrollTop).toBeGreaterThan(0);
+			else expect(scrollTop).toBe(0);
+
+			// Release the mouse to drop
+			await page.mouse.up();
+
+			// Wait for the drag operation to complete by checking the drag state returns to idle
+			await expect(draggedItem).toHaveAttribute('data-drag-state', 'idle');
+		});
+	}
+
+	test('should keep the configured margin when scrolling the target item into view using keyboard', async ({
+		page,
+	}) => {
+		// Move the target item below the visible area of the wrapper and return where the wrapper settles
+		async function getScrollTopAfterFirstKeyboardScroll(margin?: number) {
+			// Navigate to the page with the margin under test
+			await page.goto(
+				`/auto-scrolling-container${margin === undefined ? '' : `?margin=${margin}`}`
+			);
+			await page.locator('.ssl-root').waitFor();
+
+			// Focus the list and pick up List Item 1
+			const wrapper = page.locator('.wrapper');
+			const root = page.locator('.ssl-root');
+			await root.focus();
+			await page.keyboard.press('ArrowDown');
+			await expect(root.locator('[data-item-id="list-item-1"]')).toBeFocused();
+			await page.keyboard.press('Space');
+
+			// Move the item down until the wrapper starts scrolling
+			for (let i = 0; i < 100; i++) {
+				await page.keyboard.press('ArrowDown');
+				const hasScrolled = await expect
+					.poll(() => wrapper.evaluate((el) => el.scrollTop), { timeout: 200 })
+					.toBeGreaterThan(0)
+					.then(() => true)
+					.catch(() => false);
+				if (hasScrolled) break;
+			}
+
+			// Wait for the smooth scroll to settle
+			let lastScrollTop = -1;
+			await expect
+				.poll(async () => {
+					const scrollTop = await wrapper.evaluate((el) => el.scrollTop);
+					const isSettled = scrollTop > 0 && scrollTop === lastScrollTop;
+					lastScrollTop = scrollTop;
+					return isSettled;
+				})
+				.toBe(true);
+
+			// Cancel the drag
+			await page.keyboard.press('Escape');
+
+			return lastScrollTop;
+		}
+
+		// Scroll the target item into view with the default margin and with a wider one
+		const defaultScrollTop = await getScrollTopAfterFirstKeyboardScroll();
+		const widerScrollTop = await getScrollTopAfterFirstKeyboardScroll(120);
+
+		// Verify the wider margin scrolled further by the difference with the default (40px)
+		expect(Math.abs(widerScrollTop - defaultScrollTop - 80)).toBeLessThanOrEqual(2);
+	});
 });
