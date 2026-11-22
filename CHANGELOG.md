@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0-next.8] (2026-11-22)
+
+### BREAKING
+
+- Extract auto-scroll into opt-in `autoScroll()` module.
+- Extract cross-list into opt-in `crossList()` module.
+
+### Added
+
+- Add opt-in modules contract.
+
+### Test
+
+- Add E2E coverage for opt-in auto-scroll and its options.
+
+### Docs
+
+- Document opt-in modules
+
 ## [3.0.0-next.7] (2026-11-15)
 
 ### BREAKING
@@ -1991,7 +2010,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a ghost element to represent the item being dragged and dropped.
 - Add base animations.
 
-[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.7...HEAD
+[unreleased]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.8...HEAD
+[3.0.0-next.8]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.7...v3.0.0-next.8
 [3.0.0-next.7]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.6...v3.0.0-next.7
 [3.0.0-next.6]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.5...v3.0.0-next.6
 [3.0.0-next.5]: https://github.com/rodrigodagostino/svelte-sortable-list/compare/v3.0.0-next.4...v3.0.0-next.5
