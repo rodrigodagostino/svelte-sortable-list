@@ -21,6 +21,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 - `canRemoveOnDropOut`: if `true`, items will be removed when dragged and dropped outside of the list bounds.
 - `isLocked`: if `true`, allows items to be focused, but prevents them from being dragged. Interactive elements inside will operate normally. When the list belongs to a `group`, it also stops receiving items from its peer lists.
 - `isDisabled`: if `true`, allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled. When the list belongs to a `group`, it also stops receiving items from its peer lists.
+- `modules`: opt-in features. Read once at mount.
 - `announcements`: announcements to be read out by the screen reader during drag and drop operations.
 
 ### Events
@@ -46,7 +47,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 -->
 
 <script lang="ts">
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
 	import {
 		registry,
@@ -93,7 +94,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		removeScrollListener,
 		restoreFocus,
 		scrollIntoView,
-		shouldAutoScroll,
 		startPointerSession,
 		updateFixedOrigin,
 		updateScrollOffset,
@@ -115,6 +115,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		canRemoveOnDropOut = false,
 		isLocked = false,
 		isDisabled = false,
+		modules = undefined,
 		announcements = undefined,
 		onmounted,
 		ondragstart,
@@ -133,6 +134,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		easing: 'cubic-bezier(0.2, 1, 0.1, 1)',
 		...transition,
 	});
+	const _modules = untrack(() => modules) ?? [];
 	const _announcements = $derived(announcements || announce);
 
 	$effect.pre(() => {

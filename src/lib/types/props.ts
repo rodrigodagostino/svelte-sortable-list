@@ -10,6 +10,7 @@ import type {
 	DragEndEvent,
 	DestroyedEvent,
 } from './events.js';
+import type { SortableListModule } from './modules.js';
 
 interface SortableListRootBaseProps extends Pick<
 	AriaAttributes & {
@@ -54,6 +55,8 @@ interface SortableListRootBaseProps extends Pick<
 	isLocked?: boolean;
 	/** Allows items to be focused, but prevents them from being dragged and change its appearance to dimmed. Interactive elements inside will be disabled. */
 	isDisabled?: boolean;
+	/** Opt-in features. Read once at mount. */
+	modules?: SortableListModule[];
 	/** The announcements to be read out by the screen reader during drag and drop operations. */
 	announcements?: Announcements;
 	/** Content to be rendered inside the list. */
