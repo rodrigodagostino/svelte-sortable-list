@@ -1,4 +1,4 @@
-import type { ItemRect } from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/data-extraction.js';
 
 export function areColliding(a: DOMRect | ItemRect, b: DOMRect | ItemRect) {
 	return a.right > b.x && a.x < b.right && a.bottom > b.y && a.y < b.bottom;

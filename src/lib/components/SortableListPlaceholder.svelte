@@ -18,7 +18,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	import { untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import { linear } from 'svelte/easing';
-	import { getSortableListRootState, registry } from '$lib/states/index.js';
+	import { getSortableListRootState } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
 	import type { SortableListPlaceholderProps as PlaceholderProps } from '$lib/types/props.js';
 	import {
@@ -39,7 +39,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 
 	function conditionalTransition(node: HTMLElement) {
 		if (!isPeerPlaceholder) return {};
-		if (registry.crossingItemId === node.dataset.itemId) return {};
+		if (rootState.crossList?.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			easing: linear,
@@ -56,16 +56,16 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		return {
 			...config,
 			get duration() {
-				return registry.crossingItemId === node.dataset.itemId ? 0 : config.duration;
+				return rootState.crossList?.crossingItemId === node.dataset.itemId ? 0 : config.duration;
 			},
 		};
 	}
 
 	const rootState = getSortableListRootState();
 	const sourceState = $derived(
-		rootState.draggedItem || !rootState.group
+		rootState.draggedItem || !rootState.crossList
 			? rootState
-			: (registry.sourceList?.state ?? rootState)
+			: (rootState.crossList.sourceList?.state ?? rootState)
 	);
 
 	const classes = $derived(['ssl-placeholder', restProps.class]);
@@ -77,7 +77,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 			: null
 	);
 	const targetIndex = $derived(
-		rootState.isSource && registry.targetList
+		rootState.isSource && rootState.crossList?.targetList
 			? null
 			: sourceState.targetItem
 				? getIndex(sourceState.targetItem)
@@ -106,13 +106,13 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	};
 
 	let isVertical = $derived(rootState.props.direction === 'vertical');
-	const isPeerPlaceholder = registry.isTargetList(rootState);
+	const isPeerPlaceholder = rootState.crossList?.targetList?.state === rootState;
 	let isPositioned = $state(!isPeerPlaceholder);
 
 	function isSlotClosing() {
 		return (
-			registry.isSourceList(rootState) &&
-			!!registry.targetList &&
+			rootState.crossList?.sourceList?.state === rootState &&
+			!!rootState.crossList.targetList &&
 			(rootState.dragState === 'ptr-predrop' ||
 				rootState.dragState === 'ptr-drop' ||
 				rootState.dragState === 'kbd-drop')
@@ -145,7 +145,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	}
 
 	function getStyleTransform() {
-		if (registry.isTargetList(rootState)) return getPeerTransform();
+		if (rootState.crossList?.targetList?.state === rootState) return getPeerTransform();
 
 		if (!draggedRect || !targetRect || draggedIndex === null || targetIndex === null)
 			return 'translate3d(0, 0, 0)';
@@ -163,7 +163,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	}
 
 	function getPeerTransform() {
-		const { targetItemId, targetItemRect, placeholderRect } = registry.targetList ?? {};
+		const { targetItemId, targetItemRect, placeholderRect } = rootState.crossList?.targetList ?? {};
 		if (!ref || targetItemId == null || !targetItemRect) return 'translate3d(0, 0, 0)';
 		// The placeholder is appended when `targetList` is set,
 		// so it is still missing when the pointer first enters this list.
@@ -181,7 +181,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		if (rootState.group) void registry.targetList;
+		if (rootState.crossList) void rootState.crossList.targetList;
 		return untrack(() => getStyleWidth());
 	});
 
@@ -189,7 +189,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		if (rootState.group) void registry.targetList;
+		if (rootState.crossList) void rootState.crossList.targetList;
 		return untrack(() => getStyleHeight());
 	});
 
@@ -197,13 +197,13 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 		void rootState.dragState;
 		void sourceState.draggedItem;
 		void rootState.isWithinBounds;
-		if (rootState.group) void registry.targetList;
+		if (rootState.crossList) void rootState.crossList.targetList;
 		return untrack(() => getStyleMargin());
 	});
 
 	const styleTransform = $derived.by(() => {
 		void rootState.targetItem;
-		if (rootState.group) void registry.targetList;
+		if (rootState.crossList) void rootState.crossList.targetList;
 		void ref;
 		return untrack(() => getStyleTransform());
 	});
@@ -211,7 +211,7 @@ Serves as a stand-in for the dragged item’s original position. Rendered by `<S
 	const styleOverflow = $derived.by(() => {
 		void rootState.dragState;
 		void rootState.isWithinBounds;
-		if (rootState.group) void registry.targetList;
+		if (rootState.crossList) void rootState.crossList.targetList;
 		return untrack(() => getStyleOverflow());
 	});
 </script>

@@ -1,4 +1,5 @@
 import type {
+	CrossListModule,
 	SortableListRootProps as RootProps,
 	SortableListItemProps as ItemProps,
 	ItemRect,
@@ -7,7 +8,7 @@ import { getContext, setContext } from 'svelte';
 
 export class SortableListRootState {
 	ref: HTMLUListElement | null = $state.raw(null);
-	group: string | undefined = $state.raw(undefined);
+	crossList: CrossListModule | undefined = undefined;
 	isSource: boolean = $state(false);
 	isTarget: boolean = $state(false);
 	props: RootProps = $state.raw({});

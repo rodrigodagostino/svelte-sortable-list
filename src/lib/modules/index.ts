@@ -1,2 +1,3 @@
 export { autoScroll } from './auto-scroll.js';
-export type { AutoScrollOptions } from '$lib/types/modules.js';
+export { crossList } from './cross-list.svelte.js';
+export type { AutoScrollOptions, CrossListOptions } from '$lib/types/modules.js';

@@ -26,13 +26,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	import { onDestroy, tick, untrack } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
-	import {
-		getSortableListRootState,
-		registry,
-		setSortableListItemState,
-	} from '$lib/states/index.js';
+	import { getSortableListRootState, setSortableListItemState } from '$lib/states/index.js';
 	import { scaleFly } from '$lib/transitions/index.js';
-	import type { SortableListItemProps as ItemProps } from '$lib/types/index.js';
+	import type { SortableListItemProps as ItemProps } from '$lib/types/props.js';
 	import {
 		calculateTranslate,
 		calculateTranslateWithAlignment,
@@ -62,7 +58,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const itemState = setSortableListItemState();
 
 	function defaultTransition(node: HTMLElement) {
-		if (registry.crossingItemId === node.dataset.itemId) return {};
+		if (rootState.crossList?.crossingItemId === node.dataset.itemId) return {};
 		const config = scaleFly(node, {
 			duration: rootState.props.transition?.duration,
 			axis: rootState.props.direction === 'vertical' ? 'y' : 'x',
@@ -73,7 +69,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		return {
 			...config,
 			get duration() {
-				return registry.crossingItemId === node.dataset.itemId ? 0 : config.duration;
+				return rootState.crossList?.crossingItemId === node.dataset.itemId ? 0 : config.duration;
 			},
 		};
 	}
@@ -110,7 +106,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 			: new DOMRect(rect.x - scrollOffset.left, rect.y - scrollOffset.top, rect.width, rect.height);
 	});
 	const targetIndex = $derived(
-		rootState.isSource && registry.targetList
+		rootState.isSource && rootState.crossList?.targetList
 			? null
 			: rootState.targetItem
 				? getIndex(rootState.targetItem)
@@ -157,7 +153,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (!isDragged || !rect) return undefined;
 
 		if (isPointerPredropping || isPointerDropping) {
-			const peerTarget = registry.targetList?.targetItem;
+			const peerTarget = rootState.crossList?.targetList?.targetItem;
 			if (peerTarget)
 				return `${toFixedPosition('x', getItemRect(peerTarget).x, rootState.fixedOrigin)}px`;
 		}
@@ -188,7 +184,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (!isDragged || !rect || !ref) return undefined;
 
 		if (isPointerPredropping || isPointerDropping) {
-			const peerTarget = registry.targetList?.targetItem;
+			const peerTarget = rootState.crossList?.targetList?.targetItem;
 			if (peerTarget)
 				return `${toFixedPosition('y', getItemRect(peerTarget).y, rootState.fixedOrigin)}px`;
 		}
@@ -233,7 +229,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getStyleTransform() {
-		if (registry.isTargetList(rootState)) return getPeerNeighborTransform();
+		if (rootState.crossList?.targetList?.state === rootState) return getPeerNeighborTransform();
 
 		if (
 			rootState.dragState === 'idle' ||
@@ -258,7 +254,8 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getPeerNeighborTransform() {
-		const { sourceList, targetList } = registry;
+		const sourceList = rootState.crossList?.sourceList;
+		const targetList = rootState.crossList?.targetList;
 		if (
 			!targetList ||
 			!sourceList ||
@@ -315,10 +312,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getKeyboardTransform() {
-		if (registry.targetList) {
-			const peerTargetRect = registry.targetList?.targetItem
-				? getItemRect(registry.targetList.targetItem)
-				: null;
+		const targetList = rootState.crossList?.targetList;
+		if (targetList) {
+			const peerTargetRect = targetList.targetItem ? getItemRect(targetList.targetItem) : null;
 
 			if (!peerTargetRect) return 'translate3d(0, 0, 0)';
 
@@ -344,7 +340,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	}
 
 	function getPredropTransform() {
-		const peerTarget = registry.targetList?.targetItem;
+		const peerTarget = rootState.crossList?.targetList?.targetItem;
 		if (peerTarget) {
 			// Take a live read of the dragged item’s rect to avoid stale values.
 			const draggedRectLive = rootState.draggedItem!.getBoundingClientRect();
@@ -456,9 +452,9 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 		if (isDragged) void rootState.pointer;
 		void rootState.targetItem;
 		void rootState.isWithinBounds;
-		if (rootState.group) {
-			void registry.sourceList;
-			if (rootState.isSource || rootState.isTarget) void registry.targetList;
+		if (rootState.crossList) {
+			void rootState.crossList.sourceList;
+			if (rootState.isSource || rootState.isTarget) void rootState.crossList.targetList;
 		}
 		return untrack(() => getStyleTransform());
 	});
@@ -466,7 +462,7 @@ Serves as an individual item within `<SortableList.Root>`. Holds the data and co
 	const styleTransition = $derived.by(() => {
 		void styleTransform;
 		void rootState.dragState;
-		if (rootState.group) void registry.sourceList;
+		if (rootState.crossList) void rootState.crossList.sourceList;
 		return untrack(() => getStyleTransition());
 	});
 

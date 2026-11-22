@@ -1,13 +1,9 @@
-import type { SortableListRegistry as Registry } from '$lib/states/index.js';
 import type {
 	SortableListAnnouncements as Announcements,
 	SortableListRootProps as RootProps,
 } from '$lib/types/index.js';
 
-export function restoreFocus(
-	focusedElement: Element | null,
-	crossingItemId: Registry['crossingItemId']
-) {
+export function restoreFocus(focusedElement: Element | null, crossingItemId: string | null) {
 	if (!focusedElement) return;
 	// Do not restore the focus if it didn’t get lost.
 	const { activeElement } = document;

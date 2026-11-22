@@ -1,5 +1,5 @@
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
-import type { ItemRect } from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/data-extraction.js';
 
 /**
  * Converts a viewport coordinate into the `left`/`top` value that places a `position: fixed`

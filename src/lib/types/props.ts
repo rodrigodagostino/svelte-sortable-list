@@ -10,7 +10,7 @@ import type {
 	DragEndEvent,
 	DestroyedEvent,
 } from './events.js';
-import type { SortableListModule } from './modules.js';
+import type { AutoScrollModule, SortableListModule } from './modules.js';
 
 interface SortableListRootBaseProps extends Pick<
 	AriaAttributes & {
@@ -75,25 +75,26 @@ interface SortableListRootBaseProps extends Pick<
 	ondestroyed?: (event: DestroyedEvent) => void;
 }
 
-interface SortableListRootUngroupedProps extends SortableListRootBaseProps {
-	/** Group this list belongs to. */
-	group?: undefined;
+interface SortableListRootAutoScrollProps extends SortableListRootBaseProps {
+	/** Opt-in features. Read once at mount. */
+	modules?: AutoScrollModule[];
 	/** Unique identifier for each list. */
 	id?: string;
 	/** Position of the list in the group. */
 	index?: number;
 }
 
-interface SortableListRootGroupedProps extends SortableListRootBaseProps {
-	/** Group this list belongs to. */
-	group: string;
+interface SortableListRootCrossListProps extends SortableListRootBaseProps {
+	/** Opt-in features. Read once at mount. */
+	modules: SortableListModule[];
 	/** Unique identifier for each list. */
 	id: string;
 	/** Position of the list in the group. */
 	index: number;
 }
 
-export type SortableListRootProps = SortableListRootUngroupedProps | SortableListRootGroupedProps;
+export type SortableListRootProps =
+	SortableListRootAutoScrollProps | SortableListRootCrossListProps;
 
 export interface SortableListItemProps extends Pick<
 	AriaAttributes,

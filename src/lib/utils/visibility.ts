@@ -1,6 +1,6 @@
 import { getTranslateValues } from './styles.js';
 import type { SortableListRootState as RootState } from '$lib/states/index.js';
-import type { ItemRect } from '$lib/types/index.js';
+import type { ItemRect } from '$lib/types/data-extraction.js';
 
 export function isFullyVisible(element: HTMLElement, container: HTMLElement) {
 	const elementRect = element.getBoundingClientRect();

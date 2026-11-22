@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { SortableList, insertItem, removeItem, sortItems } from '$lib/index.js';
-	import { autoScroll } from '$lib/modules/index.js';
+	import { autoScroll, crossList } from '$lib/modules/index.js';
 	import { defaultRootProps, getDefaultLists } from '../fixtures.js';
 	import layoutState from '../states.svelte.js';
 	import '$lib/styles.css';
@@ -143,8 +143,7 @@
 			{#if listCount > 1}
 				<SortableList.Root
 					{...layoutState.props}
-					group="benchmarking-group"
-					modules={[autoScroll()]}
+					modules={[autoScroll(), crossList({ group: 'benchmarking-group' })]}
 					{id}
 					{index}
 					aria-labelledby="list-title-{id}"

@@ -5,7 +5,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 ### Props
 - `ref`: reference to the list element (HTMLUListElement). `[$bindable]`
-- `group`: group this list belongs to.
 - `id`: unique identifier for the list.
 - `index`: position of the list in the group.
 - `gap`: separation between items (in pixels).
@@ -49,14 +48,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 <script lang="ts">
 	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import SortableListPlaceholder from '$lib/components/SortableListPlaceholder.svelte';
-	import {
-		registry,
-		setSortableListRootState,
-		unsetSortableListRootState,
-	} from '$lib/states/index.js';
+	import { setSortableListRootState, unsetSortableListRootState } from '$lib/states/index.js';
 	import type {
 		AutoScrollModule,
-		RegistryList,
+		CrossListModule,
 		SortableListRootProps as RootProps,
 	} from '$lib/types/index.js';
 	import {
@@ -65,9 +60,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		announce,
 		areColliding,
 		canScroll,
-		clearPeerItemRects,
 		endPointerSession,
-		getClosestItemRect,
 		getClosestScrollableAncestor,
 		getCollidingItemRect,
 		getDefaultAriaDescription,
@@ -75,19 +68,15 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		getFixedOrigin,
 		getHandle,
 		getIndex,
-		getItemRect,
 		getItemRects,
 		getItemRectWithOffset,
 		getItems,
 		getItemSibling,
-		getPeerItemRects,
 		getPeerTargetFields,
-		getPlaceholder,
 		getTargetItemFields,
 		getTextDirection,
 		getVisibleRange,
 		isActivePointer,
-		isCenterCrossed,
 		isFullyVisible,
 		isOrResidesInInteractiveElement,
 		isRootElement,
@@ -102,7 +91,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 	let {
 		ref = $bindable(null),
-		group = undefined,
 		id = undefined,
 		index = undefined,
 		gap = 12,
@@ -137,11 +125,13 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 	const _modules = untrack(() => modules) ?? [];
 	const autoScroll = _modules.find((m): m is AutoScrollModule => m.kind === 'autoScroll');
+	const crossList = _modules.find((m): m is CrossListModule => m.kind === 'crossList');
+	rootState.crossList = crossList;
+	const group = crossList?.group;
 	const _announcements = $derived(announcements || announce);
 
 	$effect.pre(() => {
 		rootState.ref = ref;
-		rootState.group = group;
 		rootState.props = {
 			id,
 			index,
@@ -167,8 +157,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	});
 
 	$effect.pre(() => {
-		rootState.isSource = registry.isSourceList(rootState);
-		rootState.isTarget = registry.isTargetList(rootState);
+		rootState.isSource = crossList?.sourceList?.state === rootState;
+		rootState.isTarget = crossList?.targetList?.state === rootState;
 	});
 
 	const classes = $derived(['ssl-root', restProps.class]);
@@ -199,22 +189,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	let delayTimeoutId: ReturnType<typeof setTimeout> | null = null;
 	let transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
-	let registryEntry: RegistryList | null = null;
 	onMount(() => {
-		if (group) {
-			registryEntry = {
-				ref: ref!,
-				group,
-				state: rootState,
-				get id() {
-					return id ?? null;
-				},
-				get index() {
-					return index ?? null;
-				},
-			};
-			unregister = registry.register(registryEntry);
-		}
+		rootState.ref = ref;
+		unregister = crossList?.register(rootState) ?? null;
 		onmounted?.(null);
 		rootState.isRTL = getTextDirection(ref!) === 'rtl';
 		// Peer lists hand a key over to this list when interrupting a drop moved the focused item here.
@@ -232,12 +209,6 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		autoScroll?.stop();
 		scrollEventTarget = removeScrollListener(scrollEventTarget, handleScroll);
 		pointerSession = endPointerSession(pointerSession);
-		if (registry.isSourceList(rootState)) {
-			registry.sourceList = null;
-			registry.targetList = null;
-		} else if (registry.isTargetList(rootState)) {
-			registry.targetList = null;
-		}
 		unregister?.();
 		unsetSortableListRootState(rootState);
 		ondestroyed?.(null);
@@ -280,71 +251,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		const collidingItemRect = getCollidingItemRect(draggedRectWithOffset, rootState.itemRects);
 		if (collidingItemRect) {
 			rootState.targetItem = collidingItemRect.ref;
-			if (group) registry.targetList = null;
+			if (crossList) crossList.targetList = null;
 			return;
 		} else if (canClearOnDragOut && !rootState.isWithinBounds)
 			rootState.targetItem = rootState.draggedItem;
 
-		if (group) {
-			const peerList = registry
-				.getTargetablePeerLists(group, rootState)
-				.find((l) => areColliding(draggedRect, l.ref.getBoundingClientRect()));
-
-			if (peerList) {
-				// Dragging over a peer list counts as being between bounds.
-				rootState.isWithinBounds = true;
-
-				const peerItemRects = getPeerItemRects(peerList);
-				peerList.state.visibleRange = getVisibleRange(
-					peerItemRects,
-					draggedRect,
-					peerList.state.props.gap!
-				);
-				const peerCollidingItemRect = getCollidingItemRect(draggedRect, peerItemRects);
-				if (peerCollidingItemRect) {
-					if (
-						registry.targetList?.state !== peerList.state ||
-						registry.targetList.targetItemId !== peerCollidingItemRect.id
-					)
-						registry.targetList = {
-							...peerList,
-							...getTargetItemFields(peerCollidingItemRect.ref),
-						};
-					return;
-				}
-
-				// If the peer list is empty, place the dragged item in its first position.
-				if (!peerItemRects.length) {
-					if (registry.targetList?.state !== peerList.state) {
-						registry.targetList = { ...peerList, ...getTargetItemFields(null), targetItemIndex: 0 };
-
-						// Wait until `targetList` is set and the placeholder element
-						// is appended before setting `targetItem`.
-						tick().then(() => {
-							// Bail out if the target changed in the meantime.
-							if (registry.targetList?.state !== peerList.state) return;
-							const placeholder = getPlaceholder(peerList.ref);
-							registry.targetList = { ...registry.targetList, ...getTargetItemFields(placeholder) };
-						});
-					}
-					return;
-				}
-
-				// Use the placeholder to let the dragged item be dropped at the end of the peer list.
-				const peerPlaceholder = getPlaceholder(peerList.ref);
-				if (
-					peerPlaceholder &&
-					registry.targetList?.targetItemIndex !== peerItemRects.length &&
-					isCenterCrossed(draggedRect, getItemRect(peerPlaceholder))
-				) {
-					registry.targetList = { ...peerList, ...getTargetItemFields(peerPlaceholder) };
-				}
-				return;
-			}
-
-			if (canClearOnDragOut || (canRemoveOnDropOut && !rootState.isWithinBounds))
-				registry.targetList = null;
-		}
+		crossList?.updateTarget(rootState, draggedRect);
 	}
 
 	let scrollRafId: number | null = null;
@@ -369,9 +281,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function handlePointerDown(e: PointerEvent) {
 		const focusedRootState = rootState.focusedItem
 			? rootState
-			: group
-				? registry.getPeerLists(group, rootState).find((l) => l.state.focusedItem)?.state
-				: null;
+			: crossList?.getPeerLists(rootState).find((l) => l.state.focusedItem)?.state;
 		focusedRootState?.focusedItem?.blur();
 
 		const target = e.target as HTMLElement;
@@ -435,7 +345,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		if (
 			!isIdle ||
 			delayTimeoutId !== null ||
-			(group && registry.isOtherDragActive(rootState)) ||
+			crossList?.isOtherDragActive(rootState) ||
 			rootState.isNestedDragActive()
 		)
 			return;
@@ -480,19 +390,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		await tick();
 		rootState.dragState = 'ptr-drag-start';
-
-		if (group && rootState.itemRects) {
-			registry.sourceList = {
-				group,
-				ref: ref!,
-				state: rootState,
-				id: id ?? null,
-				index: index ?? null,
-				draggedItem: currItem,
-				draggedItemId: currItem.id,
-				draggedItemIndex: getIndex(currItem),
-			};
-		}
+		crossList?.start(rootState, currItem);
 
 		ondragstart?.({
 			deviceType: 'pointer',
@@ -549,7 +447,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				targetItemIndex: rootState.targetItem ? getIndex(rootState.targetItem) : null,
 				isWithinBounds: rootState.isWithinBounds,
 				canRemoveOnDropOut: canRemoveOnDropOut || false,
-				...getPeerTargetFields(registry, group, rootState),
+				...getPeerTargetFields(crossList, rootState),
 			});
 
 			if (autoScroll && scrollableAncestor && canScroll(scrollableAncestor))
@@ -623,10 +521,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				// list so it acts on the item’s new position instead of on the place it left behind.
 				const { activeElement } = document;
 				const focusedPeerList =
-					group && !ref!.contains(activeElement)
-						? registry
-								.getPeerLists(group, rootState)
-								.find((peer) => peer.ref.contains(activeElement))
+					crossList && !ref!.contains(activeElement)
+						? crossList.getPeerLists(rootState).find((peer) => peer.ref.contains(activeElement))
 						: null;
 				if (focusedPeerList) {
 					focusedPeerList.state.handleKeyDown?.(e, activeElement as HTMLElement);
@@ -650,7 +546,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 					return;
 
 				if (isIdle) {
-					if (group && registry.isOtherDragActive(rootState)) return;
+					if (crossList?.isOtherDragActive(rootState)) return;
 					if (rootState.isNestedDragActive()) return;
 
 					rootState.draggedItem = rootState.focusedItem;
@@ -666,18 +562,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 					await tick();
 					rootState.dragState = 'kbd-drag-start';
-					if (group && rootState.itemRects) {
-						registry.sourceList = {
-							group,
-							ref: ref!,
-							state: rootState,
-							id: id ?? null,
-							index: index ?? null,
-							draggedItem: rootState.focusedItem,
-							draggedItemId: rootState.focusedItem.id,
-							draggedItemIndex: draggedIndex,
-						};
-					}
+					crossList?.start(rootState, rootState.focusedItem);
 
 					ondragstart?.({
 						deviceType: 'keyboard',
@@ -709,10 +594,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
 						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
-						targetList: registry.targetList?.ref ?? null,
-						targetListIndex: registry.targetList?.index ?? null,
-						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
-						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
+						targetList: crossList?.targetList?.ref ?? null,
+						targetListIndex: crossList?.targetList?.index ?? null,
+						targetItem: crossList?.targetList?.targetItem ?? rootState.targetItem,
+						targetItemIndex: crossList?.targetList?.targetItemIndex ?? targetIndex,
 					});
 
 					handlePointerAndKeyboardDrop(rootState.focusedItem, 'kbd-drop');
@@ -730,39 +615,14 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						: 1;
 				shouldScrollIntoView = true;
 				const focusedIndex = rootState.focusedItem ? getIndex(rootState.focusedItem) : null;
-				const { targetList } = registry;
+				const targetList = crossList?.targetList;
 
 				if (!isKeyboardStartingDragOrDragging) {
 					if (
 						((key === 'ArrowLeft' || key === 'ArrowRight') && direction === 'vertical') ||
 						((key === 'ArrowUp' || key === 'ArrowDown') && direction === 'horizontal')
 					) {
-						if (!group || !rootState.focusedItem) return;
-
-						// Prevent switching focus if the focused item is located at the first or last list.
-						const lastListIndex = registry.getGroupLists(group).length - 1;
-						if ((step === -1 && index === 0) || (step === 1 && index === lastListIndex)) return;
-
-						// Leave out peer lists that are empty, so they won’t block the way to the lists behind it.
-						const peerListsWithItems = registry
-							.getPeerLists(group, rootState)
-							.filter((l) => getItems(l.ref).length);
-						let nextListIndex = index! + step;
-						let peerList: RegistryList | undefined;
-						while (nextListIndex >= 0 && nextListIndex <= lastListIndex) {
-							peerList = peerListsWithItems.find((l) => l.index === nextListIndex);
-							if (peerList) break;
-							nextListIndex += step;
-						}
-
-						if (peerList) {
-							const closestRect = getClosestItemRect(
-								rootState.focusedItem.getBoundingClientRect(),
-								getItemRects(peerList.ref)
-							);
-							const peerTargetItem = closestRect?.ref;
-							peerTargetItem?.focus({ preventScroll: true });
-						}
+						crossList?.focusPeer(rootState, step);
 					} else {
 						if (!rootState.focusedItem || focusedIndex === null) {
 							const firstItem = getItems(ref!)[0];
@@ -800,7 +660,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								return;
 
 							const targetItemSibling = getItemSibling(targetList.targetItem, step, false);
-							registry.targetList = { ...targetList, ...getTargetItemFields(targetItemSibling) };
+							crossList!.targetList = { ...targetList, ...getTargetItemFields(targetItemSibling) };
 						} else {
 							// Prevent moving the selected item if it’s the first or last item,
 							// or is at the top or bottom of the list.
@@ -819,72 +679,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 								step
 							);
 						}
-					} else {
-						if (!group) return;
-
-						const lastListIndex = registry.getGroupLists(group).length - 1;
-						const targetablePeerLists = registry.getTargetablePeerLists(group, rootState);
-						let nextListIndex = (targetList ? targetList.index! : index!) + step;
-						let peerList: RegistryList | undefined;
-						while (
-							nextListIndex >= 0 &&
-							nextListIndex <= lastListIndex &&
-							nextListIndex !== index
-						) {
-							peerList = targetablePeerLists.find((l) => l.index === nextListIndex);
-							if (peerList) break;
-							nextListIndex += step;
-						}
-						// Prevent moving the selected item past the first or last list that can receive it.
-						if (nextListIndex < 0 || nextListIndex > lastListIndex) return;
-
-						if (!rootState.targetItem) rootState.targetItem = rootState.draggedItem;
-
-						const draggedRect = rootState.draggedItem.getBoundingClientRect();
-
-						if (peerList) {
-							const closestRect = getClosestItemRect(draggedRect, getItemRects(peerList.ref));
-							const peerTargetItem = closestRect?.ref;
-							if (peerTargetItem) {
-								if (
-									registry.targetList?.state !== peerList.state ||
-									registry.targetList.targetItemId !== peerTargetItem.id
-								)
-									registry.targetList = { ...peerList, ...getTargetItemFields(peerTargetItem) };
-							}
-							// If the peer list is empty, place the dragged item in its first position.
-							else {
-								if (registry.targetList?.state !== peerList.state) {
-									registry.targetList = {
-										...peerList,
-										...getTargetItemFields(null),
-										targetItemIndex: 0,
-									};
-
-									// Wait until `targetList` is set and the placeholder element
-									// is appended before setting `targetItem`.
-									tick().then(() => {
-										// Bail out if the target changed in the meantime.
-										if (registry.targetList?.state !== peerList.state) return;
-										const placeholder = getPlaceholder(peerList.ref);
-										registry.targetList = {
-											...registry.targetList,
-											...getTargetItemFields(placeholder),
-										};
-									});
-								}
-							}
-						} else {
-							// Offset the dragged rect by the current scroll.
-							const draggedRectWithOffset = getItemRectWithOffset(
-								draggedRect,
-								rootState.scrollOffset
-							);
-							const closestRect = getClosestItemRect(draggedRectWithOffset, rootState.itemRects);
-							if (closestRect) rootState.targetItem = closestRect.ref;
-							registry.targetList = null;
-						}
-					}
+					} else if (!crossList?.moveTarget(rootState, step)) return;
 
 					targetIndex = getIndex(rootState.targetItem!);
 					rootState.dragState = 'kbd-drag';
@@ -905,7 +700,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetItemIndex: targetIndex,
 						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
-						...getPeerTargetFields(registry, group, rootState),
+						...getPeerTargetFields(crossList, rootState),
 					});
 
 					liveText = _announcements.dragged({
@@ -914,10 +709,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
 						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
-						targetList: registry.targetList?.ref,
-						targetListIndex: registry.targetList?.index,
-						targetItem: registry.targetList?.targetItem ?? rootState.targetItem,
-						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
+						targetList: crossList?.targetList?.ref,
+						targetListIndex: crossList?.targetList?.index,
+						targetItem: crossList?.targetList?.targetItem ?? rootState.targetItem,
+						targetItemIndex: crossList?.targetList?.targetItemIndex ?? targetIndex,
 					});
 				}
 			}
@@ -944,7 +739,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				} else {
 					if (!rootState.draggedItem || !rootState.itemRects) return;
 
-					const { targetList } = registry;
+					const targetList = crossList?.targetList;
 					const draggedIndex = getIndex(rootState.draggedItem);
 					let targetIndex = rootState.targetItem ? getIndex(rootState.targetItem) : null;
 
@@ -961,7 +756,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 							key === 'Home'
 								? targetListChildren[0]
 								: targetListChildren[targetListChildren.length - 1];
-						registry.targetList = { ...targetList, ...getTargetItemFields(peerTargetItem) };
+						crossList!.targetList = { ...targetList, ...getTargetItemFields(peerTargetItem) };
 					} else {
 						// Prevent moving the selected item if it’s the first or last item,
 						// or is at the top or bottom of the list.
@@ -995,7 +790,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						targetItemIndex: targetIndex,
 						isWithinBounds: rootState.isWithinBounds,
 						canRemoveOnDropOut: canRemoveOnDropOut || false,
-						...getPeerTargetFields(registry, group, rootState),
+						...getPeerTargetFields(crossList, rootState),
 					});
 
 					liveText = _announcements.dragged({
@@ -1004,10 +799,10 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 						draggedItem: rootState.draggedItem,
 						draggedItemIndex: draggedIndex,
 						draggedItemType: rootState.draggedItem?.querySelector('.ssl-root') ? 'list' : 'item',
-						targetList: registry.targetList?.ref,
-						targetListIndex: registry.targetList?.index,
-						targetItem: registry.targetList?.targetItem ?? rootState.targetItem!,
-						targetItemIndex: registry.targetList?.targetItemIndex ?? targetIndex,
+						targetList: crossList?.targetList?.ref,
+						targetListIndex: crossList?.targetList?.index,
+						targetItem: crossList?.targetList?.targetItem ?? rootState.targetItem!,
+						targetItemIndex: crossList?.targetList?.targetItemIndex ?? targetIndex,
 					});
 				}
 			}
@@ -1042,8 +837,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			await tick();
 			const scrollTarget = !isKeyboardDragging
 				? rootState.focusedItem
-				: registry.targetList
-					? registry.targetList.targetItem
+				: crossList?.targetList
+					? crossList.targetList.targetItem
 					: rootState.targetItem;
 
 			if (scrollTarget && scrollableAncestor && !isFullyVisible(scrollTarget, scrollableAncestor))
@@ -1094,7 +889,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			}
 		} else if (action === 'ptr-cancel') {
 			// Release the peer list so the dragged item returns to its list.
-			registry.targetList = null;
+			if (crossList) crossList.targetList = null;
 			await tick();
 			rootState.targetItem = rootState.draggedItem;
 			rootState.isWithinBounds = true;
@@ -1106,7 +901,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			rootState.dragState = 'kbd-drop';
 		} else if (action === 'kbd-cancel') {
 			// Release the peer list so the dragged item returns to its list.
-			registry.targetList = null;
+			if (crossList) crossList.targetList = null;
 			await tick();
 			rootState.targetItem = rootState.draggedItem;
 			rootState.dragState = 'kbd-cancel';
@@ -1148,12 +943,12 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			isCanceled: action.endsWith('cancel'),
-			...getPeerTargetFields(registry, group, rootState),
+			...getPeerTargetFields(crossList, rootState),
 		});
 
 		const dropDuration = Math.max(
 			_transition.duration,
-			registry.targetList?.state.props.transition?.duration ?? 0
+			crossList?.targetList?.state.props.transition?.duration ?? 0
 		);
 
 		if (dropDuration > 0) {
@@ -1175,7 +970,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 				// Prevent the pending timeout from triggering `handlePointerAndKeyboardDragEnd()`,
 				// then settle the drop right away.
 				finalizeDrop(false);
-				getDropAnimations(element, ref!, registry).forEach((animation) => animation.finish());
+				getDropAnimations(element, ref!, crossList).forEach((animation) => animation.finish());
 				await handlePointerAndKeyboardDragEnd(action);
 			};
 
@@ -1208,11 +1003,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		const draggedItem = rootState.draggedItem;
 		const targetItem = rootState.targetItem;
-
-		if (!action.endsWith('cancel') && group && registry.targetList) {
-			registry.crossingItemId = draggedItem.id;
-			requestAnimationFrame(() => (registry.crossingItemId = null));
-		}
+		const peerTargetFields = getPeerTargetFields(crossList, rootState);
 
 		// Svelte does not retain focus when elements are moved (even when keyed), so we’ll store the
 		// focused element inside the list before `ondragend` lets the consumer sort the items.
@@ -1222,8 +1013,7 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 
 		// Return their transitions back to the items that shifted out of sight.
 		rootState.visibleRange = null;
-		if (group)
-			registry.getPeerLists(group, rootState).forEach((l) => (l.state.visibleRange = null));
+		crossList?.end(rootState, action.endsWith('cancel'));
 		rootState.dragState = 'idle';
 		removeFixedOriginProbe(ref!);
 
@@ -1241,13 +1031,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 			isWithinBounds: rootState.isWithinBounds,
 			canRemoveOnDropOut: canRemoveOnDropOut || false,
 			isCanceled: action.endsWith('cancel'),
-			...getPeerTargetFields(registry, group, rootState),
+			...peerTargetFields,
 		});
 
-		if (group) {
-			registry.sourceList = null;
-			registry.targetList = null;
-		}
 		if (typeof pointerId === 'number' && draggedItem?.hasPointerCapture(pointerId))
 			draggedItem?.releasePointerCapture(pointerId);
 		pointerId = null;
@@ -1256,12 +1042,11 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 		rootState.draggedItem = null;
 		rootState.targetItem = null;
 		rootState.itemRects = null;
-		clearPeerItemRects();
 		rootState.isWithinBounds = true;
 
 		// Wait for the sorted items to be updated before restoring focus.
 		await tick();
-		restoreFocus(focusedElement, registry.crossingItemId);
+		restoreFocus(focusedElement, crossList?.crossingItemId ?? null);
 	}
 
 	// Interrupt any ongoing drop transition so the user can immediately start a new drag,
@@ -1269,10 +1054,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	async function interruptDropTransition(e: PointerEvent | KeyboardEvent) {
 		const droppingRootState = rootState.interruptDropTransition
 			? rootState
-			: group
-				? registry.getPeerLists(group, rootState).find((peer) => peer.state.interruptDropTransition)
-						?.state
-				: undefined;
+			: crossList?.getPeerLists(rootState).find((peer) => peer.state.interruptDropTransition)
+					?.state;
 		if (!droppingRootState?.interruptDropTransition) return;
 
 		e.preventDefault();
@@ -1318,8 +1101,8 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 	data-has-bounds={hasBounds}
 	data-can-clear-on-drag-out={canClearOnDragOut}
 	data-can-remove-on-drop-out={canRemoveOnDropOut}
-	data-is-group-dragging={group
-		? group === registry.sourceList?.group && registry.sourceList.state.dragState !== 'idle'
+	data-is-group-dragging={crossList
+		? group === crossList.sourceList?.group && crossList.sourceList?.state.dragState !== 'idle'
 		: undefined}
 	data-is-source={group ? rootState.isSource : undefined}
 	data-is-target={group ? rootState.isTarget : undefined}
@@ -1350,9 +1133,9 @@ Serves as the primary container. Provides the main structure, the drag-and-drop 
 >
 	{#if children}
 		{@render children()}
-		{#if rootState.isTarget && registry.sourceList?.draggedItemId}
+		{#if rootState.isTarget && crossList?.sourceList?.draggedItemId}
 			<SortableListPlaceholder
-				id={registry.sourceList.draggedItemId}
+				id={crossList.sourceList.draggedItemId}
 				index={getItems(ref).length ?? 0}
 			/>
 		{/if}

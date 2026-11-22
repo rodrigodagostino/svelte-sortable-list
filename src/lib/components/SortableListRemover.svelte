@@ -20,7 +20,7 @@ Serves as a `<button>` element that (when pressed) removes an item. Including it
 <script lang="ts">
 	import SortableListIcon from '$lib/components/SortableListIcon.svelte';
 	import { getSortableListItemState, getSortableListRootState } from '$lib/states/index.js';
-	import type { SortableListRemoverProps as RemoverProps } from '$lib/types/index.js';
+	import type { SortableListRemoverProps as RemoverProps } from '$lib/types/props.js';
 
 	let { ref = $bindable(null), children, ...restProps }: RemoverProps = $props();
 

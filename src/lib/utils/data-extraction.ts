@@ -1,10 +1,7 @@
 import { getTranslateValues } from './styles.js';
 import { getItems, getPlaceholder } from './whereabouts.js';
-import type {
-	SortableListRegistry as Registry,
-	SortableListRootState as RootState,
-} from '$lib/states/index.js';
-import type { ItemRect, RegistryList } from '$lib/types/index.js';
+import type { SortableListRootState as RootState } from '$lib/states/index.js';
+import type { CrossListModule, ItemRect } from '$lib/types/index.js';
 
 export function getIndex(element: HTMLUListElement | HTMLLIElement) {
 	return Number(element.dataset.listIndex ?? element.dataset.itemIndex);
@@ -48,21 +45,6 @@ export function getItemRectWithOffset(
 		: itemRect;
 }
 
-let peerSnapshot: { list: RegistryList; key: string; rects: ItemRect[] } | null = null;
-
-export function getPeerItemRects(list: RegistryList): ItemRect[] {
-	const { x, y, width, height } = list.ref.getBoundingClientRect();
-	const key = `${x},${y},${width},${height},${list.ref.scrollLeft},${list.ref.scrollTop}`;
-	if (peerSnapshot?.list !== list || peerSnapshot.key !== key)
-		peerSnapshot = { list, key, rects: getItemRects(list.ref) };
-
-	return peerSnapshot.rects;
-}
-
-export function clearPeerItemRects() {
-	peerSnapshot = null;
-}
-
 export function getTargetItemFields(item: HTMLLIElement | null) {
 	const list = item?.parentElement as HTMLUListElement | null;
 	const placeholder = list ? getPlaceholder(list) : null;
@@ -75,24 +57,21 @@ export function getTargetItemFields(item: HTMLLIElement | null) {
 	};
 }
 
-export function getPeerTargetFields(
-	registry: Registry,
-	group: string | undefined,
-	state: RootState
-) {
-	if (!group || !registry.targetList || !registry.isSourceList(state))
+export function getPeerTargetFields(crossList: CrossListModule | undefined, state: RootState) {
+	if (!crossList?.targetList || crossList.sourceList?.state !== state)
 		return {
 			targetList: null,
 			targetListId: null,
 			targetListIndex: null,
 		};
 
-	const { targetItem, targetItemId, targetItemIndex } = registry.targetList;
+	const targetList = crossList.targetList;
+	const { targetItem, targetItemId, targetItemIndex } = targetList;
 
 	return {
-		targetList: registry.targetList?.ref ?? null,
-		targetListId: registry.targetList?.id ?? null,
-		targetListIndex: registry.targetList?.index ?? null,
+		targetList: targetList.ref ?? null,
+		targetListId: targetList.id ?? null,
+		targetListIndex: targetList.index ?? null,
 		targetItem,
 		targetItemId,
 		targetItemIndex,

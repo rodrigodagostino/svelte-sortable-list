@@ -1,12 +1,12 @@
-import type { SortableListRegistry as Registry } from '$lib/states/index.js';
+import type { CrossListModule } from '$lib/types/modules.js';
 
 export function getDropAnimations(
 	draggedItem: HTMLElement,
 	list: HTMLUListElement,
-	registry: Registry
+	crossList: CrossListModule | undefined
 ) {
 	const sourcePlaceholder = list?.querySelector<HTMLLIElement>(':scope > .ssl-placeholder');
-	const targetPlaceholder = registry.targetList?.ref?.querySelector<HTMLLIElement>(
+	const targetPlaceholder = crossList?.targetList?.ref?.querySelector<HTMLLIElement>(
 		':scope > .ssl-placeholder'
 	);
 
