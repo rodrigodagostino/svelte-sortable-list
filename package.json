@@ -50,6 +50,9 @@
 	],
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",
+	"sideEffects": [
+		"**/*.css"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
